@@ -9,7 +9,7 @@ import { createBoss } from './entities/bosses.js';
 import { TreasureBox, FloatingItem } from './entities/items.js';
 import { EnemyShot, WEAPONS } from './entities/projectiles.js';
 import { SONGS } from './audio.js';
-import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBogHD } from './gfx/hdworld.js';
+import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBogHD, buildSpikeHD } from './gfx/hdworld.js';
 import { THEMES } from './gfx/tiles.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
@@ -35,7 +35,7 @@ export class World {
                         candyforest: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones, k: D.lollipop },
                         castle: { n: D.pillar, w: D.window, v: D.candelabra, x: D.blood, o: D.bones, t: D.banner } }[this.level.theme] ?? {};
       for (const k of Object.keys(decoMap)) if (!decoMap[k]) delete decoMap[k];
-      this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles, 512, decoMap);
+      this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles, 512, decoMap, buildSpikeHD(THEMES[this.level.theme]));
       this.bogHD = buildBogHD(THEMES[this.level.theme]);
     }
     this.bgHD = { sky: gen.bg?.[this.level.theme + '_sky'], far: gen.bg?.[this.level.theme + '_far'], mid: gen.bg?.[this.level.theme + '_mid'] };

@@ -54,8 +54,20 @@ export function buildBogHD(theme, seed = 7) {
   return out;
 }
 
+// HD 棘タイル（48px）: 6 本の鋼の棘、先端に血
+export function buildSpikeHD(theme) {
+  const c = canvas(T, T); const g = c.getContext('2d');
+  g.fillStyle = theme.dirt[2]; g.fillRect(0, T - 6, T, 6); g.fillStyle = theme.dirt[0]; g.fillRect(0, T - 4, T, 2);
+  for (let i = 0; i < 6; i++) {
+    const bx = i * 8 + 1;
+    for (let y = 0; y < 40; y++) { const hw = Math.max(0, Math.round(3 * y / 40)); g.fillStyle = '#d8d8e6'; g.fillRect(bx + 3 - hw, 6 + y, hw * 2 + 1, 1); g.fillStyle = '#a5a5b8'; g.fillRect(bx + 3 + hw, 6 + y, 1, 1); if (hw > 1) { g.fillStyle = '#5d5d70'; g.fillRect(bx + 3 - hw, 6 + y, 1, 1); } }
+    g.fillStyle = '#d9262b'; g.fillRect(bx + 3, 4, 1, 8); g.fillRect(bx + 2, 9, 3, 2); g.fillStyle = '#7a0f1f'; g.fillRect(bx + 3, 11, 1, 3);
+  }
+  return c;
+}
+
 // マップ全体を HD チャンクに事前描画（世界 512px 幅 = 1536 HD px ごと）
-export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512, decoHD = null) {
+export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512, decoHD = null, spikeHD = null) {
   const chunks = [];
   for (let cx = 0; cx < map.pixelWidth; cx += chunkWorld) {
     const cw = Math.min(chunkWorld, map.pixelWidth - cx);
@@ -70,7 +82,7 @@ export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512, decoHD
       } else if (map.isOneWay(tx, ty)) g.drawImage(tiles.plat[v], px, py);
       else if (decoHD && decoHD[ch]) { const d = decoHD[ch].r; g.drawImage(d, px + Math.round((T - d.width) / 2), py + T - d.height); } // 生成装飾: 足元をタイル下端に
       else if (decoTiles && decoTiles['deco_' + ch]) g.drawImage(decoTiles['deco_' + ch], px, py, T, T); // 旧装飾は 3 倍表示（暫定）
-      else if (ch === '^' && decoTiles) g.drawImage(decoTiles.spike, px, py, T, T);
+      else if (ch === '^') { if (spikeHD) g.drawImage(spikeHD, px, py); else if (decoTiles) g.drawImage(decoTiles.spike, px, py, T, T); }
     }
     chunks.push({ x: cx, canvas: c });
   }

@@ -104,7 +104,8 @@ def rule_map(im, target):
     for c, ys in cols.items():
         r, g, b = (v / 255 for v in c); hh, l, sat = colorsys.rgb_to_hls(r, g, b)
         deg = hh * 360
-        if not (sat > 0.25 and (deg >= 295 or deg <= 15)): continue          # 桃〜赤紫〜赤
+        if not (sat > 0.35 and (deg >= 300 or deg <= 5)): continue           # 桃〜赤紫（肌の暖色は除外）
+        if l > 0.8 and sat < 0.5: continue                                    # 肌のハイライト等
         if np.mean(ys) < h * 0.42: continue                                    # 髪・顔の位置に多い色は除外
         if target == 'plain':
             if l > 0.62: nl = 0.90 + (l - 0.62) * 0.2; nr, ng, nb = colorsys.hls_to_rgb(0.65, min(0.97, nl), 0.15)   # 白（わずかに青み）
