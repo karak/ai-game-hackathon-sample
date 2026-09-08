@@ -71,6 +71,14 @@
   "src": "assets/sprites/bg/castle_mid3.png",
   "w": 269
  },
+ "bg/castle_sky": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 260,
+  "src": "assets/sprites/bg/castle_sky.png",
+  "w": 262
+ },
  "bg/graveyard_far": {
   "anchor": "center",
   "colors": 32,
