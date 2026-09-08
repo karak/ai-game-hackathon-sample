@@ -18,5 +18,5 @@
 - 生成リクエストは `tools/gen_ledger.json` で管理（セッション予算はユーザーが指定）。逐次実行
 - 完了報告は「テスト結果 / ボット結果 / スクリーンショット / 未達と次の手」の 4 要素
 - codex-review は使わない（ユーザー指示）
-- コマンド: `npm run dev`（Vite）、`npm test`（Vitest）、`npm run build`、素材は `python3 tools/gemini_gen.py <spec>` → `tools/build_sprites.py` → `tools/derive_variants.py`（PIL / numpy / google-genai 入りの Python）
+- コマンド: `npm run dev`（Vite）、`npm test`（Vitest）、`npm run e2e`（Playwright ボット自走）、`npm run build`、素材は `python3 tools/gemini_gen.py <spec>` → `tools/build_sprites.py` → `tools/derive_variants.py`（PIL / numpy / google-genai 入りの Python）
 - カタログ `catalog.html` は資料（キャラシート／敵・ボス／アイテム・弾／タイル／背景／ステージ／UI）。素材を変えたら必ず該当章を確認

@@ -20,11 +20,11 @@ ID は種別＋連番。優先: P1（次スプリント）/ P2（次マイルス
 | ID | 内容 | 優先 | 対応 |
 |----|------|------|------|
 | DEBT-001 | 敵・粒子が `Math.random` 依存（デモ再生・E2E の決定論性なし） | 済（敵・ボス・アイテム・弾は `grand()`。粒子・画面揺れは演出のため対象外） | 世界シード RNG へ置換 |
-| DEBT-002 | E2E がブラウザ手動スクリプト | P2 | Playwright 化、CI |
+| DEBT-002 | E2E がブラウザ手動スクリプト | 済（`npm run e2e`、Playwright/Chromium headless。CI 定義はリモート未設定のため未着手） | Playwright 化、CI |
 | DEBT-003 | 文字列ドット絵（旧 `src/gfx/sprites/*`）が残存（炎・フォールバック） | P2 | 炎を生成に置換後、削除 |
 | DEBT-004 | `world.js` が描画・当たり判定・ボス管理を抱えて肥大 | P2 | `render.js` / `collision.js` に分割 |
 | DEBT-005 | 背景の密度が層ごとに違う（空 3・遠 2・中 1） | 済（遠景 1 倍化、A/B 連結。空 3 は残存: 城 2） | 遠景 A/B 生成（台帳 75〜82） |
-| DEBT-006 | HUD のミニフォントが手描き 3×5 | P2 | 8px 英数フォントに置換 |
+| DEBT-006 | HUD のミニフォントが手描き 3×5 | 済（DotGothic16 16px） | 8px 英数フォントに置換 |
 | DEBT-007 | `specs.json` の `box` が検査専用で意味が曖昧 | P3 | `max` に改名、`docs/gen-pipeline.md` 更新 |
 | DEBT-008 | 生成スクリプトが参照プロジェクトの `.venv` と `.env` に依存 | P2 | 本リポに `requirements.txt` と `.env.example` を置く |
 

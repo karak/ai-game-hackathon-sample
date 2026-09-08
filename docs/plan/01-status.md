@@ -14,7 +14,7 @@
 | 資料 | デザインカタログ 7 章（キャラ／敵／アイテム／タイル／背景／ステージ／UI） | `catalog.html` |
 | 入力・保存 | キーボード／Gamepad API（standard mapping）／タッチ、キーコンフィグ、`localStorage` セーブ（進行・音量・ミュート・割り当て・ハイスコア） | `src/input.js`、`src/settings.js`、`test/input.test.js`、`test/settings.test.js` |
 | バランス | 復活地点 ±96 湧き禁止、復活後 2 秒敵弾なし、制限時間 300/300/330（歩行×3＋ボス 90 秒） | `src/balance.js`、`test/balance.test.js` |
-| テスト | Vitest 63 件（物理・レベル・ギミック・テキスト・スプライト仕様・音・入力・設定・バランス・演出・アイテム・アート基準） | `npm test` |
+| テスト | Vitest 67 件（物理・レベル・ギミック・デモ／乱数・テキスト・スプライト仕様・音・入力・設定・バランス・演出・アイテム・アート基準）＋ Playwright E2E 3 件（ボット自走 4 面・設定保存・デモ決定論） | `npm test`、`npm run e2e` |
 | ビルド | Vite（index.html / catalog.html） | `npm run build` |
 
 ## 素材（manifest 147 エントリ）

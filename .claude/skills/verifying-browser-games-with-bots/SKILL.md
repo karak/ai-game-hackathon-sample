@@ -59,6 +59,10 @@ async () => {
 2. 無敵中の点滅で主人公が消えることがある: 撮る直前に `p.invT = 0.05` にする
 3. ボス戦・アイテム取得・被弾変身・死亡復活・ゲームオーバー・クリア・エンディングを **各 1 枚**。タイトルだけでは証跡にならない
 
+## CI Form: Playwright
+
+同じボットを `e2e/*.spec.js` に置けば CI で回る（`playwright.config.js` の `webServer` で Vite を起動、`page.evaluate` 内で上の骨格をそのまま実行）。`pageerror` と console error を集めて `expect(errors).toEqual([])`。開発中は DevTools MCP で対話的に、仕上げは `npm run e2e` で、と使い分ける。
+
 ## Evidence in the Report (all four)
 
 1. ボット結果の表（ステージ、終了状態、所要秒、エラー数）

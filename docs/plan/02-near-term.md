@@ -63,5 +63,5 @@
 | 3 | ボス 1 コマ | A-4 | 済 |
 | 4 | 生成台帳の並列書き込み競合 | ファイルロック（`fcntl`）を追加 | 済（`record()`） |
 | 5 | 敵弾の当たり判定が旧サイズ（4〜8 世界単位） | 生成スプライトの実寸 ×0.6 に自動追従 | 済（`SHOT_HIT_RATIO`） |
-| 6 | E2E が手動スクリプト | Playwright でボット自走を CI 化（Chromium headless） | Sprint B |
-| 7 | ミニフォントの視認性 | 生成 or 手描きの 8px 英数フォントに置換 | Sprint B |
+| 6 | E2E が手動スクリプト | 済: `npm run e2e`（`playwright.config.js`、`e2e/autoplay.spec.js` 3 件: 全 4 面ボット自走 clear・エラー 0 / タイトル→オプション→保存 / デモ再生の決定論と中断）。Vite を 5174 で自動起動、6.7 秒 | 済 |
+| 7 | ミニフォントの視認性 | 済: `mini()` を DotGothic16 16px（半角 8px 送り = 旧ビットマップと同じ論理 8/3）に置換。旧 3×5 は `miniBitmap()` としてフォント未読込時のフォールバック。`logs/sprintB-hud-minifont.png` | 済 |

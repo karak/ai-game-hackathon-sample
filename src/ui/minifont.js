@@ -9,11 +9,23 @@ const MINI = {
   'N': '110101101101101', 'G': '111100101101111', 'D': '110101101101110', 'Y': '101101010010010', 'W': '101101101111101',
   'F': '111100110100100', 'K': '101101110101101', 'Z': '111001010100111', 'J': '001001001101010', 'X': '101101010101101', 'Q': '111101101111001',
 };
-import { inScreen } from './layout.js';
+import { inScreen, FONT } from './layout.js';
 
 // ミニフォント描画。x,y は論理座標、1 ドット = DOT スクリーン px（2）。1 文字の送りは論理 4px 相当を保つ
 const DOT = 2;
+// 2026-09-08: HUD の視認性のため、既定の mini() は DotGothic16 の 16px（半角 8px 送り = 論理 8/3、旧ビットマップと同じ送り）で描く。
+// 旧 3x5 ビットマップは miniBitmap() として残す（フォント未読込時のフォールバック）
+const MINI_PX = 16;
 export function mini(g, str, x, y, color = '#fdfbf7', shadow = true) {
+  if (typeof document !== 'undefined' && document.fonts && !document.fonts.check(`${MINI_PX}px DotGothic16`)) return miniBitmap(g, str, x, y, color, shadow);
+  inScreen(g, S => {
+    const X = Math.round(x * S), Y = Math.round(y * S);
+    g.font = `${MINI_PX}px ${FONT}`; g.textBaseline = 'top'; g.textAlign = 'left';
+    if (shadow) { g.fillStyle = '#1a0f1e'; g.fillText(str, X + 1, Y + 1); }
+    g.fillStyle = color; g.fillText(str, X, Y);
+  });
+}
+export function miniBitmap(g, str, x, y, color = '#fdfbf7', shadow = true) {
   inScreen(g, S => {
     const X = Math.round(x * S), Y = Math.round(y * S);
     for (let i = 0; i < str.length; i++) {
