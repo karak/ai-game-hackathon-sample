@@ -70,7 +70,7 @@ export class WeepingDoll extends Boss {
         break;
     }
     this.physics(dt);
-    if (this.x < this.world.arena.x0 + 8) { this.x = this.world.arena.x0 + 8; }
+    const ar = this.world.arena; if (this.x < ar.x0 + 8) this.x = ar.x0 + 8; if (this.x + this.w > ar.x1 - 8) this.x = ar.x1 - 8 - this.w;
   }
   spriteName() { return 'doll1'; }
   draw(g, cam, assets) {

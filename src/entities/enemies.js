@@ -233,7 +233,7 @@ export class EyeTurret extends Enemy {
     this.blinkT -= dt;
     if (this.blinkT <= 0) { this.open = !this.open; this.blinkT = this.open ? rand(2.5, 4) : 0.5; }
     if (!this.open) return;
-    const p = this.player; const dx = p.centerX - this.cx, dy = (p.y + p.h / 2) - this.cy; const dist = Math.hypot(dx, dy);
+    const p = this.player; const dx = p.centerX - this.cx, dy = (p.y + p.h / 2) - this.cy; const dist = Math.hypot(dx, dy) || 1;
     this.facing = Math.sign(dx) || 1;
     if (dist < 170) {
       this.fireT -= dt;

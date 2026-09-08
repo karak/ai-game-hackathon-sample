@@ -78,7 +78,7 @@ export class FloatingItem {
   update(dt) { this.t += dt; }
   pickup(player) { Item.prototype.pickup.call(this, player); }
   draw(g, cam, sheet) {
-    const spr = sheet[this.kind]; const bob = Math.sin(this.t * 3) * 2;
+    const spr = sheet[this.kind]; if (!spr) return; const bob = Math.sin(this.t * 3) * 2;
     g.drawImage(spr.r, Math.floor(this.x - cam.x), Math.floor(this.y + bob - cam.y));
   }
 }

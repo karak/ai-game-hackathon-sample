@@ -140,7 +140,7 @@ export class World {
       if (e.dead || e.hp === undefined) continue;
       if (aabb(f, e)) { const last = f.hitIds.get(e.id) ?? -1; if (f.t - last > 0.35) { f.hitIds.set(e.id, f.t); e.hurt(1, f); } }
     }
-    if (!p.alive) return;
+    if (!p.alive || this.cleared) return;
     const pbox = p;
     // 敵接触
     for (const e of this.enemies) if (!e.dead && e.contact && aabb(pbox, e)) { if (p.hit(e)) break; }
@@ -164,7 +164,7 @@ export class World {
     const A = this.assets;
     for (const b of this.boxes) b.draw(g, cam, A.items);
     for (const q of this.pools) q.draw(g, cam);
-    for (const i of this.items) i.draw(g, cam, A.items);
+    for (const i of this.items) i.draw(g, cam, A.pickups);
     for (const e of this.enemies) e.draw(g, cam, A);
     this.player.draw(g, cam, A);
     for (const f of this.fires) f.draw(g, cam, A.shots);

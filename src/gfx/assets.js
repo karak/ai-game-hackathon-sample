@@ -26,6 +26,7 @@ export function buildAssets() {
     items: buildSheet(ITEM, itemRemap),
     tiles: {}, backgrounds: {},
   };
+  assets.pickups = { ...assets.items, ...assets.shots }; // 宝箱から出る武器アイテムは弾のスプライトを流用
   for (const th of Object.keys(THEMES)) { assets.tiles[th] = buildTileset(th); assets.backgrounds[th] = buildBackground(th); }
   return assets;
 }
