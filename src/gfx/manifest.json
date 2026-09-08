@@ -91,17 +91,17 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 136,
+  "h": 75,
   "src": "assets/sprites/bg/graveyard_mid2.png",
-  "w": 272
+  "w": 265
  },
  "bg/graveyard_mid3": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 114,
+  "h": 37,
   "src": "assets/sprites/bg/graveyard_mid3.png",
-  "w": 201
+  "w": 260
  },
  "bg/graveyard_sky": {
   "anchor": "center",

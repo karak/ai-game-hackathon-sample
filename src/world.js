@@ -39,7 +39,10 @@ export class World {
       this.bogHD = buildBogHD(THEMES[this.level.theme]);
     }
     const th = this.level.theme;
-    this.bgHD = { sky: gen.bg?.[th + '_sky'], far: [gen.bg?.[th + '_far']].filter(Boolean), mid: [gen.bg?.[th + '_mid'], gen.bg?.[th + '_mid2'], gen.bg?.[th + '_mid3']].filter(Boolean) };
+    const mids = [gen.bg?.[th + '_mid'], gen.bg?.[th + '_mid2'], gen.bg?.[th + '_mid3']].filter(Boolean);
+    // 主バリアントと高さが大きく違う層（壁面 vs 小物列など）は連結しない
+    const midOk = mids.filter((L, i) => i === 0 || L.r.height >= mids[0].r.height * 0.5);
+    this.bgHD = { sky: gen.bg?.[th + '_sky'], far: [gen.bg?.[th + '_far']].filter(Boolean), mid: midOk };
     if (!this.bgHD.sky && !this.bgHD.far.length && !this.bgHD.mid.length) this.bgHD = null;
     this.decals = new Decals(map.pixelWidth, map.pixelHeight);
     this.particles = new Particles(this);

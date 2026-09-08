@@ -1,5 +1,5 @@
 {
- "requests": 66,
+ "requests": 68,
  "entries": [
   {
    "name": "player-base",
@@ -488,6 +488,22 @@
    "secs": 14.9,
    "text": "",
    "ts": 1788849802.065811
+  },
+  {
+   "name": "bg-graveyard-mid2",
+   "v": 2,
+   "ok": true,
+   "secs": 12.6,
+   "text": "",
+   "ts": 1788857582.11801
+  },
+  {
+   "name": "bg-graveyard-mid3",
+   "v": 2,
+   "ok": true,
+   "secs": 9.7,
+   "text": "",
+   "ts": 1788857592.378206
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"
