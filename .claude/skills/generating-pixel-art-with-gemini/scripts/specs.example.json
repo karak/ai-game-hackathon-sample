@@ -1,0 +1,772 @@
+{
+ "_doc": "各素材の仕様。box=[w,h] は論理セルの最大値（検査用。出力は自然サイズ）。frames=1リクエスト内のフレーム数(最大2)。実測: キャンバス一杯のキャラ ≈ 100 セル。",
+ "cell": 8,
+ "canvas": 1024,
+ "baseline_px": 960,
+ "sprites": {
+  "player-base": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-base.txt",
+   "out": [
+    "player/idle",
+    "player/idle_nohat"
+   ]
+  },
+  "player-nohat": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "player-nohat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/idle"
+   ],
+   "skip": true
+  },
+  "player-hat": {
+   "box": [
+    80,
+    50
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "player-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/hat"
+   ]
+  },
+  "player-run-a": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-run-a.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run1_nohat",
+    "player/run2_nohat"
+   ],
+   "palette": "player/idle"
+  },
+  "player-run-b": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-run-b.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run3_nohat",
+    "player/run4_nohat"
+   ],
+   "palette": "player/idle"
+  },
+  "player-jump": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-jump.txt",
+   "ref": "player-base",
+   "out": [
+    "player/jump_nohat",
+    "player/fall_nohat"
+   ],
+   "palette": "player/idle"
+  },
+  "player-attack": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-attack.txt",
+   "ref": "player-base",
+   "out": [
+    "player/attack_nohat",
+    "player/crouch_nohat"
+   ],
+   "palette": "player/idle"
+  },
+  "player-hurt": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-hurt.txt",
+   "ref": "player-base",
+   "out": [
+    "player/hurt_nohat",
+    "player/hurt2_nohat"
+   ],
+   "palette": "player/idle"
+  },
+  "player-dead": {
+   "box": [
+    130,
+    80
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "player-dead.txt",
+   "ref": "player-base",
+   "out": [
+    "player/dead_nohat"
+   ],
+   "palette": "player/idle"
+  },
+  "player-plain": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "player-plain.txt",
+   "ref": "player-base",
+   "out": [
+    "player/idle_plain"
+   ]
+  },
+  "player-gold": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "player-gold.txt",
+   "ref": "player-base",
+   "out": [
+    "player/idle_gold"
+   ]
+  },
+  "enemy-zombie": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-zombie.txt",
+   "out": [
+    "enemies/zombie1",
+    "enemies/zombie2"
+   ],
+   "use": "v1"
+  },
+  "enemy-mushroom": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-mushroom.txt",
+   "out": [
+    "enemies/mushroom1",
+    "enemies/mushroom2"
+   ]
+  },
+  "enemy-unicorn": {
+   "box": [
+    160,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-unicorn.txt",
+   "out": [
+    "enemies/unicorn1",
+    "enemies/unicorn2"
+   ]
+  },
+  "enemy-cake": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-cake.txt",
+   "out": [
+    "enemies/cake1",
+    "enemies/cake2"
+   ]
+  },
+  "enemy-angel": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-angel.txt",
+   "out": [
+    "enemies/angel1",
+    "enemies/angel2"
+   ]
+  },
+  "enemy-bear": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-bear.txt",
+   "out": [
+    "enemies/bear1",
+    "enemies/bear2"
+   ]
+  },
+  "enemy-eye": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "center",
+   "subject": "enemy-eye.txt",
+   "out": [
+    "enemies/eye1",
+    "enemies/eye2"
+   ]
+  },
+  "boss-doll": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-doll.txt",
+   "out": [
+    "bosses/doll1"
+   ]
+  },
+  "boss-teddy": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-teddy.txt",
+   "out": [
+    "bosses/teddy1"
+   ]
+  },
+  "boss-noir": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-noir.txt",
+   "out": [
+    "bosses/noir1"
+   ]
+  },
+  "tiles-graveyard": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-graveyard.txt",
+   "out": [
+    "tiles/graveyard"
+   ],
+   "kind": "tiles",
+   "colors": 24
+  },
+  "tiles-candyforest": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-candyforest.txt",
+   "out": [
+    "tiles/candyforest"
+   ],
+   "kind": "tiles",
+   "colors": 24
+  },
+  "tiles-castle": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-castle.txt",
+   "out": [
+    "tiles/castle"
+   ],
+   "kind": "tiles",
+   "colors": 24
+  },
+  "player-run-a-hat": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-run-a-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run1",
+    "player/run2"
+   ],
+   "palette": "player/idle"
+  },
+  "player-run-b-hat": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-run-b-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run3",
+    "player/run4"
+   ],
+   "palette": "player/idle"
+  },
+  "player-jump-hat": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-jump-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/jump",
+    "player/fall"
+   ],
+   "palette": "player/idle"
+  },
+  "player-attack-hat": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-attack-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/attack",
+    "player/crouch"
+   ],
+   "palette": "player/idle"
+  },
+  "player-hurt-hat": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-hurt-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/hurt",
+    "player/hurt2"
+   ],
+   "palette": "player/idle"
+  },
+  "player-dead-hat": {
+   "box": [
+    130,
+    80
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "player-dead-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/dead"
+   ],
+   "palette": "player/idle"
+  },
+  "bg-graveyard-sky": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-graveyard-sky.txt",
+   "out": [
+    "bg/graveyard_sky"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "bg-graveyard-far": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-graveyard-far.txt",
+   "out": [
+    "bg/graveyard_far"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.7
+  },
+  "bg-graveyard-mid": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-graveyard-mid.txt",
+   "out": [
+    "bg/graveyard_mid"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-candyforest-sky": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-candyforest-sky.txt",
+   "out": [
+    "bg/candyforest_sky"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "bg-candyforest-far": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-candyforest-far.txt",
+   "out": [
+    "bg/candyforest_far"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.7
+  },
+  "bg-candyforest-mid": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-candyforest-mid.txt",
+   "out": [
+    "bg/candyforest_mid"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-castle-sky": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-castle-sky.txt",
+   "out": [
+    "bg/castle_sky"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "bg-castle-far": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-castle-far.txt",
+   "out": [
+    "bg/castle_far"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.7
+  },
+  "bg-castle-mid": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-castle-mid.txt",
+   "out": [
+    "bg/castle_mid"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "items-a": {
+   "box": [
+    64,
+    64
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "items-a.txt",
+   "out": [
+    "items/box",
+    "items/dress",
+    "items/golddress",
+    "items/oneup"
+   ]
+  },
+  "items-b": {
+   "box": [
+    64,
+    64
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "items-b.txt",
+   "out": [
+    "shots/star",
+    "shots/knife",
+    "shots/heart",
+    "shots/candle"
+   ]
+  },
+  "items-c": {
+   "box": [
+    64,
+    64
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "items-c.txt",
+   "out": [
+    "items/potion",
+    "items/candy",
+    "shots/charge",
+    "shots/pool"
+   ]
+  },
+  "deco-graveyard": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-graveyard.txt",
+   "out": [
+    "deco/tomb",
+    "deco/cross",
+    "deco/flowers",
+    "deco/candle"
+   ],
+   "colors": 15
+  },
+  "deco-candy": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-candy.txt",
+   "out": [
+    "deco/tree",
+    "deco/blood",
+    "deco/bones",
+    "deco/lollipop"
+   ],
+   "colors": 15
+  },
+  "deco-castle": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-castle.txt",
+   "out": [
+    "deco/pillar",
+    "deco/window",
+    "deco/banner",
+    "deco/candelabra"
+   ],
+   "colors": 15
+  },
+  "bg-graveyard-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-graveyard-mid2.txt",
+   "out": [
+    "bg/graveyard_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-graveyard-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-graveyard-mid3.txt",
+   "out": [
+    "bg/graveyard_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-candyforest-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-candyforest-mid2.txt",
+   "out": [
+    "bg/candyforest_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-candyforest-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-candyforest-mid3.txt",
+   "out": [
+    "bg/candyforest_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-castle-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-castle-mid2.txt",
+   "out": [
+    "bg/castle_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-castle-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-castle-mid3.txt",
+   "out": [
+    "bg/castle_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "shots-enemy-a": {
+   "box": [
+    64,
+    64
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "shots-enemy-a.txt",
+   "out": [
+    "shots/poison",
+    "shots/blood",
+    "shots/bone",
+    "shots/maggot"
+   ],
+   "colors": 12
+  },
+  "shots-enemy-b": {
+   "box": [
+    64,
+    64
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "shots-enemy-b.txt",
+   "out": [
+    "shots/acid",
+    "shots/darkheart",
+    "shots/arm",
+    "shots/bolt"
+   ],
+   "colors": 12
+  }
+ }
+}
