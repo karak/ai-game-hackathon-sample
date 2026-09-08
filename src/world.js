@@ -38,8 +38,9 @@ export class World {
       this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles, 512, decoMap, buildSpikeHD(THEMES[this.level.theme]));
       this.bogHD = buildBogHD(THEMES[this.level.theme]);
     }
-    this.bgHD = { sky: gen.bg?.[this.level.theme + '_sky'], far: gen.bg?.[this.level.theme + '_far'], mid: gen.bg?.[this.level.theme + '_mid'] };
-    if (!this.bgHD.sky && !this.bgHD.far && !this.bgHD.mid) this.bgHD = null;
+    const th = this.level.theme;
+    this.bgHD = { sky: gen.bg?.[th + '_sky'], far: [gen.bg?.[th + '_far']].filter(Boolean), mid: [gen.bg?.[th + '_mid'], gen.bg?.[th + '_mid2'], gen.bg?.[th + '_mid3']].filter(Boolean) };
+    if (!this.bgHD.sky && !this.bgHD.far.length && !this.bgHD.mid.length) this.bgHD = null;
     this.decals = new Decals(map.pixelWidth, map.pixelHeight);
     this.particles = new Particles(this);
     this.classes = { EnemyShot };

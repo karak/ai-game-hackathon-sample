@@ -15,6 +15,22 @@
   "src": "assets/sprites/bg/candyforest_mid.png",
   "w": 316
  },
+ "bg/candyforest_mid2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 80,
+  "src": "assets/sprites/bg/candyforest_mid2.png",
+  "w": 275
+ },
+ "bg/candyforest_mid3": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 130,
+  "src": "assets/sprites/bg/candyforest_mid3.png",
+  "w": 266
+ },
  "bg/candyforest_sky": {
   "anchor": "center",
   "colors": 32,
@@ -39,6 +55,22 @@
   "src": "assets/sprites/bg/castle_mid.png",
   "w": 266
  },
+ "bg/castle_mid2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 69,
+  "src": "assets/sprites/bg/castle_mid2.png",
+  "w": 276
+ },
+ "bg/castle_mid3": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 37,
+  "src": "assets/sprites/bg/castle_mid3.png",
+  "w": 269
+ },
  "bg/graveyard_far": {
   "anchor": "center",
   "colors": 32,
@@ -54,6 +86,22 @@
   "h": 114,
   "src": "assets/sprites/bg/graveyard_mid.png",
   "w": 263
+ },
+ "bg/graveyard_mid2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 136,
+  "src": "assets/sprites/bg/graveyard_mid2.png",
+  "w": 272
+ },
+ "bg/graveyard_mid3": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/bg/graveyard_mid3.png",
+  "w": 201
  },
  "bg/graveyard_sky": {
   "anchor": "center",
@@ -744,6 +792,46 @@
   "src": "assets/sprites/player/run4_plain.png",
   "w": 62
  },
+ "shots/acid": {
+  "anchor": "center",
+  "colors": 4,
+  "fits": true,
+  "h": 28,
+  "src": "assets/sprites/shots/acid.png",
+  "w": 19
+ },
+ "shots/arm": {
+  "anchor": "center",
+  "colors": 10,
+  "fits": true,
+  "h": 17,
+  "src": "assets/sprites/shots/arm.png",
+  "w": 33
+ },
+ "shots/blood": {
+  "anchor": "center",
+  "colors": 7,
+  "fits": true,
+  "h": 50,
+  "src": "assets/sprites/shots/blood.png",
+  "w": 26
+ },
+ "shots/bolt": {
+  "anchor": "center",
+  "colors": 5,
+  "fits": true,
+  "h": 18,
+  "src": "assets/sprites/shots/bolt.png",
+  "w": 39
+ },
+ "shots/bone": {
+  "anchor": "center",
+  "colors": 9,
+  "fits": true,
+  "h": 48,
+  "src": "assets/sprites/shots/bone.png",
+  "w": 22
+ },
  "shots/candle": {
   "anchor": "center",
   "colors": 11,
@@ -758,6 +846,14 @@
   "fits": true,
   "h": 32,
   "src": "assets/sprites/shots/charge.png",
+  "w": 33
+ },
+ "shots/darkheart": {
+  "anchor": "center",
+  "colors": 6,
+  "fits": true,
+  "h": 31,
+  "src": "assets/sprites/shots/darkheart.png",
   "w": 33
  },
  "shots/heart": {
@@ -775,6 +871,22 @@
   "h": 10,
   "src": "assets/sprites/shots/knife.png",
   "w": 32
+ },
+ "shots/maggot": {
+  "anchor": "center",
+  "colors": 8,
+  "fits": true,
+  "h": 26,
+  "src": "assets/sprites/shots/maggot.png",
+  "w": 44
+ },
+ "shots/poison": {
+  "anchor": "center",
+  "colors": 11,
+  "fits": true,
+  "h": 62,
+  "src": "assets/sprites/shots/poison.png",
+  "w": 38
  },
  "shots/pool": {
   "anchor": "center",

@@ -1,0 +1,41 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/shots-enemy-a-v1.png",
+ "pitch": [
+  6.0,
+  5.0
+ ],
+ "max_box": [
+  64,
+  64
+ ],
+ "frames": [
+  {
+   "w": 38,
+   "h": 62,
+   "fits": true,
+   "colors": 11,
+   "name": "poison"
+  },
+  {
+   "w": 26,
+   "h": 50,
+   "fits": true,
+   "colors": 7,
+   "name": "blood"
+  },
+  {
+   "w": 22,
+   "h": 48,
+   "fits": true,
+   "colors": 9,
+   "name": "bone"
+  },
+  {
+   "w": 44,
+   "h": 26,
+   "fits": true,
+   "colors": 8,
+   "name": "maggot"
+  }
+ ]
+}

@@ -179,6 +179,7 @@ def main():
     ap.add_argument('--split', action='store_true'); ap.add_argument('--names', default=''); ap.add_argument('--tol', type=int, default=60)
     ap.add_argument('--nokey', action='store_true', help='クロマキーしない（空などキャンバス全面の絵）')
     ap.add_argument('--keep-bottom', type=float, default=0, help='論理画像の下側この比率だけ残す（背景中景の月などを除く）')
+    ap.add_argument('--nosplit', action='store_true', help='複数物体でも 1 枚として扱う（背景層・タイル帯）')
     a = ap.parse_args()
     bw, bh = (int(v) for v in a.logical.split('x'))
     im = Image.open(a.src).convert('RGBA') if a.nokey else key_out(Image.open(a.src), a.tol)
@@ -190,7 +191,7 @@ def main():
     def info(img):
         return {'w': img.width, 'h': img.height, 'fits': img.width <= bw and img.height <= bh, 'colors': len([c for c in img.getcolors(99999) if c[1][3] > 0])}
     if not a.split:
-        fr = split_frames(logical, min_gap=2, min_width=8)
+        fr = [] if a.nosplit else split_frames(logical, min_gap=2, min_width=8)
         if len(fr) >= 2: logical = logical.crop((fr[0][0], 0, fr[0][1], logical.height))  # 複数体描かれた場合は最初の 1 体
         out = crop_alpha(logical); out.save(a.dst); meta.update(info(out))
         Path(a.dst).with_suffix('.json').write_text(json.dumps(meta, indent=1)); print(json.dumps(meta)); return

@@ -92,13 +92,18 @@ export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512, decoHD
 // 背景レイヤー描画: sky は画面全体に、far/mid は下端を地平線に合わせて横方向に繰り返す
 // 背景の画素密度: 空 3 画面px/セル（ディザ空は粗くても成立）、遠景 2、中景 1（スプライトと同じ）。
 // 1 リクエストで得られる横幅（約 250 セル）の制約による妥協。docs/art-standard.md §2.4 参照。
-const BG_PX = { sky: 3, far: 3, mid: 2 };
+const BG_PX = { sky: 3, far: 2, mid: 1 };
 export function drawBackgroundHD(g, layers, camX, W, H) {
   if (layers.sky) { const s = BG_PX.sky / HD_SCALE; g.drawImage(layers.sky.r, 0, 0, layers.sky.r.width * s, layers.sky.r.height * s); }
-  for (const [name, speed, bottom] of [['far', 0.2, 168], ['mid', 0.5, 176]]) {
-    const L = layers[name]; if (!L) continue;
-    const s = BG_PX[name] / HD_SCALE; const lw = L.r.width * s, lh = L.r.height * s; // 世界単位
-    let ox = -((camX * speed) % lw); if (ox > 0) ox -= lw;
-    for (let x = ox; x < W; x += lw) g.drawImage(L.r, Math.round(x * HD_SCALE) / HD_SCALE, bottom - lh, lw, lh);
+  for (const [name, speed, bottom] of [['far', 0.2, 172], ['mid', 0.5, 176]]) {
+    const list = layers[name]; if (!list || !list.length) continue;
+    const s = BG_PX[name] / HD_SCALE;
+    // 複数バリアントを順に連結した 1 本の帯として繰り返す（両端に余白があるので順序を問わず継ぎ目なし）
+    const widths = list.map(L => L.r.width * s); const total = widths.reduce((a, b) => a + b, 0);
+    let ox = -((camX * speed) % total); if (ox > 0) ox -= total;
+    for (let x = ox; x < W; x += total) {
+      let cx = x;
+      list.forEach((L, i) => { const lw = widths[i], lh = L.r.height * s; if (cx + lw > 0 && cx < W) g.drawImage(L.r, Math.round(cx * HD_SCALE) / HD_SCALE, bottom - lh, lw, lh); cx += lw; });
+    }
   }
 }

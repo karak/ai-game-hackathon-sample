@@ -1,5 +1,5 @@
 {
- "requests": 58,
+ "requests": 66,
  "entries": [
   {
    "name": "player-base",
@@ -424,6 +424,70 @@
    "secs": 12.8,
    "text": "",
    "ts": 1788848320.448456
+  },
+  {
+   "name": "bg-graveyard-mid2",
+   "v": 1,
+   "ok": true,
+   "secs": 11.5,
+   "text": "",
+   "ts": 1788849713.056086
+  },
+  {
+   "name": "bg-graveyard-mid3",
+   "v": 1,
+   "ok": true,
+   "secs": 13.3,
+   "text": "",
+   "ts": 1788849726.785981
+  },
+  {
+   "name": "bg-candyforest-mid2",
+   "v": 1,
+   "ok": true,
+   "secs": 8.7,
+   "text": "",
+   "ts": 1788849735.957118
+  },
+  {
+   "name": "bg-candyforest-mid3",
+   "v": 1,
+   "ok": true,
+   "secs": 10.8,
+   "text": "",
+   "ts": 1788849747.261208
+  },
+  {
+   "name": "bg-castle-mid2",
+   "v": 1,
+   "ok": true,
+   "secs": 11.7,
+   "text": "",
+   "ts": 1788849759.3981209
+  },
+  {
+   "name": "bg-castle-mid3",
+   "v": 1,
+   "ok": true,
+   "secs": 13.5,
+   "text": "Here is Variant C, a pixel-art parallax layer for your side-scrolling game, featuring a blood-stained sugar-white castle interior in the specified 16-bit SNES JRPG style.\n",
+   "ts": 1788849773.533081
+  },
+  {
+   "name": "shots-enemy-a",
+   "v": 1,
+   "ok": true,
+   "secs": 12.4,
+   "text": "Here are the four enemy projectile sprites you requested: ",
+   "ts": 1788849786.5550148
+  },
+  {
+   "name": "shots-enemy-b",
+   "v": 1,
+   "ok": true,
+   "secs": 14.9,
+   "text": "",
+   "ts": 1788849802.065811
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

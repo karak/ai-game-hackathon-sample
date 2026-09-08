@@ -645,6 +645,128 @@
     "deco/candelabra"
    ],
    "colors": 15
+  },
+  "bg-graveyard-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-graveyard-mid2.txt",
+   "out": [
+    "bg/graveyard_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-graveyard-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-graveyard-mid3.txt",
+   "out": [
+    "bg/graveyard_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-candyforest-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-candyforest-mid2.txt",
+   "out": [
+    "bg/candyforest_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-candyforest-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-candyforest-mid3.txt",
+   "out": [
+    "bg/candyforest_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-castle-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-castle-mid2.txt",
+   "out": [
+    "bg/castle_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "bg-castle-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-castle-mid3.txt",
+   "out": [
+    "bg/castle_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.5
+  },
+  "shots-enemy-a": {
+   "box": [
+    64,
+    64
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "shots-enemy-a.txt",
+   "out": [
+    "shots/poison",
+    "shots/blood",
+    "shots/bone",
+    "shots/maggot"
+   ],
+   "colors": 12
+  },
+  "shots-enemy-b": {
+   "box": [
+    64,
+    64
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "shots-enemy-b.txt",
+   "out": [
+    "shots/acid",
+    "shots/darkheart",
+    "shots/arm",
+    "shots/bolt"
+   ],
+   "colors": 12
   }
  }
 }

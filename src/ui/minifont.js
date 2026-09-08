@@ -9,14 +9,23 @@ const MINI = {
   'N': '110101101101101', 'G': '111100101101111', 'D': '110101101101110', 'Y': '101101010010010', 'W': '101101101111101',
   'F': '111100110100100', 'K': '101101110101101', 'Z': '111001010100111', 'J': '001001001101010', 'X': '101101010101101', 'Q': '111101101111001',
 };
+import { inScreen } from './layout.js';
+
+// ミニフォント描画。x,y は論理座標、1 ドット = DOT スクリーン px（2）。1 文字の送りは論理 4px 相当を保つ
+const DOT = 2;
 export function mini(g, str, x, y, color = '#fdfbf7', shadow = true) {
-  for (let i = 0; i < str.length; i++) {
-    const glyph = MINI[str[i]] ?? MINI[str[i].toUpperCase()] ?? MINI[' '];
-    for (let k = 0; k < 15; k++) if (glyph[k] === '1') {
-      const px = x + i * 4 + (k % 3), py = y + Math.floor(k / 3);
-      if (shadow) { g.fillStyle = '#1a0f1e'; g.fillRect(px + 1, py + 1, 1, 1); }
-      g.fillStyle = color; g.fillRect(px, py, 1, 1);
+  inScreen(g, S => {
+    const X = Math.round(x * S), Y = Math.round(y * S);
+    for (let i = 0; i < str.length; i++) {
+      const glyph = MINI[str[i]] ?? MINI[str[i].toUpperCase()] ?? MINI[' '];
+      for (let k = 0; k < 15; k++) if (glyph[k] === '1') {
+        const px = X + i * 4 * DOT + (k % 3) * DOT, py = Y + Math.floor(k / 3) * DOT;
+        if (shadow) { g.fillStyle = '#1a0f1e'; g.fillRect(px + DOT, py + DOT, DOT, DOT); }
+        g.fillStyle = color; g.fillRect(px, py, DOT, DOT);
+      }
     }
-  }
+  });
 }
+// ミニフォント 1 文字の幅（論理 px）
+export const MINI_W = 4 * DOT / 3;
 
