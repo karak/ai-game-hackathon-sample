@@ -42,7 +42,7 @@ export class Game {
     this.hi = Number(localStorage.getItem('lyrica_hi') ?? 0) || 0;
     this.paused = false; this.textIdx = 0;
   }
-  setState(s) { (this.trace ??= []).push(`${this.state}>${s}@${Math.round(performance.now())}`); this.state = s; this.stateT = 0; }
+  setState(s) { (this.trace ??= []).push(`${this.state}>${s}@${Math.round(performance.now())}`); if (this.trace.length > 20) this.trace.shift(); this.state = s; this.stateT = 0; }
 
   // ---- 遷移 ----
   startGame() {
