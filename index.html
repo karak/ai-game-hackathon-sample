@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>マジカル☆リリカと血塗られたおとぎの国</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 fill=%27%232d1f4c%27/%3E%3Cpolygon points=%278,1 11,9 5,9%27 fill=%27%23ff8fc8%27/%3E%3Crect x=%272%27 y=%279%27 width=%2712%27 height=%272%27 fill=%27%23d9262b%27/%3E%3C/svg%3E">
+<style>
+  @font-face { font-family: 'DotGothic16'; src: url('assets/fonts/DotGothic16-Regular.ttf') format('truetype'); }
+  html, body { margin: 0; background: #0e0a18; color: #cbaaf5; font-family: 'DotGothic16', 'Hiragino Kaku Gothic ProN', sans-serif; overflow: hidden; height: 100%; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+  #wrap { position: relative; }
+  canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; background: #000; box-shadow: 0 0 0 2px #2d1f4c, 0 0 40px rgba(180,92,245,0.25); }
+  #info { margin-top: 10px; font-size: 13px; color: #8f8fb0; text-align: center; line-height: 1.6; }
+  #info b { color: #ff8fc8; }
+  #touchpad { display: flex; justify-content: space-between; width: 100%; max-width: 520px; padding: 10px 12px; box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
+  #touchpad .grp { display: flex; gap: 8px; }
+  #touchpad button { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #8f8fb0; background: #1c1430; color: #fdfbf7; font-size: 18px; font-family: inherit; }
+  #touchpad button.on { background: #d84f9c; }
+  @media (min-width: 600px) { #touchpad { display: none !important; } }
+</style>
+</head>
+<body>
+  <div id="wrap"><canvas id="game" width="256" height="224"></canvas></div>
+  <div id="touchpad">
+    <div class="grp"><button data-act="left">◀</button><button data-act="down">▼</button><button data-act="right">▶</button></div>
+    <div class="grp"><button data-act="shoot">Z</button><button data-act="jump">X</button><button data-act="start">▶▶</button></div>
+  </div>
+  <div id="info">
+    <b>←→</b> 移動　<b>↓</b> しゃがみ　<b>Z / J</b> 魔法弾　<b>X / K / Space</b> ジャンプ（空中でもう一度：ほうき二段ジャンプ）　<b>M</b> ミュート　<b>P</b> ポーズ<br>
+    宝箱を撃つとアイテムが出ます。被弾すると変身が解けて、もう一度当たると…。音源・フォント（DotGothic16 / OFL）以外は全て自作です。
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

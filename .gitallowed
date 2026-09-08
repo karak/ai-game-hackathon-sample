@@ -1,0 +1,2 @@
+# pixel-art sprite rows (false positives for secret scanning)
+src/gfx/sprites.js:[0-9]+:\s*'[.0-9A-Za-z]+',?$
