@@ -1,5 +1,9 @@
 import { TILE, aabb } from '../physics.js';
 import { PAL } from '../gfx/palette.js';
+import { HD_SCALE } from '../gfx/sprite.js';
+
+// スプライトの描画サイズ（世界単位）。生成 PNG は 1/HD_SCALE
+const dims = spr => spr.hd ? [spr.r.width / HD_SCALE, spr.r.height / HD_SCALE] : [spr.r.width, spr.r.height];
 
 // 主人公の魔法弾
 export const WEAPONS = {
@@ -47,7 +51,8 @@ export class PlayerShot {
     g.translate(cx, cy);
     if (this.type === 'star' || this.type === 'heart' || this.charged) g.rotate(this.t * (this.charged ? 6 : 14) * this.dir);
     if (this.type === 'candle') g.rotate(this.t * 8 * this.dir);
-    g.drawImage(img, -Math.floor(img.width / 2), -Math.floor(img.height / 2));
+    const [dw, dh] = dims(spr);
+    g.drawImage(img, -dw / 2, -dh / 2, dw, dh);
     g.restore();
   }
 }
@@ -69,7 +74,8 @@ export class Fire {
   }
   draw(g, cam, sheet) {
     const spr = Math.floor(this.t * 12) % 2 ? sheet.fire1 : sheet.fire2;
-    g.drawImage(spr.r, Math.floor(this.x - cam.x), Math.floor(this.y - cam.y));
+    const [dw, dh] = dims(spr);
+    g.drawImage(spr.r, Math.floor(this.x - cam.x), Math.floor(this.y + this.h - dh - cam.y), dw, dh);
   }
 }
 
@@ -126,9 +132,10 @@ export class EnemyShot {
     const spr = sheet[this.def.sprite];
     const img = this.vx < 0 ? spr.l : spr.r;
     const cx = Math.floor(this.x + this.w / 2 - cam.x), cy = Math.floor(this.y + this.h / 2 - cam.y);
+    const [dw, dh] = dims(spr);
     if (this.def.spin) {
-      g.save(); g.translate(cx, cy); g.rotate(this.t * 10); g.drawImage(img, -Math.floor(img.width / 2), -Math.floor(img.height / 2)); g.restore();
-    } else g.drawImage(img, cx - Math.floor(img.width / 2), cy - Math.floor(img.height / 2));
+      g.save(); g.translate(cx, cy); g.rotate(this.t * 10); g.drawImage(img, -dw / 2, -dh / 2, dw, dh); g.restore();
+    } else g.drawImage(img, cx - Math.floor(dw / 2), cy - Math.floor(dh / 2), dw, dh);
   }
 }
 
