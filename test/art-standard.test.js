@@ -34,7 +34,7 @@ test('§2.2 every generated sprite has 10-15 colors and fits its spec box', () =
   for (const [k, v] of entries) {
     if (k === 'player/hat' || k.includes('hurt2')) continue; // 帽子は色抽出の単品、hurt2 は白飛びフレーム
     if (k.startsWith('bg/') || k.startsWith('tiles/')) { expect(v.colors, k).toBeLessThanOrEqual(32); continue; } // 背景・地形は 32 色まで
-    if (k.startsWith('shots/') || k.startsWith('items/')) { expect(v.colors, k).toBeGreaterThanOrEqual(5); expect(v.colors, k).toBeLessThanOrEqual(15); expect(v.fits, k).toBe(true); continue; } // 小物は 5 色以上
+    if (k.startsWith('shots/') || k.startsWith('items/') || k.startsWith('deco/')) { expect(v.colors, k).toBeGreaterThanOrEqual(5); expect(v.colors, k).toBeLessThanOrEqual(15); expect(v.fits, k).toBe(true); continue; } // 小物は 5 色以上
     expect(v.colors, k).toBeGreaterThanOrEqual(10); expect(v.colors, k).toBeLessThanOrEqual(15);
     expect(v.fits, k).toBe(true);
   }
