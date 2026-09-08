@@ -2,23 +2,43 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>デザインカタログ - マジカル☆リリカ</title>
+<title>デザイン資料 - マジカル☆リリカ</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 fill=%27%232d1f4c%27/%3E%3Crect x=%273%27 y=%273%27 width=%2710%27 height=%2710%27 fill=%27%23ff8fc8%27/%3E%3C/svg%3E">
 <style>
   @font-face { font-family: 'DotGothic16'; src: url('assets/fonts/DotGothic16-Regular.ttf') format('truetype'); }
-  html, body { margin: 0; background: #0e0a18; color: #cbaaf5; font-family: 'DotGothic16', sans-serif; }
-  #bar { position: sticky; top: 0; background: #1c1430; padding: 8px 12px; display: flex; gap: 12px; align-items: center; z-index: 1; border-bottom: 1px solid #2d1f4c; }
-  #bar a { color: #ff8fc8; }
-  canvas { display: block; image-rendering: pixelated; margin: 0 auto 24px; background: #000; }
-  h2 { margin: 16px 12px 4px; font-size: 14px; color: #ff8fc8; }
+  html, body { margin: 0; background: #0e0a18; color: #d8d0e8; font-family: 'DotGothic16', 'Hiragino Kaku Gothic ProN', sans-serif; font-size: 14px; }
+  #bar { position: sticky; top: 0; background: #1c1430; padding: 8px 12px; display: flex; gap: 14px; align-items: center; z-index: 1; border-bottom: 1px solid #2d1f4c; flex-wrap: wrap; }
+  #bar b { color: #ff8fc8; }
+  #bar a { color: #cbaaf5; text-decoration: none; padding: 2px 8px; border: 1px solid #2d1f4c; border-radius: 3px; }
+  #bar a.on { background: #d84f9c; color: #fff; border-color: #d84f9c; }
+  #bar label { color: #a5a5b8; }
+  main { padding: 12px 16px 60px; max-width: 1400px; }
+  h1 { font-size: 20px; color: #ff8fc8; margin: 12px 0 4px; }
+  h2 { font-size: 16px; color: #ffe860; margin: 22px 0 6px; border-left: 4px solid #d84f9c; padding-left: 8px; }
+  h3 { font-size: 14px; color: #cbaaf5; margin: 14px 0 4px; }
+  p.note { color: #a5a5b8; margin: 4px 0 8px; }
+  canvas { display: block; image-rendering: pixelated; background: #2a2a3e; border: 1px solid #3a3a52; }
+  .row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  table { border-collapse: collapse; margin: 6px 0 10px; font-size: 13px; }
+  th, td { border: 1px solid #3a3a52; padding: 3px 8px; text-align: left; white-space: nowrap; }
+  th { background: #1c1430; color: #cbaaf5; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .swatch { display: inline-block; width: 14px; height: 14px; border: 1px solid #000; vertical-align: middle; margin-right: 2px; }
+  .legend span { display: inline-block; margin-right: 12px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 4px; vertical-align: middle; }
 </style>
 </head>
 <body>
   <div id="bar">
-    <b>デザインカタログ</b>
-    <label>拡大 <select id="scale"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
+    <b>デザイン資料</b>
+    <nav id="tabs"></nav>
+    <label>倍率 <select id="scale"><option>1</option><option selected>2</option><option>3</option></select></label>
+    <label><input type="checkbox" id="ov-hit" checked> 当たり判定</label>
+    <label><input type="checkbox" id="ov-anchor" checked> アンカー</label>
+    <label><input type="checkbox" id="ov-grid"> グリッド</label>
     <a href="index.html">ゲームへ</a>
   </div>
-  <div id="sections"></div>
-  <script type="module" src="src/catalog.js"></script>
+  <main id="main"></main>
+  <script type="module" src="src/catalog/index.js"></script>
 </body>
 </html>
