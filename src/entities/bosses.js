@@ -55,7 +55,7 @@ export class WeepingDoll extends Boss {
         break;
       case 'cry':
         this.vx = 0;
-        if (Math.floor(this.stateT * 8) !== Math.floor((this.stateT - dt) * 8)) {
+        if (Math.floor(this.stateT * 5) !== Math.floor((this.stateT - dt) * 5)) {
           const spd = Math.sign(d) * rand(30, 90);
           this.shoot('acid', spd, -60, this.facing * -5, -14); this.shoot('acid', spd * 0.6, -80, this.facing * 5, -14);
           if (enraged) this.shoot('blood', Math.sign(d) * rand(60, 120), -150, 0, -10);

@@ -30,7 +30,7 @@ export class World {
     this.time = this.level.timeLimit; this.t = 0; this.cutscene = false; this.cleared = false;
     this.shakeT = 0; this.shakeAmp = 0; this.toasts = []; this.tickT = 0;
     this.checkpoint = { ...this.level.playerStart };
-    this.player = new Player(this, this.level.playerStart.x, this.level.playerStart.y + TILE);
+    this.player = new Player(this, this.level.playerStart.x, this.level.playerStart.y);
     this.spawnAll();
     this.cam.x = Math.max(0, this.player.centerX - W / 2);
   }
@@ -57,13 +57,13 @@ export class World {
     // チェックポイントから再開。敵は再配置、ボス戦中ならボス戦をリセット
     if (this.boss) { this.boss = null; this.arena = null; this.bossState = 'none'; this.cutscene = false; }
     this.spawnAll();
-    this.player.respawn(this.checkpoint.x, this.checkpoint.y + TILE);
+    this.player.respawn(this.checkpoint.x, this.checkpoint.y);
     this.cam.x = Math.max(0, Math.min(this.level.map.pixelWidth - W, this.player.centerX - W / 2));
     this.time = Math.max(this.time, 60);
     this.audio.playBgm(SONGS[this.level.theme]);
   }
   onBossDying() { this.cutscene = true; this.audio.stopBgm(); }
-  onBossDefeated() { this.cleared = true; this.game.stageClear(); }
+  onBossDefeated() { this.cleared = true; this.cutscene = true; this.player.vx = 0; this.game.stageClear(); }
 
   update(dt, input) {
     this.t += dt;
@@ -129,7 +129,7 @@ export class World {
       if (s.dead) continue;
       for (const e of this.enemies) {
         if (e.dead || e.hp === undefined || s.hitIds.has(e.id)) continue;
-        if (e.state === 'enter' || e.rise > 0 && false) continue;
+        if (e.state === 'enter') continue;
         if (aabb(s, e)) { s.hitIds.add(e.id); e.hurt(s.dmg, s); s.onHit(); if (s.dead) break; }
       }
       if (s.dead) continue;

@@ -8,7 +8,7 @@ const STAND_H = 22, CROUCH_H = 16;
 export class Player {
   constructor(world, x, y) {
     this.world = world;
-    this.w = 10; this.h = STAND_H; this.x = x + 3; this.y = y - 8;
+    this.w = 10; this.h = STAND_H; this.x = x + 3; this.y = y + TILE - STAND_H; // マーカーのタイル下端に足を合わせる
     this.vx = 0; this.vy = 0; this.facing = 1; this.onGround = false;
     this.costume = 'dress'; this.weapon = 'star';
     this.state = 'normal'; this.jumps = 0; this.crouch = false;
@@ -73,6 +73,7 @@ export class Player {
 
     // 危険タイル・落下
     const cx = Math.floor(this.centerX / TILE), fy = Math.floor((this.y + this.h - 2) / TILE), hy = Math.floor((this.y + this.h / 2) / TILE);
+    if (this.world.cleared) return;
     if (this.y > map.pixelHeight + 8) this.die('fall');
     else if (map.isHazard(cx, fy) || map.isHazard(cx, hy)) this.die(map.at(cx, fy) === '^' ? 'spike' : 'bog');
     else if (this.x < 0) this.x = 0;
@@ -119,7 +120,7 @@ export class Player {
   }
 
   respawn(x, y) {
-    this.x = x + 3; this.y = y - 8; this.vx = 0; this.vy = 0; this.h = STAND_H; this.crouch = false;
+    this.x = x + 3; this.y = y + TILE - STAND_H; this.vx = 0; this.vy = 0; this.h = STAND_H; this.crouch = false;
     this.state = 'normal'; this.costume = 'dress'; this.invT = 2.0; this.hurtT = 0; this.jumps = 0; this.chargeT = 0; this.facing = 1;
   }
 

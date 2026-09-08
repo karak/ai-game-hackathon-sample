@@ -150,7 +150,8 @@ export class Unicorn extends Enemy {
       if (Math.abs(d) < 130 && Math.abs(this.player.y - this.y) < 40) { this.state = 'charge'; this.world.audio.sfx('hurt'); }
     } else {
       this.vx = this.facing * 115;
-      if (Math.random() < 0.5) this.shoot('blood', this.facing * -30 + rand(-20, 20), rand(-120, -60), this.facing * -2, -6, { life: 1.2 });
+      if (Math.random() < 0.12) this.shoot('blood', this.facing * -30 + rand(-20, 20), rand(-120, -60), this.facing * -2, -6, { life: 1.2 });
+      if (Math.random() < 0.3) this.world.particles.emit('blood', this.x + (this.facing > 0 ? 4 : this.w - 4), this.y + 2, 2);
     }
     const res = this.physics(dt);
     if (res.hitLeft || res.hitRight) { this.facing = -this.facing; this.state = 'charge'; }
@@ -169,7 +170,7 @@ export class RottenCake extends Enemy {
     super.update(dt);
     this.facePlayer();
     const d = this.distX();
-    if (this.onGround) this.vx = Math.abs(d) > 30 ? this.facing * 18 : 0;
+    if (this.onGround) this.vx = Math.abs(d) > 30 && Math.abs(d) < 200 ? this.facing * 18 : 0;
     if (Math.abs(d) < 150) {
       this.spitT -= dt;
       if (this.spitT <= 0) { this.spitT = 2.6; for (let i = 0; i < 3; i++) this.shoot('maggot', this.facing * (40 + i * 25), -90 - i * 15, this.facing * 4, -2); this.world.audio.sfx('squish'); }
