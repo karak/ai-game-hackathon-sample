@@ -20,7 +20,7 @@ export async function render(main, A) {
   main.appendChild(h2('実描画サンプル（768×672）'));
   const c = canvas(768, 672); const g = c.getContext('2d'); g.save(); g.scale(3, 3);
   const stub = { assets: A, audio: { sfx() {}, playBgm() {}, stopBgm() {}, muted: false }, score: 12340, lives: 2, stageIndex: 0 };
-  const w = new World(stub, STAGES[0]); w.player.x = 600; w.cam.x = 500; w.toast('魔法のドレス！'); w.toast('祈りの十字路：ここから再開できる');
+  const w = new World(stub, STAGES[0]); w.player.x = 600; w.cam.x = 500; w.toast('魔法のドレス！'); w.toast('祈りの十字路：ここから再開できる'); for (const t of w.toasts) t.t = 0.6; // 表示中の状態
   w.draw(g); drawHud(g, w, stub);
   textBox(g, [{ t: '第一章　花畑の墓地', color: '#ff8fc8' }, { t: '土の下から、可愛いものたちが這い出してくる' }], { y: 90, minWidth: 224 });
   textBox(g, 'これは長いテロップの折り返しテストです。実測幅で 240 論理 px 以内に収まるように改行されます。', { y: 150, pad: 4 });
