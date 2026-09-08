@@ -1,7 +1,7 @@
 import { TILE, moveBody } from '../physics.js';
 import { PlayerShot, WEAPONS } from './projectiles.js';
 import { blit } from '../gfx/sprite.js';
-import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, ladderAt, ladderBelow, LADDER_SPEED } from './gimmicks.js';
+import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConveyor, ladderAt, ladderBelow, LADDER_SPEED } from './gimmicks.js';
 
 const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196; // 単発ジャンプ 42 世界px(2.6タイル)
 const STAND_H = 28, CROUCH_H = 18; // 当たり判定（世界単位）。スプライトは生成 PNG のサイズに従う（docs/art-standard.md §2.1）
@@ -83,6 +83,7 @@ export class Player {
     landOnPlatforms(this, this.world.platforms ?? [], prevBottom);
     if (this.onGround) triggerCrumbles(this, this.world.crumbles ?? []);
     applyFlow(this, map, dt);                              // 水流（地上）／風（空中）
+    applyConveyor(this, map, dt);                          // ベルトコンベア（地上）
     if (this.onGround && this.hurtT > 0) this.vx = 0;
 
     // 危険タイル・落下
@@ -90,6 +91,7 @@ export class Player {
     if (this.world.cleared) return;
     if (this.y > map.pixelHeight + 8) this.die('fall');
     else if (map.isHazard(cx, fy) || map.isHazard(cx, hy)) this.die(map.at(cx, fy) === '^' ? 'spike' : 'bog');
+    else if ((this.world.presses ?? []).some(q => q.hits(this))) this.die('press');
     else if (this.x < 0) this.x = 0;
   }
 

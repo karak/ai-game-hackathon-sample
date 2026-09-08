@@ -5,10 +5,13 @@ export const FLOW_SPEED = 40;          // 水流・風で加わる速度（世�
 export const CRUMBLE_SHAKE_T = 0.6;    // 乗ってから落ちるまで
 export const CRUMBLE_RESPAWN_T = 8.0;  // 復活まで
 export const LADDER_SPEED = 50;        // はしごの昇降速度
+export const CONVEYOR_SPEED = 30;      // ベルトコンベアで地上の体に加わる速度
+export const PRESS = { period: 3.0, downT: 0.5, dropT: 0.15, riseT: 0.6, h: 3 }; // プレス機: 3 秒周期、0.15 秒で落ちて 0.5 秒下で留まり 0.6 秒で戻る。ブロック高 3 タイル
 export const PLATFORM = {              // 記号ごとの既定
   platformH: { axis: 'x', amp: 48, period: 4, w: 3, oneWay: false },
   platformV: { axis: 'y', amp: 32, period: 4, w: 3, oneWay: false },
   island:    { axis: 'y', amp: 8,  period: 4, w: 2, oneWay: true },
+  wheel:     { axis: 'circle', amp: 48, period: 8, w: 2, oneWay: true, count: 4 }, // 観覧車: 半径 48、4 枚、8 秒で 1 周
 };
 
 // 往復する足場。update で 1 フレームの移動量 dx/dy を記録し、乗っている物体が同じだけ動く
@@ -22,6 +25,10 @@ export class MovingPlatform {
   }
   get top() { return this.y; }
   positionAt(t) {
+    if (this.axis === 'circle') { // 円運動（回転足場）。phase で同じ中心の他の足場と位相をずらす
+      const a = t / this.period * Math.PI * 2 + (this.phase ?? 0);
+      return [this.cx + Math.cos(a) * this.amp - this.w / 2, this.cy + Math.sin(a) * this.amp - this.h / 2];
+    }
     const off = Math.sin(t / this.period * Math.PI * 2) * this.amp;
     return this.axis === 'x' ? [this.cx - this.w / 2 + off, this.cy - this.h / 2] : [this.cx - this.w / 2, this.cy - this.h / 2 + off];
   }
@@ -55,6 +62,49 @@ export function landOnPlatforms(body, platforms, prevBottom) {
   body.platform = null;
   for (const p of platforms) if (!p.dead && p.tryLand(body, prevBottom)) return p;
   return null;
+}
+
+// 観覧車（マーカー O）: 同じ中心に count 枚の足場を等間隔の位相で置く
+export function makeWheel(world, tx, ty) {
+  const d = PLATFORM.wheel, out = [];
+  for (let i = 0; i < d.count; i++) { const p = new MovingPlatform(world, 'wheel', tx, ty); p.phase = i / d.count * Math.PI * 2; const [x, y] = p.positionAt(0); p.x = x; p.y = y; out.push(p); }
+  return out;
+}
+
+// プレス機（マーカー %）: マーカーの位置を上端として天井から吊られ、周期的に床まで落ちる。降下中・停止中に触れると即死
+export class PressMachine {
+  constructor(world, tx, ty) {
+    this.world = world; this.tx = tx; this.ty = ty; this.w = TILE; this.hBlock = PRESS.h * TILE; this.dead = false;
+    const map = world.level.map; let fy = ty + 1; while (fy < map.height && !map.isSolid(tx, fy)) fy++; // 直下の床
+    this.topY = ty * TILE; this.floorY = fy * TILE; this.travel = Math.max(0, this.floorY - this.topY - this.hBlock);
+    this.t = (tx * 0.7) % PRESS.period; this.y = this.topY; // 位相は列でずらす
+  }
+  get phase() { const t = this.t % PRESS.period; if (t < PRESS.dropT) return 'drop'; if (t < PRESS.dropT + PRESS.downT) return 'down'; if (t < PRESS.dropT + PRESS.downT + PRESS.riseT) return 'rise'; return 'wait'; }
+  get x() { return this.tx * TILE; } get h() { return this.hBlock; }
+  get crushing() { const p = this.phase; return p === 'drop' || p === 'down'; }
+  update(dt) {
+    this.t += dt; const t = this.t % PRESS.period, ph = this.phase;
+    let k = 0;
+    if (ph === 'drop') k = t / PRESS.dropT; else if (ph === 'down') k = 1; else if (ph === 'rise') k = 1 - (t - PRESS.dropT - PRESS.downT) / PRESS.riseT;
+    const prev = this.y; this.y = this.topY + this.travel * k;
+    if (ph === 'down' && prev < this.y) { this.world.shake?.(3); this.world.audio?.sfx('hit'); }
+  }
+  // 体と重なっているか（降下・停止中のみ致死）
+  hits(body) { return this.crushing && body.x < this.x + this.w && body.x + body.w > this.x && body.y < this.y + this.hBlock && body.y + body.h > this.y; }
+}
+
+// ベルトコンベア: 足元のタイルが ')' なら右、'(' なら左へ CONVEYOR_SPEED。地上のみ
+export function conveyorAt(map, body) {
+  const x0 = Math.floor(body.x / TILE), x1 = Math.floor((body.x + body.w - 0.001) / TILE), ty = Math.floor((body.y + body.h + 0.5) / TILE);
+  for (let tx = x0; tx <= x1; tx++) { const c = map.at(tx, ty); if (c === ')') return 1; if (c === '(') return -1; }
+  return 0;
+}
+export function applyConveyor(body, map, dt) {
+  if (!body.onGround) return 0;
+  const dir = conveyorAt(map, body); if (!dir) return 0;
+  const dx = dir * CONVEYOR_SPEED * dt;
+  if (!overlapsSolid(map, body.x + dx, body.y, body.w, body.h)) { body.x += dx; return dx; }
+  return 0;
 }
 
 // 崩れる足場（タイル '!'）。乗ると揺れ、CRUMBLE_SHAKE_T 後に消え、CRUMBLE_RESPAWN_T 後に戻る

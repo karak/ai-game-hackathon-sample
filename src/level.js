@@ -20,8 +20,10 @@ export const MARKERS = {
   M: 'platformH',   // 動く足場（水平往復、3 タイル幅）
   V: 'platformV',   // 動く足場（垂直往復）
   '@': 'island',    // 浮島（上下に揺れるすり抜け足場）
+  O: 'wheel',       // 回転足場（観覧車: 中心に 4 枚の足場が円運動）
+  '%': 'press',     // プレス機（天井から周期的に降りる即死ブロック）
 };
-// マップに残るギミック記号: ! 崩れる足場  L はしご  > < 水流  } { 風
+// マップに残るギミック記号: ! 崩れる足場  L はしご  > < 水流  } { 風  ) ( ベルトコンベア（地面。右／左に 30/s）
 
 export function parseLevel(stage) {
   const rows = stage.rows.map(r => r.split(''));

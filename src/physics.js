@@ -1,7 +1,7 @@
 // タイルベース物理。gravity は呼び出し側が vy に加える（超魔界村的な固定軌道ジャンプのため）。
 export const TILE = 16;
 
-const SOLID = new Set(['#', 'D', 'S', 'R', 'W', 'K', 'Q', '!']); // '!' は崩れる足場（消えると '.' に書き換わる）
+const SOLID = new Set(['#', 'D', 'S', 'R', 'W', 'K', 'Q', '!', ')', '(']); // '!' は崩れる足場（消えると '.' に書き換わる）。')' '(' はベルトコンベア（右／左）
 const ONEWAY = new Set(['=', '-']);
 
 export class TileMap {

@@ -15,7 +15,7 @@ import { SAFE_SHOT_T } from './balance.js';
 import { Fx } from './fx.js';
 import { seedGame, hashSeed } from './util.js';
 import { HD_SCALE as HD } from './gfx/sprite.js';
-import { MovingPlatform, CrumbleTile, PLATFORM } from './entities/gimmicks.js';
+import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine } from './entities/gimmicks.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
@@ -62,7 +62,7 @@ export class World {
     this.classes = { EnemyShot };
 
     this.enemies = []; this.shots = []; this.enemyShots = []; this.fires = []; this.pools = []; this.items = []; this.boxes = [];
-    this.platforms = []; this.crumbles = []; // ギミック（spawnAll で配置）
+    this.platforms = []; this.crumbles = []; this.presses = []; // ギミック（spawnAll で配置）
     this.cam = { x: 0, y: 0 }; this.arena = null; this.boss = null; this.bossState = 'none';
     this.time = this.level.timeLimit; this.t = 0; this.cutscene = false; this.cleared = false;
     this.shakeT = 0; this.shakeAmp = 0; this.toasts = []; this.tickT = 0; this.safeT = 0; // safeT > 0 の間は敵弾なし
@@ -79,9 +79,11 @@ export class World {
 
   spawnAll() {
     this.enemies = []; this.boxes = []; this.items = []; this.enemyShots = []; this.shots = []; this.fires = []; this.pools = [];
-    this.platforms = []; this.crumbles = this.level.crumbles.map(c => new CrumbleTile(this, c.tx, c.ty));
+    this.platforms = []; this.presses = []; this.crumbles = this.level.crumbles.map(c => new CrumbleTile(this, c.tx, c.ty));
     for (const c of this.crumbles) this.level.map.set(c.tx, c.ty, '!'); // 消えていた足場を戻す
     for (const s of this.level.spawns) {
+      if (s.type === 'wheel') { this.platforms.push(...makeWheel(this, s.tx, s.ty)); continue; }
+      if (s.type === 'press') { this.presses.push(new PressMachine(this, s.tx, s.ty)); continue; }
       if (PLATFORM[s.type]) { this.platforms.push(new MovingPlatform(this, s.type, s.tx, s.ty)); continue; }
       if (s.type === 'treasure') this.boxes.push(new TreasureBox(this, s.x, s.y));
       else if (s.type === 'heartitem') this.items.push(new FloatingItem(this, 'potion', s.x, s.y));
@@ -117,6 +119,7 @@ export class World {
     }
     for (const q of this.platforms) q.update(dt);   // 足場は主人公より先に動かす（乗り物処理のため）
     for (const c of this.crumbles) c.update(dt);
+    for (const q of this.presses) q.update(dt);
     p.update(dt, input);
 
     // チェックポイント
@@ -246,6 +249,23 @@ export class World {
     };
     for (const p of this.platforms) if (p.x + p.w > cam.x && p.x < cam.x + W) plat(p.x, p.y, p.w, 0, p.kind === 'island' ? 'island' : 'plat');
     for (const c of this.crumbles) if (c.state !== 'gone' && c.x + TILE > cam.x && c.x < cam.x + W) plat(c.x, c.y, TILE, c.shake, 'plank');
+    // プレス機: 吊り鎖 + ブロック（生成絵 tiles/press があれば使う）
+    for (const q of this.presses) {
+      if (q.x + q.w < cam.x || q.x > cam.x + W) continue;
+      const x = q.x - cam.x, y = q.y - cam.y;
+      g.fillStyle = '#5d5d70'; for (let cy = q.topY - cam.y; cy < y; cy += 4) g.fillRect(x + TILE / 2 - 1, cy, 2, 3);
+      if (G.press) { const sw = G.press.r.width / HD, sh = G.press.r.height / HD; g.drawImage(G.press.r, Math.round(x + TILE / 2 - sw / 2), Math.round(y + q.hBlock - sh), sw, sh); }
+      else { g.fillStyle = '#4e4e60'; g.fillRect(x - 2, y, TILE + 4, q.hBlock); g.fillStyle = '#a5a5b8'; g.fillRect(x - 2, y, TILE + 4, 2); g.fillStyle = '#d9262b'; g.fillRect(x, y + q.hBlock - 3, TILE, 3); }
+    }
+    // ベルトコンベア: 地面タイルの上に動くストライプ
+    { const map2 = this.level.map, bx0 = Math.floor(cam.x / TILE), bx1 = bx0 + W / TILE + 1;
+      for (let ty = 0; ty < map2.height; ty++) for (let tx = bx0; tx <= bx1; tx++) {
+        const c = map2.at(tx, ty); if (c !== ')' && c !== '(') continue;
+        const x = tx * TILE - cam.x, y = ty * TILE - cam.y, dir = c === ')' ? 1 : -1, off = ((this.t * 30 * dir) % 8 + 8) % 8;
+        g.fillStyle = '#2d1f4c'; g.fillRect(x, y, TILE, 4);
+        g.fillStyle = '#a5a5b8'; for (let s = -8; s < TILE; s += 8) { const sx = x + s + off; const w = Math.min(3, x + TILE - sx); if (sx >= x && w > 0) g.fillRect(sx, y + 1, w, 2); }
+      }
+    }
     // はしご（1 タイル 1 段。生成絵は 2 段分なので上半分／下半分を交互に使う）
     const map = this.level.map, tx0 = Math.floor(cam.x / TILE), tx1 = tx0 + W / TILE + 1;
     const th = THEMES[this.level.theme];
