@@ -13,6 +13,7 @@ import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBo
 import { THEMES } from './gfx/tiles.js';
 import { SAFE_SHOT_T } from './balance.js';
 import { Fx } from './fx.js';
+import { seedGame, hashSeed } from './util.js';
 import { HD_SCALE as HD } from './gfx/sprite.js';
 import { MovingPlatform, CrumbleTile, PLATFORM } from './entities/gimmicks.js';
 
@@ -25,6 +26,7 @@ const NO_INPUT = { down: () => false, hit: () => false };
 export class World {
   constructor(game, stageDef) {
     this.game = game; this.assets = game.assets; this.audio = game.audio;
+    seedGame(stageDef.seed ?? hashSeed(stageDef.name)); // ステージ開始で乱数を固定（同じ入力 → 同じ結果）
     this.level = parseLevel(stageDef);
     const map = this.level.map;
     this.tiles = this.assets.tiles[this.level.theme];

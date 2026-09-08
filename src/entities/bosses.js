@@ -1,5 +1,5 @@
 import { Enemy } from './enemies.js';
-import { rand } from '../util.js';
+import { rand, grand } from '../util.js';
 import { PAL } from '../gfx/palette.js';
 import { blit } from '../gfx/sprite.js';
 
@@ -23,9 +23,9 @@ export class Boss extends Enemy {
     super.update(dt); this.stateT += dt;
     if (this.dying) {
       this.dieT += dt;
-      if (Math.random() < 0.5) this.world.particles.emit('blood', this.x + Math.random() * this.w, this.y + Math.random() * this.h, 6, { power: 1.5 });
-      if (Math.random() < 0.3) this.world.particles.emit('gore', this.x + Math.random() * this.w, this.y + Math.random() * this.h, 2);
-      if (Math.random() < 0.2) this.world.shake(3);
+      if (grand() < 0.5) this.world.particles.emit('blood', this.x + grand() * this.w, this.y + grand() * this.h, 6, { power: 1.5 });
+      if (grand() < 0.3) this.world.particles.emit('gore', this.x + grand() * this.w, this.y + grand() * this.h, 2);
+      if (grand() < 0.2) this.world.shake(3);
       if (this.dieT > 2.6) { this.dead = true; this.world.addScore(this.score); this.world.particles.emit('gore', this.cx, this.cy, 30); this.world.particles.emit('blood', this.cx, this.cy, 60, { power: 2 }); this.world.particles.emit('stuffing', this.cx, this.cy, 20); this.world.onBossDefeated(); }
       return true;
     }
@@ -52,7 +52,7 @@ export class WeepingDoll extends Boss {
         break;
       case 'walk':
         this.facePlayer(); this.vx = this.facing * (enraged ? 24 : 14);
-        if (this.stateT > (enraged ? 1.6 : 2.4)) this.setState(Math.random() < 0.65 ? 'cry' : 'throw');
+        if (this.stateT > (enraged ? 1.6 : 2.4)) this.setState(grand() < 0.65 ? 'cry' : 'throw');
         break;
       case 'cry':
         this.vx = 0;
@@ -60,7 +60,7 @@ export class WeepingDoll extends Boss {
           const spd = Math.sign(d) * rand(30, 90);
           this.shoot('acid', spd, -60, this.facing * -5, -14); this.shoot('acid', spd * 0.6, -80, this.facing * 5, -14);
           if (enraged) this.shoot('blood', Math.sign(d) * rand(60, 120), -150, 0, -10);
-          if (Math.random() < 0.3) this.world.audio.sfx('poison');
+          if (grand() < 0.3) this.world.audio.sfx('poison');
         }
         if (this.stateT > 1.4) this.setState('walk');
         break;
@@ -119,8 +119,8 @@ export class GutsTeddy extends Boss {
         if (this.stateT > 0.5 && Math.floor(this.stateT * 12) !== Math.floor((this.stateT - dt) * 12) && this.stateT < 1.6) {
           const a = rand(-2.6, -0.5); const sp = rand(90, 150);
           this.shoot('blood', Math.cos(a) * sp, Math.sin(a) * sp, 0, 6, { life: 3 });
-          if (Math.random() < 0.3) this.world.particles.emit('stuffing', this.cx, this.cy + 6, 3);
-          if (Math.random() < 0.2) this.world.audio.sfx('squish');
+          if (grand() < 0.3) this.world.particles.emit('stuffing', this.cx, this.cy + 6, 3);
+          if (grand() < 0.2) this.world.audio.sfx('squish');
         }
         if (this.stateT > 1.9) this.setState('idle');
         break;
@@ -165,25 +165,25 @@ export class Noir extends Boss {
           for (let i = 0; i < n; i++) { const aa = ang + (i - (n - 1) / 2) * 0.28; this.shoot('darkheart', Math.cos(aa) * 110, Math.sin(aa) * 110, 0, 0, { life: 3 }); }
           this.world.audio.sfx('shoot'); this.volleys++;
         }
-        if (this.volleys >= 3) { this.volleys = 0; const r = Math.random(); this.setState(r < 0.4 ? 'teleport' : r < 0.7 ? 'rain' : 'dash'); }
+        if (this.volleys >= 3) { this.volleys = 0; const r = grand(); this.setState(r < 0.4 ? 'teleport' : r < 0.7 ? 'rain' : 'dash'); }
         break;
       }
       case 'teleport':
         this.alpha = Math.max(0, 1 - this.stateT * 2);
-        if (this.stateT > 0.5 && !this.tp) { this.tp = true; this.x = p.centerX + (Math.random() < 0.5 ? -90 : 90); this.x = Math.max(a.x0 + 16, Math.min(a.x1 - 32, this.x)); this.world.particles.emit('dark', this.cx, this.cy, 20); }
+        if (this.stateT > 0.5 && !this.tp) { this.tp = true; this.x = p.centerX + (grand() < 0.5 ? -90 : 90); this.x = Math.max(a.x0 + 16, Math.min(a.x1 - 32, this.x)); this.world.particles.emit('dark', this.cx, this.cy, 20); }
         if (this.stateT > 0.6) { this.alpha = Math.min(1, (this.stateT - 0.6) * 3); }
         if (this.stateT > 1.0) { this.tp = false; this.alpha = 1; this.setState('hover'); }
         break;
       case 'rain':
         this.y = this.hoverY - 20 + Math.sin(this.t * 2) * 4; this.alpha = 1;
-        if (this.stateT > 0.4 && this.stateT < (enraged ? 2.2 : 1.6) && Math.random() < 0.35) {
-          this.world.enemyShots.push(...[0].map(() => { const sx = a.x0 + 16 + Math.random() * (a.x1 - a.x0 - 32); return this._rainDrop(sx); }));
+        if (this.stateT > 0.4 && this.stateT < (enraged ? 2.2 : 1.6) && grand() < 0.35) {
+          this.world.enemyShots.push(...[0].map(() => { const sx = a.x0 + 16 + grand() * (a.x1 - a.x0 - 32); return this._rainDrop(sx); }));
         }
         if (this.stateT > 2.4) this.setState('hover');
         break;
       case 'dash':
         if (this.stateT < 0.5) { this.facing = Math.sign(dx) || 1; this.targetY = p.y + p.h / 2 - this.h / 2; this.y += (this.targetY - this.y) * 6 * dt; this.vx = 0; }
-        else { this.vx = this.facing * (enraged ? 230 : 180); this.x += this.vx * dt; if (Math.random() < 0.6) this.world.particles.emit('dark', this.cx, this.cy, 2); }
+        else { this.vx = this.facing * (enraged ? 230 : 180); this.x += this.vx * dt; if (grand() < 0.6) this.world.particles.emit('dark', this.cx, this.cy, 2); }
         if (this.x < a.x0 + 4 || this.x + this.w > a.x1 - 4) { this.x = Math.max(a.x0 + 4, Math.min(a.x1 - 4 - this.w, this.x)); this.setState('hover'); }
         break;
     }

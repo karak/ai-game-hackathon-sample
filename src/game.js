@@ -8,6 +8,9 @@ import { blit } from './gfx/sprite.js';
 import { drawBackgroundHD } from './gfx/hdworld.js';
 import { PROLOGUE, ENDING } from './story.js';
 import { irisRadius, IRIS_T, BOSS_INTRO_T } from './fx.js';
+import { DemoRecorder, DemoInput, DEMO_MAX_T, DEMO_IDLE_T } from './demo.js';
+import { DEMOS } from './demos.js';
+import { hashSeed } from './util.js';
 import { defaultSettings, saveSettings, volumeGain, bind, codesFor, keyName, keyNameMini, padName, REBINDABLE, ACTION_LABEL, VOLUME_MAX, DEFAULT_KEYS, DEFAULT_PAD } from './settings.js';
 
 // オプション画面の行。kind: volume / mute / key(action) / reset / back
@@ -24,6 +27,7 @@ export class Game {
     this.hi = this.settings.hi;
     this.paused = false; this.textIdx = 0;
     this.menuIdx = 0; this.optIdx = 0; this.capturing = null; // タイトルメニュー / オプションのカーソル、キー割り当て待ちの操作名
+    this.recorder = null; this.demo = null; this.demoIdx = 0; // デモ記録／再生
     this.audio.setVolume(volumeGain(this.settings.volume)); this.audio.setMuted(this.settings.muted);
   }
   setState(s) { (this.trace ??= []).push(`${this.state}>${s}@${Math.round(performance.now())}`); if (this.trace.length > 20) this.trace.shift(); this.state = s; this.stateT = 0; }
@@ -43,8 +47,9 @@ export class Game {
   }
   // アイリスワイプで閉じてから then() を実行する（画面遷移）
   startWipe(then) { if (this.state === 'wipe') return; this.wipe = { from: this.state, t: 0, then }; this.setState('wipe'); }
-  gameOver() { this.setState('gameover'); this.audio.stopBgm(); this.audio.sfx('bossdie'); this.saveHi(); }
+  gameOver() { if (this.state === 'demo') { this.endDemo(); return; } this.setState('gameover'); this.audio.stopBgm(); this.audio.sfx('bossdie'); this.saveHi(); }
   stageClear() {
+    if (this.state === 'demo') { this.endDemo(); return; }
     this.timeBonus = Math.ceil(this.world.time) * 10; this.score += this.timeBonus; this.setState('clear'); this.audio.sfx('clear');
     // 進行を保存（次章から「つづきから」で再開できる）
     if (this.stageIndex + 1 < STAGES.length && this.stageIndex + 1 > this.settings.progress.stage) { this.settings.progress.stage = this.stageIndex + 1; this.save(); }
@@ -58,6 +63,8 @@ export class Game {
     switch (this.state) {
       case 'title': {
         this.titleCam += dt * 20;
+        if (inp.anyKey) this.stateT = 0;
+        if (this.stateT > DEMO_IDLE_T && this.startDemo()) break; // 放置でデモ
         const menu = this.titleMenu();
         if (inp.hit('up')) { this.menuIdx = (this.menuIdx + menu.length - 1) % menu.length; this.audio.sfx('select'); }
         if (inp.hit('down')) { this.menuIdx = (this.menuIdx + 1) % menu.length; this.audio.sfx('select'); }
@@ -72,6 +79,13 @@ export class Game {
         break;
       }
       case 'options': this.updateOptions(inp); break;
+      case 'demo': {
+        if (inp.anyKey || inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) { this.endDemo(); break; }
+        const d = this.demo; d.t += dt;
+        this.world.update(dt, d.input); d.input.next();
+        if (d.input.done || d.t > DEMO_MAX_T || this.state !== 'demo') { if (this.state === 'demo') { if (!this.startDemo(this.demoIdx + 1)) this.endDemo(); } }
+        break;
+      }
       case 'wipe':
         this.wipe.t += dt;
         if (this.wipe.from === 'clear' && this.wipe.t < IRIS_T) this.world.update(dt, inp);
@@ -88,6 +102,7 @@ export class Game {
         if (this.paused) break;
         this.debugKeys(inp);
         this.irisT += dt;
+        if (this.recorder) this.recorder.record(inp);
         this.world.update(dt, inp);
         break;
       case 'clear':
@@ -107,6 +122,28 @@ export class Game {
         if (this.stateT > 4 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump'))) { this.setState('title'); this.audio.playBgm(SONGS.title); }
         break;
     }
+  }
+
+  // ---- デモ（アトラクト）モード ----
+  // 入力ログの記録: window.__game.startRecording() → プレイ → stopRecording() が JSON を返す（assets/demo/stageN.json に保存）
+  startRecording() { const st = STAGES[this.stageIndex]; this.recorder = new DemoRecorder(st.name, st.seed ?? hashSeed(st.name)); return this.recorder; }
+  stopRecording() { const r = this.recorder; this.recorder = null; return r ? r.toJSON() : null; }
+  // 未収録（frames 0）を飛ばして i 番目以降のデモを開始。無ければ false
+  startDemo(i = 0) {
+    for (let k = i; k < DEMOS.length && k < STAGES.length; k++) {
+      const d = DEMOS[k]; if (!d || !d.frames) continue;
+      this.demoIdx = k; this.score = 0; this.lives = 2; this.stageIndex = k;
+      this.world = new World(this, { ...STAGES[k], seed: d.seed });
+      this.demo = { input: new DemoInput(d), t: 0 }; this.irisT = 99;
+      this.audio.playBgm(SONGS[this.world.level.theme]); this.setState('demo'); return true;
+    }
+    return false;
+  }
+  endDemo() { this.demo = null; this.world = null; this.demoIdx = 0; this.setState('title'); this.audio.playBgm(SONGS.title); }
+  drawDemo(g) {
+    this.world.draw(g); drawHud(g, this.world, this);
+    if (Math.floor(this.stateT * 2) % 2) text(g, 'DEMO', 128, 100, { align: 'center', color: '#ffe860' });
+    mini(g, 'PUSH ANY KEY', miniX('PUSH ANY KEY'), 118, '#fdfbf7');
   }
 
   // ---- デバッグキー（A-5 の演出確認用。F1 被弾ヒットストップ / F2 最寄りの敵を撃破 / F3 ボス撃破演出 / F4 アイリスワイプ / F6 ボス登場バナー）----
@@ -192,6 +229,7 @@ export class Game {
     switch (state) {
       case 'title': this.drawTitle(g); break;
       case 'options': this.drawOptions(g); break;
+      case 'demo': this.drawDemo(g); break;
       case 'wipe': this.drawState(g, this.wipe.from); this.drawIris(g, irisRadius(this.wipe.t, false, W, H)); break;
       case 'prologue': this.drawScroll(g, PROLOGUE, 'prologue'); break;
       case 'intro': this.world.draw(g); this.drawIris(g, irisRadius(this.stateT, true, W, H)); this.drawIntro(g); break;

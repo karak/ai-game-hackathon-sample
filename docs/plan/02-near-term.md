@@ -50,6 +50,7 @@
 - AC: ボット自走クリア、カタログ「ステージ構成」に俯瞰・セグメント表が出る
 
 ### B-3 デモ（アトラクト）モード
+- 済: `src/demo.js`（6 操作の held/pressed をビットマスクにし RLE 保存、`DemoRecorder` / `DemoInput`）、`src/util.js` のシード付き乱数 `grand()` にゲーム進行の `Math.random` を置換（enemies 7・bosses 16・items 3・projectiles 3 箇所。粒子・揺れは対象外）。`World` はステージ名ハッシュでシード。タイトル放置 15 秒 → 4 面のデモを 60 秒ずつ順に再生、任意キーで中断。同じデモを 2 回再生して 900 フレーム後の座標・敵数が一致（決定論）。`test/demo.test.js` 4 件。**デモの中身はボット記録（`window.__game.startRecording()`）で、60 秒中に 2〜3 回死ぬ質。人手収録は繰延**
 - タイトル放置 15 秒で録画済み入力を再生（`assets/demo/*.json`）。入力で即中断
 - AC: 3 面分のデモが 1 分ずつ再生される。決定論性（同じ入力→同じ結果）のテスト
 

@@ -1,7 +1,7 @@
 import { TILE, moveBody } from '../physics.js';
 import { EnemyShot } from './projectiles.js';
 import { tint, blit } from '../gfx/sprite.js';
-import { rand } from '../util.js';
+import { rand, grand } from '../util.js';
 import { SAFE_ZONE_X } from '../balance.js';
 
 let nextId = 1;
@@ -15,7 +15,7 @@ export class Enemy {
   constructor(world, x, y, w, h) {
     this.world = world; this.id = nextId++;
     this.x = x; this.y = y; this.w = w; this.h = h; this.vx = 0; this.vy = 0;
-    this.hp = 1; this.score = 100; this.t = Math.random() * 10; this.flashT = 0; this.dead = false;
+    this.hp = 1; this.score = 100; this.t = grand() * 10; this.flashT = 0; this.dead = false;
     this.facing = -1; this.contact = true; this.gravity = true; this.onGround = false; this.spriteOff = [0, 0];
     this.gore = 'blood';
   }
@@ -87,7 +87,7 @@ export class ZombieRabbit extends Enemy {
     if (this.onGround) { this.vx = this.facing * 26; }
     const res = this.physics(dt);
     if (res.hitLeft || res.hitRight) this.facing = -this.facing;
-    if (Math.random() < 0.02) this.world.decals.splat(this.cx, this.y + this.h, '#d9262b', 1);
+    if (grand() < 0.02) this.world.decals.splat(this.cx, this.y + this.h, '#d9262b', 1);
   }
   spriteName() { return this.rise > 0 ? 'zombieRise' : (Math.floor(this.t * 5) % 2 ? 'zombie1' : 'zombie2'); }
   draw(g, cam, assets) {
@@ -114,7 +114,7 @@ export class ZombieSpawner {
     const alive = this.world.enemies.filter(e => e instanceof ZombieRabbit && !e.dead).length;
     if (alive >= 4) return;
     const map = this.world.level.map;
-    const side = Math.random() < 0.6 ? p.facing : -p.facing;
+    const side = grand() < 0.6 ? p.facing : -p.facing;
     const sx = p.centerX + side * rand(50, 100);
     // 復活地点（開始地点・中間地点）の ±SAFE_ZONE_X には湧かない
     const safe = [this.world.level.playerStart, ...this.world.level.checkpoints];
@@ -146,7 +146,7 @@ export class MushroomFairy extends Enemy {
         this.world.audio.sfx('poison');
       }
     }
-    if (Math.random() < 0.05) this.world.particles.emit('poison', this.cx, this.y + this.h, 1);
+    if (grand() < 0.05) this.world.particles.emit('poison', this.cx, this.y + this.h, 1);
   }
   spriteName() { return Math.floor(this.t * 6) % 2 ? 'mushroom1' : 'mushroom2'; }
 }
@@ -165,8 +165,8 @@ export class Unicorn extends Enemy {
       if (Math.abs(d) < 130 && Math.abs(this.player.y - this.y) < 40) { this.state = 'charge'; this.world.audio.sfx('hurt'); }
     } else {
       this.vx = this.facing * 115;
-      if (Math.random() < 0.12) this.shoot('blood', this.facing * -30 + rand(-20, 20), rand(-120, -60), this.facing * -2, -6, { life: 1.2 });
-      if (Math.random() < 0.3) this.world.particles.emit('blood', this.x + (this.facing > 0 ? 4 : this.w - 4), this.y + 2, 2);
+      if (grand() < 0.12) this.shoot('blood', this.facing * -30 + rand(-20, 20), rand(-120, -60), this.facing * -2, -6, { life: 1.2 });
+      if (grand() < 0.3) this.world.particles.emit('blood', this.x + (this.facing > 0 ? 4 : this.w - 4), this.y + 2, 2);
     }
     const res = this.physics(dt);
     if (res.hitLeft || res.hitRight) { this.facing = -this.facing; this.state = 'charge'; }
@@ -210,7 +210,7 @@ export class AngelSkeleton extends Enemy {
     }
     this.y = this.baseY + Math.sin(this.t * 3) * 8;
     this.dropT -= dt;
-    if (this.dropT <= 0 && Math.abs(d) < 24) { this.dropT = 1.8; this.shoot(Math.random() < 0.5 ? 'bone' : 'blood', rand(-10, 10), 20, 0, 6); }
+    if (this.dropT <= 0 && Math.abs(d) < 24) { this.dropT = 1.8; this.shoot(grand() < 0.5 ? 'bone' : 'blood', rand(-10, 10), 20, 0, 6); }
   }
   spriteName() { return Math.floor(this.t * 8) % 2 ? 'angel1' : 'angel2'; }
 }

@@ -1,3 +1,4 @@
+import { grand } from '../util.js';
 import { TILE, moveBody } from '../physics.js';
 import { WEAPON_ORDER } from './projectiles.js';
 import { blit } from '../gfx/sprite.js';
@@ -31,11 +32,11 @@ export function chooseContents(world) {
   world.boxCount = (world.boxCount ?? 0) + 1;
   if (p.costume === 'plain') return 'dress';
   if (p.costume === 'dress' && world.boxCount % 3 === 0) return 'golddress';
-  const r = Math.random();
+  const r = grand();
   if (r < 0.08) return 'oneup';
   if (r < 0.16) return 'potion';
   const others = WEAPON_ORDER.filter(w => w !== p.weapon);
-  return others[Math.floor(Math.random() * others.length)];
+  return others[Math.floor(grand() * others.length)];
 }
 
 const ITEM_SIZE = { dress: [14, 12], golddress: [14, 12], oneup: [12, 8], candy: [9, 7], potion: [7, 7], star: [8, 7], knife: [12, 3], heart: [8, 6], candle: [5, 9] };
@@ -74,7 +75,7 @@ export class Item {
 export class FloatingItem {
   constructor(world, kind, x, y) {
     this.world = world; this.kind = kind; [this.w, this.h] = ITEM_SIZE[kind] ?? [8, 8];
-    this.x = x + 4; this.y = y + 4; this.t = Math.random() * 6; this.dead = false;
+    this.x = x + 4; this.y = y + 4; this.t = grand() * 6; this.dead = false;
   }
   update(dt) { this.t += dt; }
   pickup(player) { Item.prototype.pickup.call(this, player); }

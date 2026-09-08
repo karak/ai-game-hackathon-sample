@@ -1,3 +1,4 @@
+import { grand } from '../util.js';
 import { TILE, aabb } from '../physics.js';
 import { PAL } from '../gfx/palette.js';
 import { HD_SCALE } from '../gfx/sprite.js';
@@ -70,7 +71,7 @@ export class Fire {
   }
   update(dt) {
     this.t += dt; if (this.t > this.life) this.dead = true;
-    if (Math.random() < 0.3) this.world.particles.emit('fire', this.x + 4, this.y + 2, 1);
+    if (grand() < 0.3) this.world.particles.emit('fire', this.x + 4, this.y + 2, 1);
   }
   draw(g, cam, sheet) {
     const spr = Math.floor(this.t * 12) % 2 ? sheet.fire1 : sheet.fire2;
@@ -153,7 +154,7 @@ export class PoisonPool {
   }
   update(dt) {
     this.t += dt; if (this.t > this.life) this.dead = true;
-    if (Math.random() < 0.08) this.world.particles.emit('poison', this.x + Math.random() * this.w, this.y, 1);
+    if (grand() < 0.08) this.world.particles.emit('poison', this.x + grand() * this.w, this.y, 1);
   }
   draw(g, cam, sheet) {
     const a = this.t > this.life - 0.8 ? (this.life - this.t) / 0.8 : 1;
