@@ -1,0 +1,22 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 200 cells wide x 200 cells tall (= 1600 x 1600 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 170 cells of the 200-cell height).
+- Exactly 2 figures side by side in one row, separated by clear gaps of green, the group centered horizontally. Same scale and same palette for every figure.
+- Feet rest on the baseline y = 960 px (that is 8 cells above the bottom edge). Nothing below the baseline.
+
+SUBJECT: BOSS "Serpent of Tears" — BODY PARTS, two frames side by side (same scale as a large boss): FRAME 1 = one BODY SEGMENT: a thick horizontal cylinder of pale teal porcelain-like scales, cut flat at both left and right ends so segments chain together, a few scales cracked and leaking blood-tears, a small pink lace ribbon tied around it. FRAME 2 = the TAIL: the same scaled body tapering to the right into a fin shaped like a wet lace bow, torn and dripping blood-tears. Flat side view, no head.
+
+
+REFERENCE: the attached image is the canonical design of this character (same pixel grid). Keep design, colors and proportions identical.
+
+[refs] /Users/yasushi/projects/poc-square/assets/gen/raw/boss-serpent-head-v1.png

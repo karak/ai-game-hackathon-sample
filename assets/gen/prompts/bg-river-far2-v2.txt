@@ -1,0 +1,22 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 400 cells wide x 300 cells tall (= 3200 x 2400 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 255 cells of the 300-cell height).
+- Exactly ONE sprite, horizontally centered on the canvas.
+- Vertically centered on the canvas.
+
+SUBJECT: a FAR-DISTANCE PARALLAX LAYER for a side-scrolling game: a wide horizontal row of distant riverbank scenery — a cluster of dead willows, a tilted watermill wheel, a row of leaning fence posts, distant reeds — drawn as a silhouette-like layer in 4 to 6 dark blue-grey tones with soft rim light. The objects stand on an invisible ground line at the bottom edge of the canvas and occupy the LOWER 45% of the canvas. STRICT KEY: the background behind, between and BELOW the objects must be the flat pure green #00FF00 only — do NOT paint any water, river, sky, fog band, frame, border, panel or ground plane; the only non-green pixels are the silhouetted objects themselves. Leave a clear GREEN GAP (no objects) at both the LEFT and RIGHT edges of the row so that several such rows can be placed side by side in any order. No characters, no text, no labels. Arrangement B (different from the attached variant A, same scale and palette).
+
+
+REFERENCE: the attached image is the canonical design of this character (same pixel grid). Keep design, colors and proportions identical.
+
+[refs] /Users/yasushi/projects/poc-square/assets/gen/raw/bg-river-far-v2.png

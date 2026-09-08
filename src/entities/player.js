@@ -203,12 +203,12 @@ export class Player {
     blit(g, spr, this.facing < 0, px, py);
     const hat = assets.hat; const hatDy = -(hat.h - (hat.brim ?? 2)); // つばが髪に少しかかる
     if (this.costume !== 'plain' && this.state === 'normal') {
-      const hy = fr === 'crouch' ? Math.floor(spr.h * 0.15) : 0;
+      const hy = (spr.headY ?? (fr === 'crouch' ? Math.floor(spr.h * 0.15) : 0)); // 髪の上端（生成コマは高さが違う）
       blit(g, hat, this.facing < 0, this.centerX - hat.w / 2 - cam.x, py + hatDy + hy);
     }
     if (this.state === 'dying' && this.deathReason !== 'bog') {
       // 帽子が飛ぶ
-      const t = this.deathT; const hx = this.centerX - hat.w / 2 - cam.x + t * 20 * -this.facing, hy = py + hatDy - (60 * t - 90 * t * t);
+      const t = this.deathT; const hx = this.centerX - hat.w / 2 - cam.x + t * 20 * -this.facing, hy = py + (spr.headY ?? 0) + hatDy - (60 * t - 90 * t * t);
       blit(g, hat, this.facing < 0, hx, Math.min(hy, py + spr.h * 0.5));
     }
     if (this.broomT > 0) blit(g, assets.broom, this.facing < 0, this.centerX - assets.broom.w / 2 - cam.x, this.y + this.h - 4 - cam.y);

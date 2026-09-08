@@ -143,6 +143,54 @@
   "src": "assets/sprites/bg/graveyard_sky.png",
   "w": 257
  },
+ "bg/river_far": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 75,
+  "src": "assets/sprites/bg/river_far.png",
+  "w": 236
+ },
+ "bg/river_far2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 74,
+  "src": "assets/sprites/bg/river_far2.png",
+  "w": 234
+ },
+ "bg/river_mid": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/bg/river_mid.png",
+  "w": 267
+ },
+ "bg/river_mid2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 105,
+  "src": "assets/sprites/bg/river_mid2.png",
+  "w": 253
+ },
+ "bg/river_mid3": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 70,
+  "src": "assets/sprites/bg/river_mid3.png",
+  "w": 248
+ },
+ "bg/river_sky": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 252,
+  "src": "assets/sprites/bg/river_sky.png",
+  "w": 201
+ },
  "bosses/doll1": {
   "anchor": "bottom",
   "colors": 15,
@@ -174,6 +222,38 @@
   "h": 175,
   "src": "assets/sprites/bosses/noir2.png",
   "w": 154
+ },
+ "bosses/serpent_body": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 63,
+  "src": "assets/sprites/bosses/serpent_body.png",
+  "w": 101
+ },
+ "bosses/serpent_head1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 131,
+  "src": "assets/sprites/bosses/serpent_head1.png",
+  "w": 82
+ },
+ "bosses/serpent_head2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 131,
+  "src": "assets/sprites/bosses/serpent_head2.png",
+  "w": 120
+ },
+ "bosses/serpent_tail": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 110,
+  "src": "assets/sprites/bosses/serpent_tail.png",
+  "w": 83
  },
  "bosses/teddy1": {
   "anchor": "bottom",
@@ -215,6 +295,14 @@
   "src": "assets/sprites/deco/bones.png",
   "w": 49
  },
+ "deco/bridgepost": {
+  "anchor": "bottom",
+  "colors": 10,
+  "fits": true,
+  "h": 72,
+  "src": "assets/sprites/deco/bridgepost.png",
+  "w": 42
+ },
  "deco/candelabra": {
   "anchor": "bottom",
   "colors": 15,
@@ -238,6 +326,14 @@
   "h": 61,
   "src": "assets/sprites/deco/cross.png",
   "w": 36
+ },
+ "deco/dollhead": {
+  "anchor": "bottom",
+  "colors": 13,
+  "fits": true,
+  "h": 81,
+  "src": "assets/sprites/deco/dollhead.png",
+  "w": 54
  },
  "deco/flowers": {
   "anchor": "bottom",
@@ -263,6 +359,14 @@
   "src": "assets/sprites/deco/pillar.png",
   "w": 33
  },
+ "deco/reeds": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 85,
+  "src": "assets/sprites/deco/reeds.png",
+  "w": 58
+ },
  "deco/tomb": {
   "anchor": "bottom",
   "colors": 11,
@@ -278,6 +382,14 @@
   "h": 70,
   "src": "assets/sprites/deco/tree.png",
   "w": 45
+ },
+ "deco/willow": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 85,
+  "src": "assets/sprites/deco/willow.png",
+  "w": 62
  },
  "deco/window": {
   "anchor": "bottom",
@@ -351,6 +463,22 @@
   "src": "assets/sprites/enemies/eye2.png",
   "w": 54
  },
+ "enemies/mermaid1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 53,
+  "src": "assets/sprites/enemies/mermaid1.png",
+  "w": 42
+ },
+ "enemies/mermaid2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 77,
+  "src": "assets/sprites/enemies/mermaid2.png",
+  "w": 78
+ },
  "enemies/mushroom1": {
   "anchor": "bottom",
   "colors": 15,
@@ -366,6 +494,22 @@
   "h": 113,
   "src": "assets/sprites/enemies/mushroom2.png",
   "w": 84
+ },
+ "enemies/umbrella1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 81,
+  "src": "assets/sprites/enemies/umbrella1.png",
+  "w": 80
+ },
+ "enemies/umbrella2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 86,
+  "src": "assets/sprites/enemies/umbrella2.png",
+  "w": 70
  },
  "enemies/unicorn1": {
   "anchor": "bottom",
@@ -999,5 +1143,37 @@
   "h": 102,
   "src": "assets/sprites/tiles/graveyard.png",
   "w": 199
+ },
+ "tiles/island": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 56,
+  "src": "assets/sprites/tiles/island.png",
+  "w": 84
+ },
+ "tiles/ladder": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 74,
+  "src": "assets/sprites/tiles/ladder.png",
+  "w": 44
+ },
+ "tiles/plank": {
+  "anchor": "bottom",
+  "colors": 11,
+  "fits": true,
+  "h": 31,
+  "src": "assets/sprites/tiles/plank.png",
+  "w": 64
+ },
+ "tiles/river": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": true,
+  "h": 260,
+  "src": "assets/sprites/tiles/river.png",
+  "w": 263
  }
 }

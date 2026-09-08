@@ -259,6 +259,61 @@ export class EyeTurret extends Enemy {
   spriteName() { return this.open ? 'eye1' : 'eye2'; }
 }
 
+// ---- 人魚人形 (第三章): 水面下で待ち、主人公が近づくと跳ね上がって噛みつく ----
+export class MermaidDoll extends Enemy {
+  constructor(world, x, y) {
+    super(world, x, y - 6, 14, 20); this.spriteOff = [3, 2];
+    this.hp = 3; this.score = 300; this.gravity = false; this.gore = 'bone'; this.fitSprite('mermaid1', 0.6, 0.85);
+    // マーカーの真下で最初に見つかる '~' の上端を水面にする
+    const map = world.level.map, tx = Math.floor((x + 7) / TILE); let ty = Math.floor(y / TILE);
+    while (ty < map.height && map.at(tx, ty) !== '~') ty++;
+    this.waterY = ty < map.height ? ty * TILE : y + TILE; this.restY = this.waterY - Math.round(this.h * 0.45); this.y = this.restY; // 胸まで水面上
+    this.state = 'wait'; this.waitT = rand(0.4, 1.2); this.lunge = 0;
+  }
+  update(dt) {
+    super.update(dt); this.facePlayer();
+    const d = this.distX(), p = this.player;
+    switch (this.state) {
+      case 'wait':
+        this.y = this.restY + Math.sin(this.t * 2) * 2; this.contact = false;
+        this.waitT -= dt;
+        if (this.waitT <= 0 && Math.abs(d) < 56 && p.y + p.h <= this.waterY + 4) { this.state = 'lunge'; this.lunge = 0; this.vy = -150; this.contact = true; this.world.audio.sfx('squish'); this.world.particles.emit('poison', this.cx, this.waterY, 6); }
+        break;
+      case 'lunge': // 放物線で跳ね上がり、噛みついて戻る
+        this.lunge += dt; this.vy += 380 * dt; this.y += this.vy * dt; this.x += this.facing * 30 * dt;
+        if (this.y >= this.restY) { this.y = this.restY; this.state = 'wait'; this.waitT = rand(1.2, 2.0); this.contact = false; this.world.particles.emit('poison', this.cx, this.waterY, 5); }
+        break;
+    }
+  }
+  hurt(dmg, shot) { if (this.state === 'wait' && shot && shot.y + shot.h > this.waterY) return; super.hurt(dmg, shot); } // 水面下は撃てない
+  spriteName() { return this.state === 'lunge' ? 'mermaid2' : 'mermaid1'; }
+  draw(g, cam, assets) {
+    // 水面より下は描かない（潜っている表現）
+    g.save(); g.beginPath(); g.rect(0, 0, 9999, Math.floor(this.waterY - cam.y)); g.clip();
+    super.draw(g, cam, assets); g.restore();
+  }
+}
+
+// ---- 傘の妖精 (第三章): 主人公の上空を漂い、血の雨滴を落とす ----
+export class UmbrellaFairy extends Enemy {
+  constructor(world, x, y) {
+    super(world, x, y, 14, 18); this.spriteOff = [3, 2]; this.baseY = y - 40; this.y = this.baseY;
+    this.hp = 2; this.score = 250; this.gravity = false; this.contact = true; this.gore = 'blood'; this.fitSprite('umbrella1', 0.55, 0.85); this.baseY = this.y;
+    this.homeX = x; this.dropT = rand(1, 2); this.dir = -1;
+  }
+  update(dt) {
+    super.update(dt);
+    const d = this.distX();
+    // 主人公の上へゆっくり寄る（±90 の範囲で追従）、上下にふらふら
+    const targetX = Math.max(this.homeX - 90, Math.min(this.homeX + 90, this.player.centerX));
+    this.x += Math.sign(targetX - this.cx) * Math.min(Math.abs(targetX - this.cx), 28 * dt);
+    this.y = this.baseY + Math.sin(this.t * 1.8) * 5; this.facing = d < 0 ? -1 : 1;
+    if (Math.abs(d) < 24) { this.dropT -= dt; if (this.dropT <= 0) { this.dropT = 1.6; for (let i = -1; i <= 1; i++) this.shoot('rain', i * 18, 30, i * 6, 8); this.world.audio.sfx('poison'); } }
+    else this.dropT = Math.max(this.dropT, 0.3);
+  }
+  spriteName() { return Math.floor(this.t * 4) % 2 ? 'umbrella1' : 'umbrella2'; }
+}
+
 export function createEnemy(world, spawn) {
   const { type, x, y } = spawn;
   switch (type) {
@@ -269,6 +324,8 @@ export function createEnemy(world, spawn) {
     case 'angel': return new AngelSkeleton(world, x + 2, y);
     case 'bear': return new TeddyBear(world, x + 2, y + 2);
     case 'eye': return new EyeTurret(world, x + 1, y);
+    case 'mermaid': return new MermaidDoll(world, x + 1, y);
+    case 'umbrella': return new UmbrellaFairy(world, x + 1, y);
   }
   return null;
 }

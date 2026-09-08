@@ -5,6 +5,7 @@ import { buildTileset, THEMES } from './tiles.js';
 import { buildBackground } from './background.js';
 import manifest from './manifest.json';
 import { loadManifest, nest } from './loader.js';
+import { HD_SCALE } from './sprite.js';
 
 // 全アセットを起動時に生成。生成済み PNG（manifest）があればそれを優先し、無い分は文字列スプライトで補う。
 export async function buildAssets() {
@@ -20,10 +21,19 @@ export async function buildAssets() {
     }
     assets.player.generated = true;
     if (gen.player.hat) assets.hat = gen.player.hat;
+    // 帽子はコマごとの「髪の上端」に載せる（コマの高さが 94〜135 セルと違うため、スプライト上端基準では浮く）
+    for (const c of Object.keys(assets.player)) for (const spr of Object.values(assets.player[c])) if (spr && spr.hd && spr.headY === undefined) spr.headY = findHairTop(spr.r) / HD_SCALE;
   }
   for (const g of ['enemies', 'bosses', 'items', 'shots']) if (gen[g]) Object.assign(assets[g], gen[g]);
   assets.generated = gen;
   return assets;
+}
+
+// 髪色（桃色: r>190, b>140, r-g>45）の最上段の行（スクリーン px）。見つからなければ 0
+function findHairTop(canvas) {
+  const g = canvas.getContext('2d'); const { width: w, height: h } = canvas; const d = g.getImageData(0, 0, w, h).data;
+  for (let y = 0; y < h; y++) { let n = 0; for (let x = 0; x < w; x++) { const i = (y * w + x) * 4; if (d[i + 3] > 0 && d[i] > 190 && d[i + 2] > 140 && d[i] - d[i + 1] > 45) n++; } if (n >= 3) return y; }
+  return 0;
 }
 
 function buildProcedural() {

@@ -26,8 +26,9 @@ test('§2.1 player body frames are 40-80 wide and 70-120 tall; hat/dead/crouch h
 });
 
 test('§2.1 enemies are 60-135 tall (0.6-1.3x player) and bosses 130-200 tall', () => {
-  for (const [k, v] of group('enemies')) { expect(v.h, k).toBeGreaterThanOrEqual(60); expect(v.h, k).toBeLessThanOrEqual(135); expect(v.w, k).toBeLessThanOrEqual(160); }
-  for (const [k, v] of group('bosses')) { expect(v.h, k).toBeGreaterThanOrEqual(130); expect(v.h, k).toBeLessThanOrEqual(200); }
+  const PARTIAL = { 'enemies/mermaid1': 40 }; // 水面上の半身だけを描くコマ（例外。下限 40）
+  for (const [k, v] of group('enemies')) { expect(v.h, k).toBeGreaterThanOrEqual(PARTIAL[k] ?? 60); expect(v.h, k).toBeLessThanOrEqual(135); expect(v.w, k).toBeLessThanOrEqual(160); }
+  for (const [k, v] of group('bosses')) { if (/_(body|tail)$/.test(k)) { expect(v.h, k).toBeGreaterThanOrEqual(50); continue; } expect(v.h, k).toBeGreaterThanOrEqual(130); expect(v.h, k).toBeLessThanOrEqual(200); } // 多節ボスの胴・尾は頭より小さい
 });
 
 test('§2.2 every generated sprite has 10-15 colors and fits its spec box', () => {

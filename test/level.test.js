@@ -2,6 +2,7 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { parseLevel } from '../src/level.js';
 import { STAGES } from '../src/levels/index.js';
+import { PLATFORM } from '../src/entities/gimmicks.js';
 
 test('parseLevel extracts markers and leaves tiles clean', () => {
   const rows = [
@@ -56,11 +57,13 @@ test('every hazard gap is crossable: at most 3 tiles wide at ground level, or ha
     const lvl = parseLevel(stage); const map = lvl.map;
     // 各列の「最も高い立てる面」を求める（地面 or 足場）
     const standY = tx => { for (let ty = 0; ty < map.height; ty++) if (map.isSolid(tx, ty) || map.isOneWay(tx, ty)) return ty; return null; };
+    // 動く足場・浮島（マーカー）も足場として数える（幅 = PLATFORM[kind].w タイル）
+    const platCols = new Set(); for (const s of lvl.spawns) if (PLATFORM[s.type]) for (let i = 0; i < PLATFORM[s.type].w; i++) platCols.add(s.tx + i);
     let gapStart = null;
     for (let tx = 0; tx <= map.width; tx++) {
       const y = tx < map.width ? standY(tx) : 0;
       // 天井のみ(城の row0-1)は立てる面ではない
-      const usable = y !== null && y >= 3;
+      const usable = (y !== null && y >= 3) || platCols.has(tx);
       if (!usable && gapStart === null) gapStart = tx;
       if (usable && gapStart !== null) {
         const width = tx - gapStart;

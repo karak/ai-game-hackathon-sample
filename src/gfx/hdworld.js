@@ -13,6 +13,7 @@ export const TILE_BANDS = {
   graveyard:   { surface: [0.00, 0.22], plat: [0.22, 0.40], fill: [0.52, 0.88] },
   candyforest: { surface: [0.00, 0.19], plat: [0.32, 0.42], fill: [0.55, 0.95] },
   castle:      { surface: [0.00, 0.20], plat: [0.50, 0.62], fill: [0.50, 1.00] },
+  river:       { surface: [0.26, 0.32], plat: [0.47, 0.52], fill: [0.53, 0.98] }, // 実測: 0〜0.25 はキー残り、草 0.26〜0.31、泥と水溜まり 0.31〜0.47、草の線 0.48〜0.50、地中 0.51〜
 };
 export function sliceTileStrip(img, bands = TILE_BANDS.graveyard) {
   const cols = Math.max(1, Math.floor(img.width / T));

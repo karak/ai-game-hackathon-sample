@@ -869,6 +869,190 @@
    "colors": 32,
    "keep_bottom": 0.9,
    "ref": "bg-castle-far"
+  },
+  "bg-river-sky": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-river-sky.txt",
+   "out": [
+    "bg/river_sky"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "bg-river-far": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-river-far.txt",
+   "out": [
+    "bg/river_far"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-river-far2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-river-far2.txt",
+   "out": [
+    "bg/river_far2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "ref": "bg-river-far"
+  },
+  "bg-river-mid": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-river-mid.txt",
+   "out": [
+    "bg/river_mid"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-river-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-river-mid2.txt",
+   "out": [
+    "bg/river_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-river-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-river-mid3.txt",
+   "out": [
+    "bg/river_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "tiles-river": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-river.txt",
+   "out": [
+    "tiles/river"
+   ],
+   "kind": "tiles",
+   "colors": 24
+  },
+  "deco-river": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-river.txt",
+   "out": [
+    "deco/willow",
+    "deco/bridgepost",
+    "deco/reeds",
+    "deco/dollhead"
+   ],
+   "colors": 15
+  },
+  "gimmick-river": {
+   "box": [
+    100,
+    120
+   ],
+   "frames": 3,
+   "anchor": "bottom",
+   "subject": "gimmick-river.txt",
+   "out": [
+    "tiles/ladder",
+    "tiles/island",
+    "tiles/plank"
+   ],
+   "colors": 15
+  },
+  "enemy-mermaid": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-mermaid.txt",
+   "out": [
+    "enemies/mermaid1",
+    "enemies/mermaid2"
+   ]
+  },
+  "enemy-umbrella": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-umbrella.txt",
+   "out": [
+    "enemies/umbrella1",
+    "enemies/umbrella2"
+   ]
+  },
+  "boss-serpent-head": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "boss-serpent-head.txt",
+   "out": [
+    "bosses/serpent_head1",
+    "bosses/serpent_head2"
+   ]
+  },
+  "boss-serpent-body": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "boss-serpent-body.txt",
+   "out": [
+    "bosses/serpent_body",
+    "bosses/serpent_tail"
+   ],
+   "ref": "boss-serpent-head"
   }
  }
 }

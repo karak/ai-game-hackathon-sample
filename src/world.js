@@ -13,6 +13,7 @@ import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBo
 import { THEMES } from './gfx/tiles.js';
 import { SAFE_SHOT_T } from './balance.js';
 import { Fx } from './fx.js';
+import { HD_SCALE as HD } from './gfx/sprite.js';
 import { MovingPlatform, CrumbleTile, PLATFORM } from './entities/gimmicks.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
@@ -38,7 +39,8 @@ export class World {
       const D = gen.deco ?? {};
       const decoMap = { graveyard: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones },
                         candyforest: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones, k: D.lollipop },
-                        castle: { n: D.pillar, w: D.window, v: D.candelabra, x: D.blood, o: D.bones, t: D.banner } }[this.level.theme] ?? {};
+                        castle: { n: D.pillar, w: D.window, v: D.candelabra, x: D.blood, o: D.bones, t: D.banner },
+                        river: { y: D.willow, n: D.bridgepost, f: D.reeds, o: D.dollhead, x: D.blood, t: D.tomb } }[this.level.theme] ?? {};
       for (const k of Object.keys(decoMap)) if (!decoMap[k]) delete decoMap[k];
       this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles, 512, decoMap, buildSpikeHD(THEMES[this.level.theme]));
       this.bogHD = buildBogHD(THEMES[this.level.theme]);
@@ -154,13 +156,18 @@ export class World {
     const tx = Math.floor((x1 - 40) / TILE); let gy = map.pixelHeight;
     const startTy = Math.max(0, Math.floor((this.player.y + this.player.h) / TILE) - 1);
     for (let ty = startTy; ty < map.height; ty++) if (map.isSolid(tx, ty)) { gy = ty * TILE; break; }
+    if (this.level.boss === 'serpent') { // 大蛇は川に棲む: 部屋の中央列で最初の '~' の上端を水面にする
+      const cx = Math.floor((x0 + x1) / 2 / TILE);
+      for (let ty = 0; ty < map.height; ty++) if (map.at(cx, ty) === '~') { gy = ty * TILE; break; }
+    }
     this.boss = createBoss(this, this.level.boss, x1 - 48, gy);
+    if (this.boss.parts) this.enemies.push(...this.boss.parts); // 胴体（接触判定のみ）
     this.enemies = this.enemies.filter(e => !(e.spawnX >= x0 - 200)); // 周辺の雑魚は消す
     this.enemies.push(this.boss);
     this.audio.playBgm(SONGS.boss);
     this.fx.bossIntro(this.bossName());
   }
-  bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール' }[this.level.boss] ?? 'BOSS'; }
+  bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', serpent: '涙の大蛇 ララバイ' }[this.level.boss] ?? 'BOSS'; }
 
   collide() {
     const p = this.player;
@@ -214,6 +221,7 @@ export class World {
     for (const s of this.shots) s.draw(g, cam, A.shots);
     for (const s of this.enemyShots) s.draw(g, cam, A.shots);
     this.particles.draw(g, cam);
+    this.drawWeather(g, cam);
     // 毒の画面効果（変身解除中にうっすら）
     if (this.player.costume === 'plain' && this.player.alive) { g.fillStyle = 'rgba(180,92,245,0.06)'; g.fillRect(0, 0, W, H); }
     // 撃破フラッシュ / ボス撃破の白飛び
@@ -221,25 +229,49 @@ export class World {
   }
   // 動く足場・崩れる足場・はしご（足場画像はテーマの足場タイルを流用。はしごは暫定の幾何描画: 第四章の地形生成で置換予定）
   drawGimmicks(g, cam) {
-    const plat = (x, y, w, shake = 0) => {
+    const G = this.assets.generated?.tiles ?? {};
+    // 生成済みのギミック絵（tiles/ladder, island, plank）があれば使う。無ければ足場タイル／幾何描画
+    const drawGen = (spr, x, y, w, h) => { const sw = spr.r.width / HD, sh = spr.r.height / HD; g.drawImage(spr.r, Math.round(x + w / 2 - sw / 2), Math.round(y + h - sh), sw, sh); };
+    const plat = (x, y, w, shake = 0, kind = 'plat') => {
+      const sx = x - cam.x + shake, sy = y - cam.y;
+      if (kind === 'island' && G.island) return drawGen(G.island, sx, sy - 2, w, TILE);
+      if (kind === 'plank' && G.plank) return drawGen(G.plank, sx, sy, w, TILE);
       const n = Math.round(w / TILE);
       for (let i = 0; i < n; i++) {
-        const sx = Math.round(x + i * TILE - cam.x + shake), sy = Math.round(y - cam.y);
-        if (this.hdTiles) { const v = (i * 7) % this.hdTiles.cols; g.drawImage(this.hdTiles.plat[v], sx, sy, TILE, TILE); }
-        else g.drawImage(this.tiles.plat, sx, sy);
+        if (this.hdTiles) { const v = (i * 7) % this.hdTiles.cols; g.drawImage(this.hdTiles.plat[v], Math.round(sx + i * TILE), Math.round(sy), TILE, TILE); }
+        else g.drawImage(this.tiles.plat, Math.round(sx + i * TILE), Math.round(sy));
       }
     };
-    for (const p of this.platforms) if (p.x + p.w > cam.x && p.x < cam.x + W) plat(p.x, p.y, p.w);
-    for (const c of this.crumbles) if (c.state !== 'gone' && c.x + TILE > cam.x && c.x < cam.x + W) plat(c.x, c.y, TILE, c.shake);
-    // はしご
+    for (const p of this.platforms) if (p.x + p.w > cam.x && p.x < cam.x + W) plat(p.x, p.y, p.w, 0, p.kind === 'island' ? 'island' : 'plat');
+    for (const c of this.crumbles) if (c.state !== 'gone' && c.x + TILE > cam.x && c.x < cam.x + W) plat(c.x, c.y, TILE, c.shake, 'plank');
+    // はしご（1 タイル 1 段。生成絵は 2 段分なので上半分／下半分を交互に使う）
     const map = this.level.map, tx0 = Math.floor(cam.x / TILE), tx1 = tx0 + W / TILE + 1;
     const th = THEMES[this.level.theme];
     for (let ty = 0; ty < map.height; ty++) for (let tx = tx0; tx <= tx1; tx++) {
       if (map.at(tx, ty) !== 'L') continue;
       const x = tx * TILE - cam.x, y = ty * TILE - cam.y;
+      if (G.ladder) { // 生成絵（2 段分、高さ ≈ 74 セル）を縦方向のテクスチャとして 1 タイル分ずつ切り出す（継ぎ目は横桟の周期でほぼ隠れる）
+        const L = G.ladder.r, th16 = TILE * HD, srcY = (ty * th16) % L.height, h1 = Math.min(th16, L.height - srcY), dx = Math.round(x + TILE / 2 - L.width / HD / 2);
+        g.drawImage(L, 0, srcY, L.width, h1, dx, Math.round(y), L.width / HD, h1 / HD);
+        if (h1 < th16) g.drawImage(L, 0, 0, L.width, th16 - h1, dx, Math.round(y) + h1 / HD, L.width / HD, (th16 - h1) / HD);
+        continue;
+      }
       g.fillStyle = th.plat[0]; g.fillRect(x + 3, y, 2, TILE); g.fillRect(x + 11, y, 2, TILE);
       g.fillStyle = th.plat[1]; g.fillRect(x + 4, y + 3, 8, 2); g.fillRect(x + 4, y + 11, 8, 2);
     }
+  }
+  // 天候: 川面は雨（斜めの雨筋＋薄い霧で視界低下）
+  drawWeather(g, cam) {
+    if (this.level.theme !== 'river') return;
+    const t = this.t; g.save(); g.globalAlpha = 0.35; g.strokeStyle = '#cbe8f0'; g.lineWidth = 1 / HD;
+    g.beginPath();
+    for (let i = 0; i < 70; i++) { // 決定論的な雨筋（i ごとの擬似乱数）: 落下速度 220/s、風で左へ 40/s
+      const seed = (i * 7919) % 997 / 997, seed2 = (i * 104729) % 991 / 991;
+      const x = ((seed * 320 - (t * 40 + cam.x * 0.3) % 320) % 320 + 320) % 320 - 32, y = ((seed2 * 260 + t * 220) % 260) - 20;
+      g.moveTo(x, y); g.lineTo(x - 2, y + 9);
+    }
+    g.stroke(); g.restore();
+    g.fillStyle = 'rgba(120,150,170,0.14)'; g.fillRect(0, 0, W, H); // 霧
   }
   drawBog(g, cam) {
     const map = this.level.map; const f = Math.floor(this.t * 3) % 2;

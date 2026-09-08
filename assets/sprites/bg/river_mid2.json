@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-river-mid2-v2.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  400,
+  300
+ ],
+ "w": 253,
+ "h": 105,
+ "fits": true,
+ "colors": 32
+}

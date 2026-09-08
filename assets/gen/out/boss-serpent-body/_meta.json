@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/boss-serpent-body-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  200,
+  200
+ ],
+ "frames": [
+  {
+   "w": 101,
+   "h": 63,
+   "fits": true,
+   "colors": 15,
+   "name": "serpent_body"
+  },
+  {
+   "w": 83,
+   "h": 110,
+   "fits": true,
+   "colors": 15,
+   "name": "serpent_tail"
+  }
+ ]
+}

@@ -24,6 +24,15 @@ export const THEMES = {
     moon: '#fff0a0', moonShade: '#f0c860', star: '#fdfbf7',
     far: '#3a3a72', mid: '#2c2c5c', near: '#1e1e44',
   },
+  river: { // 第三章 涙の川: 雨・青緑〜灰。'~' は涙の川（薄く血が混じる）
+    grass: ['#3f7a6a', '#2f5f52', '#58a08a'], grassFlower: ['#ff8fc8', '#cbe8f0', '#f8e46e'],
+    dirt: ['#3a3a48', '#4a4a5c', '#2c2c38'], pebble: '#7d8ea0',
+    plat: ['#4a5a6a', '#6a7c8c', '#34404c'], platMoss: '#58a08a',
+    bog: ['#2c4c6a', '#3a6a8a', '#5a94b4'], bogGlow: '#9ad8f0', bogBubble: '#ffb0c8',
+    skyTop: '#1c2438', skyMid: '#2c4058', skyBot: '#587890', horizon: '#9ab8a0',
+    moon: '#e8f0f4', moonShade: '#b8c8d0', star: '#cbe8f0',
+    far: '#243448', mid: '#1c2838', near: '#141c28',
+  },
   castle: {
     grass: ['#6c6c80', '#7c7c90', '#5d5d70'], grassFlower: ['#d9262b', '#7a0f1f', '#a5a5b8'],
     dirt: ['#5d5d70', '#4e4e60', '#6c6c80'], pebble: '#2d1f4c',

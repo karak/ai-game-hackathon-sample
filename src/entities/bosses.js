@@ -208,11 +208,94 @@ export class Noir extends Boss {
   }
 }
 
+// ---- 涙の大蛇 (第三章): 川を渡る長い体。頭だけが弱点、胴体は触れると被弾 ----
+// かわいい: 赤いリボンと潤んだ大きな目 / えげつない: 鱗の間から血の涙、口内に人形の腕
+export class TearSerpent extends Boss {
+  constructor(world, x, groundY) {
+    super(world, x, groundY - 40, 40, 40); this.spriteOff = [4, 2];
+    this.hpMax = this.hp = 24; this.facing = -1; this.fitSprite('serpent_head1', 0.7, 0.8);
+    this.waterY = groundY;                       // 水面（部屋の '~' の上端。startBoss が渡す groundY）
+    this.segCount = 7; this.segGap = 14;         // 胴 6 + 尾 1、間隔（世界単位）
+    this.trail = []; this.parts = []; this.pathT = 0; this.mouth = 0; this.rainT = 4;
+    for (let i = 0; i < this.segCount; i++) this.parts.push(new SerpentPart(this, i === this.segCount - 1));
+    this.enterX = x; this.headOpen = false;
+  }
+  // 弧を描いて川を横切る基準位置。t の進みで左右に往復
+  pathPos(t) {
+    const a = this.world.arena; const x0 = a.x0 + 24, x1 = a.x1 - 24;
+    const u = (Math.sin(t * 0.55) + 1) / 2;          // 0..1 往復（周期 ≈ 11.4 秒）
+    const x = x1 - (x1 - x0) * u;
+    const y = this.waterY - 26 - Math.abs(Math.sin(t * 1.6)) * 26; // 波打ちながら水面上 26〜52 を進む
+    return [x, y];
+  }
+  update(dt) {
+    if (super.update(dt)) { for (const q of this.parts) q.follow(this); if (this.dead) for (const q of this.parts) q.dead = true; return; }
+    const p = this.player; const enraged = this.hpRatio < 0.5;
+    this.pathT += dt * (enraged ? 1.4 : 1);
+    const [bx, by] = this.pathPos(this.pathT);
+    switch (this.state) {
+      case 'enter': { // 水面下から浮上
+        const ty = this.waterY - 20; this.y += (ty - this.y) * Math.min(1, dt * 2); this.x = bx - this.w / 2;
+        if (this.stateT > 1.5) { this.setState('sweep'); this.contact = true; }
+        break;
+      }
+      case 'sweep': { // 川を横切る。主人公が頭の近くに来たら噛みつき
+        this.x = bx - this.w / 2; this.y = by - this.h / 2; this.headOpen = false;
+        const d = this.distX();
+        if (this.stateT > 1.2 && Math.abs(d) < 70 && p.y < this.waterY) { this.setState('strike'); this.strikeFrom = [this.x, this.y]; this.strikeTo = [p.x + p.w / 2 - this.w / 2, Math.max(this.waterY - 110, p.y - 6)]; this.world.audio.sfx('boss'); }
+        this.rainT -= dt; if (this.rainT <= 0) { this.rainT = enraged ? 3.2 : 4.5; this.setState('rain'); }
+        break;
+      }
+      case 'strike': { // 0.35 秒で主人公へ突き出し、口を開ける。0.5 秒で戻る
+        const k = Math.min(1, this.stateT / 0.35); const e = k < 1 ? 1 - (1 - k) * (1 - k) : 1;
+        this.headOpen = k > 0.3;
+        if (this.stateT < 0.5) { this.x = this.strikeFrom[0] + (this.strikeTo[0] - this.strikeFrom[0]) * e; this.y = this.strikeFrom[1] + (this.strikeTo[1] - this.strikeFrom[1]) * e; }
+        else { const r = Math.min(1, (this.stateT - 0.5) / 0.5); this.x = this.strikeTo[0] + (bx - this.w / 2 - this.strikeTo[0]) * r; this.y = this.strikeTo[1] + (by - this.h / 2 - this.strikeTo[1]) * r; if (r >= 1) this.setState('sweep'); }
+        break;
+      }
+      case 'rain': { // 口を上に向けて血の涙を吐き上げる（落ちてくる）
+        this.x = bx - this.w / 2; this.y = by - this.h / 2; this.headOpen = true;
+        if (Math.floor(this.stateT * 8) !== Math.floor((this.stateT - dt) * 8) && this.stateT < 1) { const n = enraged ? 2 : 1; for (let i = 0; i < n; i++) this.shoot('rain', rand(-70, 70), -230 + rand(-30, 0), 0, -8, { life: 3.5 }); }
+        if (this.stateT > 1.2) this.setState('sweep');
+        break;
+      }
+    }
+    this.facing = this.player.centerX < this.cx ? -1 : 1;
+    // 軌跡を記録し、胴体を追従させる
+    this.trail.unshift([this.cx, this.cy]); if (this.trail.length > 400) this.trail.pop();
+    for (const q of this.parts) q.follow(this);
+  }
+  spriteName() { return this.headOpen ? 'serpent_head2' : 'serpent_head1'; }
+}
+// 胴体・尾の 1 節。当たると被弾するが撃てない（hp なし）。World.enemies に登録される
+class SerpentPart {
+  constructor(head, isTail) { this.head = head; this.world = head.world; this.isTail = isTail; this.w = 18; this.h = 18; this.x = head.x; this.y = head.y; this.contact = false; this.dead = false; this.spawnX = -9999; this.facing = -1; }
+  update() {}
+  follow(head) {
+    const idx = head.parts.indexOf(this) + 1; const dist = idx * head.segGap;
+    // 軌跡上で頭から dist 離れた点を探す
+    let acc = 0, pos = head.trail[0] ?? [head.cx, head.cy];
+    for (let i = 1; i < head.trail.length; i++) { const a = head.trail[i - 1], b = head.trail[i]; const d = Math.hypot(b[0] - a[0], b[1] - a[1]); if (acc + d >= dist) { const k = (dist - acc) / (d || 1); pos = [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k]; break; } acc += d; pos = b; }
+    this.facing = head.facing;
+    const spr = this.world.assets.bosses?.[this.isTail ? 'serpent_tail' : 'serpent_body'];
+    if (spr?.hd) { this.w = Math.round(spr.w * 0.7); this.h = Math.round(spr.h * 0.7); }
+    this.x = pos[0] - this.w / 2; this.y = pos[1] - this.h / 2;
+    this.contact = head.state !== 'enter' && !head.dying && this.y + this.h < head.waterY + 6;
+  }
+  draw(g, cam, assets) {
+    const spr = assets.bosses?.[this.isTail ? 'serpent_tail' : 'serpent_body']; if (!spr) { g.fillStyle = '#5a94b4'; g.fillRect(Math.round(this.x - cam.x), Math.round(this.y - cam.y), this.w, this.h); return; }
+    g.save(); g.beginPath(); g.rect(0, 0, 9999, Math.floor(this.head.waterY + 4 - cam.y)); g.clip();
+    blit(g, spr, this.facing < 0, Math.round(this.x + this.w / 2 - spr.w / 2 - cam.x), Math.round(this.y + this.h / 2 - spr.h / 2 - cam.y));
+    g.restore();
+  }
+}
+
 export function createBoss(world, kind, x, groundY) {
   switch (kind) {
     case 'doll': return new WeepingDoll(world, x, groundY);
     case 'teddy': return new GutsTeddy(world, x, groundY);
     case 'noir': return new Noir(world, x, groundY);
+    case 'serpent': return new TearSerpent(world, x, groundY);
   }
   return null;
 }

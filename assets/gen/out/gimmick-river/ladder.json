@@ -1,0 +1,17 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/gimmick-river-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  100,
+  120
+ ],
+ "frames": null,
+ "w": 44,
+ "h": 74,
+ "fits": true,
+ "colors": 15,
+ "name": "ladder"
+}

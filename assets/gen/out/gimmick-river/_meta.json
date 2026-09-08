@@ -1,0 +1,34 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/gimmick-river-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  100,
+  120
+ ],
+ "frames": [
+  {
+   "w": 44,
+   "h": 74,
+   "fits": true,
+   "colors": 15,
+   "name": "ladder"
+  },
+  {
+   "w": 84,
+   "h": 56,
+   "fits": true,
+   "colors": 15,
+   "name": "island"
+  },
+  {
+   "w": 64,
+   "h": 31,
+   "fits": true,
+   "colors": 11,
+   "name": "plank"
+  }
+ ]
+}

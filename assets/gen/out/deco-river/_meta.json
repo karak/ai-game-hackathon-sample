@@ -1,0 +1,41 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/deco-river-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  120,
+  160
+ ],
+ "frames": [
+  {
+   "w": 62,
+   "h": 85,
+   "fits": true,
+   "colors": 14,
+   "name": "willow"
+  },
+  {
+   "w": 42,
+   "h": 72,
+   "fits": true,
+   "colors": 10,
+   "name": "bridgepost"
+  },
+  {
+   "w": 58,
+   "h": 85,
+   "fits": true,
+   "colors": 14,
+   "name": "reeds"
+  },
+  {
+   "w": 54,
+   "h": 81,
+   "fits": true,
+   "colors": 13,
+   "name": "dollhead"
+  }
+ ]
+}
