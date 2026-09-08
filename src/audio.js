@@ -1,7 +1,7 @@
 // Web Audio によるチップチューン合成。外部素材なし。
 // SFX は関数で合成、BGM は簡易シーケンサで矩形波/三角波/ノイズを鳴らす。
 
-const NOTE = {}; // 'C4' → Hz
+export const NOTE = {}; // 'C4' → Hz
 {
   const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   const flats = { 'C#': 'Db', 'D#': 'Eb', 'F#': 'Gb', 'G#': 'Ab', 'A#': 'Bb' };

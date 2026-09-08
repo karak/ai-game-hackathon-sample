@@ -1,6 +1,6 @@
 import { PAL } from './palette.js';
 import { makeSprite } from './sprite.js';
-import { DECO } from './sprites.js';
+import { DECO } from './sprites/index.js';
 import { rng } from '../util.js';
 import { TILE } from '../physics.js';
 

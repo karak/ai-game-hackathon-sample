@@ -1,5 +1,5 @@
 // キーボード入力。pressed = 今フレーム押された、held = 押し続け
-const MAP = {
+export const MAP = {
   ArrowLeft: 'left', KeyA: 'left',
   ArrowRight: 'right', KeyD: 'right',
   ArrowUp: 'up', KeyW: 'up',

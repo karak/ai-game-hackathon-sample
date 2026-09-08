@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { parseLevel } from '../src/level.js';
 import { STAGES } from '../src/levels/index.js';

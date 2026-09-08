@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>デザインカタログ - マジカル☆リリカ</title>
+<style>
+  @font-face { font-family: 'DotGothic16'; src: url('assets/fonts/DotGothic16-Regular.ttf') format('truetype'); }
+  html, body { margin: 0; background: #0e0a18; color: #cbaaf5; font-family: 'DotGothic16', sans-serif; }
+  #bar { position: sticky; top: 0; background: #1c1430; padding: 8px 12px; display: flex; gap: 12px; align-items: center; z-index: 1; border-bottom: 1px solid #2d1f4c; }
+  #bar a { color: #ff8fc8; }
+  canvas { display: block; image-rendering: pixelated; margin: 0 auto 24px; background: #000; }
+  h2 { margin: 16px 12px 4px; font-size: 14px; color: #ff8fc8; }
+</style>
+</head>
+<body>
+  <div id="bar">
+    <b>デザインカタログ</b>
+    <label>拡大 <select id="scale"><option>2</option><option selected>3</option><option>4</option></select></label>
+    <a href="index.html">ゲームへ</a>
+  </div>
+  <div id="sections"></div>
+  <script type="module" src="src/catalog.js"></script>
+</body>
+</html>

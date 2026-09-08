@@ -1,37 +1,11 @@
 import { World, W, H } from './world.js';
 import { STAGES } from './levels/index.js';
-import { drawWindow, text, mini, drawHud, fmtTime } from './ui.js';
+import { drawWindow, text, mini, drawHud, textBox, wrap, LAYOUT } from './ui/index.js';
 import { SONGS } from './audio.js';
 import { drawBackground } from './gfx/background.js';
+import { PROLOGUE, ENDING } from './story.js';
 
-const PROLOGUE = [
-  'むかしむかし、おとぎの国は',
-  'ひとりの魔法少女に',
-  '守られていた。',
-  '',
-  'ある日、彼女は世界を呪った。',
-  '花は腐り、うさぎは血を吐き、',
-  '砂糖の城は赤く染まった。',
-  '',
-  '見習い魔女リリカ、15歳。',
-  '今日は、その後始末をする日。',
-];
-const ENDING = [
-  '城の奥で、ノワールは',
-  '静かに崩れた。',
-  '「……ありがとう」',
-  'そう聞こえた気がした。',
-  '',
-  'おとぎの国に朝が来る。',
-  '花はまだ腐っているし、',
-  '洗濯物は血まみれだけれど。',
-  '',
-  'リリカは帽子を直して、',
-  'ほうきに乗った。',
-  '「さ、帰って宿題やろ」',
-  '',
-  'ＴＨＥ　ＥＮＤ',
-];
+
 
 export class Game {
   constructor(assets, audio, input) {
@@ -117,12 +91,12 @@ export class Game {
     // ゾンビ
     const z = this.assets.enemies[Math.floor(this.stateT * 4) % 2 ? 'zombie1' : 'zombie2']; g.drawImage(z.l, 176, 160); g.drawImage(z.l, 22, 160);
     // タイトル
-    drawWindow(g, 16, 28, 224, 74);
-    text(g, 'マジカル☆リリカと', 128, 36, { align: 'center', color: '#ff8fc8' });
-    text(g, '血塗られたおとぎの国', 128, 56, { align: 'center', color: '#fdfbf7' });
-    g.fillStyle = '#d9262b'; g.fillRect(60, 78, 136, 1);
-    mini(g, 'MAGICAL LYRICA AND THE BLOODSTAINED FAIRYLAND', 128 - 44 * 2, 84, '#cbaaf5');
-    if (Math.floor(this.stateT * 2) % 2) text(g, 'PUSH START (Enter / Z / X)', 128, 118, { align: 'center', size: 16, color: '#ffe860' });
+    const r = textBox(g, [{ t: 'マジカル☆リリカと', color: '#ff8fc8' }, { t: '血塗られたおとぎの国', color: '#fdfbf7' }, { t: ' ', size: 6 }], { y: 28, minWidth: 224 });
+    g.fillStyle = '#d9262b'; g.fillRect(r.x + 24, r.y + r.h - 16, r.w - 48, 1);
+    const sub = 'MAGICAL LYRICA AND THE BLOODSTAINED FAIRYLAND';
+    mini(g, sub, Math.floor(128 - sub.length * 2), r.y + r.h - 11, '#cbaaf5');
+    if (Math.floor(this.stateT * 2) % 2) text(g, 'PUSH START', 128, 118, { align: 'center', size: 16, color: '#ffe860' });
+    mini(g, 'ENTER / Z / X', 128 - 13 * 2, 138, '#ffe860');
     mini(g, 'HI ' + String(this.hi).padStart(7, '0'), 4, 4, '#a5a5b8');
     mini(g, 'ARROWS MOVE  Z SHOOT  X JUMP  DOWN CROUCH', 128 - 41 * 2, 208, '#a5a5b8');
     mini(g, 'M MUTE  P PAUSE', 128 - 15 * 2, 216, '#a5a5b8');
@@ -130,34 +104,32 @@ export class Game {
   drawScroll(g, lines, kind) {
     g.fillStyle = kind === 'ending' ? '#2d1f4c' : '#0e0a18'; g.fillRect(0, 0, W, H);
     if (kind === 'ending') { drawBackground(g, this.assets.backgrounds.candyforest, this.stateT * 8, W, H); g.fillStyle = 'rgba(14,10,24,0.55)'; g.fillRect(0, 0, W, H); }
-    const shown = Math.min(lines.length, Math.floor(this.stateT / 0.9) + 1);
-    const y0 = kind === 'ending' ? Math.max(8, 100 - this.stateT * 6) : 22;
-    for (let i = 0; i < shown; i++) text(g, lines[i], 128, y0 + i * 18, { align: 'center', color: i === lines.length - 1 && kind === 'ending' ? '#ffe860' : '#fdfbf7' });
+    // 実測幅で折り返してから表示（1 行は 240px 以内）
+    const wrapped = lines.flatMap(l => l === '' ? [''] : wrap(g, l, LAYOUT.W - LAYOUT.MARGIN * 2));
+    const shown = Math.min(wrapped.length, Math.floor(this.stateT / 0.9) + 1);
+    const total = wrapped.length * LAYOUT.LINE;
+    const y0 = kind === 'ending' ? Math.max(8, 100 - this.stateT * 6) : Math.max(8, Math.floor((LAYOUT.H - 30 - total) / 2));
+    for (let i = 0; i < shown; i++) text(g, wrapped[i], 128, y0 + i * LAYOUT.LINE, { align: 'center', color: i === wrapped.length - 1 && kind === 'ending' ? '#ffe860' : '#fdfbf7' });
     if (kind === 'ending' && this.stateT > 4) { mini(g, 'SCORE ' + String(this.score).padStart(7, '0'), 128 - 26, 190, '#ff8fc8'); }
     if (shown >= lines.length && Math.floor(this.stateT * 2) % 2) mini(g, 'PUSH START', 128 - 20, 210, '#ffe860');
   }
   drawIntro(g) {
     g.fillStyle = 'rgba(14,10,24,0.6)'; g.fillRect(0, 0, W, H);
     const st = STAGES[this.stageIndex];
-    drawWindow(g, 16, 80, 224, 64);
-    text(g, st.title, 128, 88, { align: 'center', color: '#ff8fc8' });
-    text(g, st.subtitle.length > 14 ? st.subtitle.slice(0, 14) : st.subtitle, 128, 108, { align: 'center', size: 16 });
-    if (st.subtitle.length > 14) text(g, st.subtitle.slice(14), 128, 124, { align: 'center', size: 16 });
+    textBox(g, [{ t: st.title, color: '#ff8fc8' }, { t: st.subtitle }], { minWidth: 224 });
   }
-  drawPause(g) { drawWindow(g, 88, 96, 80, 32); text(g, 'PAUSE', 128, 104, { align: 'center', color: '#ffe860' }); }
+  drawPause(g) { textBox(g, [{ t: 'PAUSE', color: '#ffe860' }], { minWidth: 80 }); }
   drawClear(g) {
     if (this.stateT < 1.2) return;
-    drawWindow(g, 32, 70, 192, 84);
-    text(g, 'ステージクリア！', 128, 78, { align: 'center', color: '#ffe860' });
-    mini(g, 'TIME BONUS ' + String(this.timeBonus).padStart(5, '0'), 128 - 32, 104, '#fdfbf7');
-    mini(g, 'SCORE      ' + String(this.score).padStart(7, '0'), 128 - 36, 114, '#ff8fc8');
-    text(g, this.stageIndex + 1 < STAGES.length ? '次の章へ…' : '最終決戦へ…', 128, 128, { align: 'center', size: 16, color: '#cbaaf5' });
+    const r = textBox(g, [{ t: 'ステージクリア！', color: '#ffe860' }, { t: ' ', size: 14 }, { t: this.stageIndex + 1 < STAGES.length ? '次の章へ…' : '最終決戦へ…', color: '#cbaaf5' }], { minWidth: 192 });
+    const tb = 'TIME BONUS ' + String(this.timeBonus).padStart(5, '0'), sc = 'SCORE      ' + String(this.score).padStart(7, '0');
+    mini(g, tb, Math.floor(128 - tb.length * 2), r.y + 30, '#fdfbf7');
+    mini(g, sc, Math.floor(128 - sc.length * 2), r.y + 39, '#ff8fc8');
   }
   drawGameOver(g) {
     g.fillStyle = 'rgba(122,15,31,0.45)'; g.fillRect(0, 0, W, H);
-    drawWindow(g, 40, 80, 176, 64, { top: '#3a1650', bottom: '#150a22' });
-    text(g, 'GAME OVER', 128, 88, { align: 'center', color: '#ff6a6a' });
-    text(g, 'おとぎの国は赤いまま', 128, 106, { align: 'center', size: 16 });
-    mini(g, 'SCORE ' + String(this.score).padStart(7, '0'), 128 - 26, 128, '#fdfbf7');
+    const r = textBox(g, [{ t: 'GAME OVER', color: '#ff6a6a' }, { t: 'おとぎの国は赤いまま' }, { t: ' ', size: 6 }], { minWidth: 176, window: { top: '#3a1650', bottom: '#150a22' } });
+    const sc = 'SCORE ' + String(this.score).padStart(7, '0');
+    mini(g, sc, Math.floor(128 - sc.length * 2), r.y + r.h - 12, '#fdfbf7');
   }
 }

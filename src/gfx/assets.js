@@ -1,6 +1,6 @@
 import { buildSheet, makeSprite, flipH } from './sprite.js';
 import { COSTUMES } from './palette.js';
-import { PLAYER_TOP, PLAYER_LEGS, PLAYER_FULL, HAT, BROOM, ENEMY, BOSS, SHOT, ITEM } from './sprites.js';
+import { PLAYER_TOP, PLAYER_LEGS, PLAYER_FULL, HAT, BROOM, ENEMY, BOSS, SHOT, ITEM } from './sprites/index.js';
 import { buildTileset, THEMES } from './tiles.js';
 import { buildBackground } from './background.js';
 

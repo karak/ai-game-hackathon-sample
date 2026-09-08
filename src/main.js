@@ -12,7 +12,8 @@ async function boot() {
 
   // フォント読み込み（同梱 DotGothic16 / OFL）
   try {
-    const face = new FontFace('DotGothic16', 'url(assets/fonts/DotGothic16-Regular.ttf)');
+    const fontUrl = new URL('../assets/fonts/DotGothic16-Regular.ttf', import.meta.url);
+    const face = new FontFace('DotGothic16', `url(${fontUrl})`);
     await face.load(); document.fonts.add(face);
   } catch (e) { console.warn('font load failed', e); }
 

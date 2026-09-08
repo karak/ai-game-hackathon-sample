@@ -25,7 +25,7 @@ export class TreasureBox {
   }
 }
 
-function chooseContents(world) {
+export function chooseContents(world) {
   const p = world.player;
   world.boxCount = (world.boxCount ?? 0) + 1;
   if (p.costume === 'plain') return 'dress';
