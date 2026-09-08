@@ -1,5 +1,5 @@
 {
- "requests": 31,
+ "requests": 52,
  "entries": [
   {
    "name": "player-base",
@@ -208,6 +208,174 @@
    "secs": 9.9,
    "text": "",
    "ts": 1788847236.510133
+  },
+  {
+   "name": "player-run-a-hat",
+   "v": 1,
+   "ok": true,
+   "secs": 15.2,
+   "text": "",
+   "ts": 1788847544.491853
+  },
+  {
+   "name": "player-run-b-hat",
+   "v": 1,
+   "ok": true,
+   "secs": 11.7,
+   "text": "",
+   "ts": 1788847556.6239429
+  },
+  {
+   "name": "player-jump-hat",
+   "v": 1,
+   "ok": true,
+   "secs": 13.9,
+   "text": "",
+   "ts": 1788847570.985527
+  },
+  {
+   "name": "player-attack-hat",
+   "v": 1,
+   "ok": true,
+   "secs": 16.3,
+   "text": "",
+   "ts": 1788847587.726429
+  },
+  {
+   "name": "player-hurt-hat",
+   "v": 1,
+   "ok": true,
+   "secs": 10.8,
+   "text": "",
+   "ts": 1788847598.989446
+  },
+  {
+   "name": "player-dead-hat",
+   "v": 1,
+   "ok": true,
+   "secs": 16.5,
+   "text": "",
+   "ts": 1788847615.961387
+  },
+  {
+   "name": "bg-graveyard-sky",
+   "v": 1,
+   "ok": true,
+   "secs": 9.2,
+   "text": "Here's your SNES-era pixel art sky backdrop! ",
+   "ts": 1788847625.595617
+  },
+  {
+   "name": "bg-graveyard-far",
+   "v": 1,
+   "ok": true,
+   "secs": 9.3,
+   "text": "",
+   "ts": 1788847635.333567
+  },
+  {
+   "name": "bg-graveyard-mid",
+   "v": 1,
+   "ok": true,
+   "secs": 8.8,
+   "text": "Here is your haunted flower-field graveyard at night under a huge pink moon, rendered in 16-bit SNES-era Japanese RPG pixel art style. ",
+   "ts": 1788847644.575798
+  },
+  {
+   "name": "tiles-graveyard",
+   "v": 1,
+   "ok": true,
+   "secs": 10.9,
+   "text": "Here is your pixel art terrain tile strip: ",
+   "ts": 1788847655.899584
+  },
+  {
+   "name": "bg-candyforest-sky",
+   "v": 1,
+   "ok": true,
+   "secs": 9.2,
+   "text": "",
+   "ts": 1788847665.534442
+  },
+  {
+   "name": "bg-candyforest-far",
+   "v": 1,
+   "ok": true,
+   "secs": 9.7,
+   "text": "",
+   "ts": 1788847675.674183
+  },
+  {
+   "name": "bg-candyforest-mid",
+   "v": 1,
+   "ok": true,
+   "secs": 11.0,
+   "text": "",
+   "ts": 1788847687.119793
+  },
+  {
+   "name": "tiles-candyforest",
+   "v": 1,
+   "ok": true,
+   "secs": 10.7,
+   "text": "",
+   "ts": 1788847698.26953
+  },
+  {
+   "name": "bg-castle-sky",
+   "v": 1,
+   "ok": false,
+   "secs": 1.3,
+   "text": "Okay, I understand all the constraints for the pixel art sky backdrop. Here is the image:\n\n",
+   "ts": 1788847700.004611
+  },
+  {
+   "name": "bg-castle-far",
+   "v": 1,
+   "ok": true,
+   "secs": 13.0,
+   "text": "That's a fascinating and very specific request! I can definitely create a pixel art parallax layer for you with those specifications. Here it is: ",
+   "ts": 1788847713.458119
+  },
+  {
+   "name": "bg-castle-mid",
+   "v": 1,
+   "ok": true,
+   "secs": 9.7,
+   "text": "",
+   "ts": 1788847723.647103
+  },
+  {
+   "name": "tiles-castle",
+   "v": 1,
+   "ok": true,
+   "secs": 9.5,
+   "text": "",
+   "ts": 1788847733.5668092
+  },
+  {
+   "name": "items-a",
+   "v": 1,
+   "ok": true,
+   "secs": 10.8,
+   "text": "",
+   "ts": 1788847794.9767702
+  },
+  {
+   "name": "items-b",
+   "v": 1,
+   "ok": true,
+   "secs": 9.4,
+   "text": "",
+   "ts": 1788847805.0104861
+  },
+  {
+   "name": "items-c",
+   "v": 1,
+   "ok": true,
+   "secs": 9.0,
+   "text": "Here are the four pixel-art pickup items you requested, rendered in the style of a 16-bit SNES-era Japanese RPG. ",
+   "ts": 1788847814.473293
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

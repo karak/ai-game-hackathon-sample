@@ -1,4 +1,68 @@
 {
+ "bg/candyforest_far": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 69,
+  "src": "assets/sprites/bg/candyforest_far.png",
+  "w": 254
+ },
+ "bg/candyforest_mid": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 76,
+  "src": "assets/sprites/bg/candyforest_mid.png",
+  "w": 316
+ },
+ "bg/candyforest_sky": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 264,
+  "src": "assets/sprites/bg/candyforest_sky.png",
+  "w": 275
+ },
+ "bg/castle_far": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 88,
+  "src": "assets/sprites/bg/castle_far.png",
+  "w": 264
+ },
+ "bg/castle_mid": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 132,
+  "src": "assets/sprites/bg/castle_mid.png",
+  "w": 266
+ },
+ "bg/graveyard_far": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 67,
+  "src": "assets/sprites/bg/graveyard_far.png",
+  "w": 266
+ },
+ "bg/graveyard_mid": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 47,
+  "src": "assets/sprites/bg/graveyard_mid.png",
+  "w": 246
+ },
+ "bg/graveyard_sky": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 247,
+  "src": "assets/sprites/bg/graveyard_sky.png",
+  "w": 257
+ },
  "bosses/doll1": {
   "anchor": "bottom",
   "colors": 15,
@@ -135,20 +199,76 @@
   "src": "assets/sprites/enemies/zombie2.png",
   "w": 62
  },
+ "items/box": {
+  "anchor": "center",
+  "colors": 11,
+  "fits": true,
+  "h": 44,
+  "src": "assets/sprites/items/box.png",
+  "w": 42
+ },
+ "items/candy": {
+  "anchor": "center",
+  "colors": 14,
+  "fits": true,
+  "h": 25,
+  "src": "assets/sprites/items/candy.png",
+  "w": 39
+ },
+ "items/dress": {
+  "anchor": "center",
+  "colors": 11,
+  "fits": true,
+  "h": 44,
+  "src": "assets/sprites/items/dress.png",
+  "w": 42
+ },
+ "items/golddress": {
+  "anchor": "center",
+  "colors": 12,
+  "fits": true,
+  "h": 54,
+  "src": "assets/sprites/items/golddress.png",
+  "w": 54
+ },
+ "items/oneup": {
+  "anchor": "center",
+  "colors": 13,
+  "fits": true,
+  "h": 52,
+  "src": "assets/sprites/items/oneup.png",
+  "w": 42
+ },
+ "items/potion": {
+  "anchor": "center",
+  "colors": 14,
+  "fits": true,
+  "h": 32,
+  "src": "assets/sprites/items/potion.png",
+  "w": 25
+ },
  "player/attack": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 107,
+  "h": 117,
   "src": "assets/sprites/player/attack.png",
-  "w": 68
+  "w": 80
  },
  "player/attack_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 107,
+  "h": 117,
   "src": "assets/sprites/player/attack_gold.png",
+  "w": 80
+ },
+ "player/attack_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/attack_nohat.png",
   "w": 68
  },
  "player/attack_plain": {
@@ -171,16 +291,24 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 87,
+  "h": 114,
   "src": "assets/sprites/player/crouch.png",
-  "w": 72
+  "w": 77
  },
  "player/crouch_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 87,
+  "h": 114,
   "src": "assets/sprites/player/crouch_gold.png",
+  "w": 77
+ },
+ "player/crouch_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 87,
+  "src": "assets/sprites/player/crouch_nohat.png",
   "w": 72
  },
  "player/crouch_plain": {
@@ -195,16 +323,24 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 50,
+  "h": 74,
   "src": "assets/sprites/player/dead.png",
-  "w": 107
+  "w": 121
  },
  "player/dead_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 50,
+  "h": 74,
   "src": "assets/sprites/player/dead_gold.png",
+  "w": 121
+ },
+ "player/dead_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 50,
+  "src": "assets/sprites/player/dead_nohat.png",
   "w": 107
  },
  "player/dead_plain": {
@@ -219,16 +355,24 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 104,
+  "h": 134,
   "src": "assets/sprites/player/fall.png",
-  "w": 77
+  "w": 78
  },
  "player/fall_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 104,
+  "h": 134,
   "src": "assets/sprites/player/fall_gold.png",
+  "w": 78
+ },
+ "player/fall_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 104,
+  "src": "assets/sprites/player/fall_nohat.png",
   "w": 77
  },
  "player/fall_plain": {
@@ -244,7 +388,7 @@
   "brim_overlap": 6,
   "colors": 6,
   "fits": true,
-  "h": 62,
+  "h": 34,
   "src": "assets/sprites/player/hat.png",
   "w": 69
  },
@@ -252,24 +396,32 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 114,
+  "h": 118,
   "src": "assets/sprites/player/hurt.png",
-  "w": 77
+  "w": 82
  },
  "player/hurt2": {
+  "anchor": "bottom",
+  "colors": 5,
+  "fits": false,
+  "h": 136,
+  "src": "assets/sprites/player/hurt2.png",
+  "w": 71
+ },
+ "player/hurt2_gold": {
+  "anchor": "bottom",
+  "colors": 7,
+  "fits": true,
+  "h": 136,
+  "src": "assets/sprites/player/hurt2_gold.png",
+  "w": 71
+ },
+ "player/hurt2_nohat": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
   "h": 114,
-  "src": "assets/sprites/player/hurt2.png",
-  "w": 68
- },
- "player/hurt2_gold": {
-  "anchor": "bottom",
-  "colors": 14,
-  "fits": true,
-  "h": 114,
-  "src": "assets/sprites/player/hurt2_gold.png",
+  "src": "assets/sprites/player/hurt2_nohat.png",
   "w": 68
  },
  "player/hurt2_plain": {
@@ -284,8 +436,16 @@
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 114,
+  "h": 118,
   "src": "assets/sprites/player/hurt_gold.png",
+  "w": 82
+ },
+ "player/hurt_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/player/hurt_nohat.png",
   "w": 77
  },
  "player/hurt_plain": {
@@ -300,16 +460,24 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 103,
+  "h": 111,
   "src": "assets/sprites/player/idle.png",
-  "w": 44
+  "w": 69
  },
  "player/idle_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 103,
+  "h": 111,
   "src": "assets/sprites/player/idle_gold.png",
+  "w": 69
+ },
+ "player/idle_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/idle_nohat.png",
   "w": 44
  },
  "player/idle_plain": {
@@ -324,16 +492,24 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 76,
+  "h": 94,
   "src": "assets/sprites/player/jump.png",
-  "w": 64
+  "w": 75
  },
  "player/jump_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 76,
+  "h": 94,
   "src": "assets/sprites/player/jump_gold.png",
+  "w": 75
+ },
+ "player/jump_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 76,
+  "src": "assets/sprites/player/jump_nohat.png",
   "w": 64
  },
  "player/jump_plain": {
@@ -348,16 +524,24 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 103,
+  "h": 118,
   "src": "assets/sprites/player/run1.png",
-  "w": 68
+  "w": 73
  },
  "player/run1_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 103,
+  "h": 118,
   "src": "assets/sprites/player/run1_gold.png",
+  "w": 73
+ },
+ "player/run1_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/run1_nohat.png",
   "w": 68
  },
  "player/run1_plain": {
@@ -372,16 +556,24 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 103,
+  "h": 135,
   "src": "assets/sprites/player/run2.png",
-  "w": 59
+  "w": 69
  },
  "player/run2_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 103,
+  "h": 135,
   "src": "assets/sprites/player/run2_gold.png",
+  "w": 69
+ },
+ "player/run2_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/run2_nohat.png",
   "w": 59
  },
  "player/run2_plain": {
@@ -396,16 +588,24 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 107,
+  "h": 121,
   "src": "assets/sprites/player/run3.png",
-  "w": 60
+  "w": 76
  },
  "player/run3_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 107,
+  "h": 121,
   "src": "assets/sprites/player/run3_gold.png",
+  "w": 76
+ },
+ "player/run3_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/run3_nohat.png",
   "w": 60
  },
  "player/run3_plain": {
@@ -420,16 +620,24 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 107,
+  "h": 136,
   "src": "assets/sprites/player/run4.png",
-  "w": 62
+  "w": 69
  },
  "player/run4_gold": {
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 107,
+  "h": 136,
   "src": "assets/sprites/player/run4_gold.png",
+  "w": 69
+ },
+ "player/run4_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/run4_nohat.png",
   "w": 62
  },
  "player/run4_plain": {
@@ -439,5 +647,77 @@
   "h": 107,
   "src": "assets/sprites/player/run4_plain.png",
   "w": 62
+ },
+ "shots/candle": {
+  "anchor": "center",
+  "colors": 11,
+  "fits": true,
+  "h": 27,
+  "src": "assets/sprites/shots/candle.png",
+  "w": 11
+ },
+ "shots/charge": {
+  "anchor": "center",
+  "colors": 8,
+  "fits": true,
+  "h": 32,
+  "src": "assets/sprites/shots/charge.png",
+  "w": 33
+ },
+ "shots/heart": {
+  "anchor": "center",
+  "colors": 9,
+  "fits": true,
+  "h": 26,
+  "src": "assets/sprites/shots/heart.png",
+  "w": 28
+ },
+ "shots/knife": {
+  "anchor": "center",
+  "colors": 5,
+  "fits": true,
+  "h": 10,
+  "src": "assets/sprites/shots/knife.png",
+  "w": 32
+ },
+ "shots/pool": {
+  "anchor": "center",
+  "colors": 12,
+  "fits": true,
+  "h": 29,
+  "src": "assets/sprites/shots/pool.png",
+  "w": 36
+ },
+ "shots/star": {
+  "anchor": "center",
+  "colors": 5,
+  "fits": true,
+  "h": 26,
+  "src": "assets/sprites/shots/star.png",
+  "w": 26
+ },
+ "tiles/candyforest": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": false,
+  "h": 157,
+  "src": "assets/sprites/tiles/candyforest.png",
+  "w": 265
+ },
+ "tiles/castle": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": false,
+  "h": 143,
+  "src": "assets/sprites/tiles/castle.png",
+  "w": 189
+ },
+ "tiles/graveyard": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": true,
+  "h": 102,
+  "src": "assets/sprites/tiles/graveyard.png",
+  "w": 199
  }
 }

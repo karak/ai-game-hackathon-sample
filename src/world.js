@@ -9,6 +9,7 @@ import { createBoss } from './entities/bosses.js';
 import { TreasureBox, FloatingItem } from './entities/items.js';
 import { EnemyShot, WEAPONS } from './entities/projectiles.js';
 import { SONGS } from './audio.js';
+import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS } from './gfx/hdworld.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
@@ -22,6 +23,12 @@ export class World {
     this.tiles = this.assets.tiles[this.level.theme];
     this.chunks = renderMapLayer(map, this.tiles);
     this.bg = this.assets.backgrounds[this.level.theme];
+    // 生成済み HD 地形/背景があれば優先
+    const gen = this.assets.generated ?? {};
+    const strip = gen.tiles?.[this.level.theme];
+    if (strip) { this.hdTiles = sliceTileStrip(strip.r, TILE_BANDS[this.level.theme]); this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles); }
+    this.bgHD = { sky: gen.bg?.[this.level.theme + '_sky'], far: gen.bg?.[this.level.theme + '_far'], mid: gen.bg?.[this.level.theme + '_mid'] };
+    if (!this.bgHD.sky && !this.bgHD.far && !this.bgHD.mid) this.bgHD = null;
     this.decals = new Decals(map.pixelWidth, map.pixelHeight);
     this.particles = new Particles(this);
     this.classes = { EnemyShot };
@@ -156,9 +163,11 @@ export class World {
   draw(g) {
     const cam = { x: Math.floor(this.cam.x), y: 0 };
     if (this.shakeAmp > 0) { cam.x += Math.floor((Math.random() - 0.5) * this.shakeAmp * 2); cam.y += Math.floor((Math.random() - 0.5) * this.shakeAmp); }
-    drawBackground(g, this.bg, this.cam.x, W, H);
+    if (this.bgHD) { if (!this.bgHD.sky) drawBackground(g, [this.bg[0]], this.cam.x, W, H); drawBackgroundHD(g, this.bgHD, this.cam.x, W, H); }
+    else drawBackground(g, this.bg, this.cam.x, W, H);
     // マップ
-    for (const c of this.chunks) { const sx = c.x - cam.x; if (sx > W || sx + c.canvas.width < 0) continue; g.drawImage(c.canvas, sx, -cam.y); }
+    if (this.chunksHD) for (const c of this.chunksHD) { const sx = c.x - cam.x; const cw = c.canvas.width / 3; if (sx > W || sx + cw < 0) continue; g.drawImage(c.canvas, sx, -cam.y, cw, c.canvas.height / 3); }
+    else for (const c of this.chunks) { const sx = c.x - cam.x; if (sx > W || sx + c.canvas.width < 0) continue; g.drawImage(c.canvas, sx, -cam.y); }
     // 毒沼アニメ（'~' タイル）
     this.drawBog(g, cam);
     this.decals.draw(g, cam, W, H);

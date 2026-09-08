@@ -151,11 +151,14 @@ def main():
     ap.add_argument('src'); ap.add_argument('dst'); ap.add_argument('--logical', required=True, help='最大 WxH（検査用）')
     ap.add_argument('--palette'); ap.add_argument('--colors', type=int, default=15); ap.add_argument('--anchor', default='bottom')
     ap.add_argument('--split', action='store_true'); ap.add_argument('--names', default=''); ap.add_argument('--tol', type=int, default=60)
+    ap.add_argument('--nokey', action='store_true', help='クロマキーしない（空などキャンバス全面の絵）')
+    ap.add_argument('--keep-bottom', type=float, default=0, help='論理画像の下側この比率だけ残す（背景中景の月などを除く）')
     a = ap.parse_args()
     bw, bh = (int(v) for v in a.logical.split('x'))
-    im = key_out(Image.open(a.src), a.tol)
+    im = Image.open(a.src).convert('RGBA') if a.nokey else key_out(Image.open(a.src), a.tol)
     logical, px, py = extract_cells(im)
-    logical = strip_shadow(logical)
+    if a.keep_bottom: logical = logical.crop((0, int(logical.height * (1 - a.keep_bottom)), logical.width, logical.height))
+    if not a.nokey and not a.keep_bottom: logical = strip_shadow(logical)
     logical = quantize_shared(logical, a.colors, a.palette)
     meta = {'source': a.src, 'pitch': [px, py], 'max_box': [bw, bh]}
     def info(img):

@@ -5,12 +5,12 @@
   5.0
  ],
  "max_box": [
-  72,
+  90,
   120
  ],
  "frames": null,
- "w": 44,
- "h": 103,
+ "w": 69,
+ "h": 111,
  "fits": true,
  "colors": 15,
  "name": "idle"

@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/tiles-graveyard-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  220,
+  120
+ ],
+ "w": 199,
+ "h": 102,
+ "fits": true,
+ "colors": 24
+}

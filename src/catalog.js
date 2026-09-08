@@ -31,56 +31,21 @@ async function boot() {
   };
   const label = (g, s, x, y) => mini(g, s, x, y, '#ffe860');
 
-  // 主人公: 衣装 × フレーム
-  section('player', '主人公リリカ 全フレーム（衣装3種）', 380, 3 * 64 + 8, g => {
-    const frames = ['idle_stand', 'idle_run1', 'idle_run2', 'idle_run3', 'idle_run4', 'attack_stand', 'jump_jump', 'jump_fall', 'hurt_fall', 'crouch', 'dead'];
-    Object.keys(COSTUMES).forEach((c, ci) => {
-      label(g, c.toUpperCase(), 2, ci * 44 + 2);
-      frames.forEach((f, i) => {
-        const spr = A.player[c][f]; if (!spr) return;
-        const x = 2 + i * 34, y = ci * 64 + 14;
-        g.drawImage(spr.r, x, y);
-        if (c !== 'plain' && f !== 'dead') g.drawImage(A.hat.r, x, y - 11 + (f === 'crouch' ? 12 : 0));
-      });
-    });
-  });
-  section('player_big', '主人公 拡大比較（idle / run / jump / attack）', 170, 64, g => {
-    ['idle_stand', 'idle_run1', 'jump_jump', 'attack_stand'].forEach((f, i) => { const spr = A.player.dress[f]; g.drawImage(spr.r, 8 + i * 40, 14); g.drawImage(A.hat.r, 8 + i * 40, 3); });
-  });
-
-  // 参照画像との並置（著作物のため同梱せず外部 URL を実行時に読む。docs/art-standard.md §1）
-  section('reference', '参照並置: 左=参照(外部URL, 論理 ~40x60)  右=本作の主人公 32x48（同倍率）', 160, 80, g => {
-    const img = new Image(); img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      // 参照画像は 2px/論理px の拡大なので 1/2 に縮めて論理サイズで並べる
-      const sw = 96, sh = 128, sx = 0, sy = 0; // 左上 1 キャラ分
-      g.imageSmoothingEnabled = false;
-      g.drawImage(img, sx, sy, sw, sh, 8, 8, sw / 2, sh / 2);
-      const p = A.player.dress.idle_stand; g.drawImage(p.r, 80, 20); g.drawImage(A.hat.r, 80, 9);
-      label(g, 'REF', 8, 0); label(g, 'LYRICA', 80, 0);
-    };
-    img.onerror = () => label(g, 'REF LOAD FAILED (OFFLINE?)', 4, 30);
-    img.src = 'https://i.pinimg.com/originals/bb/b9/a0/bbb9a0d099d450252e74ac4672b354d5.jpg';
-    label(g, 'LOADING REF...', 4, 30);
-  });
-
-  // 敵
-  section('enemies', '敵キャラクター（全フレーム）', 256, 84, g => {
-    let x = 4, y = 12;
-    for (const [name, spr] of Object.entries(A.enemies)) {
-      if (x + spr.w > 252) { x = 4; y += 40; }
-      g.drawImage(spr.l, x, y + 24 - spr.h); label(g, name.slice(0, 7), x, y - 8);
-      x += Math.max(spr.w, 30) + 4;
-    }
-  });
-  section('bosses', 'ボス', 200, 80, g => {
-    let x = 4; for (const [name, spr] of Object.entries(A.bosses)) { g.drawImage(spr.l, x, 78 - spr.h); label(g, name, x, 2); x += spr.w + 12; }
-  });
-  section('shots_items', '弾・アイテム・帽子・ほうき', 256, 48, g => {
-    let x = 4; for (const [name, spr] of Object.entries(A.shots)) { g.drawImage(spr.r, x, 10); label(g, name.slice(0, 4), x, 2); x += Math.max(spr.w, 16) + 2; }
-    x = 4; for (const [name, spr] of Object.entries(A.items)) { g.drawImage(spr.r, x, 30); label(g, name.slice(0, 5), x, 22); x += Math.max(spr.w, 20) + 4; }
-    g.drawImage(A.hat.r, x, 30); x += 24; g.drawImage(A.broom.r, x, 34);
-  });
+  // 生成スプライトを 1:1（ゲーム表示と同じ画素密度）で並べるヘルパー
+  const row = (id, title, group, names, gap = 8) => {
+    const sprs = names.map(n => [n, group[n]]).filter(([, s]) => s);
+    const W = sprs.reduce((a, [, s]) => a + s.r.width + gap, gap), H = Math.max(40, ...sprs.map(([, s]) => s.r.height)) + 16;
+    section(id, title, W, H, g => { let x = gap; for (const [n, s] of sprs) { g.drawImage(s.r, x, H - 4 - s.r.height); label(g, n.slice(0, 10), x, 2); x += s.r.width + gap; } });
+  };
+  const PF = ['idle', 'run1', 'run2', 'run3', 'run4', 'jump', 'fall', 'attack', 'crouch', 'hurt', 'dead'];
+  row('player_dress', '主人公 リリカ（ドレス・帽子あり）1:1', A.player.dress, PF);
+  row('player_plain', '主人公（変身解除・私服）1:1', A.player.plain, PF);
+  row('player_gold', '主人公（フルブルーム）1:1', A.player.gold, PF);
+  row('player_parts', '帽子・ほうき', { hat: A.hat, broom: A.broom }, ['hat', 'broom']);
+  row('enemies', '敵キャラクター（全フレーム）1:1', A.enemies, Object.keys(A.enemies));
+  row('bosses', 'ボス 1:1', A.bosses, Object.keys(A.bosses));
+  row('shots', '弾', A.shots, Object.keys(A.shots));
+  row('items', 'アイテム', A.items, Object.keys(A.items));
 
   // タイル（テーマ別）
   for (const th of Object.keys(A.tiles)) {
@@ -91,20 +56,18 @@ async function boot() {
     });
   }
 
-  // 背景＋地形の合成（ゲーム画面相当）
-  const sampleRows = [
-    '................', '................', '................', '................', '................', '................',
-    '........===.....', '................', '................', '...t..f.....v...', '......x.........', '####....########', '####~~~~########', '####~~~~########',
-  ];
+  // 背景＋地形＋キャラの合成（ゲーム画面 768x672 相当）
+  const gen = A.generated ?? {};
   for (const th of Object.keys(A.backgrounds)) {
-    section('scene_' + th, `シーン合成: ${th}`, 256, 224, g => {
-      drawBackground(g, A.backgrounds[th], 300, 256, 224);
-      const map = new TileMap(sampleRows);
-      const chunks = renderMapLayer(map, A.tiles[th]);
-      for (const c of chunks) g.drawImage(c.canvas, c.x, 0);
-      for (let tx = 4; tx < 8; tx++) { g.drawImage(A.tiles[th].bogtop0, tx * 16, 12 * 16); g.drawImage(A.tiles[th].bog0, tx * 16, 13 * 16); }
-      const p = A.player.dress.idle_stand; g.drawImage(p.r, 24, 128); g.drawImage(A.hat.r, 24, 117);
-      g.drawImage(A.enemies.zombie1.l, 150, 160); g.drawImage(A.enemies.mushroom1.l, 200, 130);
+    section('scene_' + th, `シーン合成: ${th}（768x672）`, 768, 672, g => {
+      const sky = gen.bg?.[th + '_sky'], far = gen.bg?.[th + '_far'], mid = gen.bg?.[th + '_mid'], strip = gen.tiles?.[th];
+      if (sky) g.drawImage(sky.r, 0, 0, 768, 672); else { g.save(); g.scale(3, 3); drawBackground(g, [A.backgrounds[th][0]], 0, 256, 224); g.restore(); }
+      for (const L of [far, mid]) if (L) for (let x = 0; x < 768; x += L.r.width) g.drawImage(L.r, x, 528 - L.r.height);
+      if (strip) { const cols = Math.floor(strip.r.width / 48); for (let tx = 0; tx < 16; tx++) { const v = tx % cols; g.drawImage(strip.r, v * 48, 0, 48, 48, tx * 48, 528, 48, 48); g.drawImage(strip.r, v * 48, strip.r.height >= 96 ? 48 : 0, 48, 48, tx * 48, 576, 48, 48); g.drawImage(strip.r, v * 48, strip.r.height >= 96 ? 48 : 0, 48, 48, tx * 48, 624, 48, 48); } }
+      else { g.fillStyle = '#5a3a24'; g.fillRect(0, 528, 768, 144); }
+      const p = A.player.dress.idle; if (p) g.drawImage(p.r, 100, 528 - p.r.height);
+      const z = A.enemies.zombie1; if (z) g.drawImage(z.l, 420, 528 - z.l.height);
+      const m = A.enemies.mushroom1; if (m) g.drawImage(m.l, 600, 380);
     });
   }
 

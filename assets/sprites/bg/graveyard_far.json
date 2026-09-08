@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-graveyard-far-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  220,
+  120
+ ],
+ "w": 266,
+ "h": 67,
+ "fits": false,
+ "colors": 32
+}

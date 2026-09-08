@@ -13,7 +13,7 @@ export async function buildAssets() {
   if (gen.player) {
     // 生成済み主人公フレーム。衣装は当面 dress のみ（plain/gold は後段のパレット置換で生成）
     for (const [frame, spr] of Object.entries(gen.player)) {
-      if (frame === 'hat' || frame === 'base') continue;
+      if (frame === 'hat' || frame === 'base' || frame.endsWith('_nohat')) continue;
       const m = frame.match(/^(.+)_(plain|gold)$/);
       if (m) assets.player[m[2]][m[1]] = spr;             // 衣装別フレーム
       else for (const c of Object.keys(assets.player)) assets.player[c][frame] = spr; // 共通フレーム
@@ -21,7 +21,7 @@ export async function buildAssets() {
     assets.player.generated = true;
     if (gen.player.hat) assets.hat = gen.player.hat;
   }
-  for (const g of ['enemies', 'bosses', 'items']) if (gen[g]) Object.assign(assets[g], gen[g]);
+  for (const g of ['enemies', 'bosses', 'items', 'shots']) if (gen[g]) Object.assign(assets[g], gen[g]);
   assets.generated = gen;
   return assets;
 }

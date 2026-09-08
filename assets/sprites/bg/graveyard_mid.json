@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-graveyard-mid-v1.png",
+ "pitch": [
+  4.0,
+  5.0
+ ],
+ "max_box": [
+  220,
+  120
+ ],
+ "w": 246,
+ "h": 47,
+ "fits": false,
+ "colors": 32
+}

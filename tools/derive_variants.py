@@ -34,14 +34,14 @@ def overlay_offsets(a, b):
 def derive_hat():
     """base_hat から帽子だけを色で抜き出す。帽子色（暗藍・白帯・金具）かつ画像上部 55% にある画素を帽子とみなし、
     その bbox 内の帽子色でない小さな穴（髪が見える所）は透明のまま残す。"""
-    base = load('base_hat'); a = np.asarray(base); h, w = a.shape[:2]
+    base = load('idle'); a = np.asarray(base); h, w = a.shape[:2]  # idle は帽子あり
     rgb = a[..., :3].astype(int); al = a[..., 3] > 0
     r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
     indigo = (b > r + 10) & (r < 120) & (g < 110)                 # 帽子本体（暗い青紫）
     white = (r > 180) & (g > 180) & (b > 180)                      # 白いリボン帯
     gold = (r > 150) & (g > 100) & (b < 110) & (r > b + 60)        # 金具
     ys = np.arange(h)[:, None]
-    hatmask = al & (indigo | white | gold) & (ys < h * 0.55)
+    hatmask = al & (indigo | white | gold) & (ys < h * 0.30)  # 目より上の領域だけ（顔の誤検出を避ける）
     # 帯・金具は本体に隣接するものだけ（髪のハイライト等の誤検出を避ける）
     yy, xx = np.nonzero(hatmask)
     if yy.size == 0: raise SystemExit('hat not found')
@@ -54,6 +54,39 @@ def derive_hat():
     meta = {'w': out.width, 'h': out.height, 'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0]), 'fits': True, 'brim_overlap': 6}
     out.save(SPR / 'hat.png'); (SPR / 'hat.json').write_text(json.dumps(meta, indent=1))
     return meta
+
+
+def hat_mask(im):
+    a = np.asarray(im); al = a[..., 3] > 0; r, g, b = (a[..., i].astype(int) for i in range(3)); h = a.shape[0]
+    ys = np.arange(h)[:, None]
+    return al & (b > r + 10) & (r < 120) & (g < 110) & (ys < h * 0.30)
+
+
+def hair_top_center(im):
+    """髪（ピンク系）の最上行とその x 中心"""
+    a = np.asarray(im); al = a[..., 3] > 0; r, g, b = (a[..., i].astype(int) for i in range(3))
+    pink = al & (r > 180) & (b > 120) & (g < r - 30)
+    ys, xs = np.nonzero(pink)
+    if ys.size == 0: return None
+    top = ys.min(); row = xs[ys <= top + 3]
+    return int(top), float(row.mean())
+
+
+def ensure_hat(frame_name, hat_img):
+    """帽子ありセットのフレームに帽子が無ければ、抽出済み帽子を髪の上に合成する。"""
+    im = load(frame_name)
+    # 帽子の有無: 最上部 15% の不透明画素のうち暗い藍色が半数以上なら帽子あり（髪だけなら桃色が支配的）
+    a = np.asarray(im); al = a[..., 3] > 0; h = a.shape[0]; top = slice(0, max(1, int(h * 0.15)))
+    r, g, b = (a[..., i].astype(int) for i in range(3)); ind = (b > r + 10) & (r < 120) & (g < 110)
+    if al[top].sum() and (ind & al)[top].sum() / al[top].sum() > 0.5: return False
+    ht = hair_top_center(im)
+    if not ht: return False
+    top, cx = ht
+    hx = int(round(cx - hat_img.width * 0.55)); hy = top + 6 - hat_img.height  # つばを髪に 6 セルかぶせる
+    pad_top = max(0, -hy); pad_l = max(0, -hx); pad_r = max(0, hx + hat_img.width - im.width)
+    canvas = Image.new('RGBA', (im.width + pad_l + pad_r, im.height + pad_top), (0, 0, 0, 0))
+    canvas.paste(im, (pad_l, pad_top), im); canvas.paste(hat_img, (hx + pad_l, hy + pad_top), hat_img)
+    canvas.save(SPR / f'{frame_name}.png'); return True
 
 
 def learn_map(src, dst):
@@ -86,16 +119,28 @@ def main():
     manifest = json.loads(MANIFEST.read_text())
     hm = derive_hat(); manifest['player/hat'] = {'src': 'assets/sprites/player/hat.png', 'anchor': 'center', **hm}
     print('hat', hm)
-    idle = load('idle')
-    frames = [n for n in ['idle', 'run1', 'run2', 'run3', 'run4', 'jump', 'fall', 'attack', 'crouch', 'hurt', 'hurt2', 'dead'] if (SPR / f'{n}.png').exists()]
-    for cost in ['plain', 'gold']:
-        if not (SPR / f'idle_{cost}.png').exists(): print('no', cost); continue
-        mp = learn_map(idle, load(f'idle_{cost}')); print(cost, 'mapped colors', len(mp))
+    frames = ['idle', 'run1', 'run2', 'run3', 'run4', 'jump', 'fall', 'attack', 'crouch', 'hurt', 'hurt2', 'dead']
+    hat_img = load('hat')
+    for n in frames:
+        if n in ('dead',) or not (SPR / f'{n}.png').exists(): continue
+        if ensure_hat(n, hat_img):
+            out = load(n); manifest[f'player/{n}'].update({'w': out.width, 'h': out.height}); print('hat composited onto', n)
+    # plain: 帽子なしフレーム(*_nohat) に idle_nohat→idle_plain の写像を適用
+    if (SPR / 'idle_plain.png').exists() and (SPR / 'idle_nohat.png').exists():
+        mp = learn_map(load('idle_nohat'), load('idle_plain')); print('plain mapped colors', len(mp))
         for n in frames:
-            out = apply_map(load(n), mp); key = f'player/{n}_{cost}'
-            out.save(SPR / f'{n}_{cost}.png')
-            manifest[key] = {'src': f'assets/sprites/player/{n}_{cost}.png', 'w': out.width, 'h': out.height, 'anchor': 'bottom', 'fits': True,
-                             'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0])}
+            src = SPR / f'{n}_nohat.png'
+            if not src.exists(): continue
+            out = apply_map(Image.open(src).convert('RGBA'), mp); out.save(SPR / f'{n}_plain.png')
+            manifest[f'player/{n}_plain'] = {'src': f'assets/sprites/player/{n}_plain.png', 'w': out.width, 'h': out.height, 'anchor': 'bottom', 'fits': True, 'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0])}
+    # gold: 帽子ありフレームに idle_nohat→idle_gold の衣装写像を適用（帽子色は写像に含まれない）
+    if (SPR / 'idle_gold.png').exists() and (SPR / 'idle_nohat.png').exists():
+        mp = learn_map(load('idle_nohat'), load('idle_gold')); print('gold mapped colors', len(mp))
+        for n in frames:
+            src = SPR / f'{n}.png'
+            if not src.exists(): continue
+            out = apply_map(Image.open(src).convert('RGBA'), mp); out.save(SPR / f'{n}_gold.png')
+            manifest[f'player/{n}_gold'] = {'src': f'assets/sprites/player/{n}_gold.png', 'w': out.width, 'h': out.height, 'anchor': 'bottom', 'fits': True, 'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0])}
     MANIFEST.write_text(json.dumps(manifest, indent=1, sort_keys=True)); print('manifest updated', len(manifest))
 
 

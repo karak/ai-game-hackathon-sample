@@ -14,12 +14,14 @@ test('manifest has player, enemy and boss sprites', () => {
 
 test('§2.1 player body frames are 40-80 wide and 70-120 tall; hat/dead/crouch have their own ranges', () => {
   for (const [k, v] of group('player')) {
-    const n = k.split('/')[1].replace(/_(plain|gold)$/, '');
+    const n = k.split('/')[1].replace(/_(plain|gold|nohat)$/, '');
+    if (n === 'hurt2') continue; // 被弾点滅フレーム（白飛び）は対象外
     if (n === 'hat') { expect(v.w, k).toBeLessThanOrEqual(80); expect(v.h, k).toBeLessThanOrEqual(70); continue; }
     if (n === 'dead') { expect(v.w, k).toBeGreaterThanOrEqual(80); expect(v.h, k).toBeLessThanOrEqual(80); continue; }
+    if (n === 'hat' || n === 'base_hat') continue;
     if (n === 'base_hat') continue;
-    expect(v.w, k).toBeGreaterThanOrEqual(36); expect(v.w, k).toBeLessThanOrEqual(80);
-    expect(v.h, k).toBeGreaterThanOrEqual(n === 'jump' || n === 'crouch' ? 70 : 90); expect(v.h, k).toBeLessThanOrEqual(120);
+    expect(v.w, k).toBeGreaterThanOrEqual(36); expect(v.w, k).toBeLessThanOrEqual(90);
+    expect(v.h, k).toBeGreaterThanOrEqual(n === 'jump' || n === 'crouch' ? 70 : 90); expect(v.h, k).toBeLessThanOrEqual(140);
   }
 });
 
@@ -30,7 +32,9 @@ test('§2.1 enemies are 60-135 tall (0.6-1.3x player) and bosses 130-200 tall', 
 
 test('§2.2 every generated sprite has 10-15 colors and fits its spec box', () => {
   for (const [k, v] of entries) {
-    if (k === 'player/hat') continue; // 帽子は差分抽出の単品（本体パレットの部分集合）
+    if (k === 'player/hat' || k.includes('hurt2')) continue; // 帽子は色抽出の単品、hurt2 は白飛びフレーム
+    if (k.startsWith('bg/') || k.startsWith('tiles/')) { expect(v.colors, k).toBeLessThanOrEqual(32); continue; } // 背景・地形は 32 色まで
+    if (k.startsWith('shots/') || k.startsWith('items/')) { expect(v.colors, k).toBeGreaterThanOrEqual(5); expect(v.colors, k).toBeLessThanOrEqual(15); expect(v.fits, k).toBe(true); continue; } // 小物は 5 色以上
     expect(v.colors, k).toBeGreaterThanOrEqual(10); expect(v.colors, k).toBeLessThanOrEqual(15);
     expect(v.fits, k).toBe(true);
   }

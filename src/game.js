@@ -3,6 +3,7 @@ import { STAGES } from './levels/index.js';
 import { drawWindow, text, mini, drawHud, textBox, wrap, LAYOUT } from './ui/index.js';
 import { SONGS } from './audio.js';
 import { drawBackground } from './gfx/background.js';
+import { blit } from './gfx/sprite.js';
 import { PROLOGUE, ENDING } from './story.js';
 
 
@@ -86,10 +87,10 @@ export class Game {
     g.fillStyle = '#150a22'; g.fillRect(0, 176, W, 48);
     const tiles = this.assets.tiles.graveyard; for (let x = 0; x < W; x += 16) { g.drawImage(tiles.top, x, 176); g.drawImage(tiles.ground, x, 192); g.drawImage(tiles.ground, x, 208); }
     g.drawImage(tiles.deco_t, 40, 160); g.drawImage(tiles.deco_c, 200, 160); g.drawImage(tiles.deco_x, 120, 160); g.drawImage(tiles.deco_f, 70, 160);
-    // 主人公
-    const p = this.assets.player.dress.idle_stand; g.drawImage(p.r, 116, 144); g.drawImage(this.assets.hat.r, 116, 136);
+    // 主人公（生成スプライト、足元を地面 y=176 に）
+    const p = this.assets.player.dress.idle; if (p) blit(g, p, false, 128 - p.w / 2, 176 - p.h);
     // ゾンビ
-    const z = this.assets.enemies[Math.floor(this.stateT * 4) % 2 ? 'zombie1' : 'zombie2']; g.drawImage(z.l, 176, 160); g.drawImage(z.l, 22, 160);
+    const z = this.assets.enemies[Math.floor(this.stateT * 4) % 2 ? 'zombie1' : 'zombie2']; if (z) { blit(g, z, true, 190, 176 - z.h); blit(g, z, true, 18, 176 - z.h); }
     // タイトル
     const r = textBox(g, [{ t: 'マジカル☆リリカと', color: '#ff8fc8' }, { t: '血塗られたおとぎの国', color: '#fdfbf7' }, { t: ' ', size: 6 }], { y: 28, minWidth: 224 });
     g.fillStyle = '#d9262b'; g.fillRect(r.x + 24, r.y + r.h - 16, r.w - 48, 1);

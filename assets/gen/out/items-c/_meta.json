@@ -1,0 +1,41 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/items-c-v1.png",
+ "pitch": [
+  6.0,
+  7.0
+ ],
+ "max_box": [
+  64,
+  64
+ ],
+ "frames": [
+  {
+   "w": 25,
+   "h": 32,
+   "fits": true,
+   "colors": 14,
+   "name": "potion"
+  },
+  {
+   "w": 39,
+   "h": 25,
+   "fits": true,
+   "colors": 14,
+   "name": "candy"
+  },
+  {
+   "w": 33,
+   "h": 32,
+   "fits": true,
+   "colors": 8,
+   "name": "charge"
+  },
+  {
+   "w": 36,
+   "h": 29,
+   "fits": true,
+   "colors": 12,
+   "name": "pool"
+  }
+ ]
+}

@@ -85,7 +85,7 @@ def size_block(name: str) -> tuple[str, dict]:
     if frames == 1:
         lines.append(f"- Exactly ONE sprite, horizontally centered on the canvas.")
     else:
-        lines.append(f"- Exactly {frames} frames side by side, each inside its own {w}x{h}-cell box, boxes separated by a gap of 4 cells of green, the group centered horizontally. Same character, same scale, same palette in every frame.")
+        lines.append(f"- Exactly {frames} figures side by side in one row, separated by clear gaps of green, the group centered horizontally. Same scale and same palette for every figure.")
     if sp['anchor'] == 'bottom':
         lines.append(f"- Feet rest on the baseline y = {base} px (that is {(canvas - base)//cell} cells above the bottom edge). Nothing below the baseline.")
     else:

@@ -5,23 +5,23 @@
   5.0
  ],
  "max_box": [
-  72,
+  90,
   120
  ],
  "frames": [
   {
    "w": 77,
    "h": 114,
-   "fits": false,
+   "fits": true,
    "colors": 15,
-   "name": "hurt"
+   "name": "hurt_nohat"
   },
   {
    "w": 68,
    "h": 114,
    "fits": true,
    "colors": 15,
-   "name": "hurt2"
+   "name": "hurt2_nohat"
   }
  ]
 }

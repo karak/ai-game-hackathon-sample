@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-candyforest-mid-v1.png",
+ "pitch": [
+  3.0,
+  4.0
+ ],
+ "max_box": [
+  220,
+  120
+ ],
+ "w": 316,
+ "h": 76,
+ "fits": false,
+ "colors": 32
+}

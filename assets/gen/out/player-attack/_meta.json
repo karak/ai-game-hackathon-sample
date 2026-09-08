@@ -5,7 +5,7 @@
   5.0
  ],
  "max_box": [
-  72,
+  90,
   120
  ],
  "frames": [
@@ -14,14 +14,14 @@
    "h": 107,
    "fits": true,
    "colors": 15,
-   "name": "attack"
+   "name": "attack_nohat"
   },
   {
    "w": 72,
    "h": 87,
    "fits": true,
    "colors": 15,
-   "name": "crouch"
+   "name": "crouch_nohat"
   }
  ]
 }

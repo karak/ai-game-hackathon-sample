@@ -5,7 +5,7 @@
   5.0
  ],
  "max_box": [
-  72,
+  90,
   120
  ],
  "frames": [
@@ -14,14 +14,14 @@
    "h": 103,
    "fits": true,
    "colors": 15,
-   "name": "run1"
+   "name": "run1_nohat"
   },
   {
    "w": 59,
    "h": 103,
    "fits": true,
    "colors": 15,
-   "name": "run2"
+   "name": "run2_nohat"
   }
  ]
 }

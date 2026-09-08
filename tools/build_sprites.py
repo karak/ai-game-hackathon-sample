@@ -26,6 +26,9 @@ def build(name, sp):
     w, h = sp['box']; outs = sp['out']
     pal = (OUT / f"{sp['palette']}.png") if sp.get('palette') else None
     pal_arg = ['--palette', str(pal)] if pal and pal.exists() else []
+    pal_arg += ['--colors', str(sp.get('colors', 15))]
+    if sp.get('nokey'): pal_arg += ['--nokey']
+    if sp.get('keep_bottom'): pal_arg += ['--keep-bottom', str(sp['keep_bottom'])]
     if sp['frames'] == 1:
         dst = OUT / f'{outs[0]}.png'; dst.parent.mkdir(parents=True, exist_ok=True)
         subprocess.run([PY, str(ROOT / 'tools/postprocess.py'), str(raw), str(dst), '--logical', f'{w}x{h}', '--anchor', sp['anchor'], *pal_arg], check=True)

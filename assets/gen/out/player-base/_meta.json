@@ -5,7 +5,7 @@
   5.0
  ],
  "max_box": [
-  72,
+  90,
   120
  ],
  "frames": [
@@ -14,14 +14,14 @@
    "h": 111,
    "fits": true,
    "colors": 15,
-   "name": "base_hat"
+   "name": "idle"
   },
   {
    "w": 44,
    "h": 103,
    "fits": true,
    "colors": 15,
-   "name": "idle"
+   "name": "idle_nohat"
   }
  ]
 }

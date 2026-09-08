@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/player-run-a-hat-v1.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  90,
+  120
+ ],
+ "frames": [
+  {
+   "w": 73,
+   "h": 118,
+   "fits": true,
+   "colors": 15,
+   "name": "run1"
+  },
+  {
+   "w": 51,
+   "h": 108,
+   "fits": true,
+   "colors": 15,
+   "name": "run2"
+  }
+ ]
+}
