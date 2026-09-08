@@ -75,6 +75,7 @@ export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512, decoHD
     const tx0 = cx / TILE, tx1 = (cx + cw) / TILE;
     for (let ty = 0; ty < map.height; ty++) for (let tx = tx0; tx < tx1; tx++) {
       const ch = map.at(tx, ty); const px = (tx - tx0) * T, py = ty * T; const v = (tx * 7 + ty * 3) % tiles.cols;
+      if (ch === '!') continue; // 崩れる足場は World が動的に描く
       if (map.isSolid(tx, ty)) {
         const up = map.isSolid(tx, ty - 1) || ty === 0;
         g.drawImage(up ? tiles.fill[v] : tiles.top[v], px, py);

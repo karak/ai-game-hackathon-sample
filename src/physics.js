@@ -1,7 +1,7 @@
 // タイルベース物理。gravity は呼び出し側が vy に加える（超魔界村的な固定軌道ジャンプのため）。
 export const TILE = 16;
 
-const SOLID = new Set(['#', 'D', 'S', 'R', 'W', 'K', 'Q']);
+const SOLID = new Set(['#', 'D', 'S', 'R', 'W', 'K', 'Q', '!']); // '!' は崩れる足場（消えると '.' に書き換わる）
 const ONEWAY = new Set(['=', '-']);
 
 export class TileMap {
@@ -23,7 +23,9 @@ export class TileMap {
     return SOLID.has(this.at(tx, ty));
   }
   isOneWay(tx, ty) {
-    return ONEWAY.has(this.at(tx, ty));
+    const c = this.at(tx, ty);
+    // はしごの最上段は上から乗れる（超魔界村準拠: はしごの頂上で立てる）
+    return ONEWAY.has(c) || (c === 'L' && this.at(tx, ty - 1) !== 'L');
   }
   isHazard(tx, ty) {
     const c = this.at(tx, ty);
@@ -33,7 +35,7 @@ export class TileMap {
   get pixelHeight() { return this.height * TILE; }
 }
 
-function overlapsSolid(map, x, y, w, h) {
+export function overlapsSolid(map, x, y, w, h) {
   const x0 = Math.floor(x / TILE), x1 = Math.floor((x + w - 0.001) / TILE);
   const y0 = Math.floor(y / TILE), y1 = Math.floor((y + h - 0.001) / TILE);
   for (let ty = y0; ty <= y1; ty++)

@@ -15,7 +15,11 @@ export const MARKERS = {
   b: 'bear',        // テディベア（跳ねる）
   e: 'eye',         // まばたき目玉（据え置き砲台）
   h: 'heartitem',   // 回復/得点アイテム
+  M: 'platformH',   // 動く足場（水平往復、3 タイル幅）
+  V: 'platformV',   // 動く足場（垂直往復）
+  '@': 'island',    // 浮島（上下に揺れるすり抜け足場）
 };
+// マップに残るギミック記号: ! 崩れる足場  L はしご  > < 水流  } { 風
 
 export function parseLevel(stage) {
   const rows = stage.rows.map(r => r.split(''));
@@ -37,7 +41,10 @@ export function parseLevel(stage) {
     }
   }
   const map = new TileMap(rows.map(r => r.join('')));
+  const crumbles = [];
+  for (let ty = 0; ty < rows.length; ty++) for (let tx = 0; tx < rows[ty].length; tx++) if (rows[ty][tx] === '!') crumbles.push({ tx, ty });
   return {
+    crumbles,
     name: stage.name,
     title: stage.title ?? stage.name,
     theme: stage.theme ?? 'graveyard',

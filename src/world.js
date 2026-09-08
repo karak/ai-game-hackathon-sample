@@ -13,6 +13,7 @@ import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBo
 import { THEMES } from './gfx/tiles.js';
 import { SAFE_SHOT_T } from './balance.js';
 import { Fx } from './fx.js';
+import { MovingPlatform, CrumbleTile, PLATFORM } from './entities/gimmicks.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
@@ -57,6 +58,7 @@ export class World {
     this.classes = { EnemyShot };
 
     this.enemies = []; this.shots = []; this.enemyShots = []; this.fires = []; this.pools = []; this.items = []; this.boxes = [];
+    this.platforms = []; this.crumbles = []; // ギミック（spawnAll で配置）
     this.cam = { x: 0, y: 0 }; this.arena = null; this.boss = null; this.bossState = 'none';
     this.time = this.level.timeLimit; this.t = 0; this.cutscene = false; this.cleared = false;
     this.shakeT = 0; this.shakeAmp = 0; this.toasts = []; this.tickT = 0; this.safeT = 0; // safeT > 0 の間は敵弾なし
@@ -73,7 +75,10 @@ export class World {
 
   spawnAll() {
     this.enemies = []; this.boxes = []; this.items = []; this.enemyShots = []; this.shots = []; this.fires = []; this.pools = [];
+    this.platforms = []; this.crumbles = this.level.crumbles.map(c => new CrumbleTile(this, c.tx, c.ty));
+    for (const c of this.crumbles) this.level.map.set(c.tx, c.ty, '!'); // 消えていた足場を戻す
     for (const s of this.level.spawns) {
+      if (PLATFORM[s.type]) { this.platforms.push(new MovingPlatform(this, s.type, s.tx, s.ty)); continue; }
       if (s.type === 'treasure') this.boxes.push(new TreasureBox(this, s.x, s.y));
       else if (s.type === 'heartitem') this.items.push(new FloatingItem(this, 'potion', s.x, s.y));
       else { const e = createEnemy(this, s); if (e) { e.spawnX = s.x; this.enemies.push(e); } }
@@ -106,6 +111,8 @@ export class World {
       if (this.time <= 0) { this.time = 0; p.die('time'); }
       else if (this.time < 10) { this.tickT += dt; if (this.tickT > 1) { this.tickT = 0; this.audio.sfx('tick'); } }
     }
+    for (const q of this.platforms) q.update(dt);   // 足場は主人公より先に動かす（乗り物処理のため）
+    for (const c of this.crumbles) c.update(dt);
     p.update(dt, input);
 
     // チェックポイント
@@ -196,6 +203,7 @@ export class World {
     // 毒沼アニメ（'~' タイル）
     this.drawBog(g, cam);
     this.decals.draw(g, cam, W, H);
+    this.drawGimmicks(g, cam);
     const A = this.assets;
     for (const b of this.boxes) b.draw(g, cam, A.items);
     for (const q of this.pools) q.draw(g, cam, A.shots);
@@ -210,6 +218,28 @@ export class World {
     if (this.player.costume === 'plain' && this.player.alive) { g.fillStyle = 'rgba(180,92,245,0.06)'; g.fillRect(0, 0, W, H); }
     // 撃破フラッシュ / ボス撃破の白飛び
     const fa = this.fx.flashAlpha; if (fa > 0) { g.globalAlpha = fa; g.fillStyle = this.fx.flashColor; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }
+  }
+  // 動く足場・崩れる足場・はしご（足場画像はテーマの足場タイルを流用。はしごは暫定の幾何描画: 第四章の地形生成で置換予定）
+  drawGimmicks(g, cam) {
+    const plat = (x, y, w, shake = 0) => {
+      const n = Math.round(w / TILE);
+      for (let i = 0; i < n; i++) {
+        const sx = Math.round(x + i * TILE - cam.x + shake), sy = Math.round(y - cam.y);
+        if (this.hdTiles) { const v = (i * 7) % this.hdTiles.cols; g.drawImage(this.hdTiles.plat[v], sx, sy, TILE, TILE); }
+        else g.drawImage(this.tiles.plat, sx, sy);
+      }
+    };
+    for (const p of this.platforms) if (p.x + p.w > cam.x && p.x < cam.x + W) plat(p.x, p.y, p.w);
+    for (const c of this.crumbles) if (c.state !== 'gone' && c.x + TILE > cam.x && c.x < cam.x + W) plat(c.x, c.y, TILE, c.shake);
+    // はしご
+    const map = this.level.map, tx0 = Math.floor(cam.x / TILE), tx1 = tx0 + W / TILE + 1;
+    const th = THEMES[this.level.theme];
+    for (let ty = 0; ty < map.height; ty++) for (let tx = tx0; tx <= tx1; tx++) {
+      if (map.at(tx, ty) !== 'L') continue;
+      const x = tx * TILE - cam.x, y = ty * TILE - cam.y;
+      g.fillStyle = th.plat[0]; g.fillRect(x + 3, y, 2, TILE); g.fillRect(x + 11, y, 2, TILE);
+      g.fillStyle = th.plat[1]; g.fillRect(x + 4, y + 3, 8, 2); g.fillRect(x + 4, y + 11, 8, 2);
+    }
   }
   drawBog(g, cam) {
     const map = this.level.map; const f = Math.floor(this.t * 3) % 2;

@@ -1,6 +1,7 @@
 import { TILE, moveBody } from '../physics.js';
 import { PlayerShot, WEAPONS } from './projectiles.js';
 import { blit } from '../gfx/sprite.js';
+import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, ladderAt, ladderBelow, LADDER_SPEED } from './gimmicks.js';
 
 const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196; // 単発ジャンプ 42 世界px(2.6タイル)
 const STAND_H = 28, CROUCH_H = 18; // 当たり判定（世界単位）。スプライトは生成 PNG のサイズに従う（docs/art-standard.md §2.1）
@@ -14,6 +15,7 @@ export class Player {
     this.costume = 'dress'; this.weapon = 'star';
     this.state = 'normal'; this.jumps = 0; this.crouch = false;
     this.invT = 0; this.hurtT = 0; this.attackT = 0; this.runT = 0; this.chargeT = 0; this.deathT = 0;
+    this.platform = null; this.climbing = false; // 乗っている動く足場 / はしご昇降中
     this.broomT = 0; this.wasShoot = false; this.poisonT = 0;
   }
   get alive() { return this.state === 'normal'; }
@@ -33,6 +35,11 @@ export class Player {
 
     const left = ctrl && input.down('left'), right = ctrl && input.down('right');
     const dir = left ? -1 : right ? 1 : 0;
+    const up = ctrl && input.down('up'), down = ctrl && input.down('down');
+
+    // はしご（超魔界村準拠: 上下で昇降、はしご上で射撃可、ジャンプで離脱）
+    if (this.climbing) { this.updateClimb(dt, input, dir, up, down, ctrl); return; }
+    if (ctrl && !this.crouch && ((up && ladderAt(map, this)) || (down && this.onGround && ladderBelow(map, this)))) { this.startClimb(map); return; }
 
     // しゃがみ
     const wantCrouch = ctrl && input.down('down') && this.onGround;
@@ -68,8 +75,14 @@ export class Player {
     }
 
     this.vy += GRAV * dt; if (this.vy > 320) this.vy = 320;
+    if (this.vy < 0) this.platform = null;                 // ジャンプで足場から離れる
+    carryByPlatform(this);                                 // 動く足場の移動量を先に加える
+    const prevBottom = this.y + this.h;
     const res = moveBody(this, map, dt);
     if (res.hitTop) this.vy = 0;
+    landOnPlatforms(this, this.world.platforms ?? [], prevBottom);
+    if (this.onGround) triggerCrumbles(this, this.world.crumbles ?? []);
+    applyFlow(this, map, dt);                              // 水流（地上）／風（空中）
     if (this.onGround && this.hurtT > 0) this.vx = 0;
 
     // 危険タイル・落下
@@ -78,6 +91,36 @@ export class Player {
     if (this.y > map.pixelHeight + 8) this.die('fall');
     else if (map.isHazard(cx, fy) || map.isHazard(cx, hy)) this.die(map.at(cx, fy) === '^' ? 'spike' : 'bog');
     else if (this.x < 0) this.x = 0;
+  }
+
+  // ---- はしご ----
+  startClimb(map) {
+    const l = ladderAt(map, this) ?? ladderBelow(map, this); if (!l) return;
+    this.climbing = true; this.platform = null; this.vx = 0; this.vy = 0; this.jumps = 0; this.chargeT = 0;
+    this.x = l.tx * TILE + TILE / 2 - this.w / 2; this.onGround = false;
+    if (this.crouch) { this.crouch = false; this.y -= STAND_H - CROUCH_H; this.h = STAND_H; }
+  }
+  updateClimb(dt, input, dir, up, down, ctrl) {
+    const map = this.world.level.map;
+    if (dir) this.facing = dir;
+    if (ctrl && input.hit('jump')) { this.climbing = false; this.vy = JUMP_V * 0.8; this.jumps = 1; this.vx = dir * SPEED; this.world.audio.sfx('jump'); return; }
+    if (ctrl && input.hit('shoot')) this.shoot(false);
+    const vy = up ? -LADDER_SPEED : down ? LADDER_SPEED : 0;
+    this.runT = vy ? this.runT + dt : this.runT;
+    this.y += vy * dt;
+    const tx = Math.floor(this.centerX / TILE);
+    if (vy < 0) {
+      // 体の中心がはしごより上に出たら、はしごの最上段の上に立つ
+      const topTy = Math.floor((this.y + this.h / 2) / TILE);
+      if (map.at(tx, topTy) !== 'L') { let ty = topTy + 1; while (map.at(tx, ty) === 'L' && ty > 0 && map.at(tx, ty - 1) === 'L') ty--; this.y = ty * TILE - this.h; this.climbing = false; this.onGround = true; this.vy = 0; }
+    } else if (vy > 0) {
+      // 足元が地面に着いたら降りる。はしごの下端を抜けたら落下へ
+      const footTy = Math.floor((this.y + this.h + 0.5) / TILE);
+      if (map.isSolid(tx, footTy) || map.isOneWay(tx, footTy)) { this.y = footTy * TILE - this.h; this.climbing = false; this.onGround = true; this.vy = 0; }
+      else if (map.at(tx, Math.floor((this.y + this.h - 1) / TILE)) !== 'L' && map.at(tx, Math.floor((this.y + this.h / 2) / TILE)) !== 'L') { this.climbing = false; }
+    }
+    if (this.world.cleared) return;
+    if (this.y > map.pixelHeight + 8) this.die('fall');
   }
 
   shoot(charged) {
@@ -122,12 +165,13 @@ export class Player {
 
   respawn(x, y) {
     this.x = x + 2; this.y = y + TILE - STAND_H; this.vx = 0; this.vy = 0; this.h = STAND_H; this.crouch = false;
-    this.state = 'normal'; this.costume = 'dress'; this.invT = 2.0; this.hurtT = 0; this.jumps = 0; this.chargeT = 0; this.facing = 1;
+    this.state = 'normal'; this.costume = 'dress'; this.invT = 2.0; this.hurtT = 0; this.jumps = 0; this.chargeT = 0; this.facing = 1; this.platform = null; this.climbing = false;
   }
 
   // 生成スプライトのフレーム名（idle/run1-4/jump/fall/attack/crouch/hurt/dead）
   frame() {
     if (this.state !== 'normal') return 'dead';
+    if (this.climbing) return ['jump', 'fall'][Math.floor(this.runT * 6) % 2]; // 専用コマなし: 上昇／下降コマを交互に
     if (this.crouch) return 'crouch';
     if (this.hurtT > 0) return 'hurt';
     if (!this.onGround) return this.attackT > 0 ? 'attack' : (this.vy < 0 ? 'jump' : 'fall');
