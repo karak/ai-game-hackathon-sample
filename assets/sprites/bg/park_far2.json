@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-park-far2-v1.png",
+ "pitch": [
+  4.0,
+  3.0
+ ],
+ "max_box": [
+  400,
+  300
+ ],
+ "w": 267,
+ "h": 125,
+ "fits": true,
+ "colors": 32
+}

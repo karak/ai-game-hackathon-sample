@@ -43,7 +43,8 @@ export class World {
                         candyforest: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones, k: D.lollipop },
                         castle: { n: D.pillar, w: D.window, v: D.candelabra, x: D.blood, o: D.bones, t: D.banner },
                         river: { y: D.willow, n: D.bridgepost, f: D.reeds, o: D.dollhead, x: D.blood, t: D.tomb },
-                        workshop: { n: D.dressform, c: D.scissors, y: D.spool, o: D.stuffing, x: D.blood, w: D.window, v: D.candelabra } }[this.level.theme] ?? {};
+                        workshop: { n: D.dressform, c: D.scissors, y: D.spool, o: D.stuffing, x: D.blood, w: D.window, v: D.candelabra },
+                        park: { n: D.booth, f: D.balloons, y: D.carousel, c: D.popcorn, x: D.blood, o: D.bones } }[this.level.theme] ?? {};
       for (const k of Object.keys(decoMap)) if (!decoMap[k]) delete decoMap[k];
       this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles, 512, decoMap, buildSpikeHD(THEMES[this.level.theme]));
       this.bogHD = buildBogHD(THEMES[this.level.theme]);
@@ -176,7 +177,7 @@ export class World {
     this.audio.playBgm(SONGS.boss);
     this.fx.bossIntro(this.bossName());
   }
-  bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', serpent: '涙の大蛇 ララバイ', machine: '人形師の機械 マザーグース' }[this.level.boss] ?? 'BOSS'; }
+  bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', serpent: '涙の大蛇 ララバイ', machine: '人形師の機械 マザーグース', ringmaster: '大観覧車の主 グランギニョル' }[this.level.boss] ?? 'BOSS'; }
 
   collide() {
     const p = this.player;
@@ -252,7 +253,19 @@ export class World {
         else g.drawImage(this.tiles.plat, Math.round(sx + i * TILE), Math.round(sy));
       }
     };
-    for (const p of this.platforms) if (p.x + p.w > cam.x && p.x < cam.x + W) plat(p.x, p.y, p.w, 0, p.kind === 'island' ? 'island' : 'plat');
+    for (const p of this.platforms) {
+      if (p.x + p.w <= cam.x || p.x >= cam.x + W) continue;
+      if (p.kind === 'wheel' && G.gondola) { const sw = G.gondola.r.width / HD, sh = G.gondola.r.height / HD; g.drawImage(G.gondola.r, Math.round(p.x + p.w / 2 - sw / 2 - cam.x), Math.round(p.y - cam.y), sw, sh); continue; }
+      if (p.kind === 'cart' && G.cart) { const sw = G.cart.r.width / HD, sh = G.cart.r.height / HD; g.drawImage(G.cart.r, Math.round(p.x + p.w / 2 - sw / 2 - cam.x), Math.round(p.y + p.h - sh - cam.y), sw, sh); continue; }
+      plat(p.x, p.y, p.w, 0, p.kind === 'island' ? 'island' : 'plat');
+    }
+    // 観覧車の軸（中心）とスポーク
+    for (const c of this.platforms.filter(p => p.kind === 'wheel' && p.phase === 0)) {
+      if (c.cx + 60 < cam.x || c.cx - 60 > cam.x + W) continue;
+      g.strokeStyle = '#c0b8a8'; g.lineWidth = 1; for (const q of this.platforms) if (q.kind === 'wheel' && q.cx === c.cx && q.cy === c.cy) { g.beginPath(); g.moveTo(Math.round(c.cx - cam.x), Math.round(c.cy - cam.y)); g.lineTo(Math.round(q.x + q.w / 2 - cam.x), Math.round(q.y + q.h / 2 - cam.y)); g.stroke(); }
+      if (G.hub) { const sw = G.hub.r.width / HD, sh = G.hub.r.height / HD; g.drawImage(G.hub.r, Math.round(c.cx - sw / 2 - cam.x), Math.round(c.cy - sh / 2 - cam.y), sw, sh); }
+      else { g.fillStyle = '#d9262b'; g.fillRect(Math.round(c.cx - 3 - cam.x), Math.round(c.cy - 3 - cam.y), 6, 6); }
+    }
     for (const c of this.crumbles) if (c.state !== 'gone' && c.x + TILE > cam.x && c.x < cam.x + W) plat(c.x, c.y, TILE, c.shake, 'plank');
     // プレス機: 吊り鎖 + ブロック（生成絵 tiles/press があれば使う）
     for (const q of this.presses) {

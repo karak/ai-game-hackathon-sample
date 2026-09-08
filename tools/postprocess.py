@@ -16,7 +16,9 @@ from PIL import Image
 
 def bg_color(im):
     w, h = im.size; px = im.convert('RGB').load()
-    pts = [px[2, 2], px[w - 3, 2], px[2, h - 3], px[w - 3, h - 3], px[w // 2, 2], px[2, h // 2], px[w - 3, h // 2]]
+    # 上端の 3 点と左右中段を使う。下の角は地形帯や 4 体並びで絵が届くことがあるため使わない（帯の上 1/3 がキー残りになった実績）
+    pts = [px[2, 2], px[w - 3, 2], px[w // 2, 2], px[w // 4, 2], px[3 * w // 4, 2], px[2, h // 3], px[w - 3, h // 3]]
+    pts = [p for p in pts if p[1] > p[0] + 20 and p[1] > p[2] + 20] or pts  # 緑らしい点だけで平均
     return tuple(sum(p[i] for p in pts) // len(pts) for i in range(3))
 
 

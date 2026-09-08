@@ -1256,6 +1256,191 @@
     "bosses/machine2"
    ],
    "palette": "bosses/machine1"
+  },
+  "bg-park-sky": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-park-sky.txt",
+   "out": [
+    "bg/park_sky"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "bg-park-far": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-park-far.txt",
+   "out": [
+    "bg/park_far"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-park-far2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-park-far2.txt",
+   "out": [
+    "bg/park_far2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "ref": "bg-park-far"
+  },
+  "bg-park-mid": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-park-mid.txt",
+   "out": [
+    "bg/park_mid"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-park-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-park-mid2.txt",
+   "out": [
+    "bg/park_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-park-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-park-mid3.txt",
+   "out": [
+    "bg/park_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "tiles-park": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-park.txt",
+   "out": [
+    "tiles/park"
+   ],
+   "kind": "tiles",
+   "colors": 24
+  },
+  "deco-park": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-park.txt",
+   "out": [
+    "deco/booth",
+    "deco/balloons",
+    "deco/carousel",
+    "deco/popcorn"
+   ],
+   "colors": 15,
+   "strip_caption": true
+  },
+  "gimmick-park": {
+   "box": [
+    100,
+    120
+   ],
+   "frames": 3,
+   "anchor": "bottom",
+   "subject": "gimmick-park.txt",
+   "out": [
+    "tiles/cart",
+    "tiles/gondola",
+    "tiles/hub"
+   ],
+   "colors": 15,
+   "strip_caption": true
+  },
+  "enemy-balloon": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-balloon.txt",
+   "out": [
+    "enemies/balloon1",
+    "enemies/balloon2"
+   ]
+  },
+  "enemy-clown": {
+   "box": [
+    120,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-clown.txt",
+   "out": [
+    "enemies/clown1",
+    "enemies/clown2"
+   ]
+  },
+  "boss-wheel": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-wheel.txt",
+   "out": [
+    "bosses/ringmaster1"
+   ]
+  },
+  "boss-wheel-b": {
+   "box": [
+    220,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-wheel-b.txt",
+   "ref": "boss-wheel",
+   "out": [
+    "bosses/ringmaster2"
+   ],
+   "palette": "bosses/ringmaster1"
   }
  }
 }

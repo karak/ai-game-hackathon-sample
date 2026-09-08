@@ -42,6 +42,15 @@ export const THEMES = {
     moon: '#ffd890', moonShade: '#e0a850', star: '#fdfbf7',
     far: '#2c2434', mid: '#221c2a', near: '#181420',
   },
+  park: { // 第五章 骨の遊園地: 夜・原色ネオン。'~' は血のプール
+    grass: ['#e8e0d0', '#f4eee0', '#c8c0b0'], grassFlower: ['#ff2a6a', '#3af0ff', '#ffe860'],
+    dirt: ['#3a3040', '#4a3c50', '#2c2434'], pebble: '#e8e0d0',
+    plat: ['#c0b8a8', '#e0d8c8', '#908878'], platMoss: '#3af0ff',
+    bog: ['#7a0f1f', '#a01a2c', '#d9262b'], bogGlow: '#ff6a6a', bogBubble: '#ffe860',
+    skyTop: '#0a0614', skyMid: '#2a1050', skyBot: '#7a2090', horizon: '#ff2a6a',
+    moon: '#3af0ff', moonShade: '#2ab0c0', star: '#fdfbf7',
+    far: '#241838', mid: '#1a1028', near: '#100a1c',
+  },
   castle: {
     grass: ['#6c6c80', '#7c7c90', '#5d5d70'], grassFlower: ['#d9262b', '#7a0f1f', '#a5a5b8'],
     dirt: ['#5d5d70', '#4e4e60', '#6c6c80'], pebble: '#2d1f4c',

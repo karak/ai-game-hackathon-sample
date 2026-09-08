@@ -326,6 +326,47 @@ export class DollmakerMachine extends Boss {
   spriteName() { return this.attackAnim > 0 ? 'machine2' : 'machine1'; }
 }
 
+// ---- 大観覧車の主 (第五章): 部屋の観覧車（回転足場）を渡って背中側から撃つ想定。鞭の横薙ぎ・人形の頭の射出・ストンプ ----
+// かわいい: 骨の顔に描かれた笑顔と頬紅、山高帽 / えげつない: 胸郭の中で回る人形の頭の観覧車、燕尾服を伝う血
+export class Ringmaster extends Boss {
+  constructor(world, x, groundY) {
+    super(world, x, groundY - 70, 30, 70); this.spriteOff = [4, 2];
+    this.hpMax = this.hp = 30; this.facing = -1; this.fitSprite('ringmaster1', 0.5, 0.95); this.enterX = x - 30; this.attackAnim = 0; this.cycle = 0; this.whipBox = null;
+  }
+  update(dt) {
+    if (super.update(dt)) return;
+    const p = this.player, d = this.distX(), enraged = this.hpRatio < 0.5, a = this.world.arena;
+    this.attackAnim = Math.max(0, this.attackAnim - dt); this.whipBox = null;
+    switch (this.state) {
+      case 'enter': this.vx = -20; if (this.x <= this.enterX) { this.vx = 0; this.setState('stand'); this.contact = true; } break;
+      case 'stand': // 主人公に向き直り、1.4 秒で次の攻撃
+        this.facePlayer(); this.vx = 0;
+        if (this.stateT > (enraged ? 1.0 : 1.4)) { this.cycle++; this.setState(this.cycle % 3 === 1 ? 'whip' : this.cycle % 3 === 2 ? 'heads' : 'stomp'); }
+        break;
+      case 'whip': { // 0.3 秒後に前方 90 の横薙ぎ（主人公の腰の高さ）。しゃがみで避ける
+        if (this.stateT > 0.3 && this.stateT < 0.55) { this.attackAnim = 0.3; const len = 90, y = this.y + this.h * 0.45; this.whipBox = { x: this.facing > 0 ? this.x + this.w : this.x - len, y, w: len, h: 10 }; if (p.alive && p.x < this.whipBox.x + this.whipBox.w && p.x + p.w > this.whipBox.x && p.y < y + 10 && p.y + p.h > y) p.hit(this); }
+        if (this.stateT > 0.9) this.setState('stand');
+        break;
+      }
+      case 'heads': // 胸郭の観覧車から人形の頭（追尾弾 darkheart）を 3〜5 個
+        if (Math.floor(this.stateT * 4) !== Math.floor((this.stateT - dt) * 4) && this.stateT < (enraged ? 1.3 : 0.8)) { this.attackAnim = 0.4; const ang = Math.atan2(p.y - this.cy, d) + rand(-0.5, 0.5); this.shoot('darkheart', Math.cos(ang) * 90, Math.sin(ang) * 90 - 40, this.facing * 6, -10, { life: 3 }); this.world.audio.sfx('poison'); }
+        if (this.stateT > 1.6) this.setState('stand');
+        break;
+      case 'stomp': // 竹馬で跳んで着地、揺れ＋骨の破片
+        if (this.stateT < 0.05 && this.onGround) { this.vy = -240; this.vx = Math.sign(d) * 60; }
+        if (this.onGround && this.stateT > 0.3) { this.vx = 0; this.world.shake(5); this.attackAnim = 0.3; for (let i = -2; i <= 2; i++) this.shoot('bone', i * 45, -160 - Math.abs(i) * 10, 0, 20, { life: 2 }); this.world.audio.sfx('hit'); this.setState('stand'); }
+        break;
+    }
+    this.physics(dt);
+    if (a) { if (this.x < a.x0 + 8) { this.x = a.x0 + 8; } if (this.x + this.w > a.x1 - 8) { this.x = a.x1 - 8 - this.w; } }
+  }
+  spriteName() { return this.attackAnim > 0 ? 'ringmaster2' : 'ringmaster1'; }
+  draw(g, cam, assets) {
+    super.draw(g, cam, assets);
+    if (this.whipBox) { const b = this.whipBox; g.fillStyle = '#d9262b'; g.fillRect(Math.round(b.x - cam.x), Math.round(b.y + 4 - cam.y), b.w, 2); g.fillStyle = '#fdfbf7'; g.fillRect(Math.round((this.facing > 0 ? b.x + b.w - 6 : b.x) - cam.x), Math.round(b.y + 3 - cam.y), 6, 4); } // 鞭の軌跡
+  }
+}
+
 export function createBoss(world, kind, x, groundY) {
   switch (kind) {
     case 'doll': return new WeepingDoll(world, x, groundY);
@@ -333,6 +374,7 @@ export function createBoss(world, kind, x, groundY) {
     case 'noir': return new Noir(world, x, groundY);
     case 'serpent': return new TearSerpent(world, x, groundY);
     case 'machine': return new DollmakerMachine(world, x, groundY);
+    case 'ringmaster': return new Ringmaster(world, x, groundY);
   }
   return null;
 }

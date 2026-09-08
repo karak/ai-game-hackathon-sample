@@ -1,5 +1,5 @@
 {
- "requests": 118,
+ "requests": 131,
  "entries": [
   {
    "name": "player-base",
@@ -904,6 +904,110 @@
    "secs": 10.8,
    "text": "",
    "ts": 1788894405.587979
+  },
+  {
+   "name": "bg-park-sky",
+   "v": 1,
+   "ok": true,
+   "secs": 8.6,
+   "text": "",
+   "ts": 1788895012.015604
+  },
+  {
+   "name": "bg-park-far",
+   "v": 1,
+   "ok": true,
+   "secs": 10.4,
+   "text": "",
+   "ts": 1788895022.907702
+  },
+  {
+   "name": "bg-park-far2",
+   "v": 1,
+   "ok": true,
+   "secs": 14.1,
+   "text": "",
+   "ts": 1788895037.413271
+  },
+  {
+   "name": "bg-park-mid",
+   "v": 1,
+   "ok": true,
+   "secs": 10.1,
+   "text": "Here is your pixel art parallax layer:\n",
+   "ts": 1788895047.9861188
+  },
+  {
+   "name": "bg-park-mid2",
+   "v": 1,
+   "ok": true,
+   "secs": 11.5,
+   "text": "",
+   "ts": 1788895059.947219
+  },
+  {
+   "name": "bg-park-mid3",
+   "v": 1,
+   "ok": true,
+   "secs": 9.2,
+   "text": "",
+   "ts": 1788895069.6351738
+  },
+  {
+   "name": "tiles-park",
+   "v": 1,
+   "ok": true,
+   "secs": 10.1,
+   "text": "",
+   "ts": 1788895080.161618
+  },
+  {
+   "name": "deco-park",
+   "v": 1,
+   "ok": true,
+   "secs": 10.7,
+   "text": "",
+   "ts": 1788895091.3119948
+  },
+  {
+   "name": "gimmick-park",
+   "v": 1,
+   "ok": true,
+   "secs": 10.5,
+   "text": "",
+   "ts": 1788895102.233035
+  },
+  {
+   "name": "enemy-balloon",
+   "v": 1,
+   "ok": true,
+   "secs": 9.6,
+   "text": "",
+   "ts": 1788895112.231006
+  },
+  {
+   "name": "enemy-clown",
+   "v": 1,
+   "ok": true,
+   "secs": 10.9,
+   "text": "",
+   "ts": 1788895123.626558
+  },
+  {
+   "name": "boss-wheel",
+   "v": 1,
+   "ok": true,
+   "secs": 9.5,
+   "text": "Here is the \"Ringmaster of the Great Wheel\" in the specified pixel art style:\n",
+   "ts": 1788895133.6001332
+  },
+  {
+   "name": "boss-wheel-b",
+   "v": 1,
+   "ok": true,
+   "secs": 12.9,
+   "text": "",
+   "ts": 1788895146.9820201
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

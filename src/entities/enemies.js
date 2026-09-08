@@ -364,6 +364,48 @@ export class NeedleSwarm extends Enemy {
   spriteName() { return this.state === 'drift' ? 'needles1' : 'needles2'; }
 }
 
+// ---- 風船の亡霊 (第五章): ゆっくり主人公へ漂い、近づくか撃たれると膨らんで破裂、血の雨を降らせる ----
+export class BalloonGhost extends Enemy {
+  constructor(world, x, y) {
+    super(world, x, y - 40, 14, 16); this.spriteOff = [2, 2]; this.gravity = false; this.hp = 1; this.score = 150; this.gore = 'blood';
+    this.fitSprite('balloon1', 0.7, 0.8); this.swell = 0; this.contact = true;
+  }
+  update(dt) {
+    super.update(dt); const p = this.player;
+    if (this.swell > 0) { this.swell += dt; this.contact = false; if (this.swell > 0.5) this.burst(); return; }
+    const dx = p.centerX - this.cx, dy = p.y + 8 - this.cy, d = Math.hypot(dx, dy) || 1;
+    this.facing = dx < 0 ? -1 : 1;
+    this.x += dx / d * 18 * dt; this.y += dy / d * 12 * dt + Math.sin(this.t * 2) * 0.3;
+    if (d < 28) { this.swell = 0.01; this.world.audio.sfx('squish'); }
+  }
+  hurt(dmg, shot) { if (this.swell > 0) return; this.swell = 0.01; this.flashT = 0.1; this.world.audio.sfx('squish'); }
+  burst() { // 血の雨 5 滴を扇状に落とす
+    for (let i = -2; i <= 2; i++) this.shoot('rain', i * 26, 40 + Math.abs(i) * 10, 0, 4, { life: 2.5 });
+    this.world.particles.emit('blood', this.cx, this.cy, 18, { power: 1.4 }); this.world.addScore(this.score); this.world.audio.sfx('splat'); this.dead = true; this.world.fx?.killFlash();
+  }
+  spriteName() { return this.swell > 0 ? 'balloon2' : 'balloon1'; }
+}
+
+// ---- ピエロ骸骨 (第五章): 立ち止まってナイフを投げる。距離を取ろうとする ----
+export class ClownSkeleton extends Enemy {
+  constructor(world, x, y) {
+    super(world, x, y - 30, 14, 30); this.spriteOff = [3, 2]; this.hp = 3; this.score = 350; this.gore = 'bone';
+    this.fitSprite('clown1', 0.5, 0.92); this.throwT = rand(0.6, 1.4); this.anim = 0;
+  }
+  update(dt) {
+    super.update(dt); this.anim = Math.max(0, this.anim - dt); const d = this.distX();
+    this.facePlayer();
+    // 60 より近いと後退、160 より遠いと寄る
+    this.vx = !this.onGround ? this.vx : Math.abs(d) < 60 ? -this.facing * 22 : Math.abs(d) > 160 ? this.facing * 16 : 0;
+    const res = this.physics(dt); if (res.hitLeft || res.hitRight) this.vx = 0;
+    if (Math.abs(d) < 200) {
+      this.throwT -= dt;
+      if (this.throwT <= 0) { this.throwT = 1.8; this.anim = 0.35; const sp = 150; const ang = Math.atan2((this.player.y + 10) - (this.cy - 6), d); for (let i = -1; i <= 1; i += 2) this.shoot('cknife', Math.cos(ang) * sp, Math.sin(ang) * sp - 20 + i * 25, this.facing * 8, -6, { life: 2 }); this.world.audio.sfx('shoot'); }
+    }
+  }
+  spriteName() { return this.anim > 0 ? 'clown2' : 'clown1'; }
+}
+
 export function createEnemy(world, spawn) {
   const { type, x, y } = spawn;
   switch (type) {
@@ -378,6 +420,8 @@ export function createEnemy(world, spawn) {
     case 'umbrella': return new UmbrellaFairy(world, x + 1, y);
     case 'dollpart': return new UnfinishedDoll(world, x + 1, y + TILE);
     case 'needles': return new NeedleSwarm(world, x, y);
+    case 'balloon': return new BalloonGhost(world, x + 1, y);
+    case 'clown': return new ClownSkeleton(world, x + 1, y + TILE);
   }
   return null;
 }

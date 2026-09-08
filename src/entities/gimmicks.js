@@ -13,6 +13,7 @@ export const PLATFORM = {              // 記号ごとの既定
   platformV: { axis: 'y', amp: 32, period: 4, w: 3, oneWay: false },
   island:    { axis: 'y', amp: 8,  period: 4, w: 2, oneWay: true },
   wheel:     { axis: 'circle', amp: 48, period: 8, w: 2, oneWay: true, count: 4 }, // 観覧車: 半径 48、4 枚、8 秒で 1 周
+  cart:      { axis: 'rail', speed: 60, run: 24 * TILE, pause: 2, w: 3, oneWay: false }, // ジェットコースター: 右へ走り、終点で 2 秒止まって始点へ戻る
 };
 
 // 往復する足場。update で 1 フレームの移動量 dx/dy を記録し、乗っている物体が同じだけ動く
@@ -26,6 +27,10 @@ export class MovingPlatform {
   }
   get top() { return this.y; }
   positionAt(t) {
+    if (this.axis === 'rail') { // 始点→終点を speed で走り、pause 秒止まって始点に戻る（ループ）
+      const d = PLATFORM[this.kind], runT = d.run / d.speed, cyc = runT + d.pause, u = t % cyc;
+      return [this.cx - this.w / 2 + Math.min(d.run, Math.max(0, u) * d.speed), this.cy - this.h / 2];
+    }
     if (this.axis === 'circle') { // 円運動（回転足場）。phase で同じ中心の他の足場と位相をずらす
       const a = t / this.period * Math.PI * 2 + (this.phase ?? 0);
       return [this.cx + Math.cos(a) * this.amp - this.w / 2, this.cy + Math.sin(a) * this.amp - this.h / 2];

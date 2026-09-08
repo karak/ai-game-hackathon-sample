@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-park-mid-v1.png",
+ "pitch": [
+  4.0,
+  5.0
+ ],
+ "max_box": [
+  400,
+  300
+ ],
+ "w": 244,
+ "h": 150,
+ "fits": true,
+ "colors": 32
+}

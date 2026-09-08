@@ -143,6 +143,54 @@
   "src": "assets/sprites/bg/graveyard_sky.png",
   "w": 257
  },
+ "bg/park_far": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 90,
+  "src": "assets/sprites/bg/park_far.png",
+  "w": 270
+ },
+ "bg/park_far2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 125,
+  "src": "assets/sprites/bg/park_far2.png",
+  "w": 267
+ },
+ "bg/park_mid": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 150,
+  "src": "assets/sprites/bg/park_mid.png",
+  "w": 244
+ },
+ "bg/park_mid2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 72,
+  "src": "assets/sprites/bg/park_mid2.png",
+  "w": 239
+ },
+ "bg/park_mid3": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 98,
+  "src": "assets/sprites/bg/park_mid3.png",
+  "w": 244
+ },
+ "bg/park_sky": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 211,
+  "src": "assets/sprites/bg/park_sky.png",
+  "w": 255
+ },
  "bg/river_far": {
   "anchor": "center",
   "colors": 32,
@@ -287,6 +335,22 @@
   "src": "assets/sprites/bosses/noir2.png",
   "w": 154
  },
+ "bosses/ringmaster1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 187,
+  "src": "assets/sprites/bosses/ringmaster1.png",
+  "w": 146
+ },
+ "bosses/ringmaster2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 187,
+  "src": "assets/sprites/bosses/ringmaster2.png",
+  "w": 158
+ },
  "bosses/serpent_body": {
   "anchor": "bottom",
   "colors": 15,
@@ -335,6 +399,14 @@
   "src": "assets/sprites/bosses/teddy2.png",
   "w": 126
  },
+ "deco/balloons": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 129,
+  "src": "assets/sprites/deco/balloons.png",
+  "w": 52
+ },
  "deco/banner": {
   "anchor": "bottom",
   "colors": 12,
@@ -359,6 +431,14 @@
   "src": "assets/sprites/deco/bones.png",
   "w": 49
  },
+ "deco/booth": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 89,
+  "src": "assets/sprites/deco/booth.png",
+  "w": 64
+ },
  "deco/bridgepost": {
   "anchor": "bottom",
   "colors": 10,
@@ -382,6 +462,14 @@
   "h": 43,
   "src": "assets/sprites/deco/candle.png",
   "w": 30
+ },
+ "deco/carousel": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 127,
+  "src": "assets/sprites/deco/carousel.png",
+  "w": 79
  },
  "deco/cross": {
   "anchor": "bottom",
@@ -430,6 +518,14 @@
   "h": 104,
   "src": "assets/sprites/deco/pillar.png",
   "w": 33
+ },
+ "deco/popcorn": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 71,
+  "src": "assets/sprites/deco/popcorn.png",
+  "w": 58
  },
  "deco/reeds": {
   "anchor": "bottom",
@@ -511,6 +607,22 @@
   "src": "assets/sprites/enemies/angel2.png",
   "w": 79
  },
+ "enemies/balloon1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 113,
+  "src": "assets/sprites/enemies/balloon1.png",
+  "w": 54
+ },
+ "enemies/balloon2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 112,
+  "src": "assets/sprites/enemies/balloon2.png",
+  "w": 69
+ },
  "enemies/bear1": {
   "anchor": "bottom",
   "colors": 15,
@@ -542,6 +654,22 @@
   "h": 100,
   "src": "assets/sprites/enemies/cake2.png",
   "w": 71
+ },
+ "enemies/clown1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/enemies/clown1.png",
+  "w": 101
+ },
+ "enemies/clown2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 104,
+  "src": "assets/sprites/enemies/clown2.png",
+  "w": 111
  },
  "enemies/dollpart1": {
   "anchor": "bottom",
@@ -1288,6 +1416,14 @@
   "src": "assets/sprites/tiles/candyforest.png",
   "w": 265
  },
+ "tiles/cart": {
+  "anchor": "bottom",
+  "colors": 12,
+  "fits": true,
+  "h": 30,
+  "src": "assets/sprites/tiles/cart.png",
+  "w": 52
+ },
  "tiles/castle": {
   "anchor": "center",
   "colors": 24,
@@ -1304,6 +1440,14 @@
   "src": "assets/sprites/tiles/gear.png",
   "w": 52
  },
+ "tiles/gondola": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 40,
+  "src": "assets/sprites/tiles/gondola.png",
+  "w": 42
+ },
  "tiles/graveyard": {
   "anchor": "center",
   "colors": 24,
@@ -1311,6 +1455,14 @@
   "h": 102,
   "src": "assets/sprites/tiles/graveyard.png",
   "w": 199
+ },
+ "tiles/hub": {
+  "anchor": "bottom",
+  "colors": 12,
+  "fits": true,
+  "h": 41,
+  "src": "assets/sprites/tiles/hub.png",
+  "w": 41
  },
  "tiles/island": {
   "anchor": "bottom",
@@ -1327,6 +1479,14 @@
   "h": 74,
   "src": "assets/sprites/tiles/ladder.png",
   "w": 44
+ },
+ "tiles/park": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": true,
+  "h": 173,
+  "src": "assets/sprites/tiles/park.png",
+  "w": 268
  },
  "tiles/plank": {
   "anchor": "bottom",
@@ -1348,9 +1508,9 @@
   "anchor": "center",
   "colors": 24,
   "fits": true,
-  "h": 260,
+  "h": 192,
   "src": "assets/sprites/tiles/river.png",
-  "w": 263
+  "w": 262
  },
  "tiles/workshop": {
   "anchor": "center",
