@@ -1,5 +1,6 @@
 import { TILE, moveBody } from '../physics.js';
 import { WEAPON_ORDER } from './projectiles.js';
+import { blit } from '../gfx/sprite.js';
 
 // 宝箱（プレゼント箱）: 撃つと開いてアイテムが飛び出す
 export class TreasureBox {
@@ -21,7 +22,7 @@ export class TreasureBox {
   update(dt) { this.t += dt; }
   draw(g, cam, sheet) {
     const bob = Math.floor(this.t * 3) % 2;
-    g.drawImage(sheet.box.r, Math.floor(this.x - cam.x), Math.floor(this.y - cam.y - 4 + bob));
+    blit(g, sheet.box, false, this.x + this.w / 2 - sheet.box.w / 2 - cam.x, this.y + this.h - sheet.box.h - cam.y + bob);
   }
 }
 
@@ -65,7 +66,7 @@ export class Item {
   draw(g, cam, sheet) {
     if (this.t > this.life - 2.5 && Math.floor(this.t * 10) % 2) return;
     const spr = sheet[this.kind]; if (!spr) return;
-    g.drawImage(spr.r, Math.floor(this.x + this.w / 2 - spr.w / 2 - cam.x), Math.floor(this.y + this.h - spr.h - cam.y));
+    blit(g, spr, false, this.x + this.w / 2 - spr.w / 2 - cam.x, this.y + this.h - spr.h - cam.y);
   }
 }
 
@@ -79,6 +80,6 @@ export class FloatingItem {
   pickup(player) { Item.prototype.pickup.call(this, player); }
   draw(g, cam, sheet) {
     const spr = sheet[this.kind]; if (!spr) return; const bob = Math.sin(this.t * 3) * 2;
-    g.drawImage(spr.r, Math.floor(this.x - cam.x), Math.floor(this.y + bob - cam.y));
+    blit(g, spr, false, this.x - cam.x, this.y + bob - cam.y);
   }
 }

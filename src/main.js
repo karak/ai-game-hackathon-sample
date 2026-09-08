@@ -2,11 +2,11 @@ import { buildAssets } from './gfx/assets.js';
 import { Audio, SONGS } from './audio.js';
 import { Input } from './input.js';
 import { Game } from './game.js';
-import { W, H } from './world.js';
+import { W, H, SCALE } from './world.js';
 
 async function boot() {
   const canvas = document.getElementById('game');
-  canvas.width = W; canvas.height = H;
+  canvas.width = W * SCALE; canvas.height = H * SCALE; // 内部解像度 768x672。論理座標（世界単位）は 256x224 を SCALE 倍描画
   const g = canvas.getContext('2d');
   g.imageSmoothingEnabled = false;
 
@@ -17,7 +17,7 @@ async function boot() {
     await face.load(); document.fonts.add(face);
   } catch (e) { console.warn('font load failed', e); }
 
-  const assets = buildAssets();
+  const assets = await buildAssets();
   const audio = new Audio();
   const input = new Input();
   const game = new Game(assets, audio, input);
@@ -32,10 +32,11 @@ async function boot() {
   // 拡大表示
   const fit = () => {
     const wrap = document.getElementById('wrap');
-    const sw = Math.floor(window.innerWidth / W), sh = Math.floor((window.innerHeight - (window.innerWidth < 600 ? 150 : 40)) / H);
+    const cw = W * SCALE, ch = H * SCALE;
+    const sw = Math.floor(window.innerWidth / cw), sh = Math.floor((window.innerHeight - (window.innerWidth < 600 ? 150 : 40)) / ch);
     const s = Math.max(1, Math.min(sw, sh));
-    canvas.style.width = `${W * s}px`; canvas.style.height = `${H * s}px`;
-    wrap.style.width = `${W * s}px`;
+    canvas.style.width = `${cw * s}px`; canvas.style.height = `${ch * s}px`;
+    wrap.style.width = `${cw * s}px`;
   };
   fit(); window.addEventListener('resize', fit);
 
@@ -48,7 +49,7 @@ async function boot() {
     let steps = 0;
     while (acc >= STEP && steps < 5) { game.update(STEP); input.endFrame(); acc -= STEP; steps++; }
     if (steps === 5) acc = 0;
-    g.imageSmoothingEnabled = false;
+    g.setTransform(SCALE, 0, 0, SCALE, 0, 0); g.imageSmoothingEnabled = false;
     game.draw(g);
     requestAnimationFrame(loop);
   };

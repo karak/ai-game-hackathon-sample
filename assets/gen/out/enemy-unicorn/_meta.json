@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-unicorn-v3.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  160,
+  120
+ ],
+ "frames": [
+  {
+   "w": 116,
+   "h": 69,
+   "fits": true,
+   "colors": 15,
+   "name": "unicorn1"
+  },
+  {
+   "w": 117,
+   "h": 69,
+   "fits": true,
+   "colors": 15,
+   "name": "unicorn2"
+  }
+ ]
+}

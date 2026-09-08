@@ -87,7 +87,7 @@ export class Game {
     const tiles = this.assets.tiles.graveyard; for (let x = 0; x < W; x += 16) { g.drawImage(tiles.top, x, 176); g.drawImage(tiles.ground, x, 192); g.drawImage(tiles.ground, x, 208); }
     g.drawImage(tiles.deco_t, 40, 160); g.drawImage(tiles.deco_c, 200, 160); g.drawImage(tiles.deco_x, 120, 160); g.drawImage(tiles.deco_f, 70, 160);
     // 主人公
-    const p = this.assets.player.dress.idle_stand; g.drawImage(p.r, 120, 152); g.drawImage(this.assets.hat.r, 120, 146);
+    const p = this.assets.player.dress.idle_stand; g.drawImage(p.r, 116, 144); g.drawImage(this.assets.hat.r, 116, 136);
     // ゾンビ
     const z = this.assets.enemies[Math.floor(this.stateT * 4) % 2 ? 'zombie1' : 'zombie2']; g.drawImage(z.l, 176, 160); g.drawImage(z.l, 22, 160);
     // タイトル

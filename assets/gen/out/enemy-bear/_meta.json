@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-bear-v1.png",
+ "pitch": [
+  7.0,
+  7.0
+ ],
+ "max_box": [
+  96,
+  120
+ ],
+ "frames": [
+  {
+   "w": 46,
+   "h": 67,
+   "fits": true,
+   "colors": 15,
+   "name": "bear1"
+  },
+  {
+   "w": 50,
+   "h": 68,
+   "fits": true,
+   "colors": 15,
+   "name": "bear2"
+  }
+ ]
+}

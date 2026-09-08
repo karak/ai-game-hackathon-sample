@@ -1,6 +1,7 @@
 import { Enemy } from './enemies.js';
 import { rand } from '../util.js';
 import { PAL } from '../gfx/palette.js';
+import { blit } from '../gfx/sprite.js';
 
 // ボス基底: HP バー、入場、死亡演出
 export class Boss extends Enemy {
@@ -40,7 +41,7 @@ export class Boss extends Enemy {
 export class WeepingDoll extends Boss {
   constructor(world, x, groundY) {
     super(world, x, groundY - 46, 24, 46); this.spriteOff = [4, 2];
-    this.hpMax = this.hp = 16; this.facing = -1; this.enterX = x - 60;
+    this.hpMax = this.hp = 16; this.facing = -1; this.enterX = x - 60; this.fitSprite('doll1', 0.6, 0.95);
   }
   update(dt) {
     if (super.update(dt)) return;
@@ -89,7 +90,7 @@ export class WeepingDoll extends Boss {
 export class GutsTeddy extends Boss {
   constructor(world, x, groundY) {
     super(world, x, groundY - 38, 34, 38); this.spriteOff = [3, 2];
-    this.hpMax = this.hp = 20; this.facing = -1; this.enterX = x - 40; this.cycle = 0;
+    this.hpMax = this.hp = 20; this.facing = -1; this.enterX = x - 40; this.cycle = 0; this.fitSprite('teddy1', 0.75, 0.95);
   }
   update(dt) {
     if (super.update(dt)) return;
@@ -141,7 +142,7 @@ export class GutsTeddy extends Boss {
 export class Noir extends Boss {
   constructor(world, x, groundY) {
     super(world, x, groundY - 100, 16, 28); this.spriteOff = [4, 2]; this.gravity = false;
-    this.hpMax = this.hp = 24; this.facing = -1; this.volleys = 0; this.alpha = 1; this.hoverY = groundY - 70;
+    this.hpMax = this.hp = 24; this.facing = -1; this.volleys = 0; this.alpha = 1; this.fitSprite('noir1', 0.45, 0.9); this.hoverY = groundY - this.h - 30;
     this.groundY = groundY;
   }
   update(dt) {

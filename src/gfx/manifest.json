@@ -1,0 +1,443 @@
+{
+ "bosses/doll1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 176,
+  "src": "assets/sprites/bosses/doll1.png",
+  "w": 119
+ },
+ "bosses/noir1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 172,
+  "src": "assets/sprites/bosses/noir1.png",
+  "w": 163
+ },
+ "bosses/teddy1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 140,
+  "src": "assets/sprites/bosses/teddy1.png",
+  "w": 113
+ },
+ "enemies/angel1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 99,
+  "src": "assets/sprites/enemies/angel1.png",
+  "w": 92
+ },
+ "enemies/angel2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 99,
+  "src": "assets/sprites/enemies/angel2.png",
+  "w": 79
+ },
+ "enemies/bear1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 67,
+  "src": "assets/sprites/enemies/bear1.png",
+  "w": 46
+ },
+ "enemies/bear2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 68,
+  "src": "assets/sprites/enemies/bear2.png",
+  "w": 50
+ },
+ "enemies/cake1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 77,
+  "src": "assets/sprites/enemies/cake1.png",
+  "w": 73
+ },
+ "enemies/cake2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 100,
+  "src": "assets/sprites/enemies/cake2.png",
+  "w": 71
+ },
+ "enemies/eye1": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 65,
+  "src": "assets/sprites/enemies/eye1.png",
+  "w": 54
+ },
+ "enemies/eye2": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 65,
+  "src": "assets/sprites/enemies/eye2.png",
+  "w": 54
+ },
+ "enemies/mushroom1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 92,
+  "src": "assets/sprites/enemies/mushroom1.png",
+  "w": 68
+ },
+ "enemies/mushroom2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 92,
+  "src": "assets/sprites/enemies/mushroom2.png",
+  "w": 69
+ },
+ "enemies/unicorn1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 69,
+  "src": "assets/sprites/enemies/unicorn1.png",
+  "w": 116
+ },
+ "enemies/unicorn2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 69,
+  "src": "assets/sprites/enemies/unicorn2.png",
+  "w": 117
+ },
+ "enemies/zombie1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 101,
+  "src": "assets/sprites/enemies/zombie1.png",
+  "w": 64
+ },
+ "enemies/zombie2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 101,
+  "src": "assets/sprites/enemies/zombie2.png",
+  "w": 62
+ },
+ "player/attack": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/attack.png",
+  "w": 68
+ },
+ "player/attack_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/attack_gold.png",
+  "w": 68
+ },
+ "player/attack_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/attack_plain.png",
+  "w": 68
+ },
+ "player/base_hat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 111,
+  "src": "assets/sprites/player/base_hat.png",
+  "w": 69
+ },
+ "player/crouch": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 87,
+  "src": "assets/sprites/player/crouch.png",
+  "w": 72
+ },
+ "player/crouch_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 87,
+  "src": "assets/sprites/player/crouch_gold.png",
+  "w": 72
+ },
+ "player/crouch_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 87,
+  "src": "assets/sprites/player/crouch_plain.png",
+  "w": 72
+ },
+ "player/dead": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 50,
+  "src": "assets/sprites/player/dead.png",
+  "w": 107
+ },
+ "player/dead_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 50,
+  "src": "assets/sprites/player/dead_gold.png",
+  "w": 107
+ },
+ "player/dead_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 50,
+  "src": "assets/sprites/player/dead_plain.png",
+  "w": 107
+ },
+ "player/fall": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 104,
+  "src": "assets/sprites/player/fall.png",
+  "w": 77
+ },
+ "player/fall_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 104,
+  "src": "assets/sprites/player/fall_gold.png",
+  "w": 77
+ },
+ "player/fall_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 104,
+  "src": "assets/sprites/player/fall_plain.png",
+  "w": 77
+ },
+ "player/hat": {
+  "anchor": "center",
+  "brim_overlap": 6,
+  "colors": 6,
+  "fits": true,
+  "h": 62,
+  "src": "assets/sprites/player/hat.png",
+  "w": 69
+ },
+ "player/hurt": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/player/hurt.png",
+  "w": 77
+ },
+ "player/hurt2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/player/hurt2.png",
+  "w": 68
+ },
+ "player/hurt2_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/player/hurt2_gold.png",
+  "w": 68
+ },
+ "player/hurt2_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/player/hurt2_plain.png",
+  "w": 68
+ },
+ "player/hurt_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/player/hurt_gold.png",
+  "w": 77
+ },
+ "player/hurt_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/player/hurt_plain.png",
+  "w": 77
+ },
+ "player/idle": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/idle.png",
+  "w": 44
+ },
+ "player/idle_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/idle_gold.png",
+  "w": 44
+ },
+ "player/idle_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/idle_plain.png",
+  "w": 44
+ },
+ "player/jump": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 76,
+  "src": "assets/sprites/player/jump.png",
+  "w": 64
+ },
+ "player/jump_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 76,
+  "src": "assets/sprites/player/jump_gold.png",
+  "w": 64
+ },
+ "player/jump_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 76,
+  "src": "assets/sprites/player/jump_plain.png",
+  "w": 64
+ },
+ "player/run1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/run1.png",
+  "w": 68
+ },
+ "player/run1_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/run1_gold.png",
+  "w": 68
+ },
+ "player/run1_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/run1_plain.png",
+  "w": 68
+ },
+ "player/run2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/run2.png",
+  "w": 59
+ },
+ "player/run2_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/run2_gold.png",
+  "w": 59
+ },
+ "player/run2_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/player/run2_plain.png",
+  "w": 59
+ },
+ "player/run3": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/run3.png",
+  "w": 60
+ },
+ "player/run3_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/run3_gold.png",
+  "w": 60
+ },
+ "player/run3_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/run3_plain.png",
+  "w": 60
+ },
+ "player/run4": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/run4.png",
+  "w": 62
+ },
+ "player/run4_gold": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/run4_gold.png",
+  "w": 62
+ },
+ "player/run4_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/run4_plain.png",
+  "w": 62
+ }
+}

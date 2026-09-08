@@ -11,8 +11,10 @@ const only = url.searchParams.get('section'); // ?section=player など単一セ
 
 async function boot() {
   try { const fontUrl = new URL('../assets/fonts/DotGothic16-Regular.ttf', import.meta.url); const face = new FontFace('DotGothic16', `url(${fontUrl})`); await face.load(); document.fonts.add(face); } catch {}
-  const A = buildAssets();
-  const scale = Number(document.getElementById('scale').value);
+  const A = await buildAssets();
+  const sel = document.getElementById('scale');
+  if (url.searchParams.get('scale')) sel.value = url.searchParams.get('scale');
+  const scale = Number(sel.value);
   document.getElementById('scale').addEventListener('change', () => location.reload());
   const root = document.getElementById('sections');
 
@@ -30,27 +32,46 @@ async function boot() {
   const label = (g, s, x, y) => mini(g, s, x, y, '#ffe860');
 
   // 主人公: 衣装 × フレーム
-  section('player', '主人公リリカ 全フレーム（衣装3種）', 256, 3 * 44 + 8, g => {
-    const frames = ['idle_stand', 'idle_run1', 'idle_run2', 'idle_run3', 'attack_stand', 'jump_jump', 'attack_jump', 'hurt_jump', 'crouch', 'dead'];
+  section('player', '主人公リリカ 全フレーム（衣装3種）', 380, 3 * 64 + 8, g => {
+    const frames = ['idle_stand', 'idle_run1', 'idle_run2', 'idle_run3', 'idle_run4', 'attack_stand', 'jump_jump', 'jump_fall', 'hurt_fall', 'crouch', 'dead'];
     Object.keys(COSTUMES).forEach((c, ci) => {
       label(g, c.toUpperCase(), 2, ci * 44 + 2);
       frames.forEach((f, i) => {
         const spr = A.player[c][f]; if (!spr) return;
-        const x = 4 + i * 25, y = ci * 44 + 10;
+        const x = 2 + i * 34, y = ci * 64 + 14;
         g.drawImage(spr.r, x, y);
-        if (c !== 'plain' && f !== 'dead') g.drawImage(A.hat.r, x, y - 6 + (f === 'crouch' ? 7 : 0));
+        if (c !== 'plain' && f !== 'dead') g.drawImage(A.hat.r, x, y - 11 + (f === 'crouch' ? 12 : 0));
       });
     });
   });
-  section('player_big', '主人公 拡大比較（idle / run / jump / attack）', 128, 40, g => {
-    ['idle_stand', 'idle_run1', 'jump_jump', 'attack_stand'].forEach((f, i) => { const spr = A.player.dress[f]; g.drawImage(spr.r, 8 + i * 30, 8); g.drawImage(A.hat.r, 8 + i * 30, 2); });
+  section('player_big', '主人公 拡大比較（idle / run / jump / attack）', 170, 64, g => {
+    ['idle_stand', 'idle_run1', 'jump_jump', 'attack_stand'].forEach((f, i) => { const spr = A.player.dress[f]; g.drawImage(spr.r, 8 + i * 40, 14); g.drawImage(A.hat.r, 8 + i * 40, 3); });
+  });
+
+  // 参照画像との並置（著作物のため同梱せず外部 URL を実行時に読む。docs/art-standard.md §1）
+  section('reference', '参照並置: 左=参照(外部URL, 論理 ~40x60)  右=本作の主人公 32x48（同倍率）', 160, 80, g => {
+    const img = new Image(); img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // 参照画像は 2px/論理px の拡大なので 1/2 に縮めて論理サイズで並べる
+      const sw = 96, sh = 128, sx = 0, sy = 0; // 左上 1 キャラ分
+      g.imageSmoothingEnabled = false;
+      g.drawImage(img, sx, sy, sw, sh, 8, 8, sw / 2, sh / 2);
+      const p = A.player.dress.idle_stand; g.drawImage(p.r, 80, 20); g.drawImage(A.hat.r, 80, 9);
+      label(g, 'REF', 8, 0); label(g, 'LYRICA', 80, 0);
+    };
+    img.onerror = () => label(g, 'REF LOAD FAILED (OFFLINE?)', 4, 30);
+    img.src = 'https://i.pinimg.com/originals/bb/b9/a0/bbb9a0d099d450252e74ac4672b354d5.jpg';
+    label(g, 'LOADING REF...', 4, 30);
   });
 
   // 敵
-  section('enemies', '敵キャラクター', 256, 64, g => {
-    let x = 4;
-    for (const [name, spr] of Object.entries(A.enemies)) { g.drawImage(spr.l, x, 12); label(g, name.slice(0, 6), x, 2); x += Math.max(spr.w, 26) + 4; if (x > 230) break; }
-    let x2 = 4; for (const n of Object.keys(A.enemies).slice(9)) { const spr = A.enemies[n]; g.drawImage(spr.l, x2, 40); label(g, n.slice(0, 6), x2, 32); x2 += Math.max(spr.w, 26) + 4; }
+  section('enemies', '敵キャラクター（全フレーム）', 256, 84, g => {
+    let x = 4, y = 12;
+    for (const [name, spr] of Object.entries(A.enemies)) {
+      if (x + spr.w > 252) { x = 4; y += 40; }
+      g.drawImage(spr.l, x, y + 24 - spr.h); label(g, name.slice(0, 7), x, y - 8);
+      x += Math.max(spr.w, 30) + 4;
+    }
   });
   section('bosses', 'ボス', 200, 80, g => {
     let x = 4; for (const [name, spr] of Object.entries(A.bosses)) { g.drawImage(spr.l, x, 78 - spr.h); label(g, name, x, 2); x += spr.w + 12; }
@@ -82,7 +103,7 @@ async function boot() {
       const chunks = renderMapLayer(map, A.tiles[th]);
       for (const c of chunks) g.drawImage(c.canvas, c.x, 0);
       for (let tx = 4; tx < 8; tx++) { g.drawImage(A.tiles[th].bogtop0, tx * 16, 12 * 16); g.drawImage(A.tiles[th].bog0, tx * 16, 13 * 16); }
-      const p = A.player.dress.idle_stand; g.drawImage(p.r, 24, 152); g.drawImage(A.hat.r, 24, 146);
+      const p = A.player.dress.idle_stand; g.drawImage(p.r, 24, 128); g.drawImage(A.hat.r, 24, 117);
       g.drawImage(A.enemies.zombie1.l, 150, 160); g.drawImage(A.enemies.mushroom1.l, 200, 130);
     });
   }

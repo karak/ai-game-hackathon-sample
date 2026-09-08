@@ -3,6 +3,7 @@ import { drawWindow } from './window.js';
 import { text, textBox } from './text.js';
 import { mini } from './minifont.js';
 import { WEAPONS } from '../entities/projectiles.js';
+import { blit } from '../gfx/sprite.js';
 
 export function fmtTime(t) { t = Math.max(0, Math.ceil(t)); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; }
 
@@ -11,7 +12,7 @@ export function drawHud(g, world, game) {
   // 武器窓
   drawWindow(g, 2, 2, 22, 22);
   const spr = game.assets.shots[WEAPONS[world.player.weapon].sprite];
-  g.drawImage(spr.r, 13 - Math.floor(spr.w / 2), 13 - Math.floor(spr.h / 2));
+  blit(g, spr, false, 13 - spr.w / 2, 13 - spr.h / 2);
   // スコア・タイム
   mini(g, 'SCORE', 28, 4, '#cbaaf5'); mini(g, String(game.score).padStart(7, '0'), 28, 11);
   mini(g, 'TIME', 84, 4, '#cbaaf5'); mini(g, fmtTime(world.time), 84, 11, world.time < 30 ? '#ff6a6a' : '#fdfbf7');

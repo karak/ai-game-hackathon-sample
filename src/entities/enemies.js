@@ -1,6 +1,6 @@
 import { TILE, moveBody } from '../physics.js';
 import { EnemyShot } from './projectiles.js';
-import { tint } from '../gfx/sprite.js';
+import { tint, blit } from '../gfx/sprite.js';
 import { rand } from '../util.js';
 
 let nextId = 1;
@@ -17,6 +17,14 @@ export class Enemy {
     this.hp = 1; this.score = 100; this.t = Math.random() * 10; this.flashT = 0; this.dead = false;
     this.facing = -1; this.contact = true; this.gravity = true; this.onGround = false; this.spriteOff = [0, 0];
     this.gore = 'blood';
+  }
+  // 生成 PNG（hd）のサイズに当たり判定を合わせる。足元位置は維持する。
+  fitSprite(name, wRatio = 0.6, hRatio = 0.92) {
+    const spr = this.world.assets?.enemies?.[name] ?? this.world.assets?.bosses?.[name];
+    if (!spr || !spr.hd) return;
+    const bottom = this.y + this.h;
+    this.w = Math.max(6, Math.round(spr.w * wRatio)); this.h = Math.max(6, Math.round(spr.h * hRatio));
+    this.y = bottom - this.h; this.spriteOff = [Math.round((spr.w - this.w) / 2), spr.h - this.h];
   }
   get cx() { return this.x + this.w / 2; }
   get cy() { return this.y + this.h / 2; }
@@ -52,19 +60,18 @@ export class Enemy {
   draw(g, cam, assets) {
     const name = this.spriteName(); if (!name) return;
     const spr = assets.enemies[name] ?? assets.bosses[name]; if (!spr) return;
-    let img = this.facing < 0 ? spr.l : spr.r;
-    if (this.flashT > 0) img = flashImg(img);
     const ox = this.facing < 0 ? (spr.w - this.w - this.spriteOff[0]) : this.spriteOff[0];
-    g.drawImage(img, Math.floor(this.x - ox - cam.x), Math.floor(this.y - this.spriteOff[1] - cam.y));
+    const fs = this.flashT > 0 ? { ...spr, r: flashImg(spr.r), l: flashImg(spr.l) } : spr;
+    blit(g, fs, this.facing < 0, this.x - ox - cam.x, this.y - this.spriteOff[1] - cam.y);
   }
 }
 
 // ---- ゾンビうさぎ: 地面から湧いて歩いてくる ----
 export class ZombieRabbit extends Enemy {
   constructor(world, x, groundY) {
-    super(world, x, groundY - 16, 10, 16); this.spriteOff = [3, 0];
+    super(world, x, groundY - 22, 12, 22); this.spriteOff = [4, 2];
     this.hp = 1; this.score = 100; this.rise = 0.7; this.life = 9; this.contact = false;
-    this.gore = 'stuffing';
+    this.gore = 'stuffing'; this.fitSprite('zombie1');
     world.particles.emit('dirt', this.cx, groundY, 8);
   }
   update(dt) {
@@ -81,10 +88,10 @@ export class ZombieRabbit extends Enemy {
   draw(g, cam, assets) {
     if (this.rise > 0) {
       // 地面から迫り上がる（下をクリップ）
-      const groundY = this.y + this.h; const up = Math.min(16, (0.7 - this.rise) / 0.7 * 16);
+      const groundY = this.y + this.h; const up = Math.min(this.h + 2, (0.7 - this.rise) / 0.7 * (this.h + 2));
       g.save(); g.beginPath(); g.rect(0, 0, 9999, Math.floor(groundY - cam.y)); g.clip();
-      const spr = assets.enemies.zombie1; const img = this.facing < 0 ? spr.l : spr.r;
-      g.drawImage(img, Math.floor(this.x - 3 - cam.x), Math.floor(groundY - up - cam.y)); g.restore(); return;
+      const spr = assets.enemies.zombie1;
+      blit(g, spr, this.facing < 0, this.x - this.spriteOff[0] - cam.x, groundY - up - cam.y); g.restore(); return;
     }
     super.draw(g, cam, assets);
   }
@@ -115,8 +122,8 @@ export class ZombieSpawner {
 // ---- 毒キノコ妖精: 浮遊して毒胞子を吐く ----
 export class MushroomFairy extends Enemy {
   constructor(world, x, y) {
-    super(world, x, y, 12, 14); this.spriteOff = [2, 1]; this.baseY = y - 20; this.y = this.baseY;
-    this.hp = 2; this.score = 200; this.gravity = false; this.shootT = rand(1, 2); this.gore = 'poison';
+    super(world, x, y, 14, 18); this.spriteOff = [3, 2]; this.baseY = y - 22; this.y = this.baseY;
+    this.hp = 2; this.score = 200; this.gravity = false; this.shootT = rand(1, 2); this.gore = 'poison'; this.fitSprite('mushroom1', 0.6, 0.9); this.baseY = this.y;
   }
   update(dt) {
     super.update(dt);
@@ -139,8 +146,8 @@ export class MushroomFairy extends Enemy {
 // ---- 首なしユニコーン: 突進し血を撒く ----
 export class Unicorn extends Enemy {
   constructor(world, x, y) {
-    super(world, x, y, 18, 14); this.spriteOff = [3, 2];
-    this.hp = 3; this.score = 300; this.state = 'wait'; this.facing = -1;
+    super(world, x, y - 4, 26, 18); this.spriteOff = [3, 4];
+    this.hp = 3; this.score = 300; this.state = 'wait'; this.facing = -1; this.fitSprite('unicorn1', 0.7, 0.85);
   }
   update(dt) {
     super.update(dt);
@@ -163,8 +170,8 @@ export class Unicorn extends Enemy {
 // ---- 腐ったケーキの精: 蛆を吐く ----
 export class RottenCake extends Enemy {
   constructor(world, x, y) {
-    super(world, x, y, 12, 14); this.spriteOff = [2, 2];
-    this.hp = 2; this.score = 200; this.spitT = rand(1, 2); this.gore = 'blood';
+    super(world, x, y - 4, 16, 18); this.spriteOff = [2, 2];
+    this.hp = 2; this.score = 200; this.spitT = rand(1, 2); this.gore = 'blood'; this.fitSprite('cake1', 0.7, 0.9);
   }
   update(dt) {
     super.update(dt);
@@ -183,8 +190,8 @@ export class RottenCake extends Enemy {
 // ---- 天使の骸骨: 飛行して骨と臓物を落とす ----
 export class AngelSkeleton extends Enemy {
   constructor(world, x, y) {
-    super(world, x, y, 12, 14); this.spriteOff = [2, 1]; this.gravity = false;
-    this.hp = 1; this.score = 150; this.baseY = Math.max(40, y); this.dropT = rand(0.5, 1.5); this.gore = 'bone';
+    super(world, x, y, 16, 18); this.spriteOff = [4, 2]; this.gravity = false;
+    this.hp = 1; this.score = 150; this.dropT = rand(0.5, 1.5); this.gore = 'bone'; this.fitSprite('angel1', 0.5, 0.9); this.baseY = Math.max(30, y);
   }
   update(dt) {
     super.update(dt);
@@ -203,8 +210,8 @@ export class AngelSkeleton extends Enemy {
 // ---- テディベア: 跳ねて迫る、腹から綿と血 ----
 export class TeddyBear extends Enemy {
   constructor(world, x, y) {
-    super(world, x, y, 12, 14); this.spriteOff = [2, 2];
-    this.hp = 2; this.score = 200; this.hopT = rand(0.3, 1); this.gore = 'stuffing';
+    super(world, x, y - 4, 16, 18); this.spriteOff = [2, 4];
+    this.hp = 2; this.score = 200; this.hopT = rand(0.3, 1); this.gore = 'stuffing'; this.fitSprite('bear1', 0.7, 0.92);
   }
   update(dt) {
     super.update(dt);
@@ -225,8 +232,8 @@ export class TeddyBear extends Enemy {
 // ---- 目玉砲台: 開眼中に血の弾を撃つ ----
 export class EyeTurret extends Enemy {
   constructor(world, x, y) {
-    super(world, x, y + 2, 14, 12); this.spriteOff = [1, 2]; this.gravity = false;
-    this.hp = 3; this.score = 250; this.fireT = rand(0.5, 1.5); this.open = true; this.blinkT = rand(2, 4); this.gore = 'blood';
+    super(world, x, y + 1, 18, 14); this.spriteOff = [1, 1]; this.gravity = false;
+    this.hp = 3; this.score = 250; this.fireT = rand(0.5, 1.5); this.open = true; this.blinkT = rand(2, 4); this.gore = 'blood'; this.fitSprite('eye1', 0.8, 0.9);
   }
   update(dt) {
     super.update(dt);

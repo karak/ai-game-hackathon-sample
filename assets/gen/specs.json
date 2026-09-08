@@ -1,0 +1,340 @@
+{
+ "_doc": "各素材の仕様。box=[w,h] は論理セルの最大値（検査用。出力は自然サイズ）。frames=1リクエスト内のフレーム数(最大2)。実測: キャンバス一杯のキャラ ≈ 100 セル。",
+ "cell": 8,
+ "canvas": 1024,
+ "baseline_px": 960,
+ "sprites": {
+  "player-base": {
+   "box": [
+    90,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-base.txt",
+   "out": [
+    "player/base_hat",
+    "player/idle"
+   ]
+  },
+  "player-nohat": {
+   "box": [
+    90,
+    120
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "player-nohat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/idle"
+   ],
+   "skip": true
+  },
+  "player-hat": {
+   "box": [
+    80,
+    50
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "player-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/hat"
+   ]
+  },
+  "player-run-a": {
+   "box": [
+    90,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-run-a.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run1",
+    "player/run2"
+   ],
+   "palette": "player/idle"
+  },
+  "player-run-b": {
+   "box": [
+    90,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-run-b.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run3",
+    "player/run4"
+   ],
+   "palette": "player/idle"
+  },
+  "player-jump": {
+   "box": [
+    90,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-jump.txt",
+   "ref": "player-base",
+   "out": [
+    "player/jump",
+    "player/fall"
+   ],
+   "palette": "player/idle"
+  },
+  "player-attack": {
+   "box": [
+    90,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-attack.txt",
+   "ref": "player-base",
+   "out": [
+    "player/attack",
+    "player/crouch"
+   ],
+   "palette": "player/idle"
+  },
+  "player-hurt": {
+   "box": [
+    90,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-hurt.txt",
+   "ref": "player-base",
+   "out": [
+    "player/hurt",
+    "player/hurt2"
+   ],
+   "palette": "player/idle"
+  },
+  "player-dead": {
+   "box": [
+    120,
+    80
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "player-dead.txt",
+   "ref": "player-base",
+   "out": [
+    "player/dead"
+   ],
+   "palette": "player/idle"
+  },
+  "player-plain": {
+   "box": [
+    90,
+    120
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "player-plain.txt",
+   "ref": "player-base",
+   "out": [
+    "player/idle_plain"
+   ]
+  },
+  "player-gold": {
+   "box": [
+    90,
+    120
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "player-gold.txt",
+   "ref": "player-base",
+   "out": [
+    "player/idle_gold"
+   ]
+  },
+  "enemy-zombie": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-zombie.txt",
+   "out": [
+    "enemies/zombie1",
+    "enemies/zombie2"
+   ],
+   "use": "v1"
+  },
+  "enemy-mushroom": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-mushroom.txt",
+   "out": [
+    "enemies/mushroom1",
+    "enemies/mushroom2"
+   ]
+  },
+  "enemy-unicorn": {
+   "box": [
+    160,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-unicorn.txt",
+   "out": [
+    "enemies/unicorn1",
+    "enemies/unicorn2"
+   ]
+  },
+  "enemy-cake": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-cake.txt",
+   "out": [
+    "enemies/cake1",
+    "enemies/cake2"
+   ]
+  },
+  "enemy-angel": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-angel.txt",
+   "out": [
+    "enemies/angel1",
+    "enemies/angel2"
+   ]
+  },
+  "enemy-bear": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-bear.txt",
+   "out": [
+    "enemies/bear1",
+    "enemies/bear2"
+   ]
+  },
+  "enemy-eye": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "center",
+   "subject": "enemy-eye.txt",
+   "out": [
+    "enemies/eye1",
+    "enemies/eye2"
+   ]
+  },
+  "boss-doll": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-doll.txt",
+   "out": [
+    "bosses/doll1"
+   ]
+  },
+  "boss-teddy": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-teddy.txt",
+   "out": [
+    "bosses/teddy1"
+   ]
+  },
+  "boss-noir": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-noir.txt",
+   "out": [
+    "bosses/noir1"
+   ]
+  },
+  "items": {
+   "box": [
+    64,
+    64
+   ],
+   "frames": 2,
+   "anchor": "center",
+   "subject": "items.txt",
+   "out": [
+    "items/a",
+    "items/b"
+   ]
+  },
+  "tiles-graveyard": {
+   "box": [
+    128,
+    64
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-graveyard.txt",
+   "out": [
+    "tiles/graveyard"
+   ]
+  },
+  "tiles-candyforest": {
+   "box": [
+    128,
+    64
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-candyforest.txt",
+   "out": [
+    "tiles/candyforest"
+   ]
+  },
+  "tiles-castle": {
+   "box": [
+    128,
+    64
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-castle.txt",
+   "out": [
+    "tiles/castle"
+   ]
+  }
+ }
+}

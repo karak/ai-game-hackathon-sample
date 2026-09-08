@@ -1,0 +1,214 @@
+{
+ "requests": 31,
+ "entries": [
+  {
+   "name": "player-base",
+   "v": 1,
+   "ok": true,
+   "secs": 9.2,
+   "text": "Here's Lyrica, a 15-year-old apprentice witch, in the style of a 16-bit SNES-era Japanese RPG. ",
+   "ts": 1788845476.73102
+  },
+  {
+   "name": "player-nohat",
+   "v": 1,
+   "ok": true,
+   "secs": 13.8,
+   "text": "",
+   "ts": 1788845587.363402
+  },
+  {
+   "name": "player-hat",
+   "v": 1,
+   "ok": true,
+   "secs": 11.7,
+   "text": "",
+   "ts": 1788845601.860899
+  },
+  {
+   "name": "player-base",
+   "v": 2,
+   "ok": true,
+   "secs": 11.9,
+   "text": "",
+   "ts": 1788845838.6243782
+  },
+  {
+   "name": "enemy-zombie",
+   "v": 1,
+   "ok": true,
+   "secs": 9.3,
+   "text": "",
+   "ts": 1788846015.29904
+  },
+  {
+   "name": "enemy-mushroom",
+   "v": 1,
+   "ok": true,
+   "secs": 9.5,
+   "text": "",
+   "ts": 1788846025.27422
+  },
+  {
+   "name": "enemy-unicorn",
+   "v": 1,
+   "ok": true,
+   "secs": 8.1,
+   "text": "",
+   "ts": 1788846033.7998872
+  },
+  {
+   "name": "enemy-cake",
+   "v": 1,
+   "ok": true,
+   "secs": 8.9,
+   "text": "",
+   "ts": 1788846043.1795342
+  },
+  {
+   "name": "enemy-angel",
+   "v": 1,
+   "ok": true,
+   "secs": 7.3,
+   "text": "",
+   "ts": 1788846050.909361
+  },
+  {
+   "name": "enemy-bear",
+   "v": 1,
+   "ok": true,
+   "secs": 10.6,
+   "text": "Here is your \"Gutted Teddy\" enemy sprite, with two frames as requested: ",
+   "ts": 1788846061.909906
+  },
+  {
+   "name": "enemy-eye",
+   "v": 1,
+   "ok": true,
+   "secs": 9.1,
+   "text": "",
+   "ts": 1788846071.390622
+  },
+  {
+   "name": "enemy-zombie",
+   "v": 2,
+   "ok": true,
+   "secs": 15.0,
+   "text": "",
+   "ts": 1788846254.2570932
+  },
+  {
+   "name": "player-base",
+   "v": 3,
+   "ok": true,
+   "secs": 11.6,
+   "text": "Here is Lyrica, your apprentice witch, in the specified pixel art style:\n",
+   "ts": 1788846474.8310258
+  },
+  {
+   "name": "enemy-unicorn",
+   "v": 2,
+   "ok": true,
+   "secs": 10.1,
+   "text": "",
+   "ts": 1788846485.3707268
+  },
+  {
+   "name": "player-base",
+   "v": 4,
+   "ok": true,
+   "secs": 9.4,
+   "text": "",
+   "ts": 1788846612.9685361
+  },
+  {
+   "name": "player-base",
+   "v": 5,
+   "ok": true,
+   "secs": 10.3,
+   "text": "Here are two frames of Lyrica, one with her witch hat and one without, in the style of a 16-bit SNES-era JRPG sprite. ",
+   "ts": 1788846714.077441
+  },
+  {
+   "name": "player-hat",
+   "v": 3,
+   "ok": true,
+   "secs": 14.5,
+   "text": "",
+   "ts": 1788846826.689804
+  },
+  {
+   "name": "player-run-a",
+   "v": 1,
+   "ok": true,
+   "secs": 15.5,
+   "text": "",
+   "ts": 1788846842.632319
+  },
+  {
+   "name": "player-run-b",
+   "v": 1,
+   "ok": true,
+   "secs": 13.8,
+   "text": "",
+   "ts": 1788846856.9868941
+  },
+  {
+   "name": "player-jump",
+   "v": 1,
+   "ok": true,
+   "secs": 14.3,
+   "text": "",
+   "ts": 1788846871.7432861
+  },
+  {
+   "name": "player-attack",
+   "v": 1,
+   "ok": true,
+   "secs": 11.3,
+   "text": "",
+   "ts": 1788846883.487411
+  },
+  {
+   "name": "player-hurt",
+   "v": 1,
+   "ok": true,
+   "secs": 15.0,
+   "text": "",
+   "ts": 1788846898.928663
+  },
+  {
+   "name": "player-dead",
+   "v": 1,
+   "ok": true,
+   "secs": 13.3,
+   "text": "",
+   "ts": 1788846912.684753
+  },
+  {
+   "name": "player-plain",
+   "v": 1,
+   "ok": true,
+   "secs": 15.2,
+   "text": "",
+   "ts": 1788846928.3010828
+  },
+  {
+   "name": "player-gold",
+   "v": 1,
+   "ok": true,
+   "secs": 14.8,
+   "text": "",
+   "ts": 1788846943.687664
+  },
+  {
+   "name": "enemy-unicorn",
+   "v": 3,
+   "ok": true,
+   "secs": 9.9,
+   "text": "",
+   "ts": 1788847236.510133
+  }
+ ],
+ "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"
+}

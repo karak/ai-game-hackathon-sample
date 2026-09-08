@@ -37,16 +37,40 @@ export const PAL = {
   'X': '#ff8f3c', // flame orange
   'Y': '#ffe860', // flame yellow
   'Z': '#7a3a3a', // rotten meat
-  'p': '#d84f9c', // costume primary (remapped per costume)
+  // ---- 追加ランプ（小文字）----
+  'a': '#a32f78', // costume primary shadow (remapped)
+  'b': '#f07ab8', // costume primary highlight (remapped)
+  'c': '#ffe4f2', // hair highlight
+  'd': '#b04878', // hair dark
+  'e': '#e06aa8', // costume secondary shadow (remapped)
+  'f': '#3a2540', // soft inner line (plum)
+  'g': '#3c3c4c', // darkest gray
+  'h': '#4a3a78', // indigo light (hat/boots highlight)
+  'i': '#1c1230', // indigo dark
+  'j': '#b0741c', // dark gold
+  'k': '#b86a4e', // skin deep shadow
+  'l': '#4a0810', // darkest blood
+  'm': '#2f7a3a', // mid green
+  'n': '#a87850', // dark tan
+  'o': '#8cd8ff', // light blue
+  'u': '#d8a0ff', // light toxic purple
+  'v': '#e8f0ff', // white-blue highlight
+  'w': '#c8905a', // light brown
+  'x': '#1e3040', // dark teal
+  'y': '#ffb0d8', // costume skirt highlight (remapped)
+  'z': '#a06060', // pale rotten
+  // ---- 衣装キー（衣装ごとに置換）----
+  'p': '#d84f9c', // costume primary
   'q': '#ff8fc8', // costume secondary
   'r': '#fdfbf7', // costume trim
-  's': '#ffb6dc', // hair (remapped)
+  's': '#ffb6dc', // hair
   't': '#e0709e', // hair shadow
 };
 
 // 衣装ごとの色置換テーブル
 export const COSTUMES = {
-  dress:  { p: '#d84f9c', q: '#ff8fc8', r: '#fdfbf7', s: '#ffb6dc', t: '#e0709e' },
-  plain:  { p: '#1f2f66', q: '#fdfbf7', r: '#d9262b', s: '#ffb6dc', t: '#e0709e' },
-  gold:   { p: '#f0a838', q: '#fff0a0', r: '#fdfbf7', s: '#fff1c8', t: '#e8b060' },
+  // p 主色 / a 主色の影 / b 主色の光 / q 副色(スカート) / e 副色の影 / r 縁・リボン / s,t,c,d 髪
+  dress:  { p: '#d84f9c', a: '#a32f78', b: '#f07ab8', q: '#ff8fc8', e: '#e06aa8', y: '#ffb0d8', r: '#fdfbf7', s: '#ffb6dc', t: '#e0709e', c: '#ffe4f2', d: '#b04878' },
+  plain:  { p: '#26397a', a: '#182552', b: '#3a52a0', q: '#e8e8f0', e: '#b8b8cc', y: '#ffffff', r: '#d9262b', s: '#ffb6dc', t: '#e0709e', c: '#ffe4f2', d: '#b04878' },
+  gold:   { p: '#f0a838', a: '#c07818', b: '#ffd060', q: '#fff0a0', e: '#e8c060', y: '#fff8d0', r: '#fdfbf7', s: '#fff1c8', t: '#e8b060', c: '#ffffff', d: '#c89040' },
 };

@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/player-run-b-v1.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  72,
+  120
+ ],
+ "frames": [
+  {
+   "w": 60,
+   "h": 107,
+   "fits": true,
+   "colors": 15,
+   "name": "run3"
+  },
+  {
+   "w": 62,
+   "h": 107,
+   "fits": true,
+   "colors": 15,
+   "name": "run4"
+  }
+ ]
+}

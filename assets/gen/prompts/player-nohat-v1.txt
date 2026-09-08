@@ -1,0 +1,6 @@
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Crisp hand-placed pixels, NO anti-aliasing blur, NO photoreal shading, NO vector gradients. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 pixel, dark plum or dark brown (never pure black). Chibi proportions 2.5-3 heads tall. Limited palette (about 12-15 colors on the character).
+BACKGROUND: completely flat, solid, uniform pure green #00FF00 filling the entire canvas edge to edge. Nothing else in the background: no floor, no shadow, no glow, no frame, no text, no signature.
+Using the attached reference image as the exact character design, redraw the SAME character in the SAME pixel-art style, same proportions, same colors, same standing idle pose, side view facing RIGHT — but WITHOUT the witch hat. Show her full pink bob hair (chin-length, straight bangs, small side strands, a lighter highlight band on top). Everything else identical: magenta bodice, puffy pink sleeves, white sailor bib collar with red bow, pink flared skirt with white frilly hem, white socks, dark-indigo boots. Keep the same canvas framing (character about 80% of canvas height, centered).
+
+
+[refs] assets/gen/raw/player-base-v1.png

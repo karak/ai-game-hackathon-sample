@@ -1,0 +1,6 @@
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Crisp hand-placed pixels, NO anti-aliasing blur, NO photoreal shading, NO vector gradients. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 pixel, dark plum or dark brown (never pure black). Chibi proportions 2.5-3 heads tall. Limited palette (about 12-15 colors on the character).
+BACKGROUND: completely flat, solid, uniform pure green #00FF00 filling the entire canvas edge to edge. Nothing else in the background: no floor, no shadow, no glow, no frame, no text, no signature.
+Using the attached reference image only for the hat's design and colors, draw ONLY the witch hat as a standalone object sprite: wide-brimmed pointed dark-indigo witch hat with a white ribbon band and a small gold buckle, tip slightly bent toward the back (to the LEFT), seen from the side as it would sit on a head facing RIGHT. Draw it large, centered, occupying about 70% of the canvas width. No head, no character, no shadow — the hat alone.
+
+
+[refs] assets/gen/raw/player-base-v1.png

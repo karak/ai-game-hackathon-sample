@@ -1,0 +1,17 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-mushroom-v1.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  96,
+  120
+ ],
+ "frames": null,
+ "w": 69,
+ "h": 92,
+ "fits": true,
+ "colors": 15,
+ "name": "mushroom2"
+}

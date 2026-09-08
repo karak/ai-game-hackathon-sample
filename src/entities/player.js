@@ -1,14 +1,15 @@
 import { TILE, moveBody } from '../physics.js';
 import { PlayerShot, WEAPONS } from './projectiles.js';
+import { blit } from '../gfx/sprite.js';
 
-const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196;
-const STAND_H = 22, CROUCH_H = 16;
+const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196; // 単発ジャンプ 42 世界px(2.6タイル)
+const STAND_H = 28, CROUCH_H = 18; // 当たり判定（世界単位）。スプライトは生成 PNG のサイズに従う（docs/art-standard.md §2.1）
 
 // 主人公リリカ。超魔界村式: 空中制御なし・二段ジャンプで軌道修正・被弾で変身解除。
 export class Player {
   constructor(world, x, y) {
     this.world = world;
-    this.w = 10; this.h = STAND_H; this.x = x + 3; this.y = y + TILE - STAND_H; // マーカーのタイル下端に足を合わせる
+    this.w = 12; this.h = STAND_H; this.x = x + 2; this.y = y + TILE - STAND_H; // マーカーのタイル下端に足を合わせる
     this.vx = 0; this.vy = 0; this.facing = 1; this.onGround = false;
     this.costume = 'dress'; this.weapon = 'star';
     this.state = 'normal'; this.jumps = 0; this.crouch = false;
@@ -83,8 +84,8 @@ export class Player {
     const W = WEAPONS[this.weapon];
     const mine = this.world.shots.filter(s => !s.dead);
     if (!charged && mine.length >= W.max) return;
-    const sy = this.crouch ? this.y + 8 : this.y + 10;
-    const sx = this.centerX + this.facing * 6;
+    const sy = this.crouch ? this.y + 6 : this.y + 12;
+    const sx = this.centerX + this.facing * 10;
     this.world.shots.push(new PlayerShot(this.world, this.weapon, sx, sy, this.facing, charged));
     this.attackT = 0.18;
     this.world.audio.sfx(charged ? 'chargeshot' : 'shoot');
@@ -120,18 +121,19 @@ export class Player {
   }
 
   respawn(x, y) {
-    this.x = x + 3; this.y = y + TILE - STAND_H; this.vx = 0; this.vy = 0; this.h = STAND_H; this.crouch = false;
+    this.x = x + 2; this.y = y + TILE - STAND_H; this.vx = 0; this.vy = 0; this.h = STAND_H; this.crouch = false;
     this.state = 'normal'; this.costume = 'dress'; this.invT = 2.0; this.hurtT = 0; this.jumps = 0; this.chargeT = 0; this.facing = 1;
   }
 
+  // 生成スプライトのフレーム名（idle/run1-4/jump/fall/attack/crouch/hurt/dead）
   frame() {
-    if (this.state !== 'normal') return { full: 'dead' };
-    if (this.crouch) return { full: 'crouch' };
-    if (this.hurtT > 0) return { top: 'hurt', legs: 'jump' };
-    if (!this.onGround) return { top: this.attackT > 0 ? 'attack' : 'jump', legs: 'jump' };
-    const top = this.attackT > 0 ? 'attack' : 'idle';
-    if (this.vx !== 0) { const f = ['run1', 'run2', 'run3', 'run2'][Math.floor(this.runT * 9) % 4]; return { top, legs: f }; }
-    return { top, legs: 'stand' };
+    if (this.state !== 'normal') return 'dead';
+    if (this.crouch) return 'crouch';
+    if (this.hurtT > 0) return 'hurt';
+    if (!this.onGround) return this.attackT > 0 ? 'attack' : (this.vy < 0 ? 'jump' : 'fall');
+    if (this.attackT > 0) return 'attack';
+    if (this.vx !== 0) return ['run1', 'run2', 'run3', 'run4'][Math.floor(this.runT * 10) % 4];
+    return 'idle';
   }
 
   draw(g, cam, assets) {
@@ -151,27 +153,21 @@ export class Player {
   _drawBody(g, cam, assets, dy) {
     const fr = this.frame();
     const sheet = assets.player[this.costume];
-    const key = fr.full ?? `${fr.top}_${fr.legs}`;
-    const spr = sheet[key]; if (!spr) return;
-    const img = this.facing < 0 ? spr.l : spr.r;
-    const px = Math.floor(this.x - 3 - cam.x), py = Math.floor(this.y - (STAND_H + 2 - this.h) - cam.y + dy);
-    g.drawImage(img, px, py);
+    const spr = sheet[fr] ?? sheet.idle; if (!spr) return;
+    // スプライト箱の底辺中央を当たり判定の底辺中央に合わせる
+    const px = Math.floor(this.centerX - spr.w / 2 - cam.x), py = Math.floor(this.y + this.h - spr.h - cam.y + dy);
+    blit(g, spr, this.facing < 0, px, py);
+    const hat = assets.hat; const hatDy = -(hat.h - (hat.brim ?? 2)); // つばが髪に少しかかる
     if (this.costume !== 'plain' && this.state === 'normal') {
-      const hat = this.facing < 0 ? assets.hat.l : assets.hat.r;
-      const hy = fr.full === 'crouch' ? 7 : 0;
-      g.drawImage(hat, px, py - 6 + hy);
+      const hy = fr === 'crouch' ? Math.floor(spr.h * 0.15) : 0;
+      blit(g, hat, this.facing < 0, this.centerX - hat.w / 2 - cam.x, py + hatDy + hy);
     }
     if (this.state === 'dying' && this.deathReason !== 'bog') {
       // 帽子が飛ぶ
-      const t = this.deathT; const hx = px + Math.floor(t * 20 * -this.facing), hy = py - 6 - Math.floor(60 * t - 90 * t * t);
-      g.drawImage(this.facing < 0 ? assets.hat.l : assets.hat.r, hx, Math.min(hy, py + 14));
+      const t = this.deathT; const hx = this.centerX - hat.w / 2 - cam.x + t * 20 * -this.facing, hy = py + hatDy - (60 * t - 90 * t * t);
+      blit(g, hat, this.facing < 0, hx, Math.min(hy, py + spr.h * 0.5));
     }
-    if (this.broomT > 0) {
-      const b = this.facing < 0 ? assets.broom.l : assets.broom.r;
-      g.drawImage(b, Math.floor(this.centerX - 10 - cam.x), Math.floor(this.y + this.h - 2 - cam.y));
-    }
-    if (this.chargeT > 0.9 && Math.floor(this.chargeT * 20) % 2) {
-      g.drawImage(assets.shots.charge.r, px + (this.facing > 0 ? 14 : -8), py + 6);
-    }
+    if (this.broomT > 0) blit(g, assets.broom, this.facing < 0, this.centerX - assets.broom.w / 2 - cam.x, this.y + this.h - 4 - cam.y);
+    if (this.chargeT > 0.9 && Math.floor(this.chargeT * 20) % 2) blit(g, assets.shots.charge, false, this.centerX + (this.facing > 0 ? 12 : -22) - cam.x, this.y + 8 - cam.y);
   }
 }

@@ -10,7 +10,8 @@ import { TreasureBox, FloatingItem } from './entities/items.js';
 import { EnemyShot, WEAPONS } from './entities/projectiles.js';
 import { SONGS } from './audio.js';
 
-export const W = 256, H = 224;
+export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
+export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
 
 // 1ステージ分のランタイム
 export class World {
