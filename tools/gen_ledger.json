@@ -1,5 +1,5 @@
 {
- "requests": 74,
+ "requests": 82,
  "entries": [
   {
    "name": "player-base",
@@ -552,6 +552,70 @@
    "secs": 13.1,
    "text": "",
    "ts": 1788875915.264439
+  },
+  {
+   "name": "bg-graveyard-far",
+   "v": 3,
+   "ok": true,
+   "secs": 11.7,
+   "text": "Here is a haunted flower-field graveyard at night, rendered in 16-bit SNES-era Japanese RPG pixel art style as a far-distance parallax layer.\n",
+   "ts": 1788876321.11907
+  },
+  {
+   "name": "bg-graveyard-far2",
+   "v": 1,
+   "ok": true,
+   "secs": 10.5,
+   "text": "",
+   "ts": 1788876332.070967
+  },
+  {
+   "name": "bg-candyforest-far",
+   "v": 2,
+   "ok": true,
+   "secs": 12.8,
+   "text": "",
+   "ts": 1788876345.342911
+  },
+  {
+   "name": "bg-candyforest-far2",
+   "v": 1,
+   "ok": true,
+   "secs": 13.0,
+   "text": "Here's a far-distance parallax layer for a side-scrolling game, featuring a candy forest rotting in a poison swamp at dusk, with a clear green gap at both the left and right edges.\n",
+   "ts": 1788876358.744687
+  },
+  {
+   "name": "bg-castle-far",
+   "v": 2,
+   "ok": true,
+   "secs": 12.5,
+   "text": "Here is the far-distance parallax layer for a side-scrolling game, featuring a sugar-white castle stained with blood, rendered in 16-bit SNES-era Japanese RPG pixel art. ",
+   "ts": 1788876371.7083158
+  },
+  {
+   "name": "bg-castle-far2",
+   "v": 1,
+   "ok": true,
+   "secs": 12.4,
+   "text": "Here's your far-distance parallax layer for a side-scrolling game, Variant B:\n",
+   "ts": 1788876384.5419269
+  },
+  {
+   "name": "bg-castle-sky",
+   "v": 2,
+   "ok": true,
+   "secs": 10.1,
+   "text": "",
+   "ts": 1788876395.063835
+  },
+  {
+   "name": "bg-castle-far2",
+   "v": 2,
+   "ok": true,
+   "secs": 18.0,
+   "text": "",
+   "ts": 1788876549.3840451
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

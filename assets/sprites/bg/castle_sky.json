@@ -1,5 +1,5 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-castle-sky-v1.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-castle-sky-v2.png",
  "pitch": [
   4.0,
   4.0
@@ -8,8 +8,8 @@
   400,
   300
  ],
- "w": 262,
- "h": 260,
+ "w": 252,
+ "h": 261,
  "fits": true,
  "colors": 32
 }

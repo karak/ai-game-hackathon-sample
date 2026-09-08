@@ -1,11 +1,19 @@
 {
  "bg/candyforest_far": {
   "anchor": "center",
+  "colors": 31,
+  "fits": true,
+  "h": 83,
+  "src": "assets/sprites/bg/candyforest_far.png",
+  "w": 248
+ },
+ "bg/candyforest_far2": {
+  "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 69,
-  "src": "assets/sprites/bg/candyforest_far.png",
-  "w": 254
+  "h": 108,
+  "src": "assets/sprites/bg/candyforest_far2.png",
+  "w": 248
  },
  "bg/candyforest_mid": {
   "anchor": "center",
@@ -43,9 +51,17 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 88,
+  "h": 91,
   "src": "assets/sprites/bg/castle_far.png",
-  "w": 264
+  "w": 245
+ },
+ "bg/castle_far2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 95,
+  "src": "assets/sprites/bg/castle_far2.png",
+  "w": 243
  },
  "bg/castle_mid": {
   "anchor": "center",
@@ -75,17 +91,25 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 260,
+  "h": 261,
   "src": "assets/sprites/bg/castle_sky.png",
-  "w": 262
+  "w": 252
  },
  "bg/graveyard_far": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 85,
+  "h": 111,
   "src": "assets/sprites/bg/graveyard_far.png",
-  "w": 259
+  "w": 263
+ },
+ "bg/graveyard_far2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 91,
+  "src": "assets/sprites/bg/graveyard_far2.png",
+  "w": 267
  },
  "bg/graveyard_mid": {
   "anchor": "center",

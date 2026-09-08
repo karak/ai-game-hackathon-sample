@@ -1,5 +1,5 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-castle-far-v2.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-graveyard-far2-v1.png",
  "pitch": [
   4.0,
   4.0
@@ -8,7 +8,7 @@
   400,
   300
  ],
- "w": 245,
+ "w": 267,
  "h": 91,
  "fits": true,
  "colors": 32

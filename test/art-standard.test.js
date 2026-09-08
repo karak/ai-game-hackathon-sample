@@ -56,3 +56,12 @@ test('§2.4 themes define enough tones for ground, platform, sky', () => {
     expect(th.grass.length, name).toBeGreaterThanOrEqual(3); expect(th.dirt.length, name).toBeGreaterThanOrEqual(3); expect(th.plat.length, name).toBeGreaterThanOrEqual(3);
   }
 });
+
+test('§2.5 background layers: each theme has sky + far A/B + mid; far variants share scale (height 60-160 cells, width 200-330)', () => {
+  const bg = Object.fromEntries(group('bg').map(([k, v]) => [k.split('/')[1], v]));
+  for (const th of ['graveyard', 'candyforest', 'castle']) {
+    for (const l of ['sky', 'far', 'far2', 'mid']) expect(bg[th + '_' + l], th + '_' + l).toBeTruthy();
+    for (const l of ['far', 'far2']) { const v = bg[th + '_' + l]; expect(v.h, th + l).toBeGreaterThanOrEqual(60); expect(v.h, th + l).toBeLessThanOrEqual(160); expect(v.w, th + l).toBeGreaterThanOrEqual(200); expect(v.w, th + l).toBeLessThanOrEqual(330); }
+    const a = bg[th + '_far'].h, b = bg[th + '_far2'].h; expect(Math.max(a, b) / Math.min(a, b), th + ' far A/B height ratio').toBeLessThanOrEqual(1.4);
+  }
+});

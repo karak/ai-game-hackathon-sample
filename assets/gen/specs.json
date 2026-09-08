@@ -446,7 +446,7 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "keep_bottom": 0.7
+   "keep_bottom": 0.9
   },
   "bg-graveyard-mid": {
    "box": [
@@ -491,7 +491,7 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "keep_bottom": 0.7
+   "keep_bottom": 0.9
   },
   "bg-candyforest-mid": {
    "box": [
@@ -536,7 +536,7 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "keep_bottom": 0.7
+   "keep_bottom": 0.9
   },
   "bg-castle-mid": {
    "box": [
@@ -823,6 +823,52 @@
     "bosses/noir2"
    ],
    "palette": "bosses/noir1"
+  },
+  "bg-graveyard-far2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-graveyard-far2.txt",
+   "out": [
+    "bg/graveyard_far2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.9
+  },
+  "bg-candyforest-far2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-candyforest-far2.txt",
+   "out": [
+    "bg/candyforest_far2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.9
+  },
+  "bg-castle-far2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-castle-far2.txt",
+   "out": [
+    "bg/castle_far2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "keep_bottom": 0.9,
+   "ref": "bg-castle-far"
   }
  }
 }

@@ -92,10 +92,15 @@ export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512, decoHD
 // 背景レイヤー描画: sky は画面全体に、far/mid は下端を地平線に合わせて横方向に繰り返す
 // 背景の画素密度: 空 3 画面px/セル（ディザ空は粗くても成立）、遠景 2、中景 1（スプライトと同じ）。
 // 1 リクエストで得られる横幅（約 250 セル）の制約による妥協。docs/art-standard.md §2.4 参照。
-const BG_PX = { sky: 3, far: 2, mid: 1 };
+const BG_PX = { sky: 3, far: 1, mid: 1 }; // 遠景は A/B 2 変異体（高さ ≈ 130〜160 セル）を連結して 1 画面 px/セル。空のみ 3 倍のまま（docs/plan/02-near-term.md 課題 1）
 export function drawBackgroundHD(g, layers, camX, W, H) {
-  if (layers.sky) { const s = BG_PX.sky / HD_SCALE; g.drawImage(layers.sky.r, 0, 0, layers.sky.r.width * s, layers.sky.r.height * s); }
-  for (const [name, speed, bottom] of [['far', 0.2, 172], ['mid', 0.5, 176]]) {
+  if (layers.sky) {
+    // 空は既定 3 px/セル。layers.skyPx で層ごとに上書き（城の奥壁は 2: 261 セル × 2 = 522 px = 地面線 y174 まで届く）。幅が足りなければ横に繰り返す
+    const s = (layers.skyPx ?? BG_PX.sky) / HD_SCALE, sw = layers.sky.r.width * s, sh = layers.sky.r.height * s;
+    for (let x = 0; x < W; x += sw) g.drawImage(layers.sky.r, Math.round(x * HD_SCALE) / HD_SCALE, 0, sw, sh);
+  }
+  // 遠景の接地線は中景（上端 ≈ y138）より上の y=158 に置き、1 倍化した遠景（高さ 28〜37 世界単位）が中景の背後に隠れないようにする
+  for (const [name, speed, bottom] of [['far', 0.2, 158], ['mid', 0.5, 176]]) {
     const list = layers[name]; if (!list || !list.length) continue;
     const s = BG_PX[name] / HD_SCALE;
     // 複数バリアントを順に連結した 1 本の帯として繰り返す（両端に余白があるので順序を問わず継ぎ目なし）

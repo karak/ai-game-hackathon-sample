@@ -209,7 +209,7 @@ export class Game {
 
   drawTitle(g) {
     const gen = this.assets.generated ?? {};
-    if (gen.bg?.graveyard_sky) drawBackgroundHD(g, { sky: gen.bg.graveyard_sky, far: [gen.bg.graveyard_far].filter(Boolean), mid: [gen.bg.graveyard_mid, gen.bg.graveyard_mid2, gen.bg.graveyard_mid3].filter(Boolean) }, this.titleCam, W, H);
+    if (gen.bg?.graveyard_sky) drawBackgroundHD(g, { sky: gen.bg.graveyard_sky, far: [gen.bg.graveyard_far, gen.bg.graveyard_far2].filter(Boolean), mid: [gen.bg.graveyard_mid, gen.bg.graveyard_mid2, gen.bg.graveyard_mid3].filter(Boolean) }, this.titleCam, W, H);
     else drawBackground(g, this.titleBg, this.titleCam, W, H);
     // 地面の帯（HD タイルがあれば地表＋地中）
     g.fillStyle = '#150a22'; g.fillRect(0, 176, W, 48);

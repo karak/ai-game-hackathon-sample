@@ -46,7 +46,10 @@ export class World {
     const mids = [gen.bg?.[th + '_mid'], gen.bg?.[th + '_mid2'], gen.bg?.[th + '_mid3']].filter(Boolean);
     // 主バリアントと高さが大きく違う層（壁面 vs 小物列など）は連結しない
     const midOk = mids.filter((L, i) => i === 0 || L.r.height >= mids[0].r.height * 0.5);
-    this.bgHD = { sky: gen.bg?.[th + '_sky'], far: [gen.bg?.[th + '_far']].filter(Boolean), mid: midOk };
+    const fars = [gen.bg?.[th + '_far'], gen.bg?.[th + '_far2']].filter(Boolean);
+    const farOk = fars.filter((L, i) => i === 0 || (L.r.height >= fars[0].r.height * 0.5 && L.r.height <= fars[0].r.height * 2)); // 高さが極端に違う変異体は連結しない
+    const SKY_PX = { castle: 2 }; // 城の空は奥壁（レンガ）なので 2 px/セルで密度差を抑える。他は空のグラデーションなので 3 のまま
+    this.bgHD = { sky: gen.bg?.[th + '_sky'], skyPx: SKY_PX[th], far: farOk, mid: midOk }; // 遠景は A/B 2 変異体を連結（1 画面 px/セル）
     if (!this.bgHD.sky && !this.bgHD.far.length && !this.bgHD.mid.length) this.bgHD = null;
     this.fx = new Fx(); // ヒットストップ / フラッシュ / スロー / ボス登場（A-5）
     this.decals = new Decals(map.pixelWidth, map.pixelHeight);
