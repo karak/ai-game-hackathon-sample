@@ -1,0 +1,12 @@
+{
+  "name": "magical-lyrica",
+  "version": "0.1.0",
+  "description": "マジカル☆リリカと血塗られたおとぎの国 - 超魔界村スタイルの2D横スクロールACT",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 8080 --bind 127.0.0.1",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "license": "MIT"
+}
