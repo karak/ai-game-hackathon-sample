@@ -15,6 +15,7 @@ export class Input {
     this.anyKey = false;
     target.addEventListener('keydown', e => {
       const a = MAP[e.code];
+      this.lastKey = { code: e.code, t: Math.round(performance.now()) };
       if (a) { e.preventDefault(); if (!this.held.has(a) && !e.repeat) this.pressed.add(a); this.held.add(a); }
       if (!e.repeat) this.anyKey = true;
     });

@@ -6,7 +6,8 @@ import { drawBackground } from './gfx/background.js';
 
 const PROLOGUE = [
   'むかしむかし、おとぎの国は',
-  'ひとりの魔法少女に守られていた。',
+  'ひとりの魔法少女に',
+  '守られていた。',
   '',
   'ある日、彼女は世界を呪った。',
   '花は腐り、うさぎは血を吐き、',
@@ -16,7 +17,8 @@ const PROLOGUE = [
   '今日は、その後始末をする日。',
 ];
 const ENDING = [
-  '城の奥で、ノワールは静かに崩れた。',
+  '城の奥で、ノワールは',
+  '静かに崩れた。',
   '「……ありがとう」',
   'そう聞こえた気がした。',
   '',
@@ -24,10 +26,11 @@ const ENDING = [
   '花はまだ腐っているし、',
   '洗濯物は血まみれだけれど。',
   '',
-  'リリカは帽子を直して、ほうきに乗った。',
+  'リリカは帽子を直して、',
+  'ほうきに乗った。',
   '「さ、帰って宿題やろ」',
   '',
-  '　　　　　　　ＴＨＥ　ＥＮＤ',
+  'ＴＨＥ　ＥＮＤ',
 ];
 
 export class Game {
@@ -39,7 +42,7 @@ export class Game {
     this.hi = Number(localStorage.getItem('lyrica_hi') ?? 0) || 0;
     this.paused = false; this.textIdx = 0;
   }
-  setState(s) { this.state = s; this.stateT = 0; }
+  setState(s) { (this.trace ??= []).push(`${this.state}>${s}@${Math.round(performance.now())}`); this.state = s; this.stateT = 0; }
 
   // ---- 遷移 ----
   startGame() {
@@ -128,7 +131,7 @@ export class Game {
     g.fillStyle = kind === 'ending' ? '#2d1f4c' : '#0e0a18'; g.fillRect(0, 0, W, H);
     if (kind === 'ending') { drawBackground(g, this.assets.backgrounds.candyforest, this.stateT * 8, W, H); g.fillStyle = 'rgba(14,10,24,0.55)'; g.fillRect(0, 0, W, H); }
     const shown = Math.min(lines.length, Math.floor(this.stateT / 0.9) + 1);
-    const y0 = kind === 'ending' ? Math.max(20, 120 - this.stateT * 8) : 30;
+    const y0 = kind === 'ending' ? Math.max(8, 100 - this.stateT * 6) : 22;
     for (let i = 0; i < shown; i++) text(g, lines[i], 128, y0 + i * 18, { align: 'center', color: i === lines.length - 1 && kind === 'ending' ? '#ffe860' : '#fdfbf7' });
     if (kind === 'ending' && this.stateT > 4) { mini(g, 'SCORE ' + String(this.score).padStart(7, '0'), 128 - 26, 190, '#ff8fc8'); }
     if (shown >= lines.length && Math.floor(this.stateT * 2) % 2) mini(g, 'PUSH START', 128 - 20, 210, '#ffe860');
