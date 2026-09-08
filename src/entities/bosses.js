@@ -290,12 +290,49 @@ class SerpentPart {
   }
 }
 
+// ---- 人形師の機械 (第四章): ベルトコンベアの上で戦う。左右に走り、針を叩き落とし、糸弾と人形の腕を投げる ----
+// かわいい: 頰紅の描かれた機械の顔と提灯の目 / えげつない: 骨組みに縫い込まれた人形の胴体、継ぎ目から血の綿
+export class DollmakerMachine extends Boss {
+  constructor(world, x, groundY) {
+    super(world, x, groundY - 60, 40, 60); this.spriteOff = [4, 2];
+    this.hpMax = this.hp = 28; this.facing = -1; this.fitSprite('machine1', 0.7, 0.95); this.enterX = x - 40; this.attackAnim = 0; this.cycle = 0;
+  }
+  update(dt) {
+    if (super.update(dt)) return;
+    const p = this.player, d = this.distX(), enraged = this.hpRatio < 0.5, a = this.world.arena;
+    this.attackAnim = Math.max(0, this.attackAnim - dt);
+    switch (this.state) {
+      case 'enter': this.vx = -30; if (this.x <= this.enterX) { this.vx = 0; this.setState('roll'); this.contact = true; } break;
+      case 'roll': // 主人公の方へ転がる。1.6 秒で次の攻撃
+        this.facePlayer(); this.vx = this.facing * (enraged ? 40 : 26);
+        if (this.stateT > 1.6) { this.cycle++; this.setState(this.cycle % 3 === 0 ? 'toss' : this.cycle % 3 === 1 ? 'slam' : 'thread'); this.vx = 0; }
+        break;
+      case 'slam': // 主人公の真上に針を落とす（0.5 秒後に落下、着弾で床に針が刺さり 0.6 秒残る）
+        if (this.stateT > 0.5 && !this.slammed) { this.slammed = true; this.attackAnim = 0.5; this.shoot('bone', 0, 260, Math.sign(d) * Math.min(Math.abs(d), 120), -40, { life: 1.5 }); this.world.shake(2); this.world.audio.sfx('hit'); }
+        if (this.stateT > 1.1) { this.slammed = false; this.setState('roll'); }
+        break;
+      case 'thread': // 糸弾（bolt）を扇状に 3〜5 発
+        if (Math.floor(this.stateT * 6) !== Math.floor((this.stateT - dt) * 6) && this.stateT < (enraged ? 0.9 : 0.55)) { this.attackAnim = 0.3; const n = enraged ? 5 : 3; for (let i = 0; i < n; i++) { const ang = Math.atan2(p.y + p.h / 2 - this.cy, d) + (i - (n - 1) / 2) * 0.22; this.shoot('bolt', Math.cos(ang) * 120, Math.sin(ang) * 120, this.facing * 10, -10, { life: 2.5 }); } this.world.audio.sfx('poison'); }
+        if (this.stateT > 1.2) this.setState('roll');
+        break;
+      case 'toss': // 人形の胴体（arm ブーメラン）を投げる
+        if (this.stateT > 0.3 && !this.tossed) { this.tossed = true; this.attackAnim = 0.5; this.shoot('arm', this.facing * 120, -60, this.facing * 12, -14, { life: 3 }); this.world.audio.sfx('hurt'); }
+        if (this.stateT > 1.0) { this.tossed = false; this.setState('roll'); }
+        break;
+    }
+    this.physics(dt);
+    if (a) { if (this.x < a.x0 + 8) { this.x = a.x0 + 8; this.vx = Math.abs(this.vx); } if (this.x + this.w > a.x1 - 8) { this.x = a.x1 - 8 - this.w; this.vx = -Math.abs(this.vx); } }
+  }
+  spriteName() { return this.attackAnim > 0 ? 'machine2' : 'machine1'; }
+}
+
 export function createBoss(world, kind, x, groundY) {
   switch (kind) {
     case 'doll': return new WeepingDoll(world, x, groundY);
     case 'teddy': return new GutsTeddy(world, x, groundY);
     case 'noir': return new Noir(world, x, groundY);
     case 'serpent': return new TearSerpent(world, x, groundY);
+    case 'machine': return new DollmakerMachine(world, x, groundY);
   }
   return null;
 }

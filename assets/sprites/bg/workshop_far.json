@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-workshop-far-v1.png",
+ "pitch": [
+  4.0,
+  3.0
+ ],
+ "max_box": [
+  400,
+  300
+ ],
+ "w": 248,
+ "h": 140,
+ "fits": true,
+ "colors": 32
+}

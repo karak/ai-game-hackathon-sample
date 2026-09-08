@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/boss-machine-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  200,
+  200
+ ],
+ "frames": [
+  {
+   "w": 127,
+   "h": 74,
+   "fits": true,
+   "colors": 15,
+   "name": "machine1"
+  },
+  {
+   "w": 107,
+   "h": 85,
+   "fits": true,
+   "colors": 15,
+   "name": "machine2"
+  }
+ ]
+}

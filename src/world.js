@@ -42,7 +42,8 @@ export class World {
       const decoMap = { graveyard: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones },
                         candyforest: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones, k: D.lollipop },
                         castle: { n: D.pillar, w: D.window, v: D.candelabra, x: D.blood, o: D.bones, t: D.banner },
-                        river: { y: D.willow, n: D.bridgepost, f: D.reeds, o: D.dollhead, x: D.blood, t: D.tomb } }[this.level.theme] ?? {};
+                        river: { y: D.willow, n: D.bridgepost, f: D.reeds, o: D.dollhead, x: D.blood, t: D.tomb },
+                        workshop: { n: D.dressform, c: D.scissors, y: D.spool, o: D.stuffing, x: D.blood, w: D.window, v: D.candelabra } }[this.level.theme] ?? {};
       for (const k of Object.keys(decoMap)) if (!decoMap[k]) delete decoMap[k];
       this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles, 512, decoMap, buildSpikeHD(THEMES[this.level.theme]));
       this.bogHD = buildBogHD(THEMES[this.level.theme]);
@@ -175,7 +176,7 @@ export class World {
     this.audio.playBgm(SONGS.boss);
     this.fx.bossIntro(this.bossName());
   }
-  bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', serpent: '涙の大蛇 ララバイ' }[this.level.boss] ?? 'BOSS'; }
+  bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', serpent: '涙の大蛇 ララバイ', machine: '人形師の機械 マザーグース' }[this.level.boss] ?? 'BOSS'; }
 
   collide() {
     const p = this.player;
@@ -256,9 +257,9 @@ export class World {
     // プレス機: 吊り鎖 + ブロック（生成絵 tiles/press があれば使う）
     for (const q of this.presses) {
       if (q.x + q.w < cam.x || q.x > cam.x + W) continue;
-      const x = q.x - cam.x, y = q.y - cam.y;
-      g.fillStyle = '#5d5d70'; for (let cy = q.topY - cam.y; cy < y; cy += 4) g.fillRect(x + TILE / 2 - 1, cy, 2, 3);
-      if (G.press) { const sw = G.press.r.width / HD, sh = G.press.r.height / HD; g.drawImage(G.press.r, Math.round(x + TILE / 2 - sw / 2), Math.round(y + q.hBlock - sh), sw, sh); }
+      const x = q.x - cam.x, y = q.y - cam.y, cx = q.tx * TILE + TILE / 2 - cam.x;
+      g.fillStyle = '#5d5d70'; for (let cy = q.topY - cam.y - 4; cy < y; cy += 4) g.fillRect(cx - 1, cy, 2, 3); // 鎖
+      if (G.press) { const sw = G.press.r.width / HD, sh = G.press.r.height / HD; g.drawImage(G.press.r, Math.round(cx - sw / 2), Math.round(y), sw, sh); }
       else { g.fillStyle = '#4e4e60'; g.fillRect(x - 2, y, TILE + 4, q.hBlock); g.fillStyle = '#a5a5b8'; g.fillRect(x - 2, y, TILE + 4, 2); g.fillStyle = '#d9262b'; g.fillRect(x, y + q.hBlock - 3, TILE, 3); }
     }
     // ベルトコンベア: 地面タイルの上に動くストライプ
@@ -266,7 +267,8 @@ export class World {
       for (let ty = 0; ty < map2.height; ty++) for (let tx = bx0; tx <= bx1; tx++) {
         const c = map2.at(tx, ty); if (c !== ')' && c !== '(') continue;
         const x = tx * TILE - cam.x, y = ty * TILE - cam.y, dir = c === ')' ? 1 : -1, off = ((this.t * 30 * dir) % 8 + 8) % 8;
-        g.fillStyle = '#2d1f4c'; g.fillRect(x, y, TILE, 4);
+        if (G.belt) { const B = G.belt.r, bw = B.width / HD, bh = B.height / HD, sx = ((tx * TILE) % Math.max(1, Math.round(bw))) ; g.save(); g.beginPath(); g.rect(x, y - 2, TILE, bh + 2); g.clip(); g.drawImage(B, Math.round(x - sx), Math.round(y + TILE - bh), bw, bh); g.restore(); }
+        else { g.fillStyle = '#2d1f4c'; g.fillRect(x, y, TILE, 4); }
         g.fillStyle = '#a5a5b8'; for (let s = -8; s < TILE; s += 8) { const sx = x + s + off; const w = Math.min(3, x + TILE - sx); if (sx >= x && w > 0) g.fillRect(sx, y + 1, w, 2); }
       }
     }
@@ -288,6 +290,11 @@ export class World {
   }
   // 天候: 川面は雨（斜めの雨筋＋薄い霧で視界低下）
   drawWeather(g, cam) {
+    if (this.level.theme === 'workshop') { // 綿雪: ゆっくり降る白い粒（決定論的）
+      const t = this.t; g.save(); g.fillStyle = 'rgba(253,251,247,0.8)';
+      for (let i = 0; i < 40; i++) { const s1 = (i * 7919) % 997 / 997, s2 = (i * 104729) % 991 / 991; const x = ((s1 * 300 + Math.sin(t * 0.7 + i) * 12 - cam.x * 0.2) % 300 + 300) % 300 - 20, y = ((s2 * 240 + t * 22) % 240); const sz = 1 + (i % 3) / 2; g.fillRect(Math.round(x), Math.round(y), sz, sz); }
+      g.restore(); return;
+    }
     if (this.level.theme !== 'river') return;
     const t = this.t; g.save(); g.globalAlpha = 0.35; g.strokeStyle = '#cbe8f0'; g.lineWidth = 1 / HD;
     g.beginPath();

@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-needles-v3.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  80,
+  90
+ ],
+ "frames": [
+  {
+   "w": 76,
+   "h": 80,
+   "fits": true,
+   "colors": 15,
+   "name": "needles1"
+  },
+  {
+   "w": 74,
+   "h": 82,
+   "fits": true,
+   "colors": 15,
+   "name": "needles2"
+  }
+ ]
+}

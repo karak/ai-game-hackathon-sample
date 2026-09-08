@@ -1,0 +1,34 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/gimmick-workshop-v1.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  100,
+  120
+ ],
+ "frames": [
+  {
+   "w": 47,
+   "h": 56,
+   "fits": true,
+   "colors": 15,
+   "name": "press"
+  },
+  {
+   "w": 61,
+   "h": 29,
+   "fits": true,
+   "colors": 11,
+   "name": "belt"
+  },
+  {
+   "w": 52,
+   "h": 53,
+   "fits": true,
+   "colors": 15,
+   "name": "gear"
+  }
+ ]
+}

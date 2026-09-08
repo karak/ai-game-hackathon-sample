@@ -33,6 +33,15 @@ export const THEMES = {
     moon: '#e8f0f4', moonShade: '#b8c8d0', star: '#cbe8f0',
     far: '#243448', mid: '#1c2838', near: '#141c28',
   },
+  workshop: { // 第四章 綿雪の人形工房: 屋内・灰〜暖色。'~' は血の染みた綿の山（沈む）
+    grass: ['#c8c0c8', '#e0dce0', '#a8a0a8'], grassFlower: ['#d9262b', '#ff8fc8', '#f8e46e'],
+    dirt: ['#5a4a3a', '#6a5a48', '#4a3c2e'], pebble: '#b08040',
+    plat: ['#6a4a2c', '#8a6a3c', '#4a3020'], platMoss: '#e0dce0',
+    bog: ['#7a2030', '#9a3040', '#c04858'], bogGlow: '#ff6a6a', bogBubble: '#fdfbf7',
+    skyTop: '#1c1824', skyMid: '#3a3040', skyBot: '#6a5060', horizon: '#c89058',
+    moon: '#ffd890', moonShade: '#e0a850', star: '#fdfbf7',
+    far: '#2c2434', mid: '#221c2a', near: '#181420',
+  },
   castle: {
     grass: ['#6c6c80', '#7c7c90', '#5d5d70'], grassFlower: ['#d9262b', '#7a0f1f', '#a5a5b8'],
     dirt: ['#5d5d70', '#4e4e60', '#6c6c80'], pebble: '#2d1f4c',

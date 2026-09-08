@@ -1069,6 +1069,193 @@
    ],
    "colors": 12,
    "strip_caption": true
+  },
+  "bg-workshop-sky": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-workshop-sky.txt",
+   "out": [
+    "bg/workshop_sky"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "bg-workshop-far": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-workshop-far.txt",
+   "out": [
+    "bg/workshop_far"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-workshop-far2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-workshop-far2.txt",
+   "out": [
+    "bg/workshop_far2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "ref": "bg-workshop-far"
+  },
+  "bg-workshop-mid": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-workshop-mid.txt",
+   "out": [
+    "bg/workshop_mid"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-workshop-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-workshop-mid2.txt",
+   "out": [
+    "bg/workshop_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-workshop-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-workshop-mid3.txt",
+   "out": [
+    "bg/workshop_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "tiles-workshop": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-workshop.txt",
+   "out": [
+    "tiles/workshop"
+   ],
+   "kind": "tiles",
+   "colors": 24
+  },
+  "deco-workshop": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-workshop.txt",
+   "out": [
+    "deco/dressform",
+    "deco/scissors",
+    "deco/spool",
+    "deco/stuffing"
+   ],
+   "colors": 15,
+   "strip_caption": true
+  },
+  "gimmick-workshop": {
+   "box": [
+    100,
+    120
+   ],
+   "frames": 3,
+   "anchor": "bottom",
+   "subject": "gimmick-workshop.txt",
+   "out": [
+    "tiles/press",
+    "tiles/belt",
+    "tiles/gear"
+   ],
+   "colors": 15,
+   "strip_caption": true
+  },
+  "enemy-dollpart": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-dollpart.txt",
+   "out": [
+    "enemies/dollpart1",
+    "enemies/dollpart2"
+   ]
+  },
+  "enemy-needles": {
+   "box": [
+    80,
+    90
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "enemy-needles.txt",
+   "out": [
+    "enemies/needles1",
+    "enemies/needles2"
+   ],
+   "colors": 15,
+   "strip_caption": true
+  },
+  "boss-machine-a": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-machine-a.txt",
+   "out": [
+    "bosses/machine1"
+   ]
+  },
+  "boss-machine-b": {
+   "box": [
+    220,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-machine-b.txt",
+   "ref": "boss-machine-a",
+   "out": [
+    "bosses/machine2"
+   ],
+   "palette": "bosses/machine1"
   }
  }
 }

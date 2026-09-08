@@ -52,6 +52,7 @@ def build(name, sp):
 def main():
     targets = sys.argv[1:] or [k for k, v in SPECS['sprites'].items() if not v.get('skip')]
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
+    manifest = {k: v for k, v in manifest.items() if (ROOT / v['src']).exists()}  # 削除済みスプライトの残留エントリを落とす
     for name in targets:
         sp = SPECS['sprites'][name]; print(f'[{name}]')
         for key, dst in build(name, sp):

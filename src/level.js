@@ -17,6 +17,8 @@ export const MARKERS = {
   h: 'heartitem',   // 回復/得点アイテム
   r: 'mermaid',     // 人魚人形（水面から噛みつく。'~' の水面行に置く）
   p: 'umbrella',    // 傘の妖精（飛行、血の雨滴を落とす）
+  d: 'dollpart',    // 未完成の人形（腕を投げる。第四章）
+  q: 'needles',     // 縫い針の群れ（飛行、槍状に突進。第四章）
   M: 'platformH',   // 動く足場（水平往復、3 タイル幅）
   V: 'platformV',   // 動く足場（垂直往復）
   '@': 'island',    // 浮島（上下に揺れるすり抜け足場）

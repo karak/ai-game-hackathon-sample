@@ -1,5 +1,6 @@
 // 地形ギミック（docs/plan/05-systems.md 5.2）: 動く足場 M/V、浮島 @、崩れる足場 !、はしご L、水流 > <、風 } {
 import { TILE, overlapsSolid } from '../physics.js';
+import { HD_SCALE } from '../gfx/sprite.js';
 
 export const FLOW_SPEED = 40;          // 水流・風で加わる速度（世界単位/s）
 export const CRUMBLE_SHAKE_T = 0.6;    // 乗ってから落ちるまで
@@ -74,13 +75,15 @@ export function makeWheel(world, tx, ty) {
 // プレス機（マーカー %）: マーカーの位置を上端として天井から吊られ、周期的に床まで落ちる。降下中・停止中に触れると即死
 export class PressMachine {
   constructor(world, tx, ty) {
-    this.world = world; this.tx = tx; this.ty = ty; this.w = TILE; this.hBlock = PRESS.h * TILE; this.dead = false;
+    this.world = world; this.tx = tx; this.ty = ty; this.w = TILE; this.dead = false;
+    const spr = world.assets?.generated?.tiles?.press; // 生成絵があれば判定の高さ・幅を絵に合わせる（既定は 3 タイル）
+    this.hBlock = spr ? Math.max(TILE, Math.round(spr.r.height / HD_SCALE)) : PRESS.h * TILE; if (spr) this.w = Math.max(TILE, Math.round(spr.r.width / HD_SCALE));
     const map = world.level.map; let fy = ty + 1; while (fy < map.height && !map.isSolid(tx, fy)) fy++; // 直下の床
     this.topY = ty * TILE; this.floorY = fy * TILE; this.travel = Math.max(0, this.floorY - this.topY - this.hBlock);
     this.t = (tx * 0.7) % PRESS.period; this.y = this.topY; // 位相は列でずらす
   }
   get phase() { const t = this.t % PRESS.period; if (t < PRESS.dropT) return 'drop'; if (t < PRESS.dropT + PRESS.downT) return 'down'; if (t < PRESS.dropT + PRESS.downT + PRESS.riseT) return 'rise'; return 'wait'; }
-  get x() { return this.tx * TILE; } get h() { return this.hBlock; }
+  get x() { return this.tx * TILE + TILE / 2 - this.w / 2; } get h() { return this.hBlock; } // 判定はタイル中央揃え
   get crushing() { const p = this.phase; return p === 'drop' || p === 'down'; }
   update(dt) {
     this.t += dt; const t = this.t % PRESS.period, ph = this.phase;

@@ -1,0 +1,17 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 200 cells wide x 200 cells tall (= 1600 x 1600 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 170 cells of the 200-cell height).
+- Exactly 2 figures side by side in one row, separated by clear gaps of green, the group centered horizontally. Same scale and same palette for every figure.
+- Feet rest on the baseline y = 960 px (that is 8 cells above the bottom edge). Nothing below the baseline.
+
+SUBJECT: BOSS "The Dollmaker's Machine", facing LEFT, two frames side by side (same scale). A huge antique brass sewing machine automaton on a rolling base: a lantern eye, a lace-trimmed brass body, a giant needle arm, spools of red thread as shoulders, a conveyor tray at its front (cute mechanical face with rosy painted cheeks) — but half-finished doll bodies are stitched into its frame, blood-soaked cotton spills from its seams, and the needle arm is dripping (horrific). FRAME 1 = idle: needle arm raised, lantern eye calm. FRAME 2 = attack: needle arm slammed down to the left with a spray of pins and red thread, eye glowing, a doll body flung forward. Feet/wheels on the baseline.

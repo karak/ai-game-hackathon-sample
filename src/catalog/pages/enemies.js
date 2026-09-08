@@ -6,6 +6,8 @@ import { TileMap } from '../../physics.js';
 
 // 行動仕様（コードの状態機械を要約。数値は enemies.js / bosses.js の定数）
 const SPEC = {
+  dollpart: { jp: '未完成の人形', anim: '立ち / 投げ 2 コマ', move: '150 以内で主人公へ 12/s、遠いと 10/s で往復', shot: '130 以内で腕（arm ブーメラン、2.6 秒毎）', gore: '綿＋血', spawn: 'd' },
+  needles:  { jp: '縫い針の群れ', anim: '散開 / 槍 2 コマ', move: '主人公の斜め上 (−60, −40) へ 34/s で寄る → 1.6 秒後に 0.4 秒固まって 190/s で突進 0.55 秒', shot: 'なし（突進の接触）', gore: '血', spawn: 'q' },
   mermaid:  { jp: '人魚人形', anim: '待機 / 跳躍 2 コマ', move: '水面下で待機（水面上の半身のみ描く）。主人公が 56 以内・水面より上なら vy -150 で跳ね上がり、放物線で戻る（1.2〜2.0 秒間隔）', shot: 'なし（跳躍中のみ接触）', gore: '骨＋血。水面下は撃てない', spawn: 'r: 直下の ~ の上端を水面にする' },
   umbrella: { jp: '傘の妖精', anim: '傘の開閉 2 コマ 15t', move: '出現位置 ±90 の範囲で主人公の上へ 28/s で寄る、上下 ±5 浮遊', shot: '主人公の真上 24 以内で血の雨滴 3 発（1.6 秒毎）', gore: '血', spawn: 'p: マーカーの 40 上を飛ぶ' },
   zombie:   { jp: 'ゾンビうさぎ', anim: '歩き 2 コマ 12t', move: '湧き 0.7 秒 → 主人公へ 26/s 直進、壁で反転、9 秒で沈む', shot: 'なし（接触）', gore: '綿＋血。歩行中に血痕', spawn: 'z: 主人公 ±150 内で 1.5〜2.6 秒毎、前 60%/後 40%、同時 4 体' },
@@ -17,6 +19,7 @@ const SPEC = {
   eye:      { jp: '目玉砲台', anim: '開/閉（開 2.5〜4 秒、閉 0.5 秒）', move: '固定', shot: '開眼中 170 以内で血の弾 95/s を狙い撃ち 1.7 秒毎。閉眼中は無敵', gore: '血', spawn: 'e' },
 };
 const BOSS_SPEC = {
+  machine: { jp: '人形師の機械 マザーグース（第四章）', hp: 28, states: 'enter → roll(1.6s、26/s、HP 50% 以下で 40/s) → slam(0.5s 後に主人公の上へ針を落とす) | thread(糸弾 3 発扇状、HP 50% 以下で 5 発) | toss(人形の胴体ブーメラン) の順に循環。部屋の床はベルトコンベア', shots: 'bone, bolt, arm', death: '同上' },
   serpent: { jp: '涙の大蛇 ララバイ（第三章）', hp: 24, states: 'enter(1.5s 浮上) → sweep(川を横切る、周期 ≈11 秒、水面上 26〜52) → 主人公が 70 以内で strike(0.35s で突き出し、口を開く) | 4.5 秒ごとに rain(血の涙を吐き上げ 1 秒)。HP 50% 以下で速度 1.4 倍、雨 2 倍。胴 6 節＋尾は接触のみ（撃てない）', shots: 'rain', death: '同上' },
   doll:  { jp: '泣き人形ドロシー（第一章）', hp: 16, states: 'enter → walk(2.4s, 14/s) → cry(1.4s: 酸の涙 2 発/0.2s) | throw(腕ブーメラン)。HP 50% 以下で速度 24/s、涙に血が混ざる', shots: 'acid, blood, arm', death: '2.6 秒 血飛沫→大爆散（gore 30 / blood 60 / stuffing 20）' },
   teddy: { jp: 'はらわたテディ（第二章）', hp: 20, states: 'enter → idle(0.9s) → jump(vy -270) 着地で蛆 5 連 | 3 回に 1 回 belly(1.9s: 腹から血を扇状噴射)。HP 50% 以下で idle 0.5s', shots: 'maggot, blood', death: '同上' },

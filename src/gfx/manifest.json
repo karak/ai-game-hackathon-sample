@@ -191,6 +191,54 @@
   "src": "assets/sprites/bg/river_sky.png",
   "w": 201
  },
+ "bg/workshop_far": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 140,
+  "src": "assets/sprites/bg/workshop_far.png",
+  "w": 248
+ },
+ "bg/workshop_far2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 59,
+  "src": "assets/sprites/bg/workshop_far2.png",
+  "w": 237
+ },
+ "bg/workshop_mid": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 146,
+  "src": "assets/sprites/bg/workshop_mid.png",
+  "w": 158
+ },
+ "bg/workshop_mid2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 121,
+  "src": "assets/sprites/bg/workshop_mid2.png",
+  "w": 234
+ },
+ "bg/workshop_mid3": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 83,
+  "src": "assets/sprites/bg/workshop_mid3.png",
+  "w": 186
+ },
+ "bg/workshop_sky": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 202,
+  "src": "assets/sprites/bg/workshop_sky.png",
+  "w": 205
+ },
  "bosses/doll1": {
   "anchor": "bottom",
   "colors": 15,
@@ -206,6 +254,22 @@
   "h": 180,
   "src": "assets/sprites/bosses/doll2.png",
   "w": 160
+ },
+ "bosses/machine1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 189,
+  "src": "assets/sprites/bosses/machine1.png",
+  "w": 162
+ },
+ "bosses/machine2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 188,
+  "src": "assets/sprites/bosses/machine2.png",
+  "w": 181
  },
  "bosses/noir1": {
   "anchor": "bottom",
@@ -335,6 +399,14 @@
   "src": "assets/sprites/deco/dollhead.png",
   "w": 54
  },
+ "deco/dressform": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 90,
+  "src": "assets/sprites/deco/dressform.png",
+  "w": 41
+ },
  "deco/flowers": {
   "anchor": "bottom",
   "colors": 15,
@@ -366,6 +438,30 @@
   "h": 85,
   "src": "assets/sprites/deco/reeds.png",
   "w": 58
+ },
+ "deco/scissors": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 95,
+  "src": "assets/sprites/deco/scissors.png",
+  "w": 41
+ },
+ "deco/spool": {
+  "anchor": "bottom",
+  "colors": 11,
+  "fits": true,
+  "h": 59,
+  "src": "assets/sprites/deco/spool.png",
+  "w": 55
+ },
+ "deco/stuffing": {
+  "anchor": "bottom",
+  "colors": 13,
+  "fits": true,
+  "h": 47,
+  "src": "assets/sprites/deco/stuffing.png",
+  "w": 61
  },
  "deco/tomb": {
   "anchor": "bottom",
@@ -447,6 +543,22 @@
   "src": "assets/sprites/enemies/cake2.png",
   "w": 71
  },
+ "enemies/dollpart1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 113,
+  "src": "assets/sprites/enemies/dollpart1.png",
+  "w": 61
+ },
+ "enemies/dollpart2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 103,
+  "src": "assets/sprites/enemies/dollpart2.png",
+  "w": 96
+ },
  "enemies/eye1": {
   "anchor": "center",
   "colors": 15,
@@ -494,6 +606,22 @@
   "h": 113,
   "src": "assets/sprites/enemies/mushroom2.png",
   "w": 84
+ },
+ "enemies/needles1": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 80,
+  "src": "assets/sprites/enemies/needles1.png",
+  "w": 76
+ },
+ "enemies/needles2": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 82,
+  "src": "assets/sprites/enemies/needles2.png",
+  "w": 74
  },
  "enemies/umbrella1": {
   "anchor": "bottom",
@@ -1144,6 +1272,14 @@
   "src": "assets/sprites/shots/star.png",
   "w": 26
  },
+ "tiles/belt": {
+  "anchor": "bottom",
+  "colors": 11,
+  "fits": true,
+  "h": 29,
+  "src": "assets/sprites/tiles/belt.png",
+  "w": 61
+ },
  "tiles/candyforest": {
   "anchor": "center",
   "colors": 24,
@@ -1159,6 +1295,14 @@
   "h": 143,
   "src": "assets/sprites/tiles/castle.png",
   "w": 189
+ },
+ "tiles/gear": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 53,
+  "src": "assets/sprites/tiles/gear.png",
+  "w": 52
  },
  "tiles/graveyard": {
   "anchor": "center",
@@ -1192,12 +1336,28 @@
   "src": "assets/sprites/tiles/plank.png",
   "w": 64
  },
+ "tiles/press": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 56,
+  "src": "assets/sprites/tiles/press.png",
+  "w": 47
+ },
  "tiles/river": {
   "anchor": "center",
   "colors": 24,
   "fits": true,
   "h": 260,
   "src": "assets/sprites/tiles/river.png",
+  "w": 263
+ },
+ "tiles/workshop": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/tiles/workshop.png",
   "w": 263
  }
 }

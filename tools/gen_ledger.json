@@ -1,5 +1,5 @@
 {
- "requests": 102,
+ "requests": 118,
  "entries": [
   {
    "name": "player-base",
@@ -776,6 +776,134 @@
    "secs": 9.3,
    "text": "Here are the three magic-effect sprites in the specified 16-bit SNES-era Japanese RPG pixel art style: ",
    "ts": 1788893881.3434691
+  },
+  {
+   "name": "bg-workshop-sky",
+   "v": 1,
+   "ok": true,
+   "secs": 9.4,
+   "text": "Here's the pixel art back wall of a doll workshop you requested, in the style of a 16-bit SNES-era Japanese RPG.\n",
+   "ts": 1788894117.89403
+  },
+  {
+   "name": "bg-workshop-far",
+   "v": 1,
+   "ok": true,
+   "secs": 11.2,
+   "text": "",
+   "ts": 1788894129.564003
+  },
+  {
+   "name": "bg-workshop-far2",
+   "v": 1,
+   "ok": true,
+   "secs": 13.6,
+   "text": "",
+   "ts": 1788894143.631715
+  },
+  {
+   "name": "bg-workshop-mid",
+   "v": 1,
+   "ok": true,
+   "secs": 10.9,
+   "text": "",
+   "ts": 1788894154.964587
+  },
+  {
+   "name": "bg-workshop-mid2",
+   "v": 1,
+   "ok": true,
+   "secs": 10.4,
+   "text": "",
+   "ts": 1788894165.785505
+  },
+  {
+   "name": "bg-workshop-mid3",
+   "v": 1,
+   "ok": true,
+   "secs": 8.3,
+   "text": "",
+   "ts": 1788894174.492844
+  },
+  {
+   "name": "tiles-workshop",
+   "v": 1,
+   "ok": true,
+   "secs": 10.5,
+   "text": "",
+   "ts": 1788894185.480662
+  },
+  {
+   "name": "deco-workshop",
+   "v": 1,
+   "ok": true,
+   "secs": 13.4,
+   "text": "Here are the four doll-workshop decorations in the specified 16-bit SNES-era JRPG pixel art style: ",
+   "ts": 1788894199.300818
+  },
+  {
+   "name": "gimmick-workshop",
+   "v": 1,
+   "ok": true,
+   "secs": 13.0,
+   "text": "",
+   "ts": 1788894212.73742
+  },
+  {
+   "name": "enemy-dollpart",
+   "v": 1,
+   "ok": true,
+   "secs": 9.6,
+   "text": "",
+   "ts": 1788894222.813887
+  },
+  {
+   "name": "enemy-needles",
+   "v": 1,
+   "ok": true,
+   "secs": 9.1,
+   "text": "",
+   "ts": 1788894232.350456
+  },
+  {
+   "name": "boss-machine",
+   "v": 1,
+   "ok": true,
+   "secs": 10.8,
+   "text": "",
+   "ts": 1788894243.5597389
+  },
+  {
+   "name": "enemy-needles",
+   "v": 2,
+   "ok": true,
+   "secs": 11.9,
+   "text": "",
+   "ts": 1788894333.031371
+  },
+  {
+   "name": "boss-machine-a",
+   "v": 1,
+   "ok": true,
+   "secs": 10.7,
+   "text": "Here is the BOSS \"The Dollmaker's Machine\" in the requested style and specifications: ",
+   "ts": 1788894344.194886
+  },
+  {
+   "name": "boss-machine-b",
+   "v": 1,
+   "ok": true,
+   "secs": 14.2,
+   "text": "",
+   "ts": 1788894358.893024
+  },
+  {
+   "name": "enemy-needles",
+   "v": 3,
+   "ok": true,
+   "secs": 10.8,
+   "text": "",
+   "ts": 1788894405.587979
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

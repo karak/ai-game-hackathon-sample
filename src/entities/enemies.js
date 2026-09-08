@@ -314,6 +314,56 @@ export class UmbrellaFairy extends Enemy {
   spriteName() { return Math.floor(this.t * 4) % 2 ? 'umbrella1' : 'umbrella2'; }
 }
 
+// ---- 未完成の人形 (第四章): 近づくと腕を外して投げる（ブーメラン弾 'arm'） ----
+export class UnfinishedDoll extends Enemy {
+  constructor(world, x, y) {
+    super(world, x, y - 26, 14, 26); this.spriteOff = [3, 2];
+    this.hp = 3; this.score = 300; this.gore = 'stuffing'; this.fitSprite('dollpart1', 0.55, 0.92);
+    this.throwT = rand(0.8, 1.6); this.anim = 0; this.walkDir = -1;
+  }
+  update(dt) {
+    super.update(dt); this.anim = Math.max(0, this.anim - dt);
+    const d = this.distX();
+    if (Math.abs(d) < 150) { this.facePlayer(); this.vx = this.onGround && this.anim <= 0 ? this.facing * 12 : 0; }
+    else { this.vx = this.onGround ? this.walkDir * 10 : 0; this.facing = this.walkDir; }
+    const res = this.physics(dt); if (res.hitLeft || res.hitRight) this.walkDir = -this.walkDir;
+    if (Math.abs(d) < 130) {
+      this.throwT -= dt;
+      if (this.throwT <= 0) { this.throwT = 2.6; this.anim = 0.4; this.shoot('arm', this.facing * 110, -30, this.facing * 8, -8, { life: 2.4 }); this.world.audio.sfx('hurt'); this.world.particles.emit('stuffing', this.cx, this.y + 6, 4); }
+    }
+  }
+  spriteName() { return this.anim > 0 ? 'dollpart2' : 'dollpart1'; }
+}
+
+// ---- 縫い針の群れ (第四章): 主人公の周りを漂い、槍の形に固まって突進する ----
+export class NeedleSwarm extends Enemy {
+  constructor(world, x, y) {
+    super(world, x, y - 30, 16, 14); this.spriteOff = [2, 2]; this.gravity = false; this.hp = 2; this.score = 250; this.gore = 'blood';
+    this.fitSprite('needles1', 0.6, 0.6); this.homeY = this.y; this.state = 'drift'; this.stateT = 0; this.vx = 0; this.vy = 0;
+  }
+  update(dt) {
+    super.update(dt); this.stateT += dt; const p = this.player;
+    switch (this.state) {
+      case 'drift': { // 主人公の斜め上へ寄る
+        const tx = p.centerX - this.facing * 60, ty = p.y - 40;
+        this.facing = p.centerX < this.cx ? -1 : 1;
+        this.x += Math.sign(tx - this.cx) * Math.min(Math.abs(tx - this.cx), 34 * dt); this.y += Math.sign(ty - this.cy) * Math.min(Math.abs(ty - this.cy), 30 * dt) + Math.sin(this.t * 4) * 0.4;
+        if (this.stateT > 1.6 && Math.abs(this.distX()) < 110) { this.state = 'aim'; this.stateT = 0; }
+        break;
+      }
+      case 'aim': // 0.4 秒固まってから突進
+        if (this.stateT > 0.4) { const dx = p.centerX - this.cx, dy = p.y + p.h / 2 - this.cy, d = Math.hypot(dx, dy) || 1; this.vx = dx / d * 190; this.vy = dy / d * 190; this.state = 'dash'; this.stateT = 0; this.world.audio.sfx('hit'); }
+        break;
+      case 'dash':
+        this.x += this.vx * dt; this.y += this.vy * dt;
+        if (this.stateT > 0.55 || this.world.level.map.isSolid(Math.floor(this.cx / TILE), Math.floor(this.cy / TILE))) { this.state = 'drift'; this.stateT = 0; this.vx = this.vy = 0; if (this.y > this.homeY + 40) this.y = this.homeY + 40; }
+        break;
+    }
+    if (this.y < 8) this.y = 8;
+  }
+  spriteName() { return this.state === 'drift' ? 'needles1' : 'needles2'; }
+}
+
 export function createEnemy(world, spawn) {
   const { type, x, y } = spawn;
   switch (type) {
@@ -326,6 +376,8 @@ export function createEnemy(world, spawn) {
     case 'eye': return new EyeTurret(world, x + 1, y);
     case 'mermaid': return new MermaidDoll(world, x + 1, y);
     case 'umbrella': return new UmbrellaFairy(world, x + 1, y);
+    case 'dollpart': return new UnfinishedDoll(world, x + 1, y + TILE);
+    case 'needles': return new NeedleSwarm(world, x, y);
   }
   return null;
 }

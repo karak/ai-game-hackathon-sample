@@ -1,0 +1,17 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 100 cells wide x 120 cells tall (= 800 x 960 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 102 cells of the 120-cell height).
+- Exactly 3 figures side by side in one row, separated by clear gaps of green, the group centered horizontally. Same scale and same palette for every figure.
+- Feet rest on the baseline y = 960 px (that is 8 cells above the bottom edge). Nothing below the baseline.
+
+SUBJECT: THREE platformer gimmick objects for a doll workshop stage, in a row with equal spacing, flat side view: (1) a PRESS BLOCK 1 tile wide and 3 tiles tall: a heavy iron stamping block with a brass top plate, rivets, a red-stained flat bottom, a short chain stub on top, (2) a CONVEYOR BELT segment 2 tiles wide and 1 tile tall: dark rubber belt with light grey rollers visible at both ends and diagonal tread marks, (3) a LARGE BRASS GEAR 2 tiles in diameter with 8 teeth and a hole in the middle. Same pixel scale for all three, clear green gaps between them, no shadows, no text.
