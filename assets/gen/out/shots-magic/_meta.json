@@ -1,0 +1,34 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/shots-magic-v2.png",
+ "pitch": [
+  7.0,
+  7.0
+ ],
+ "max_box": [
+  100,
+  180
+ ],
+ "frames": [
+  {
+   "w": 22,
+   "h": 99,
+   "fits": true,
+   "colors": 8,
+   "name": "meteor"
+  },
+  {
+   "w": 63,
+   "h": 53,
+   "fits": true,
+   "colors": 9,
+   "name": "burst"
+  },
+  {
+   "w": 21,
+   "h": 102,
+   "fits": true,
+   "colors": 12,
+   "name": "pillar"
+  }
+ ]
+}

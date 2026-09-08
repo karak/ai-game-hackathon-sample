@@ -170,6 +170,28 @@ def split_frames(logical, min_gap=2, min_width=8, expect=0):
 
 
 
+def strip_caption(im, max_h=16, gap=2):
+    """モデルが描き足すラベル文字（物体の下に離れて置かれた高さ max_h 以下の塊）を落とす。
+    下から見て最初の空行ギャップ（gap 行以上）より下の塊が max_h 行以下なら透明にする。"""
+    a = np.asarray(im.split()[3]) > 0; h = a.shape[0]
+    occ = a.any(axis=1)
+    rows = np.where(occ)[0]
+    if rows.size == 0: return im
+    bottom = rows[-1]
+    # 下の塊の上端を探す
+    y = bottom
+    while y > 0 and occ[y - 1]: y -= 1
+    blob_h = bottom - y + 1
+    # その上に gap 行以上の空きがあり、さらに上に本体があるか
+    g0 = y - 1; n = 0
+    while g0 >= 0 and not occ[g0]: g0 -= 1; n += 1
+    if n >= gap and g0 >= 0 and blob_h <= max_h:
+        px = im.load()
+        for yy in range(y, bottom + 1):
+            for xx in range(im.width): px[xx, yy] = (0, 0, 0, 0)
+    return im
+
+
 def crop_alpha(im):
     bb = im.split()[3].getbbox(); return im.crop(bb) if bb else im
 
@@ -182,6 +204,7 @@ def main():
     ap.add_argument('--nokey', action='store_true', help='クロマキーしない（空などキャンバス全面の絵）')
     ap.add_argument('--keep-bottom', type=float, default=0, help='論理画像の下側この比率だけ残す（背景中景の月などを除く）')
     ap.add_argument('--nosplit', action='store_true', help='複数物体でも 1 枚として扱う（背景層・タイル帯）')
+    ap.add_argument('--strip-caption', action='store_true', help='物体の下に描き足されたラベル文字を落とす')
     a = ap.parse_args()
     bw, bh = (int(v) for v in a.logical.split('x'))
     im = Image.open(a.src).convert('RGBA') if a.nokey else key_out(Image.open(a.src), a.tol)
@@ -204,7 +227,9 @@ def main():
     frames = split_frames(logical, min_gap=2, min_width=8, expect=len(names)); names = names or [f'f{i}' for i in range(len(frames))]
     Path(a.dst).mkdir(parents=True, exist_ok=True); meta['frames'] = []
     for i, (x0, x1) in enumerate(frames[:len(names)]):
-        out = crop_alpha(logical.crop((x0, 0, x1, logical.height)))
+        out = logical.crop((x0, 0, x1, logical.height))
+        if a.strip_caption: out = strip_caption(out)
+        out = crop_alpha(out)
         out.save(Path(a.dst) / f'{names[i]}.png'); fi = info(out); fi['name'] = names[i]; meta['frames'].append(fi)
         (Path(a.dst) / f'{names[i]}.json').write_text(json.dumps({**meta, **fi, 'frames': None}, indent=1))
     (Path(a.dst) / '_meta.json').write_text(json.dumps(meta, indent=1)); print(json.dumps(meta))

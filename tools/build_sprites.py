@@ -28,6 +28,8 @@ def build(name, sp):
     pal_arg = ['--palette', str(pal)] if pal and pal.exists() else []
     pal_arg += ['--colors', str(sp.get('colors', 15))]
     if sp.get('nokey'): pal_arg += ['--nokey']
+    if sp.get('tol'): pal_arg += ['--tol', str(sp['tol'])]  # クロマキー許容差（格子模様の緑が残るときに上げる）
+    if sp.get('strip_caption'): pal_arg += ['--strip-caption']
     if sp.get('kind') in ('bg', 'tiles'): pal_arg += ['--nosplit']
     if sp.get('keep_bottom'): pal_arg += ['--keep-bottom', str(sp['keep_bottom'])]
     if sp['frames'] == 1:

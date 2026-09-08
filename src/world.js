@@ -63,6 +63,7 @@ export class World {
 
     this.enemies = []; this.shots = []; this.enemyShots = []; this.fires = []; this.pools = []; this.items = []; this.boxes = [];
     this.platforms = []; this.crumbles = []; this.presses = []; // ギミック（spawnAll で配置）
+    this.effects = []; // 溜め魔法などの一時エンティティ（update/draw/dead）
     this.cam = { x: 0, y: 0 }; this.arena = null; this.boss = null; this.bossState = 'none';
     this.time = this.level.timeLimit; this.t = 0; this.cutscene = false; this.cleared = false;
     this.shakeT = 0; this.shakeAmp = 0; this.toasts = []; this.tickT = 0; this.safeT = 0; // safeT > 0 の間は敵弾なし
@@ -78,7 +79,7 @@ export class World {
   shake(a) { this.shakeT = 0.25; this.shakeAmp = Math.max(this.shakeAmp, a); }
 
   spawnAll() {
-    this.enemies = []; this.boxes = []; this.items = []; this.enemyShots = []; this.shots = []; this.fires = []; this.pools = [];
+    this.enemies = []; this.boxes = []; this.items = []; this.enemyShots = []; this.shots = []; this.fires = []; this.pools = []; this.effects = [];
     this.platforms = []; this.presses = []; this.crumbles = this.level.crumbles.map(c => new CrumbleTile(this, c.tx, c.ty));
     for (const c of this.crumbles) this.level.map.set(c.tx, c.ty, '!'); // 消えていた足場を戻す
     for (const s of this.level.spawns) {
@@ -135,6 +136,8 @@ export class World {
     for (const q of this.pools) q.update(dt);
     for (const i of this.items) i.update(dt);
     for (const b of this.boxes) b.update(dt);
+    for (const e of this.effects) e.update(dt);
+    this.effects = this.effects.filter(e => !e.dead);
     this.particles.update(dt);
     this.collide();
     // 掃除（画面外に大きく離れた敵は残す＝復帰時に再登場）
@@ -225,6 +228,7 @@ export class World {
     for (const f of this.fires) f.draw(g, cam, A.shots);
     for (const s of this.shots) s.draw(g, cam, A.shots);
     for (const s of this.enemyShots) s.draw(g, cam, A.shots);
+    for (const e of this.effects) e.draw(g, cam, A);
     this.particles.draw(g, cam);
     this.drawWeather(g, cam);
     // 毒の画面効果（変身解除中にうっすら）

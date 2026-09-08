@@ -1032,6 +1032,14 @@
   "src": "assets/sprites/shots/bone.png",
   "w": 22
  },
+ "shots/burst": {
+  "anchor": "bottom",
+  "colors": 9,
+  "fits": true,
+  "h": 53,
+  "src": "assets/sprites/shots/burst.png",
+  "w": 63
+ },
  "shots/candle": {
   "anchor": "center",
   "colors": 11,
@@ -1095,6 +1103,22 @@
   "h": 26,
   "src": "assets/sprites/shots/maggot.png",
   "w": 44
+ },
+ "shots/meteor": {
+  "anchor": "bottom",
+  "colors": 8,
+  "fits": true,
+  "h": 99,
+  "src": "assets/sprites/shots/meteor.png",
+  "w": 22
+ },
+ "shots/pillar": {
+  "anchor": "bottom",
+  "colors": 12,
+  "fits": true,
+  "h": 102,
+  "src": "assets/sprites/shots/pillar.png",
+  "w": 21
  },
  "shots/poison": {
   "anchor": "center",

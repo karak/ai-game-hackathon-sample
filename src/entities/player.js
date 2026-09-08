@@ -1,6 +1,7 @@
 import { TILE, moveBody } from '../physics.js';
 import { PlayerShot, WEAPONS } from './projectiles.js';
 import { blit } from '../gfx/sprite.js';
+import { castMagic, MAGIC } from './magic.js';
 import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConveyor, ladderAt, ladderBelow, LADDER_SPEED } from './gimmicks.js';
 
 const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196; // 単発ジャンプ 42 世界px(2.6タイル)
@@ -131,10 +132,13 @@ export class Player {
     if (!charged && mine.length >= W.max) return;
     const sy = this.crouch ? this.y + 6 : this.y + 12;
     const sx = this.centerX + this.facing * 10;
+    if (charged) { // 溜め魔法（武器ごとに別: magic.js）
+      castMagic(this.world, this); this.attackT = 0.3; this.world.audio.sfx('chargeshot'); this.world.particles.emit('sparkle', sx, sy, 14);
+      this.world.toast?.(MAGIC[this.weapon]?.name ?? ''); return;
+    }
     this.world.shots.push(new PlayerShot(this.world, this.weapon, sx, sy, this.facing, charged));
     this.attackT = 0.18;
-    this.world.audio.sfx(charged ? 'chargeshot' : 'shoot');
-    if (charged) this.world.particles.emit('sparkle', sx, sy, 14);
+    this.world.audio.sfx('shoot');
   }
 
   // 被弾

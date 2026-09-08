@@ -1,0 +1,17 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/shots-magic-v2.png",
+ "pitch": [
+  7.0,
+  7.0
+ ],
+ "max_box": [
+  100,
+  180
+ ],
+ "frames": null,
+ "w": 22,
+ "h": 99,
+ "fits": true,
+ "colors": 8,
+ "name": "meteor"
+}

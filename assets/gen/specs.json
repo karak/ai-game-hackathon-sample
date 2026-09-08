@@ -1053,6 +1053,22 @@
     "bosses/serpent_tail"
    ],
    "ref": "boss-serpent-head"
+  },
+  "shots-magic": {
+   "box": [
+    100,
+    180
+   ],
+   "frames": 3,
+   "anchor": "bottom",
+   "subject": "shots-magic.txt",
+   "out": [
+    "shots/meteor",
+    "shots/burst",
+    "shots/pillar"
+   ],
+   "colors": 12,
+   "strip_caption": true
   }
  }
 }

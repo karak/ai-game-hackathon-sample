@@ -1,0 +1,17 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 100 cells wide x 180 cells tall (= 800 x 1440 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 153 cells of the 180-cell height).
+- Exactly 3 figures side by side in one row, separated by clear gaps of green, the group centered horizontally. Same scale and same palette for every figure.
+- Feet rest on the baseline y = 960 px (that is 8 cells above the bottom edge). Nothing below the baseline.
+
+SUBJECT: THREE magic-effect sprites for a platformer, in a row with equal spacing, each about 1/5 of the canvas width and at most 2/3 of the canvas height: (1) a METEOR: a bright pink-white five-pointed star with a tapering trail of pale pink and lavender sparkles about 3 times the star's height, trail pointing UP (the star falls downward), (2) a BURST RING: a circular shockwave ring seen head-on, thick pink outer ring with a thin white inner ring, a few small heart shapes and sparkles around it, the center is empty (green shows through), (3) a FIRE PILLAR: a tall narrow column of magical flame about 3 times taller than wide, orange base, yellow core, pink-purple sparks at the tip, flat bottom. Same pixel scale for all three, clear gaps of flat green between them. STRICT KEY: the background is one flat solid green with NO grid, NO checker pattern, NO lines, NO labels, NO text, NO captions, NO shadows.
