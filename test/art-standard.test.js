@@ -9,7 +9,7 @@ const group = g => entries.filter(([k]) => k.startsWith(g + '/'));
 test('manifest has player, enemy and boss sprites', () => {
   expect(group('player').length).toBeGreaterThanOrEqual(10);
   expect(group('enemies').length).toBeGreaterThanOrEqual(12);
-  expect(group('bosses').length).toBe(3);
+  expect(group('bosses').length).toBeGreaterThanOrEqual(6); // 3 体 × 2 コマ（待機 / 攻撃）
 });
 
 test('§2.1 player body frames are 40-80 wide and 70-120 tall; hat/dead/crouch have their own ranges', () => {
@@ -45,6 +45,10 @@ test('animation coverage: player has idle/run1-4/jump/fall/attack/crouch/hurt/de
   for (const n of ['idle', 'run1', 'run2', 'run3', 'run4', 'jump', 'fall', 'attack', 'crouch', 'hurt', 'dead']) expect(names.has(n), n).toBe(true);
   const en = new Set(group('enemies').map(([k]) => k.split('/')[1]));
   for (const b of ['zombie', 'mushroom', 'unicorn', 'cake', 'angel', 'bear', 'eye']) { expect(en.has(b + '1'), b + '1').toBe(true); expect(en.has(b + '2'), b + '2').toBe(true); }
+  const bs = new Set(group('bosses').map(([k]) => k.split('/')[1]));
+  for (const b of ['doll', 'teddy', 'noir']) { expect(bs.has(b + '1'), b + '1').toBe(true); expect(bs.has(b + '2'), b + '2').toBe(true); }
+  const sh = new Set(group('shots').map(([k]) => k.split('/')[1]));
+  expect(sh.has('fire1') && sh.has('fire2'), 'fire1/fire2').toBe(true);
 });
 
 test('§2.4 themes define enough tones for ground, platform, sky', () => {

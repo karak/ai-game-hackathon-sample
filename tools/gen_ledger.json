@@ -1,5 +1,5 @@
 {
- "requests": 69,
+ "requests": 74,
  "entries": [
   {
    "name": "player-base",
@@ -512,6 +512,46 @@
    "secs": 9.4,
    "text": "Here is a 16-bit SNES-era Japanese RPG pixel art image of a dark interior backdrop for a side-scrolling game. ",
    "ts": 1788867093.532368
+  },
+  {
+   "name": "shots-fire",
+   "v": 1,
+   "ok": true,
+   "secs": 10.7,
+   "text": "",
+   "ts": 1788875856.030043
+  },
+  {
+   "name": "enemy-mushroom",
+   "v": 2,
+   "ok": true,
+   "secs": 11.6,
+   "text": "",
+   "ts": 1788875868.2524102
+  },
+  {
+   "name": "boss-doll-b",
+   "v": 1,
+   "ok": true,
+   "secs": 17.1,
+   "text": "",
+   "ts": 1788875885.800171
+  },
+  {
+   "name": "boss-teddy-b",
+   "v": 1,
+   "ok": true,
+   "secs": 15.4,
+   "text": "",
+   "ts": 1788875901.654442
+  },
+  {
+   "name": "boss-noir-b",
+   "v": 1,
+   "ok": true,
+   "secs": 13.1,
+   "text": "",
+   "ts": 1788875915.264439
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

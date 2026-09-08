@@ -4,6 +4,7 @@ import { STAGES } from '../src/levels/index.js';
 import { SAFE_ZONE_X, SAFE_SHOT_T, minTimeLimit, PLAYER_SPEED } from '../src/balance.js';
 import { ZombieSpawner, Enemy } from '../src/entities/enemies.js';
 import { TILE } from '../src/physics.js';
+import { EnemyShot, ENEMY_SHOTS, SHOT_HIT_RATIO } from '../src/entities/projectiles.js';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -50,4 +51,14 @@ test('enemies do not shoot while world.safeT > 0 (respawn grace), and do afterwa
   expect(w.enemyShots.length).toBe(0);
   w.safeT = 0; e.shoot('blood', -50, -50);
   expect(w.enemyShots.length).toBe(1);
+});
+
+test('enemy shot hitbox follows the generated sprite size × SHOT_HIT_RATIO, falls back to constants without HD sprite', () => {
+  const L = flat();
+  const w = fakeWorld(L, 100); w.assets = { shots: { poison: { hd: true, w: 12, h: 10 } } };
+  const s = new EnemyShot(w, 'poison', 50, 50, 10, 0);
+  expect(s.w).toBe(Math.round(12 * SHOT_HIT_RATIO)); expect(s.h).toBe(Math.round(10 * SHOT_HIT_RATIO));
+  expect(s.x + s.w / 2).toBeCloseTo(50); expect(s.y + s.h / 2).toBeCloseTo(50); // 中心は変わらない
+  const w2 = fakeWorld(L, 100); const s2 = new EnemyShot(w2, 'poison', 50, 50, 10, 0);
+  expect(s2.w).toBe(ENEMY_SHOTS.poison.w); expect(s2.h).toBe(ENEMY_SHOTS.poison.h);
 });

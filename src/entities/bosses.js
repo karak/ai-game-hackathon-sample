@@ -73,7 +73,7 @@ export class WeepingDoll extends Boss {
     this.physics(dt);
     const ar = this.world.arena; if (this.x < ar.x0 + 8) this.x = ar.x0 + 8; if (this.x + this.w > ar.x1 - 8) this.x = ar.x1 - 8 - this.w;
   }
-  spriteName() { return 'doll1'; }
+  spriteName() { return this.state === 'cry' || this.state === 'throw' ? 'doll2' : 'doll1'; } // 2 コマ目（攻撃）は生成済みならそれを使う
   draw(g, cam, assets) {
     super.draw(g, cam, assets);
     if (this.dying || this.state === 'enter') return;
@@ -128,7 +128,7 @@ export class GutsTeddy extends Boss {
     this.physics(dt);
     const a = this.world.arena; if (this.x < a.x0 + 4) this.x = a.x0 + 4; if (this.x + this.w > a.x1 - 4) this.x = a.x1 - 4 - this.w;
   }
-  spriteName() { return 'teddy1'; }
+  spriteName() { return this.state === 'belly' || this.state === 'jump' ? 'teddy2' : 'teddy1'; }
   draw(g, cam, assets) {
     if (this.state === 'belly' && !this.dying) {
       const sx = Math.floor(this.x - cam.x), sy = Math.floor(this.y - cam.y);
@@ -195,7 +195,7 @@ export class Noir extends Boss {
     return new EnemyShot(this.world, 'rain', sx, ty * 16 + 4, 0, 40, { owner: this, life: 4 });
   }
   hurt(dmg, shot) { if (this.state === 'teleport' || this.alpha < 0.8) return; super.hurt(dmg, shot); }
-  spriteName() { return 'noir1'; }
+  spriteName() { return this.state === 'rain' || this.state === 'dash' ? 'noir2' : 'noir1'; }
   draw(g, cam, assets) {
     g.globalAlpha = this.alpha;
     super.draw(g, cam, assets);

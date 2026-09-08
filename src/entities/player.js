@@ -103,7 +103,7 @@ export class Player {
     this.costume = 'plain'; this.chargeT = 0;
     this.invT = 1.8; this.hurtT = 0.35;
     this.vx = (source && source.x + (source.w ?? 0) / 2 > this.centerX ? -1 : 1) * 50; this.vy = -120; this.onGround = false;
-    w.audio.sfx('undress'); w.shake(4);
+    w.audio.sfx('undress'); w.shake(4); w.fx?.hitStop();
     w.toast('変身が解けた…！');
     return true;
   }

@@ -23,6 +23,7 @@ export class Enemy {
   fitSprite(name, wRatio = 0.6, hRatio = 0.92) {
     const spr = this.world.assets?.enemies?.[name] ?? this.world.assets?.bosses?.[name];
     if (!spr || !spr.hd) return;
+    this.baseSprite = name; // 差分コマ（doll2 等）が無いときの描画フォールバック
     const bottom = this.y + this.h;
     this.w = Math.max(6, Math.round(spr.w * wRatio)); this.h = Math.max(6, Math.round(spr.h * hRatio));
     this.y = bottom - this.h; this.spriteOff = [Math.round((spr.w - this.w) / 2), spr.h - this.h];
@@ -40,7 +41,7 @@ export class Enemy {
     if (this.hp <= 0) this.die(); else this.world.audio.sfx('hit');
   }
   die() {
-    this.dead = true; this.world.addScore(this.score);
+    this.dead = true; this.world.addScore(this.score); this.world.fx?.killFlash();
     const p = this.world.particles;
     if (this.gore === 'blood') { p.emit('blood', this.cx, this.cy, 22, { power: 1.2 }); p.emit('gore', this.cx, this.cy, 6); this.world.audio.sfx('splat'); }
     else if (this.gore === 'stuffing') { p.emit('stuffing', this.cx, this.cy, 14); p.emit('blood', this.cx, this.cy, 10); p.emit('gore', this.cx, this.cy, 3); this.world.audio.sfx('squish'); }
@@ -61,10 +62,12 @@ export class Enemy {
   spriteName() { return null; }
   draw(g, cam, assets) {
     const name = this.spriteName(); if (!name) return;
-    const spr = assets.enemies[name] ?? assets.bosses[name]; if (!spr) return;
-    const ox = this.facing < 0 ? (spr.w - this.w - this.spriteOff[0]) : this.spriteOff[0];
+    const spr = assets.enemies[name] ?? assets.bosses[name] ?? (this.baseSprite && (assets.enemies[this.baseSprite] ?? assets.bosses[this.baseSprite])); if (!spr) return;
+    // HD スプライトは寸法がコマごとに違いうる（doll1/doll2 等）ので、底辺中央を当たり判定の底辺中央に合わせる
+    const ox = spr.hd ? (spr.w - this.w) / 2 : this.facing < 0 ? (spr.w - this.w - this.spriteOff[0]) : this.spriteOff[0];
+    const oy = spr.hd ? spr.h - this.h : this.spriteOff[1];
     const fs = this.flashT > 0 ? { ...spr, r: flashImg(spr.r), l: flashImg(spr.l) } : spr;
-    blit(g, fs, this.facing < 0, this.x - ox - cam.x, this.y - this.spriteOff[1] - cam.y);
+    blit(g, fs, this.facing < 0, this.x - ox - cam.x, this.y - oy - cam.y);
   }
 }
 

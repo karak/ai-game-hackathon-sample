@@ -767,6 +767,62 @@
     "shots/bolt"
    ],
    "colors": 12
+  },
+  "shots-fire": {
+   "box": [
+    48,
+    56
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "shots-fire.txt",
+   "out": [
+    "shots/fire1",
+    "shots/fire2"
+   ],
+   "colors": 12
+  },
+  "boss-doll-b": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-doll-b.txt",
+   "ref": "boss-doll",
+   "out": [
+    "bosses/doll2"
+   ],
+   "palette": "bosses/doll1"
+  },
+  "boss-teddy-b": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-teddy-b.txt",
+   "ref": "boss-teddy",
+   "out": [
+    "bosses/teddy2"
+   ],
+   "palette": "bosses/teddy1"
+  },
+  "boss-noir-b": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-noir-b.txt",
+   "ref": "boss-noir",
+   "out": [
+    "bosses/noir2"
+   ],
+   "palette": "bosses/noir1"
   }
  }
 }

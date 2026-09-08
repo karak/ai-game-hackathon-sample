@@ -80,6 +80,7 @@ export class Fire {
 }
 
 // 敵弾
+export const SHOT_HIT_RATIO = 0.6; // 敵弾の当たり判定 = 描画寸法 × 0.6（見た目より少し甘く）
 export const ENEMY_SHOTS = {
   poison:    { sprite: 'poison',    w: 5, h: 5, gravity: 380, pool: true },
   blood:     { sprite: 'blood',     w: 4, h: 4, gravity: 480, splat: true },
@@ -96,7 +97,11 @@ export class EnemyShot {
   constructor(world, kind, x, y, vx, vy, opts = {}) {
     const D = ENEMY_SHOTS[kind];
     this.world = world; this.kind = kind; this.def = D;
-    this.w = D.w; this.h = D.h; this.x = x - this.w / 2; this.y = y - this.h / 2;
+    this.w = D.w; this.h = D.h;
+    // 生成スプライト（hd）があれば当たり判定を実寸 × SHOT_HIT_RATIO に追従させる（BUG-002。旧定数は非 HD 時のフォールバック）
+    const spr = world.assets?.shots?.[D.sprite];
+    if (spr?.hd) { this.w = Math.max(3, Math.round(spr.w * SHOT_HIT_RATIO)); this.h = Math.max(3, Math.round(spr.h * SHOT_HIT_RATIO)); }
+    this.x = x - this.w / 2; this.y = y - this.h / 2;
     this.vx = vx; this.vy = vy; this.t = 0; this.dead = false;
     this.owner = opts.owner ?? null; this.bounces = D.bounce ?? 0; this.life = opts.life ?? 4;
     this.dmg = 1;

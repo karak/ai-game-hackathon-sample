@@ -127,6 +127,14 @@
   "src": "assets/sprites/bosses/doll1.png",
   "w": 119
  },
+ "bosses/doll2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 180,
+  "src": "assets/sprites/bosses/doll2.png",
+  "w": 160
+ },
  "bosses/noir1": {
   "anchor": "bottom",
   "colors": 15,
@@ -135,6 +143,14 @@
   "src": "assets/sprites/bosses/noir1.png",
   "w": 163
  },
+ "bosses/noir2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 175,
+  "src": "assets/sprites/bosses/noir2.png",
+  "w": 154
+ },
  "bosses/teddy1": {
   "anchor": "bottom",
   "colors": 15,
@@ -142,6 +158,14 @@
   "h": 140,
   "src": "assets/sprites/bosses/teddy1.png",
   "w": 113
+ },
+ "bosses/teddy2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 140,
+  "src": "assets/sprites/bosses/teddy2.png",
+  "w": 126
  },
  "deco/banner": {
   "anchor": "bottom",
@@ -307,17 +331,17 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 92,
+  "h": 94,
   "src": "assets/sprites/enemies/mushroom1.png",
-  "w": 68
+  "w": 83
  },
  "enemies/mushroom2": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 92,
+  "h": 113,
   "src": "assets/sprites/enemies/mushroom2.png",
-  "w": 69
+  "w": 84
  },
  "enemies/unicorn1": {
   "anchor": "bottom",
@@ -863,6 +887,22 @@
   "h": 31,
   "src": "assets/sprites/shots/darkheart.png",
   "w": 33
+ },
+ "shots/fire1": {
+  "anchor": "bottom",
+  "colors": 9,
+  "fits": true,
+  "h": 53,
+  "src": "assets/sprites/shots/fire1.png",
+  "w": 42
+ },
+ "shots/fire2": {
+  "anchor": "bottom",
+  "colors": 10,
+  "fits": true,
+  "h": 51,
+  "src": "assets/sprites/shots/fire2.png",
+  "w": 43
  },
  "shots/heart": {
   "anchor": "center",

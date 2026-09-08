@@ -32,6 +32,22 @@ def ledger() -> dict:
     return json.loads(LEDGER.read_text()) if LEDGER.exists() else {'requests': 0, 'entries': []}
 
 
+def record(entry: dict) -> int:
+    """台帳に 1 リクエストを追記する。fcntl のファイルロックで並列実行時の計数競合を防ぐ（BUG-003）。
+    戻り値は更新後の requests。"""
+    import fcntl
+    lock = LEDGER.with_suffix('.lock')
+    with open(lock, 'w') as lf:
+        fcntl.flock(lf, fcntl.LOCK_EX)
+        try:
+            led = ledger()
+            led['requests'] += 1; led['entries'].append(entry)
+            tmp = LEDGER.with_suffix('.tmp'); tmp.write_text(json.dumps(led, indent=1, ensure_ascii=False)); tmp.replace(LEDGER)
+            return led['requests']
+        finally:
+            fcntl.flock(lf, fcntl.LOCK_UN)
+
+
 def next_version(name: str) -> int:
     vs = [int(p.stem.rsplit('-v', 1)[1]) for p in RAW.glob(f'{name}-v*.png')]
     return max(vs, default=0) + 1
@@ -52,9 +68,7 @@ def generate(name: str, prompt: str, refs: list[Path], n: int = 1) -> list[Path]
         try:
             resp = client.models.generate_content(model=MODEL, contents=parts)
         except Exception as e:  # noqa: BLE001
-            led['requests'] += 1; led['entries'].append({'name': name, 'v': v, 'ok': False, 'err': str(e)[:200], 'ts': time.time()})
-            LEDGER.write_text(json.dumps(led, indent=1, ensure_ascii=False)); print('ERROR', e, file=sys.stderr); continue
-        led['requests'] += 1
+            record({'name': name, 'v': v, 'ok': False, 'err': str(e)[:200], 'ts': time.time()}); print('ERROR', e, file=sys.stderr); continue
         saved = None
         for cand in resp.candidates or []:
             for part in cand.content.parts:
@@ -65,9 +79,8 @@ def generate(name: str, prompt: str, refs: list[Path], n: int = 1) -> list[Path]
                     break
             if saved: break
         txt = ''.join(getattr(p, 'text', '') or '' for c in (resp.candidates or []) for p in c.content.parts)
-        led['entries'].append({'name': name, 'v': v, 'ok': bool(saved), 'secs': round(time.time() - t0, 1), 'text': txt[:200], 'ts': time.time()})
-        LEDGER.write_text(json.dumps(led, indent=1, ensure_ascii=False))
-        print(f'[{led["requests"]}/{BUDGET}] {name}-v{v}: {"saved " + str(saved.relative_to(ROOT)) if saved else "NO IMAGE: " + txt[:200]}')
+        used = record({'name': name, 'v': v, 'ok': bool(saved), 'secs': round(time.time() - t0, 1), 'text': txt[:200], 'ts': time.time()})
+        print(f'[{used}/{BUDGET}] {name}-v{v}: {"saved " + str(saved.relative_to(ROOT)) if saved else "NO IMAGE: " + txt[:200]}')
         if saved: out.append(saved)
     return out
 

@@ -24,6 +24,7 @@ export class Input {
         if (this.capture) { e.preventDefault?.(); if (!e.repeat) this._resolveCapture({ type: 'key', code: e.code }); return; }
         const a = this.keys[e.code];
         if (a) { e.preventDefault?.(); if (!this.held.has(a) && !e.repeat) this.pressed.add(a); this.held.add(a); }
+        else if (/^F[1-9]$/.test(e.code) && e.code !== 'F5') { e.preventDefault?.(); if (!e.repeat) this.pressed.add(e.code); } // デバッグキー F1〜F9（F5 はリロードのため除外）
         if (!e.repeat) this.anyKey = true;
       });
       target.addEventListener('keyup', e => {

@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/shots-fire-v1.png",
+ "pitch": [
+  6.0,
+  6.0
+ ],
+ "max_box": [
+  48,
+  56
+ ],
+ "frames": [
+  {
+   "w": 42,
+   "h": 53,
+   "fits": true,
+   "colors": 9,
+   "name": "fire1"
+  },
+  {
+   "w": 43,
+   "h": 51,
+   "fits": true,
+   "colors": 10,
+   "name": "fire2"
+  }
+ ]
+}

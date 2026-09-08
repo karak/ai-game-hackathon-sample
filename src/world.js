@@ -12,9 +12,12 @@ import { SONGS } from './audio.js';
 import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBogHD, buildSpikeHD } from './gfx/hdworld.js';
 import { THEMES } from './gfx/tiles.js';
 import { SAFE_SHOT_T } from './balance.js';
+import { Fx } from './fx.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
+
+const NO_INPUT = { down: () => false, hit: () => false };
 
 // 1ステージ分のランタイム
 export class World {
@@ -45,6 +48,7 @@ export class World {
     const midOk = mids.filter((L, i) => i === 0 || L.r.height >= mids[0].r.height * 0.5);
     this.bgHD = { sky: gen.bg?.[th + '_sky'], far: [gen.bg?.[th + '_far']].filter(Boolean), mid: midOk };
     if (!this.bgHD.sky && !this.bgHD.far.length && !this.bgHD.mid.length) this.bgHD = null;
+    this.fx = new Fx(); // ヒットストップ / フラッシュ / スロー / ボス登場（A-5）
     this.decals = new Decals(map.pixelWidth, map.pixelHeight);
     this.particles = new Particles(this);
     this.classes = { EnemyShot };
@@ -86,10 +90,12 @@ export class World {
     this.time = Math.max(this.time, 60);
     this.audio.playBgm(SONGS[this.level.theme]);
   }
-  onBossDying() { this.cutscene = true; this.audio.stopBgm(); }
+  onBossDying() { this.cutscene = true; this.audio.stopBgm(); this.fx.bossDefeat(); }
   onBossDefeated() { this.cleared = true; this.cutscene = true; this.player.vx = 0; this.game.stageClear(); }
 
   update(dt, input) {
+    dt = this.fx.tick(dt); if (dt <= 0) return; // ヒットストップ中は世界を止める。スロー中は dt が縮む
+    if (this.fx.introActive) input = NO_INPUT;  // ボス登場中は操作を受け付けない
     this.t += dt; if (this.safeT > 0) this.safeT = Math.max(0, this.safeT - dt);
     const p = this.player, map = this.level.map;
     if (!this.cutscene && p.alive) {
@@ -142,7 +148,7 @@ export class World {
     this.enemies = this.enemies.filter(e => !(e.spawnX >= x0 - 200)); // 周辺の雑魚は消す
     this.enemies.push(this.boss);
     this.audio.playBgm(SONGS.boss);
-    this.toast(this.bossName());
+    this.fx.bossIntro(this.bossName());
   }
   bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール' }[this.level.boss] ?? 'BOSS'; }
 
@@ -199,6 +205,8 @@ export class World {
     this.particles.draw(g, cam);
     // 毒の画面効果（変身解除中にうっすら）
     if (this.player.costume === 'plain' && this.player.alive) { g.fillStyle = 'rgba(180,92,245,0.06)'; g.fillRect(0, 0, W, H); }
+    // 撃破フラッシュ / ボス撃破の白飛び
+    const fa = this.fx.flashAlpha; if (fa > 0) { g.globalAlpha = fa; g.fillStyle = this.fx.flashColor; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }
   }
   drawBog(g, cam) {
     const map = this.level.map; const f = Math.floor(this.t * 3) % 2;

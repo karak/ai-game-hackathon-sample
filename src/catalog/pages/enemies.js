@@ -48,7 +48,8 @@ export async function render(main, A) {
   for (const [key, sp] of Object.entries(BOSS_SPEC)) {
     const b = createBoss(w, key, 200, 176);
     main.appendChild(h3(sp.jp));
-    main.appendChild(frameStrip([{ name: key, spr: A.bosses[key + '1'], left: true, hit: b ? { w: b.w, h: b.h } : undefined }]));
+    // 1 = 待機（基準コマ）、2 = 攻撃コマ（生成済みなら）。当たり判定は 1 コマ目基準で共通
+    main.appendChild(frameStrip([{ name: key + '1 待機', spr: A.bosses[key + '1'], left: true, hit: b ? { w: b.w, h: b.h } : undefined }, ...(A.bosses[key + '2'] ? [{ name: key + '2 攻撃', spr: A.bosses[key + '2'], left: true, hit: b ? { w: b.w, h: b.h } : undefined }] : [])]));
     main.appendChild(paletteStrip(A.bosses[key + '1']));
     main.appendChild(table(['HP', '当たり判定', '状態遷移', '弾', '撃破演出'], [[sp.hp, b ? `${b.w}x${b.h}` : '-', sp.states, sp.shots, sp.death]]));
   }

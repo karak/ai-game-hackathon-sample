@@ -7,6 +7,7 @@ import { drawBackground } from './gfx/background.js';
 import { blit } from './gfx/sprite.js';
 import { drawBackgroundHD } from './gfx/hdworld.js';
 import { PROLOGUE, ENDING } from './story.js';
+import { irisRadius, IRIS_T, BOSS_INTRO_T } from './fx.js';
 import { defaultSettings, saveSettings, volumeGain, bind, codesFor, keyName, keyNameMini, padName, REBINDABLE, ACTION_LABEL, VOLUME_MAX, DEFAULT_KEYS, DEFAULT_PAD } from './settings.js';
 
 // オプション画面の行。kind: volume / mute / key(action) / reset / back
@@ -38,8 +39,10 @@ export class Game {
   }
   startStage() {
     this.world = new World(this, STAGES[this.stageIndex]);
-    this.setState('intro'); this.audio.stopBgm();
+    this.setState('intro'); this.audio.stopBgm(); this.irisT = 0; // アイリスが開く
   }
+  // アイリスワイプで閉じてから then() を実行する（画面遷移）
+  startWipe(then) { if (this.state === 'wipe') return; this.wipe = { from: this.state, t: 0, then }; this.setState('wipe'); }
   gameOver() { this.setState('gameover'); this.audio.stopBgm(); this.audio.sfx('bossdie'); this.saveHi(); }
   stageClear() {
     this.timeBonus = Math.ceil(this.world.time) * 10; this.score += this.timeBonus; this.setState('clear'); this.audio.sfx('clear');
@@ -69,6 +72,11 @@ export class Game {
         break;
       }
       case 'options': this.updateOptions(inp); break;
+      case 'wipe':
+        this.wipe.t += dt;
+        if (this.wipe.from === 'clear' && this.wipe.t < IRIS_T) this.world.update(dt, inp);
+        if (this.wipe.t >= IRIS_T) { const w = this.wipe; this.wipe = null; w.then(); }
+        break;
       case 'prologue':
         if (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) { if (this.stateT < PROLOGUE.length * 0.9) this.stateT = PROLOGUE.length * 0.9 + 0.1; else this.startStage(); }
         break;
@@ -78,23 +86,50 @@ export class Game {
       case 'play':
         if (inp.hit('pause') || inp.hit('start')) { this.paused = !this.paused; this.audio.sfx('select'); } // パッドの START でもポーズ
         if (this.paused) break;
+        this.debugKeys(inp);
+        this.irisT += dt;
         this.world.update(dt, inp);
         break;
       case 'clear':
         if (this.stateT < 3.5) this.world.update(dt, inp);
         if (this.stateT > 2 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) || this.stateT > 7) {
-          this.stageIndex++;
-          if (this.stageIndex >= STAGES.length) { this.setState('ending'); this.audio.playBgm(SONGS.ending); this.saveHi(); }
-          else this.startStage();
+          this.startWipe(() => {
+            this.stageIndex++;
+            if (this.stageIndex >= STAGES.length) { this.setState('ending'); this.audio.playBgm(SONGS.ending); this.saveHi(); }
+            else this.startStage();
+          });
         }
         break;
       case 'gameover':
-        if (this.stateT > 1.5 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump'))) { this.setState('title'); this.audio.playBgm(SONGS.title); }
+        if (this.stateT > 1.5 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump'))) this.startWipe(() => { this.setState('title'); this.audio.playBgm(SONGS.title); });
         break;
       case 'ending':
         if (this.stateT > 4 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump'))) { this.setState('title'); this.audio.playBgm(SONGS.title); }
         break;
     }
+  }
+
+  // ---- デバッグキー（A-5 の演出確認用。F1 被弾ヒットストップ / F2 最寄りの敵を撃破 / F3 ボス撃破演出 / F4 アイリスワイプ / F6 ボス登場バナー）----
+  debugKeys(inp) {
+    const w = this.world, p = w.player;
+    if (inp.hit('F1')) { p.invT = 0; p.costume = 'dress'; p.hit({ x: p.x + 20, w: 4 }); }
+    if (inp.hit('F2')) { const es = w.enemies.filter(e => !e.dead && e.hp !== undefined && !e.isBoss).sort((a, b) => Math.abs(a.cx - p.centerX) - Math.abs(b.cx - p.centerX)); if (es[0]) es[0].hurt(99, null); else w.fx.killFlash(); }
+    if (inp.hit('F3')) { if (w.boss && !w.boss.dying) w.boss.hurt(9999, null); else w.fx.bossDefeat(); }
+    if (inp.hit('F4')) this.startWipe(() => { this.setState('play'); this.irisT = 0; });
+    if (inp.hit('F6')) w.fx.bossIntro(w.bossName());
+  }
+  // アイリス（円の外側を黒く塗る）。r は世界単位、中心は主人公
+  drawIris(g, r) {
+    if (r <= 0) { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); return; }
+    const p = this.world?.player, cam = this.world?.cam ?? { x: 0 };
+    const cx = p ? Math.max(0, Math.min(W, p.centerX - Math.floor(cam.x))) : W / 2, cy = p ? Math.max(0, Math.min(H, p.y + p.h / 2)) : H / 2;
+    g.save(); g.beginPath(); g.rect(0, 0, W, H); g.arc(cx, cy, r, 0, Math.PI * 2, true); g.fillStyle = '#000'; g.fill(); g.restore();
+  }
+  drawBossIntro(g) {
+    const fx = this.world.fx, k = Math.min(1, (BOSS_INTRO_T - fx.introT) / 0.3); // 0.3 秒でバーが降りる
+    const bar = Math.floor(28 * k);
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, bar); g.fillRect(0, H - bar, W, bar);
+    if (k >= 1) textBox(g, [{ t: fx.introName, color: '#ff8fc8' }, { t: 'WARNING', size: 10, color: '#ff6a6a' }], { minWidth: 160, window: { top: '#3a1650', bottom: '#150a22' } });
   }
 
   // ---- オプション（音量 / ミュート / キー・パッド割り当て） ----
@@ -152,13 +187,20 @@ export class Game {
     mini(g, hint, miniX(hint), y + h + 6, '#a5a5b8');
   }
 
-  draw(g) {
-    switch (this.state) {
+  draw(g) { this.drawState(g, this.state); }
+  drawState(g, state) {
+    switch (state) {
       case 'title': this.drawTitle(g); break;
       case 'options': this.drawOptions(g); break;
+      case 'wipe': this.drawState(g, this.wipe.from); this.drawIris(g, irisRadius(this.wipe.t, false, W, H)); break;
       case 'prologue': this.drawScroll(g, PROLOGUE, 'prologue'); break;
-      case 'intro': this.world.draw(g); this.drawIntro(g); break;
-      case 'play': this.world.draw(g); drawHud(g, this.world, this); if (this.paused) this.drawPause(g); break;
+      case 'intro': this.world.draw(g); this.drawIris(g, irisRadius(this.stateT, true, W, H)); this.drawIntro(g); break;
+      case 'play':
+        this.world.draw(g); drawHud(g, this.world, this);
+        if (this.world.fx.introActive) this.drawBossIntro(g);
+        if (this.irisT < IRIS_T) this.drawIris(g, irisRadius(this.irisT, true, W, H));
+        if (this.paused) this.drawPause(g);
+        break;
       case 'clear': this.world.draw(g); drawHud(g, this.world, this); this.drawClear(g); break;
       case 'gameover': if (this.world) this.world.draw(g); this.drawGameOver(g); break;
       case 'ending': this.drawScroll(g, ENDING, 'ending'); break;

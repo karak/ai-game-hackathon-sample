@@ -156,6 +156,8 @@ def split_frames(logical, min_gap=2, min_width=8, expect=0):
                 gph[0], gph[1], gph[2], gph[3] = min(gph[0], c[0]), max(gph[1], c[1]), min(gph[2], c[2]), max(gph[3], c[3]); break
         else: groups.append(list(c[:4]))
     frames = sorted([(g0, g1) for g0, g1, _, _ in groups if g1 - g0 >= min_width])
+    # 1 コマ指定なら、離れた付属物（浮遊するハート・飛沫など）も含めて 1 コマにまとめる
+    if expect == 1 and len(frames) > 1: frames = [(min(f[0] for f in frames), max(f[1] for f in frames))]
     # 期待フレーム数に足りない場合、最も幅の広いフレームを「列占有が最小の位置」で割る（接触した物体の分離）
     occ = a.sum(axis=0)
     while expect and len(frames) < expect and frames:
@@ -192,7 +194,10 @@ def main():
         return {'w': img.width, 'h': img.height, 'fits': img.width <= bw and img.height <= bh, 'colors': len([c for c in img.getcolors(99999) if c[1][3] > 0])}
     if not a.split:
         fr = [] if a.nosplit else split_frames(logical, min_gap=2, min_width=8)
-        if len(fr) >= 2: logical = logical.crop((fr[0][0], 0, fr[0][1], logical.height))  # 複数体描かれた場合は最初の 1 体
+        if len(fr) >= 2:  # 複数物体が描かれた場合は不透明画素が最も多い 1 体（浮遊するハート等の付属物や余分な体は捨てる）
+            occ = (np.asarray(logical.split()[3]) > 0).sum(axis=0)
+            x0, x1 = max(fr, key=lambda f: int(occ[f[0]:f[1]].sum()))
+            logical = logical.crop((x0, 0, x1, logical.height))
         out = crop_alpha(logical); out.save(a.dst); meta.update(info(out))
         Path(a.dst).with_suffix('.json').write_text(json.dumps(meta, indent=1)); print(json.dumps(meta)); return
     names = a.names.split(',') if a.names else []
