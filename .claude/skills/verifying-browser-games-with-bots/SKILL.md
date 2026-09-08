@@ -80,3 +80,4 @@ async () => {
 | `canvas.width === window.innerWidth * 3` のような無意味な断定 | 内部解像度は設計値と比べる。CSS 幅とは無関係 |
 | 「テストは書けないので目視で確認」 | ボットで通しプレイ＋状態遷移トレースは書ける。目視は補助 |
 | 何百フレームも `await sleep` で待つ | `g.update(STEP)` を直接ループで回して早送りする |
+| スクリーンショットに HUD が無い／毎回同じ絵になる | ブラウザ窓が縮んでキャンバス上端が画面外（`canvas.getBoundingClientRect().top < 0`）。`resize_page` で 1340×900 にしてから撮る。キャンバス画素は `getImageData` で直接検査できる |
