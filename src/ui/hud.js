@@ -18,9 +18,10 @@ export function drawHud(g, world, game) {
   mini(g, 'TIME', 84, 4, '#cbaaf5'); mini(g, fmtTime(world.time), 84, 11, world.time < 30 ? '#ff6a6a' : '#fdfbf7');
   // 残機（リリカ人形）
   mini(g, 'LIFE', 124, 4, '#cbaaf5');
-  const doll = game.assets.items.oneup.r; const n = Math.min(5, game.lives);
-  for (let i = 0; i < n; i++) g.drawImage(doll, 2, 0, 8, 6, 124 + i * 10, 10, 8, 6);
-  if (game.lives > 5) mini(g, 'x' + game.lives, 124, 11);
+  const doll = game.assets.items.oneup; const n = Math.min(3, game.lives);
+  const dw = doll.hd ? doll.w * 0.75 : 8, dh = doll.hd ? doll.h * 0.75 : 6; // 世界単位（HD は 3/4 = 整数比でない縮小を避けるため 1:1 で描く）
+  for (let i = 0; i < n; i++) blit(g, doll, false, 124 + i * (doll.hd ? doll.w + 2 : 10), 26 - (doll.hd ? doll.h : 6) - 1);
+  if (game.lives > 3) mini(g, 'x' + game.lives, 124 + n * (doll.hd ? doll.w + 2 : 10), 14);
   // 衣装状態
   const cst = world.player.costume;
   mini(g, cst === 'gold' ? 'FULL BLOOM' : cst === 'dress' ? 'DRESS' : 'BROKEN', 176, 4, cst === 'gold' ? '#ffe860' : cst === 'dress' ? '#ff8fc8' : '#ff6a6a');

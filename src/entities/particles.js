@@ -1,6 +1,8 @@
 import { PAL } from '../gfx/palette.js';
 import { TILE } from '../physics.js';
 import { rand, pick } from '../util.js';
+import { HD_SCALE } from '../gfx/sprite.js';
+const S = 1 / HD_SCALE; // 1 スクリーン px の世界単位
 
 // 血・綿・火花などの粒子。地面に落ちた血は decal として残る。
 export class Particles {
@@ -59,31 +61,33 @@ export class Particles {
     for (const p of this.list) {
       if (p.twinkle && Math.floor(p.life * 20) % 2) continue;
       g.fillStyle = p.color;
-      g.fillRect(Math.floor(p.x - cam.x), Math.floor(p.y - cam.y), p.size, p.size);
+      const sz = (p.size + 1) * S; // 粒子は 2〜4 スクリーン px
+      g.fillRect(Math.round((p.x - cam.x) / S) * S, Math.round((p.y - cam.y) / S) * S, sz, sz);
     }
   }
 }
 
 // 地面に残る血痕レイヤー（マップ全幅の canvas に描き込む）
 export class Decals {
+  // 血痕レイヤーはスクリーン解像度（HD_SCALE 倍）で持ち、描画時に 1/HD_SCALE で貼る
   constructor(width, height) {
     this.canvas = document.createElement('canvas');
-    this.canvas.width = width; this.canvas.height = height;
+    this.canvas.width = width * HD_SCALE; this.canvas.height = height * HD_SCALE;
     this.g = this.canvas.getContext('2d');
   }
   splat(x, groundY, color, size = 1) {
-    const g = this.g;
+    const g = this.g; const K = HD_SCALE; const X = x * K, Y = groundY * K;
     g.fillStyle = color;
-    const w = 2 + Math.floor(Math.random() * size * 3);
-    g.fillRect(Math.floor(x - w / 2), groundY - 1, w, 1);
-    if (Math.random() < 0.5) g.fillRect(Math.floor(x - w / 4), groundY, Math.max(1, Math.floor(w / 2)), 1);
-    if (size >= 2) g.fillRect(Math.floor(x - w / 2) + 1, groundY - 2, Math.max(1, w - 2), 1);
-    // 壁への飛び散り
-    if (Math.random() < 0.25) g.fillRect(Math.floor(x + (Math.random() - 0.5) * 12), groundY - 2 - Math.floor(Math.random() * 6), 1, 1);
+    const w = (3 + Math.floor(Math.random() * size * 4)) * 2;      // 6〜30 スクリーン px の楕円状の染み
+    g.fillRect(Math.floor(X - w / 2), Y - 2, w, 2);
+    g.fillRect(Math.floor(X - w / 3), Y - 4, Math.floor(w * 2 / 3), 2);
+    if (size >= 2) g.fillRect(Math.floor(X - w / 5), Y - 6, Math.floor(w * 2 / 5), 2);
+    for (let i = 0; i < 3; i++) g.fillRect(Math.floor(X + (Math.random() - 0.5) * w * 1.6), Y - 2 - Math.floor(Math.random() * 3) * 2, 2, 2); // 飛沫
+    if (Math.random() < 0.3) g.fillRect(Math.floor(X + (Math.random() - 0.5) * 30), Y - 8 - Math.floor(Math.random() * 16), 2, 2);
   }
   draw(g, cam, W, H) {
-    const sx = Math.max(0, Math.floor(cam.x)), sw = Math.min(W, this.canvas.width - sx);
+    const K = HD_SCALE; const sx = Math.max(0, Math.floor(cam.x * K)), sw = Math.min(W * K, this.canvas.width - sx);
     if (sw <= 0) return;
-    g.drawImage(this.canvas, sx, 0, sw, H, sx - Math.floor(cam.x), 0, sw, H);
+    g.drawImage(this.canvas, sx, 0, sw, H * K, (sx - Math.floor(cam.x * K)) / K, 0, sw / K, H);
   }
 }
