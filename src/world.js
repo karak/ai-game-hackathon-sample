@@ -188,7 +188,7 @@ export class World {
     this.decals.draw(g, cam, W, H);
     const A = this.assets;
     for (const b of this.boxes) b.draw(g, cam, A.items);
-    for (const q of this.pools) q.draw(g, cam);
+    for (const q of this.pools) q.draw(g, cam, A.shots);
     for (const i of this.items) i.draw(g, cam, A.pickups);
     for (const e of this.enemies) e.draw(g, cam, A);
     this.player.draw(g, cam, A);

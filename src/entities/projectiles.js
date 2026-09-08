@@ -150,10 +150,17 @@ export class PoisonPool {
     this.t += dt; if (this.t > this.life) this.dead = true;
     if (Math.random() < 0.08) this.world.particles.emit('poison', this.x + Math.random() * this.w, this.y, 1);
   }
-  draw(g, cam) {
+  draw(g, cam, sheet) {
     const a = this.t > this.life - 0.8 ? (this.life - this.t) / 0.8 : 1;
     g.globalAlpha = a;
     const x = Math.floor(this.x - cam.x), y = Math.floor(this.y - cam.y);
+    const spr = sheet?.pool;
+    if (spr?.hd && this.color !== 'acid') {
+      // 生成済みの毒溜まりスプライト（世界単位で 1/HD_SCALE）。泡の点滅は上に重ねる
+      const [dw, dh] = dims(spr); g.drawImage(spr.r, x + this.w / 2 - dw / 2, y + this.h - dh + 1, dw, dh);
+      if (Math.floor(this.t * 6) % 2) { g.fillStyle = PAL['1']; g.fillRect(x + 3 + Math.floor(this.t * 7) % 8, y, 1 / HD_SCALE * 2, 1 / HD_SCALE * 2); }
+      g.globalAlpha = 1; return;
+    }
     g.fillStyle = this.color === 'acid' ? PAL.U : PAL.T; g.fillRect(x, y + 1, this.w, 2);
     g.fillStyle = this.color === 'acid' ? PAL.I : PAL.A; g.fillRect(x + 2, y, this.w - 4, 1); g.fillRect(x + 1, y + 3, this.w - 2, 1);
     if (Math.floor(this.t * 6) % 2) { g.fillStyle = PAL['1']; g.fillRect(x + 3 + Math.floor(this.t * 7) % 8, y, 1, 1); }
