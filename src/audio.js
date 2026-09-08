@@ -13,14 +13,14 @@ export const NOTE = {}; // 'C4' → Hz
 
 export class Audio {
   constructor() {
-    this.ctx = null; this.master = null; this.muted = false;
+    this.ctx = null; this.master = null; this.muted = false; this.volume = 0.35; // volume = マスターゲイン（settings.volumeGain で算出）
     this.bgm = null; this.bgmTimer = null;
   }
   ensure() {
     if (this.ctx) return true;
     try {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-      this.master = this.ctx.createGain(); this.master.gain.value = 0.35; this.master.connect(this.ctx.destination);
+      this.master = this.ctx.createGain(); this.master.gain.value = this.muted ? 0 : this.volume; this.master.connect(this.ctx.destination);
       this.sfxBus = this.ctx.createGain(); this.sfxBus.gain.value = 1; this.sfxBus.connect(this.master);
       this.bgmBus = this.ctx.createGain(); this.bgmBus.gain.value = 0.55; this.bgmBus.connect(this.master);
       // ノイズバッファ
@@ -31,7 +31,10 @@ export class Audio {
     } catch { return false; }
   }
   resume() { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); }
-  toggleMute() { this.muted = !this.muted; if (this.master) this.master.gain.value = this.muted ? 0 : 0.35; return this.muted; }
+  toggleMute() { return this.setMuted(!this.muted); }
+  setMuted(m) { this.muted = !!m; this._applyGain(); return this.muted; }
+  setVolume(gain) { this.volume = Math.max(0, Math.min(1, gain)); this._applyGain(); }
+  _applyGain() { if (this.master) this.master.gain.value = this.muted ? 0 : this.volume; }
 
   // ---- 基本音源 ----
   tone({ type = 'square', f0 = 440, f1 = f0, dur = 0.1, vol = 0.3, delay = 0, curve = 'exp', bus = 'sfx' }) {

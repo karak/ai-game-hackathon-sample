@@ -3,6 +3,7 @@ import { Audio, SONGS } from './audio.js';
 import { Input } from './input.js';
 import { Game } from './game.js';
 import { W, H, SCALE } from './world.js';
+import { loadSettings } from './settings.js';
 
 async function boot() {
   const canvas = document.getElementById('game');
@@ -18,9 +19,10 @@ async function boot() {
   } catch (e) { console.warn('font load failed', e); }
 
   const assets = await buildAssets();
+  const settings = loadSettings(localStorage); // キー/パッド割り当て・音量・進行・ハイスコア
   const audio = new Audio();
-  const input = new Input();
-  const game = new Game(assets, audio, input);
+  const input = new Input(window, settings);
+  const game = new Game(assets, audio, input, settings, localStorage);
   window.__game = game; // デバッグ用
 
   // 最初のキー/タップで AudioContext を起動
@@ -46,6 +48,7 @@ async function boot() {
     let dt = (now - last) / 1000; last = now;
     if (dt > 0.25) dt = 0.25;
     acc += dt;
+    input.poll(); // ゲームパッド（押下エッジは次の update まで pressed に残る）
     let steps = 0;
     while (acc >= STEP && steps < 5) { game.update(STEP); input.endFrame(); acc -= STEP; steps++; }
     if (steps === 5) acc = 0;
