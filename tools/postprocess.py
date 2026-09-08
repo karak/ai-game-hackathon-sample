@@ -130,16 +130,42 @@ def strip_shadow(logical):
     return logical
 
 
-def split_frames(logical, min_gap=2, min_width=8):
-    a = logical.split()[3]; w, h = logical.size; px = a.load()
-    occ = [any(px[x, y] for y in range(h)) for x in range(w)]
-    frames, start, gap = [], None, 0
-    for x, o in enumerate(occ + [False]):
-        if o: start = x if start is None else start; gap = 0
-        elif start is not None:
-            gap += 1
-            if gap >= min_gap or x == w: frames.append((start, x - gap + 1)); start = None; gap = 0
-    return [f for f in frames if f[1] - f[0] >= min_width]  # ゴミ片を除外
+def split_frames(logical, min_gap=2, min_width=8, expect=0):
+    """フレーム分割。透明列だけでは x が重なる物体（枝が隣にかかる等）を分けられないので、
+    8 近傍の連結成分を取り、bbox が min_gap 以内で重なる成分は同じフレームに併合する。左から順に返す。"""
+    a = np.asarray(logical.split()[3]) > 0; h, w = a.shape
+    labels = np.zeros((h, w), dtype=np.int32); comps = []
+    for y in range(h):
+        for x in range(w):
+            if not a[y, x] or labels[y, x]: continue
+            idx = len(comps) + 1; stack = [(y, x)]; labels[y, x] = idx; x0 = x1 = x; y0 = y1 = y; n = 0
+            while stack:
+                cy, cx = stack.pop(); n += 1
+                x0, x1, y0, y1 = min(x0, cx), max(x1, cx), min(y0, cy), max(y1, cy)
+                for dy in (-1, 0, 1):
+                    for dx in (-1, 0, 1):
+                        ny, nx = cy + dy, cx + dx
+                        if 0 <= ny < h and 0 <= nx < w and a[ny, nx] and not labels[ny, nx]: labels[ny, nx] = idx; stack.append((ny, nx))
+            comps.append([x0, x1 + 1, y0, y1 + 1, n])
+    if not comps: return []
+    # 大きい成分から順に、bbox が近接する小成分を併合（血しぶきの飛沫など）
+    comps.sort(key=lambda c: -c[4]); groups = []
+    for c in comps:
+        for gph in groups:
+            if c[0] <= gph[1] + min_gap and c[1] >= gph[0] - min_gap and c[2] <= gph[3] + min_gap * 3 and c[3] >= gph[2] - min_gap * 3:
+                gph[0], gph[1], gph[2], gph[3] = min(gph[0], c[0]), max(gph[1], c[1]), min(gph[2], c[2]), max(gph[3], c[3]); break
+        else: groups.append(list(c[:4]))
+    frames = sorted([(g0, g1) for g0, g1, _, _ in groups if g1 - g0 >= min_width])
+    # 期待フレーム数に足りない場合、最も幅の広いフレームを「列占有が最小の位置」で割る（接触した物体の分離）
+    occ = a.sum(axis=0)
+    while expect and len(frames) < expect and frames:
+        i = max(range(len(frames)), key=lambda k: frames[k][1] - frames[k][0]); x0, x1 = frames[i]
+        if x1 - x0 < min_width * 2: break
+        cut = min(range(x0 + min_width, x1 - min_width), key=lambda x: (occ[x], abs(x - (x0 + x1) / 2)))
+        frames[i:i + 1] = [(x0, cut), (cut, x1)]
+    return frames
+
+
 
 
 def crop_alpha(im):
@@ -168,7 +194,8 @@ def main():
         if len(fr) >= 2: logical = logical.crop((fr[0][0], 0, fr[0][1], logical.height))  # 複数体描かれた場合は最初の 1 体
         out = crop_alpha(logical); out.save(a.dst); meta.update(info(out))
         Path(a.dst).with_suffix('.json').write_text(json.dumps(meta, indent=1)); print(json.dumps(meta)); return
-    frames = split_frames(logical, min_gap=2, min_width=8); names = a.names.split(',') if a.names else [f'f{i}' for i in range(len(frames))]
+    names = a.names.split(',') if a.names else []
+    frames = split_frames(logical, min_gap=2, min_width=8, expect=len(names)); names = names or [f'f{i}' for i in range(len(frames))]
     Path(a.dst).mkdir(parents=True, exist_ok=True); meta['frames'] = []
     for i, (x0, x1) in enumerate(frames[:len(names)]):
         out = crop_alpha(logical.crop((x0, 0, x1, logical.height)))

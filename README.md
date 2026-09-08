@@ -12,8 +12,10 @@
 依存パッケージはありません。ES modules を使うため HTTP サーバー経由で開いてください。
 
 ```bash
-npm run dev      # http://127.0.0.1:8080/ を開く
-npm test         # 物理・レベルデータのユニットテスト
+npm install
+npm run dev      # Vite: http://127.0.0.1:5173/ （catalog.html でデザインカタログ）
+npm test         # Vitest: 物理・レベル・テキスト折り返し・アート基準（manifest）
+npm run build    # dist/ に静的ビルド
 ```
 
 ## 操作
@@ -56,10 +58,22 @@ npm test         # 物理・レベルデータのユニットテスト
 
 ## 技術
 
-- Vanilla JS（ES modules）+ Canvas 2D、内部解像度 256×224（SNES 準拠）を整数倍拡大
-- スプライト・タイル・背景はすべてコード内のピクセル文字列／手続き生成（`src/gfx/`）
+- Vanilla JS（ES modules）+ Canvas 2D + Vite。内部解像度 **768×672**（世界座標 256×224 を 3 倍描画、SNES と同じ 16×14 タイル画面）
+- キャラ・敵・ボス・背景・地形・アイテムは **Gemini 2.5 Flash Image で生成したドット絵**を後処理（クロマキー→セル抽出→15 色量子化）した PNG（`assets/sprites/`、`docs/gen-pipeline.md`）
+- アート基準は `docs/art-standard.md`。`catalog.html` で全素材を 1:1 表示・シーン合成して確認できる
 - 効果音・BGM は Web Audio API でリアルタイム合成（`src/audio.js`）。外部音源なし
 - フォント：[DotGothic16](https://github.com/fontworks-fonts/DotGothic16)（SIL Open Font License 1.1、`assets/fonts/`）
+
+### 素材の生成・更新
+
+```bash
+# 参照プロジェクトの .env にある GEMINI_API_KEY を使う（tools/gemini_gen.py が読む）
+python3 tools/gemini_gen.py enemy-zombie          # specs.json のキーで 1 件生成（台帳 tools/gen_ledger.json に記録）
+python3 tools/build_sprites.py                    # raw → assets/sprites/*.png + src/gfx/manifest.json
+python3 tools/derive_variants.py                  # 帽子抽出・衣装パレット置換（リクエスト不要）
+```
+
+PIL / numpy / google-genai が入った Python（参照プロジェクトの `.venv`）で実行する。
 
 ```
 src/

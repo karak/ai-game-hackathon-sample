@@ -289,8 +289,8 @@
   },
   "tiles-graveyard": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -303,8 +303,8 @@
   },
   "tiles-candyforest": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -317,8 +317,8 @@
   },
   "tiles-castle": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -420,8 +420,8 @@
   },
   "bg-graveyard-sky": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -435,8 +435,8 @@
   },
   "bg-graveyard-far": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -450,8 +450,8 @@
   },
   "bg-graveyard-mid": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -465,8 +465,8 @@
   },
   "bg-candyforest-sky": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -480,8 +480,8 @@
   },
   "bg-candyforest-far": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -495,8 +495,8 @@
   },
   "bg-candyforest-mid": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -510,8 +510,8 @@
   },
   "bg-castle-sky": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -525,8 +525,8 @@
   },
   "bg-castle-far": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -540,8 +540,8 @@
   },
   "bg-castle-mid": {
    "box": [
-    220,
-    120
+    400,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -597,6 +597,54 @@
     "shots/charge",
     "shots/pool"
    ]
+  },
+  "deco-graveyard": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-graveyard.txt",
+   "out": [
+    "deco/tomb",
+    "deco/cross",
+    "deco/flowers",
+    "deco/candle"
+   ],
+   "colors": 15
+  },
+  "deco-candy": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-candy.txt",
+   "out": [
+    "deco/tree",
+    "deco/blood",
+    "deco/bones",
+    "deco/lollipop"
+   ],
+   "colors": 15
+  },
+  "deco-castle": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-castle.txt",
+   "out": [
+    "deco/pillar",
+    "deco/window",
+    "deco/banner",
+    "deco/candelabra"
+   ],
+   "colors": 15
   }
  }
 }

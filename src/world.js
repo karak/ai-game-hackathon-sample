@@ -9,7 +9,8 @@ import { createBoss } from './entities/bosses.js';
 import { TreasureBox, FloatingItem } from './entities/items.js';
 import { EnemyShot, WEAPONS } from './entities/projectiles.js';
 import { SONGS } from './audio.js';
-import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS } from './gfx/hdworld.js';
+import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBogHD } from './gfx/hdworld.js';
+import { THEMES } from './gfx/tiles.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
@@ -26,7 +27,17 @@ export class World {
     // 生成済み HD 地形/背景があれば優先
     const gen = this.assets.generated ?? {};
     const strip = gen.tiles?.[this.level.theme];
-    if (strip) { this.hdTiles = sliceTileStrip(strip.r, TILE_BANDS[this.level.theme]); this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles); }
+    if (strip) {
+      this.hdTiles = sliceTileStrip(strip.r, TILE_BANDS[this.level.theme]);
+      // 装飾記号 → 生成装飾スプライト（テーマごとに割り当て）
+      const D = gen.deco ?? {};
+      const decoMap = { graveyard: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones },
+                        candyforest: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones, k: D.lollipop },
+                        castle: { n: D.pillar, w: D.window, v: D.candelabra, x: D.blood, o: D.bones, t: D.banner } }[this.level.theme] ?? {};
+      for (const k of Object.keys(decoMap)) if (!decoMap[k]) delete decoMap[k];
+      this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles, 512, decoMap);
+      this.bogHD = buildBogHD(THEMES[this.level.theme]);
+    }
     this.bgHD = { sky: gen.bg?.[this.level.theme + '_sky'], far: gen.bg?.[this.level.theme + '_far'], mid: gen.bg?.[this.level.theme + '_mid'] };
     if (!this.bgHD.sky && !this.bgHD.far && !this.bgHD.mid) this.bgHD = null;
     this.decals = new Decals(map.pixelWidth, map.pixelHeight);
@@ -190,7 +201,8 @@ export class World {
     for (let ty = 0; ty < map.height; ty++) for (let tx = tx0; tx <= tx1; tx++) {
       if (map.at(tx, ty) !== '~') continue;
       const top = map.at(tx, ty - 1) !== '~';
-      g.drawImage(this.tiles[(top ? 'bogtop' : 'bog') + f], tx * TILE - cam.x, ty * TILE - cam.y);
+      if (this.bogHD) { const img = this.bogHD[f]; if (top) g.drawImage(img, tx * TILE - cam.x, ty * TILE - cam.y + 6, TILE, TILE - 6); else g.drawImage(img, 0, 24, 48, 24, tx * TILE - cam.x, ty * TILE - cam.y, TILE, TILE); }
+      else g.drawImage(this.tiles[(top ? 'bogtop' : 'bog') + f], tx * TILE - cam.x, ty * TILE - cam.y);
     }
   }
 }

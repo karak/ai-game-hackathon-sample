@@ -1,0 +1,41 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/deco-candy-v1.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  120,
+  160
+ ],
+ "frames": [
+  {
+   "w": 45,
+   "h": 70,
+   "fits": true,
+   "colors": 6,
+   "name": "tree"
+  },
+  {
+   "w": 56,
+   "h": 49,
+   "fits": true,
+   "colors": 10,
+   "name": "blood"
+  },
+  {
+   "w": 49,
+   "h": 34,
+   "fits": true,
+   "colors": 10,
+   "name": "bones"
+  },
+  {
+   "w": 38,
+   "h": 71,
+   "fits": true,
+   "colors": 12,
+   "name": "lollipop"
+  }
+ ]
+}

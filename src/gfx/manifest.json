@@ -2,7 +2,7 @@
  "bg/candyforest_far": {
   "anchor": "center",
   "colors": 32,
-  "fits": false,
+  "fits": true,
   "h": 69,
   "src": "assets/sprites/bg/candyforest_far.png",
   "w": 254
@@ -10,7 +10,7 @@
  "bg/candyforest_mid": {
   "anchor": "center",
   "colors": 32,
-  "fits": false,
+  "fits": true,
   "h": 76,
   "src": "assets/sprites/bg/candyforest_mid.png",
   "w": 316
@@ -18,7 +18,7 @@
  "bg/candyforest_sky": {
   "anchor": "center",
   "colors": 32,
-  "fits": false,
+  "fits": true,
   "h": 264,
   "src": "assets/sprites/bg/candyforest_sky.png",
   "w": 275
@@ -26,7 +26,7 @@
  "bg/castle_far": {
   "anchor": "center",
   "colors": 32,
-  "fits": false,
+  "fits": true,
   "h": 88,
   "src": "assets/sprites/bg/castle_far.png",
   "w": 264
@@ -34,7 +34,7 @@
  "bg/castle_mid": {
   "anchor": "center",
   "colors": 32,
-  "fits": false,
+  "fits": true,
   "h": 132,
   "src": "assets/sprites/bg/castle_mid.png",
   "w": 266
@@ -42,23 +42,23 @@
  "bg/graveyard_far": {
   "anchor": "center",
   "colors": 32,
-  "fits": false,
-  "h": 67,
+  "fits": true,
+  "h": 85,
   "src": "assets/sprites/bg/graveyard_far.png",
-  "w": 266
+  "w": 259
  },
  "bg/graveyard_mid": {
   "anchor": "center",
   "colors": 32,
-  "fits": false,
-  "h": 47,
+  "fits": true,
+  "h": 114,
   "src": "assets/sprites/bg/graveyard_mid.png",
-  "w": 246
+  "w": 263
  },
  "bg/graveyard_sky": {
   "anchor": "center",
   "colors": 32,
-  "fits": false,
+  "fits": true,
   "h": 247,
   "src": "assets/sprites/bg/graveyard_sky.png",
   "w": 257
@@ -86,6 +86,102 @@
   "h": 140,
   "src": "assets/sprites/bosses/teddy1.png",
   "w": 113
+ },
+ "deco/banner": {
+  "anchor": "bottom",
+  "colors": 12,
+  "fits": true,
+  "h": 143,
+  "src": "assets/sprites/deco/banner.png",
+  "w": 50
+ },
+ "deco/blood": {
+  "anchor": "bottom",
+  "colors": 10,
+  "fits": true,
+  "h": 49,
+  "src": "assets/sprites/deco/blood.png",
+  "w": 56
+ },
+ "deco/bones": {
+  "anchor": "bottom",
+  "colors": 10,
+  "fits": true,
+  "h": 34,
+  "src": "assets/sprites/deco/bones.png",
+  "w": 49
+ },
+ "deco/candelabra": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 99,
+  "src": "assets/sprites/deco/candelabra.png",
+  "w": 47
+ },
+ "deco/candle": {
+  "anchor": "bottom",
+  "colors": 12,
+  "fits": true,
+  "h": 43,
+  "src": "assets/sprites/deco/candle.png",
+  "w": 30
+ },
+ "deco/cross": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 61,
+  "src": "assets/sprites/deco/cross.png",
+  "w": 36
+ },
+ "deco/flowers": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 59,
+  "src": "assets/sprites/deco/flowers.png",
+  "w": 48
+ },
+ "deco/lollipop": {
+  "anchor": "bottom",
+  "colors": 12,
+  "fits": true,
+  "h": 71,
+  "src": "assets/sprites/deco/lollipop.png",
+  "w": 38
+ },
+ "deco/pillar": {
+  "anchor": "bottom",
+  "colors": 11,
+  "fits": true,
+  "h": 104,
+  "src": "assets/sprites/deco/pillar.png",
+  "w": 33
+ },
+ "deco/tomb": {
+  "anchor": "bottom",
+  "colors": 11,
+  "fits": true,
+  "h": 56,
+  "src": "assets/sprites/deco/tomb.png",
+  "w": 41
+ },
+ "deco/tree": {
+  "anchor": "bottom",
+  "colors": 6,
+  "fits": true,
+  "h": 70,
+  "src": "assets/sprites/deco/tree.png",
+  "w": 45
+ },
+ "deco/window": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 123,
+  "src": "assets/sprites/deco/window.png",
+  "w": 46
  },
  "enemies/angel1": {
   "anchor": "bottom",
@@ -257,7 +353,7 @@
  },
  "player/attack_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 117,
   "src": "assets/sprites/player/attack_gold.png",
@@ -297,7 +393,7 @@
  },
  "player/crouch_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 114,
   "src": "assets/sprites/player/crouch_gold.png",
@@ -329,7 +425,7 @@
  },
  "player/dead_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 74,
   "src": "assets/sprites/player/dead_gold.png",
@@ -361,7 +457,7 @@
  },
  "player/fall_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 134,
   "src": "assets/sprites/player/fall_gold.png",
@@ -410,7 +506,7 @@
  },
  "player/hurt2_gold": {
   "anchor": "bottom",
-  "colors": 7,
+  "colors": 8,
   "fits": true,
   "h": 136,
   "src": "assets/sprites/player/hurt2_gold.png",
@@ -434,7 +530,7 @@
  },
  "player/hurt_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 118,
   "src": "assets/sprites/player/hurt_gold.png",
@@ -466,7 +562,7 @@
  },
  "player/idle_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 111,
   "src": "assets/sprites/player/idle_gold.png",
@@ -498,7 +594,7 @@
  },
  "player/jump_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 94,
   "src": "assets/sprites/player/jump_gold.png",
@@ -530,7 +626,7 @@
  },
  "player/run1_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 118,
   "src": "assets/sprites/player/run1_gold.png",
@@ -562,7 +658,7 @@
  },
  "player/run2_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 135,
   "src": "assets/sprites/player/run2_gold.png",
@@ -594,7 +690,7 @@
  },
  "player/run3_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 121,
   "src": "assets/sprites/player/run3_gold.png",
@@ -626,7 +722,7 @@
  },
  "player/run4_gold": {
   "anchor": "bottom",
-  "colors": 14,
+  "colors": 15,
   "fits": true,
   "h": 136,
   "src": "assets/sprites/player/run4_gold.png",
@@ -699,7 +795,7 @@
  "tiles/candyforest": {
   "anchor": "center",
   "colors": 24,
-  "fits": false,
+  "fits": true,
   "h": 157,
   "src": "assets/sprites/tiles/candyforest.png",
   "w": 265
@@ -707,7 +803,7 @@
  "tiles/castle": {
   "anchor": "center",
   "colors": 24,
-  "fits": false,
+  "fits": true,
   "h": 143,
   "src": "assets/sprites/tiles/castle.png",
   "w": 189

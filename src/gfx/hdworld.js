@@ -11,8 +11,8 @@ function canvas(w, h) { const c = document.createElement('canvas'); c.width = w;
 // bands: ストリップ高さに対する帯の [開始, 終了]（0..1）。生成物の実測: 地表(草) / 石壁 / 地中
 export const TILE_BANDS = {
   graveyard:   { surface: [0.00, 0.22], plat: [0.22, 0.40], fill: [0.52, 0.88] },
-  candyforest: { surface: [0.00, 0.22], plat: [0.22, 0.40], fill: [0.52, 0.88] },
-  castle:      { surface: [0.00, 0.22], plat: [0.22, 0.40], fill: [0.52, 0.88] },
+  candyforest: { surface: [0.00, 0.19], plat: [0.32, 0.42], fill: [0.55, 0.95] },
+  castle:      { surface: [0.00, 0.20], plat: [0.50, 0.62], fill: [0.50, 1.00] },
 };
 export function sliceTileStrip(img, bands = TILE_BANDS.graveyard) {
   const cols = Math.max(1, Math.floor(img.width / T));
@@ -38,8 +38,24 @@ export function sliceTileStrip(img, bands = TILE_BANDS.graveyard) {
   return { top, fill, plat, cols };
 }
 
+// HD 毒沼タイル（2 フレーム）。テーマ色から 48px 解像度で生成する
+export function buildBogHD(theme, seed = 7) {
+  let s = seed >>> 0 || 1; const rnd = () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
+  const out = [];
+  for (let f = 0; f < 2; f++) {
+    const c = canvas(T, T); const g = c.getContext('2d');
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const v = rnd(); g.fillStyle = theme.bog[v < 0.7 ? 0 : v < 0.93 ? 1 : 2]; g.fillRect(x, y, 1, 1); }
+    // 揺らぐ表面ライン
+    for (let x = 0; x < T; x++) { const yy = 1 + Math.round(Math.sin((x + f * 6) / 5) * 1.5); g.fillStyle = theme.bogGlow; g.fillRect(x, yy, 1, 1); g.fillStyle = theme.bogBubble; if (x % 9 === (f * 4) % 9) g.fillRect(x, yy + 1, 1, 1); }
+    // 泡
+    for (let i = 0; i < 5; i++) { const bx = Math.floor(rnd() * (T - 6)) + 3, by = Math.floor(rnd() * (T - 10)) + 6, r = 1 + Math.floor(rnd() * 2); g.fillStyle = theme.bogGlow; g.fillRect(bx - r, by, r * 2 + 1, 1); g.fillRect(bx, by - r, 1, r * 2 + 1); g.fillStyle = theme.bogBubble; g.fillRect(bx, by - r, 1, 1); }
+    out.push(c);
+  }
+  return out;
+}
+
 // マップ全体を HD チャンクに事前描画（世界 512px 幅 = 1536 HD px ごと）
-export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512) {
+export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512, decoHD = null) {
   const chunks = [];
   for (let cx = 0; cx < map.pixelWidth; cx += chunkWorld) {
     const cw = Math.min(chunkWorld, map.pixelWidth - cx);
@@ -52,6 +68,7 @@ export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512) {
         g.drawImage(up ? tiles.fill[v] : tiles.top[v], px, py);
         if (!map.isSolid(tx, ty + 1) && ty < map.height - 1) { g.fillStyle = 'rgba(26,15,30,0.45)'; g.fillRect(px, py + T - 4, T, 4); }
       } else if (map.isOneWay(tx, ty)) g.drawImage(tiles.plat[v], px, py);
+      else if (decoHD && decoHD[ch]) { const d = decoHD[ch].r; g.drawImage(d, px + Math.round((T - d.width) / 2), py + T - d.height); } // 生成装飾: 足元をタイル下端に
       else if (decoTiles && decoTiles['deco_' + ch]) g.drawImage(decoTiles['deco_' + ch], px, py, T, T); // 旧装飾は 3 倍表示（暫定）
       else if (ch === '^' && decoTiles) g.drawImage(decoTiles.spike, px, py, T, T);
     }

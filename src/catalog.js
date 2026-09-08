@@ -56,18 +56,17 @@ async function boot() {
     });
   }
 
-  // 背景＋地形＋キャラの合成（ゲーム画面 768x672 相当）
-  const gen = A.generated ?? {};
-  for (const th of Object.keys(A.backgrounds)) {
-    section('scene_' + th, `シーン合成: ${th}（768x672）`, 768, 672, g => {
-      const sky = gen.bg?.[th + '_sky'], far = gen.bg?.[th + '_far'], mid = gen.bg?.[th + '_mid'], strip = gen.tiles?.[th];
-      if (sky) g.drawImage(sky.r, 0, 0, 768, 672); else { g.save(); g.scale(3, 3); drawBackground(g, [A.backgrounds[th][0]], 0, 256, 224); g.restore(); }
-      for (const L of [far, mid]) if (L) for (let x = 0; x < 768; x += L.r.width) g.drawImage(L.r, x, 528 - L.r.height);
-      if (strip) { const cols = Math.floor(strip.r.width / 48); for (let tx = 0; tx < 16; tx++) { const v = tx % cols; g.drawImage(strip.r, v * 48, 0, 48, 48, tx * 48, 528, 48, 48); g.drawImage(strip.r, v * 48, strip.r.height >= 96 ? 48 : 0, 48, 48, tx * 48, 576, 48, 48); g.drawImage(strip.r, v * 48, strip.r.height >= 96 ? 48 : 0, 48, 48, tx * 48, 624, 48, 48); } }
-      else { g.fillStyle = '#5a3a24'; g.fillRect(0, 528, 768, 144); }
-      const p = A.player.dress.idle; if (p) g.drawImage(p.r, 100, 528 - p.r.height);
-      const z = A.enemies.zombie1; if (z) g.drawImage(z.l, 420, 528 - z.l.height);
-      const m = A.enemies.mushroom1; if (m) g.drawImage(m.l, 600, 380);
+  // シーン合成: 実際の World 描画（背景層・HD タイル・装飾・毒沼）をそのまま使う
+  const { World } = await import('./world.js');
+  const { STAGES } = await import('./levels/index.js');
+  const stubGame = { assets: A, audio: { sfx() {}, playBgm() {}, stopBgm() {} }, score: 0, lives: 2, stageIndex: 0 };
+  for (const [i, st] of STAGES.entries()) {
+    section('scene_' + st.theme, `シーン合成: ${st.theme}（768x672、実描画）`, 768, 672, g => {
+      const w = new World(stubGame, st); const p = w.player;
+      // 見どころ位置: ステージ中盤の足場付近へカメラを置く
+      p.x = (st.name === 'stage3' ? 40 : 60) * 16; w.cam.x = p.x - 90; p.invT = 0;
+      for (const e of w.enemies) if (e.update && e.hp !== undefined && Math.abs(e.x - p.x) < 300) { /* 位置のみ */ }
+      g.save(); g.scale(3, 3); w.draw(g); g.restore();
     });
   }
 

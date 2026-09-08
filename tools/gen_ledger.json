@@ -1,5 +1,5 @@
 {
- "requests": 52,
+ "requests": 58,
  "entries": [
   {
    "name": "player-base",
@@ -376,6 +376,54 @@
    "secs": 9.0,
    "text": "Here are the four pixel-art pickup items you requested, rendered in the style of a 16-bit SNES-era Japanese RPG. ",
    "ts": 1788847814.473293
+  },
+  {
+   "name": "deco-graveyard",
+   "v": 1,
+   "ok": true,
+   "secs": 13.6,
+   "text": "",
+   "ts": 1788848188.4706502
+  },
+  {
+   "name": "deco-candy",
+   "v": 1,
+   "ok": true,
+   "secs": 9.5,
+   "text": "Here are the four candy-forest decorations you requested, depicted in 16-bit SNES-era Japanese RPG pixel art style:\n",
+   "ts": 1788848198.4501498
+  },
+  {
+   "name": "deco-castle",
+   "v": 1,
+   "ok": true,
+   "secs": 13.4,
+   "text": "Here are the four castle decorations in 16-bit SNES-era Japanese RPG pixel art style, with the specified dimensions and details: ",
+   "ts": 1788848212.333899
+  },
+  {
+   "name": "bg-graveyard-far",
+   "v": 2,
+   "ok": true,
+   "secs": 8.9,
+   "text": "Here's your pixel art parallax layer:\n",
+   "ts": 1788848221.6914601
+  },
+  {
+   "name": "bg-graveyard-mid",
+   "v": 2,
+   "ok": true,
+   "secs": 11.9,
+   "text": "",
+   "ts": 1788848234.0970082
+  },
+  {
+   "name": "player-plain",
+   "v": 2,
+   "ok": true,
+   "secs": 12.8,
+   "text": "",
+   "ts": 1788848320.448456
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

@@ -89,6 +89,32 @@ def ensure_hat(frame_name, hat_img):
     canvas.save(SPR / f'{frame_name}.png'); return True
 
 
+def rule_map(im, target):
+    """衣装色を規則で置換する（生成モデルが衣装変更を守らないため）。
+    髪より下（高さ 42% 以下）に主に現れる桃〜赤紫色を衣装色とみなし、
+    plain: 明るい色→白系、暗い色→紺  /  gold: 色相を金色へ回し明度は維持。"""
+    import colorsys
+    a = np.asarray(im); al = a[..., 3] > 0; h = a.shape[0]
+    cols = {}
+    for y in range(h):
+        for x in range(a.shape[1]):
+            if not al[y, x]: continue
+            c = tuple(int(v) for v in a[y, x, :3]); cols.setdefault(c, []).append(y)
+    mp = {}
+    for c, ys in cols.items():
+        r, g, b = (v / 255 for v in c); hh, l, sat = colorsys.rgb_to_hls(r, g, b)
+        deg = hh * 360
+        if not (sat > 0.25 and (deg >= 295 or deg <= 15)): continue          # 桃〜赤紫〜赤
+        if np.mean(ys) < h * 0.42: continue                                    # 髪・顔の位置に多い色は除外
+        if target == 'plain':
+            if l > 0.62: nl = 0.90 + (l - 0.62) * 0.2; nr, ng, nb = colorsys.hls_to_rgb(0.65, min(0.97, nl), 0.15)   # 白（わずかに青み）
+            else: nr, ng, nb = colorsys.hls_to_rgb(0.62, max(0.18, l * 0.55), 0.55)                              # 紺
+        else:
+            nr, ng, nb = colorsys.hls_to_rgb(0.11, min(0.92, l * 1.05), min(1.0, sat * 1.1))                     # 金〜クリーム
+        mp[c] = (int(nr * 255), int(ng * 255), int(nb * 255))
+    return mp
+
+
 def learn_map(src, dst):
     """src と dst を足元中央で重ね、src 色 → dst 色 の多数決写像を作る（一致率 60% 未満の色は変えない）"""
     ox, oy = overlay_offsets(src, dst)  # dst を src 座標系へ: dst(x,y) は src(x+ox, y+oy)
@@ -126,16 +152,16 @@ def main():
         if ensure_hat(n, hat_img):
             out = load(n); manifest[f'player/{n}'].update({'w': out.width, 'h': out.height}); print('hat composited onto', n)
     # plain: 帽子なしフレーム(*_nohat) に idle_nohat→idle_plain の写像を適用
-    if (SPR / 'idle_plain.png').exists() and (SPR / 'idle_nohat.png').exists():
-        mp = learn_map(load('idle_nohat'), load('idle_plain')); print('plain mapped colors', len(mp))
+    if (SPR / 'idle_nohat.png').exists():
+        mp = rule_map(load('idle_nohat'), 'plain'); print('plain mapped colors', len(mp))
         for n in frames:
             src = SPR / f'{n}_nohat.png'
             if not src.exists(): continue
             out = apply_map(Image.open(src).convert('RGBA'), mp); out.save(SPR / f'{n}_plain.png')
             manifest[f'player/{n}_plain'] = {'src': f'assets/sprites/player/{n}_plain.png', 'w': out.width, 'h': out.height, 'anchor': 'bottom', 'fits': True, 'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0])}
     # gold: 帽子ありフレームに idle_nohat→idle_gold の衣装写像を適用（帽子色は写像に含まれない）
-    if (SPR / 'idle_gold.png').exists() and (SPR / 'idle_nohat.png').exists():
-        mp = learn_map(load('idle_nohat'), load('idle_gold')); print('gold mapped colors', len(mp))
+    if (SPR / 'idle.png').exists():
+        mp = rule_map(load('idle_nohat'), 'gold'); print('gold mapped colors', len(mp))
         for n in frames:
             src = SPR / f'{n}.png'
             if not src.exists(): continue
