@@ -2,6 +2,7 @@ import { TILE, moveBody } from '../physics.js';
 import { EnemyShot } from './projectiles.js';
 import { tint, blit } from '../gfx/sprite.js';
 import { rand } from '../util.js';
+import { SAFE_ZONE_X } from '../balance.js';
 
 let nextId = 1;
 const flashCache = new Map();
@@ -47,6 +48,7 @@ export class Enemy {
     else if (this.gore === 'bone') { p.emit('stuffing', this.cx, this.cy, 6); p.emit('gore', this.cx, this.cy, 5); p.emit('blood', this.cx, this.cy, 12); this.world.audio.sfx('splat'); }
   }
   shoot(kind, vx, vy, ox = 0, oy = 0, opts = {}) {
+    if (this.world.safeT > 0) return; // 復活直後は敵弾なし（balance.js SAFE_SHOT_T）
     this.world.enemyShots.push(new EnemyShot(this.world, kind, this.cx + ox, this.cy + oy, vx, vy, { owner: this, ...opts }));
   }
   physics(dt) {
@@ -111,6 +113,9 @@ export class ZombieSpawner {
     const map = this.world.level.map;
     const side = Math.random() < 0.6 ? p.facing : -p.facing;
     const sx = p.centerX + side * rand(50, 100);
+    // 復活地点（開始地点・中間地点）の ±SAFE_ZONE_X には湧かない
+    const safe = [this.world.level.playerStart, ...this.world.level.checkpoints];
+    if (safe.some(c => c && Math.abs(sx - (c.x + TILE / 2)) < SAFE_ZONE_X)) return;
     const tx = Math.floor(sx / TILE);
     // 足元の地面を探す
     for (let ty = Math.floor(p.y / TILE); ty < map.height; ty++) {

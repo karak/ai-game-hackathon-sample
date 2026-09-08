@@ -11,6 +11,7 @@ import { EnemyShot, WEAPONS } from './entities/projectiles.js';
 import { SONGS } from './audio.js';
 import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBogHD, buildSpikeHD } from './gfx/hdworld.js';
 import { THEMES } from './gfx/tiles.js';
+import { SAFE_SHOT_T } from './balance.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
@@ -51,7 +52,7 @@ export class World {
     this.enemies = []; this.shots = []; this.enemyShots = []; this.fires = []; this.pools = []; this.items = []; this.boxes = [];
     this.cam = { x: 0, y: 0 }; this.arena = null; this.boss = null; this.bossState = 'none';
     this.time = this.level.timeLimit; this.t = 0; this.cutscene = false; this.cleared = false;
-    this.shakeT = 0; this.shakeAmp = 0; this.toasts = []; this.tickT = 0;
+    this.shakeT = 0; this.shakeAmp = 0; this.toasts = []; this.tickT = 0; this.safeT = 0; // safeT > 0 の間は敵弾なし
     this.checkpoint = { ...this.level.playerStart };
     this.player = new Player(this, this.level.playerStart.x, this.level.playerStart.y);
     this.spawnAll();
@@ -80,7 +81,7 @@ export class World {
     // チェックポイントから再開。敵は再配置、ボス戦中ならボス戦をリセット
     if (this.boss) { this.boss = null; this.arena = null; this.bossState = 'none'; this.cutscene = false; }
     this.spawnAll();
-    this.player.respawn(this.checkpoint.x, this.checkpoint.y);
+    this.player.respawn(this.checkpoint.x, this.checkpoint.y); this.safeT = SAFE_SHOT_T;
     this.cam.x = Math.max(0, Math.min(this.level.map.pixelWidth - W, this.player.centerX - W / 2));
     this.time = Math.max(this.time, 60);
     this.audio.playBgm(SONGS[this.level.theme]);
@@ -89,7 +90,7 @@ export class World {
   onBossDefeated() { this.cleared = true; this.cutscene = true; this.player.vx = 0; this.game.stageClear(); }
 
   update(dt, input) {
-    this.t += dt;
+    this.t += dt; if (this.safeT > 0) this.safeT = Math.max(0, this.safeT - dt);
     const p = this.player, map = this.level.map;
     if (!this.cutscene && p.alive) {
       this.time -= dt;

@@ -456,7 +456,7 @@ export const STAGES = [
     title: '第一章　花畑の墓地',
     subtitle: '土の下から、可愛いものたちが這い出してくる',
     theme: 'graveyard',
-    timeLimit: 210,
+    timeLimit: 300, // balance.js minTimeLimit: 歩行 59s×3 + ボス 90s = 267 → 300
     boss: 'doll',
     rows: stitch(...s1),
   },
@@ -465,7 +465,7 @@ export const STAGES = [
     title: '第二章　毒沼の菓子の森',
     subtitle: '甘い匂いは、腐った匂いと見分けがつかない',
     theme: 'candyforest',
-    timeLimit: 210,
+    timeLimit: 300, // 歩行 55s×3 + 90 = 255 → 300
     boss: 'teddy',
     rows: stitch(...s2),
   },
@@ -474,7 +474,7 @@ export const STAGES = [
     title: '最終章　血染めの砂糖城',
     subtitle: 'かつて、彼女も誰かの希望だった',
     theme: 'castle',
-    timeLimit: 240,
+    timeLimit: 330, // 歩行 49s×3 + 90 = 237。足場が最も多く、最終ボスが最長のため 330
     boss: 'noir',
     rows: stitch(...s3),
   },
