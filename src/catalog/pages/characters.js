@@ -6,6 +6,7 @@ import { HD_SCALE } from '../../gfx/sprite.js';
 const ANIMS = [
   { name: 'idle', frames: ['idle'], ticks: [0], loop: false, desc: '待機。無敵中は 18Hz で点滅' },
   { name: 'run', frames: ['run1', 'run2', 'run3', 'run4'], ticks: [6, 6, 6, 6], loop: true, desc: '走り 4 コマ（runT×10 → 1 コマ 6 tick）' },
+  { name: 'run+shoot', frames: ['run1s', 'run3s'], ticks: [12, 12], loop: true, desc: '走り撃ち 2 コマ（足は run1/run3 の接地コマ、上半身が射撃。射撃後 0.18 秒だけ差し替え）' },
   { name: 'jump / fall', frames: ['jump', 'fall'], ticks: [0, 0], loop: false, desc: '上昇中 jump、下降中 fall。空中制御なし' },
   { name: 'attack', frames: ['attack'], ticks: [11], loop: false, desc: '射撃後 0.18 秒（≈11 tick）表示' },
   { name: 'crouch', frames: ['crouch'], ticks: [0], loop: false, desc: '↓ 押下中。当たり判定 12×18' },

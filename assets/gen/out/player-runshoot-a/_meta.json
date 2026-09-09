@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/player-runshoot-a-v2.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  110,
+  135
+ ],
+ "frames": [
+  {
+   "w": 103,
+   "h": 104,
+   "fits": true,
+   "colors": 15,
+   "name": "run1s_nohat"
+  },
+  {
+   "w": 51,
+   "h": 104,
+   "fits": true,
+   "colors": 15,
+   "name": "run2s_nohat"
+  }
+ ]
+}

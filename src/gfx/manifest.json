@@ -347,9 +347,9 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 59,
+  "h": 116,
   "src": "assets/sprites/bg/workshop_far2.png",
-  "w": 237
+  "w": 247
  },
  "bg/workshop_mid": {
   "anchor": "center",
@@ -609,9 +609,9 @@
  },
  "deco/carousel": {
   "anchor": "bottom",
-  "colors": 15,
+  "colors": 14,
   "fits": true,
-  "h": 126,
+  "h": 102,
   "src": "assets/sprites/deco/carousel.png",
   "w": 79
  },
@@ -827,17 +827,17 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 252,
+  "h": 242,
   "src": "assets/sprites/ending/scene4.png",
-  "w": 258
+  "w": 248
  },
  "ending/scene5": {
   "anchor": "center",
   "colors": 32,
   "fits": false,
-  "h": 275,
+  "h": 271,
   "src": "assets/sprites/ending/scene5.png",
-  "w": 269
+  "w": 265
  },
  "ending/scene6": {
   "anchor": "center",
@@ -1432,6 +1432,38 @@
   "src": "assets/sprites/player/run1_plain.png",
   "w": 68
  },
+ "player/run1s": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 112,
+  "src": "assets/sprites/player/run1s.png",
+  "w": 103
+ },
+ "player/run1s_gold": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 112,
+  "src": "assets/sprites/player/run1s_gold.png",
+  "w": 103
+ },
+ "player/run1s_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 104,
+  "src": "assets/sprites/player/run1s_nohat.png",
+  "w": 103
+ },
+ "player/run1s_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 104,
+  "src": "assets/sprites/player/run1s_plain.png",
+  "w": 103
+ },
  "player/run2": {
   "anchor": "bottom",
   "colors": 15,
@@ -1495,6 +1527,38 @@
   "h": 104,
   "src": "assets/sprites/player/run3_plain.png",
   "w": 64
+ },
+ "player/run3s": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 113,
+  "src": "assets/sprites/player/run3s.png",
+  "w": 102
+ },
+ "player/run3s_gold": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 113,
+  "src": "assets/sprites/player/run3s_gold.png",
+  "w": 102
+ },
+ "player/run3s_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 105,
+  "src": "assets/sprites/player/run3s_nohat.png",
+  "w": 99
+ },
+ "player/run3s_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 105,
+  "src": "assets/sprites/player/run3s_plain.png",
+  "w": 99
  },
  "player/run4": {
   "anchor": "bottom",
@@ -1779,10 +1843,10 @@
  "tiles/press": {
   "anchor": "bottom",
   "colors": 15,
-  "fits": true,
-  "h": 56,
+  "fits": false,
+  "h": 147,
   "src": "assets/sprites/tiles/press.png",
-  "w": 47
+  "w": 157
  },
  "tiles/river": {
   "anchor": "center",

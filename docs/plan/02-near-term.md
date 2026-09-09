@@ -108,3 +108,17 @@
 | 5 | 敵弾の当たり判定が旧サイズ（4〜8 世界単位） | 生成スプライトの実寸 ×0.6 に自動追従 | 済（`SHOT_HIT_RATIO`） |
 | 6 | E2E が手動スクリプト | 済: `npm run e2e`（`playwright.config.js`、`e2e/autoplay.spec.js` 3 件: 全 4 面ボット自走 clear・エラー 0 / タイトル→オプション→保存 / デモ再生の決定論と中断）。Vite を 5174 で自動起動、6.7 秒 | 済 |
 | 7 | ミニフォントの視認性 | 済: `mini()` を DotGothic16 16px（半角 8px 送り = 旧ビットマップと同じ論理 8/3）に置換。旧 3×5 は `miniBitmap()` としてフォント未読込時のフォールバック。`logs/sprintB-hud-minifont.png` | 済 |
+
+## Sprint E — 「ビジュアル残課題の一掃」（2026-09-09、ユーザー指示「ビジュアル面の残課題をまず片付けて」）
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| BUG-012 コマ寸法 | 仕様を「部位ごとの論理 px」に変更（`specs.json part_sizes` → prompt PART SIZES → build QA）。jump/fall・私服 jump・hurt2・cake を直した | commit（本スプリント）、`tools/gemini_gen.py part_block`、`tools/build_sprites.py measure_parts`、カタログ「キャラクターシート」撮影 `test-results/shots/cat_motion_d1.png` |
+| BUG-013 carousel 混入 | 分割を連結成分の所属で切る `split_frames_masked` | `tools/postprocess.py`、`assets/sprites/deco/carousel.png` 79×102 |
+| IMP-010 プレス機 | 単体 spec、157×147（3 タイル級） | `test-results/shots/game_workshop_runshoot_d2.png` |
+| IMP-011 工房遠景 B | 247×116（A 140 の 0.83 倍、連結条件 0.5〜2 倍を満たす） | `assets/sprites/bg/workshop_far2.png` |
+| IMP-012 地面板 | 全 41 層の下端を機械計測、板は残っていない（床帯は意匠） | 08-backlog 記載 |
+| IMP-016 走り撃ち | run1s/run3s の 2 コマ（杖込み幅 103）。射撃中は 12 tick 交互 | `test/player-frames.test.js`、上記実機撮影 |
+| エンディング場面 5 の額縁 | `--trim-border` で外周の一様色 5 px を除去（場面 4 も 2 px） | `assets/sprites/ending/scene5.png` 265×271 |
+
+未達: 通過コマ（run2s/run4s）に杖を持たせる生成が 2 回とも失敗。hurt のつば幅 1.45x（傾き）。fall_nohat の髪幅 1.39x。台帳 186/200。

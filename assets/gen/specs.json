@@ -35,6 +35,12 @@
    "legs_height": 18,
    "boot_height": 10,
    "boot_width": 12
+  },
+  "press": {
+   "total_height": 120,
+   "block_width": 130,
+   "block_height": 100,
+   "chain_height": 20
   }
  },
  "sprites": {
@@ -1166,8 +1172,8 @@
   },
   "bg-workshop-far2": {
    "box": [
-    400,
-    300
+    260,
+    150
    ],
    "frames": 1,
    "anchor": "center",
@@ -1268,7 +1274,25 @@
     "tiles/gear"
    ],
    "colors": 15,
-   "strip_caption": true
+   "strip_caption": true,
+   "skip_out": [
+    "tiles/press"
+   ]
+  },
+  "gimmick-press": {
+   "box": [
+    150,
+    140
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "gimmick-press.txt",
+   "out": [
+    "tiles/press"
+   ],
+   "colors": 15,
+   "strip_caption": true,
+   "parts": "press"
   },
   "enemy-dollpart": {
    "box": [
@@ -1873,7 +1897,8 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "nokey": true
+   "nokey": true,
+   "trim_border": true
   },
   "ending-2": {
    "box": [
@@ -1888,7 +1913,8 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "nokey": true
+   "nokey": true,
+   "trim_border": true
   },
   "ending-3": {
    "box": [
@@ -1903,7 +1929,8 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "nokey": true
+   "nokey": true,
+   "trim_border": true
   },
   "ending-4": {
    "box": [
@@ -1918,7 +1945,8 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "nokey": true
+   "nokey": true,
+   "trim_border": true
   },
   "ending-5": {
    "box": [
@@ -1933,7 +1961,8 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "nokey": true
+   "nokey": true,
+   "trim_border": true
   },
   "ending-6": {
    "box": [
@@ -1948,7 +1977,88 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "nokey": true
+   "nokey": true,
+   "trim_border": true
+  },
+  "player-runshoot-a-hat": {
+   "box": [
+    110,
+    135
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-runshoot-a-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run1s",
+    "player/run2s"
+   ],
+   "palette": "player/idle",
+   "strip_caption": true,
+   "parts": "player",
+   "skip": true,
+   "_note": "v1 は idle 比 1.14〜1.24x で不採用。run*s は run*s_nohat に帽子を合成して作る（derive_variants）"
+  },
+  "player-runshoot-b-hat": {
+   "box": [
+    110,
+    135
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-runshoot-b-hat.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run3s",
+    "player/run4s"
+   ],
+   "palette": "player/idle",
+   "strip_caption": true,
+   "parts": "player",
+   "skip": true,
+   "_note": "v1 は idle 比 1.14〜1.24x で不採用。run*s は run*s_nohat に帽子を合成して作る（derive_variants）"
+  },
+  "player-runshoot-a": {
+   "box": [
+    110,
+    135
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-runshoot-a.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run1s_nohat",
+    "player/run2s_nohat"
+   ],
+   "palette": "player/idle",
+   "strip_caption": true,
+   "parts": "player_nohat",
+   "skip_out": [
+    "player/run2s_nohat"
+   ],
+   "_note": "2 コマ目（通過ポーズ）は v1/v2 とも杖が描かれなかったので不使用。走り撃ちは run1s/run3s の 2 コマ運用（IMP-016）"
+  },
+  "player-runshoot-b": {
+   "box": [
+    110,
+    135
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-runshoot-b.txt",
+   "ref": "player-base",
+   "out": [
+    "player/run3s_nohat",
+    "player/run4s_nohat"
+   ],
+   "palette": "player/idle",
+   "strip_caption": true,
+   "parts": "player_nohat",
+   "skip_out": [
+    "player/run4s_nohat"
+   ],
+   "_note": "2 コマ目（通過ポーズ）は v1/v2 とも杖が描かれなかったので不使用。走り撃ちは run1s/run3s の 2 コマ運用（IMP-016）"
   }
  }
 }

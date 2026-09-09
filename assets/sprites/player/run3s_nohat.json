@@ -1,0 +1,17 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/player-runshoot-b-v2.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  110,
+  135
+ ],
+ "frames": null,
+ "w": 99,
+ "h": 105,
+ "fits": true,
+ "colors": 15,
+ "name": "run3s_nohat"
+}

@@ -20,7 +20,7 @@ test('§2.1 player body frames are 40-80 wide and 70-120 tall; hat/dead/crouch h
     if (n === 'dead') { expect(v.w, k).toBeGreaterThanOrEqual(80); expect(v.h, k).toBeLessThanOrEqual(80); continue; }
     if (n === 'hat' || n === 'base_hat') continue;
     if (n === 'base_hat') continue;
-    expect(v.w, k).toBeGreaterThanOrEqual(36); expect(v.w, k).toBeLessThanOrEqual(90);
+    expect(v.w, k).toBeGreaterThanOrEqual(36); expect(v.w, k).toBeLessThanOrEqual(/^run\ds$/.test(n) ? 110 : 90); // 走り撃ち（run1s/run3s）は前に突き出した杖と火花で幅 +25 まで許す
     expect(v.h, k).toBeGreaterThanOrEqual(n === 'jump' || n === 'crouch' ? 70 : 90); expect(v.h, k).toBeLessThanOrEqual(140);
   }
 });

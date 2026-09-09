@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/player-runshoot-b-hat-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  100,
+  135
+ ],
+ "frames": [
+  {
+   "w": 95,
+   "h": 126,
+   "fits": true,
+   "colors": 15,
+   "name": "run3s"
+  },
+  {
+   "w": 75,
+   "h": 113,
+   "fits": true,
+   "colors": 15,
+   "name": "run4s"
+  }
+ ]
+}

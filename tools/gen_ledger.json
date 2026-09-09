@@ -1,5 +1,5 @@
 {
- "requests": 177,
+ "requests": 186,
  "entries": [
   {
    "name": "player-base",
@@ -1376,6 +1376,78 @@
    "secs": 11.7,
    "text": "",
    "ts": 1788937295.05441
+  },
+  {
+   "name": "gimmick-press",
+   "v": 1,
+   "ok": true,
+   "secs": 10.4,
+   "text": "",
+   "ts": 1788937664.446679
+  },
+  {
+   "name": "bg-workshop-far2",
+   "v": 2,
+   "ok": true,
+   "secs": 11.4,
+   "text": "",
+   "ts": 1788937740.0249758
+  },
+  {
+   "name": "bg-workshop-far2",
+   "v": 3,
+   "ok": true,
+   "secs": 13.3,
+   "text": "",
+   "ts": 1788937848.7913952
+  },
+  {
+   "name": "player-runshoot-a-hat",
+   "v": 1,
+   "ok": true,
+   "secs": 21.8,
+   "text": "",
+   "ts": 1788937914.879337
+  },
+  {
+   "name": "player-runshoot-b-hat",
+   "v": 1,
+   "ok": true,
+   "secs": 14.6,
+   "text": "",
+   "ts": 1788937929.934334
+  },
+  {
+   "name": "player-runshoot-a",
+   "v": 1,
+   "ok": true,
+   "secs": 19.1,
+   "text": "",
+   "ts": 1788937949.453645
+  },
+  {
+   "name": "player-runshoot-b",
+   "v": 1,
+   "ok": true,
+   "secs": 17.8,
+   "text": "",
+   "ts": 1788937967.9396439
+  },
+  {
+   "name": "player-runshoot-a",
+   "v": 2,
+   "ok": true,
+   "secs": 16.2,
+   "text": "",
+   "ts": 1788938088.692909
+  },
+  {
+   "name": "player-runshoot-b",
+   "v": 2,
+   "ok": true,
+   "secs": 18.1,
+   "text": "",
+   "ts": 1788938107.282733
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

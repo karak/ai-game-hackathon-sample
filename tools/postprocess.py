@@ -133,6 +133,10 @@ def strip_shadow(logical):
 
 
 def split_frames(logical, min_gap=2, min_width=8, expect=0):
+    return [f[:2] for f in split_frames_masked(logical, min_gap, min_width, expect)]
+
+
+def split_frames_masked(logical, min_gap=2, min_width=8, expect=0):
     """フレーム分割。透明列だけでは x が重なる物体（枝が隣にかかる等）を分けられないので、
     8 近傍の連結成分を取り、bbox が min_gap 以内で重なる成分は同じフレームに併合する。左から順に返す。"""
     a = np.asarray(logical.split()[3]) > 0; h, w = a.shape
@@ -148,28 +152,57 @@ def split_frames(logical, min_gap=2, min_width=8, expect=0):
                     for dx in (-1, 0, 1):
                         ny, nx = cy + dy, cx + dx
                         if 0 <= ny < h and 0 <= nx < w and a[ny, nx] and not labels[ny, nx]: labels[ny, nx] = idx; stack.append((ny, nx))
-            comps.append([x0, x1 + 1, y0, y1 + 1, n])
+            comps.append([x0, x1 + 1, y0, y1 + 1, n, idx])
     if not comps: return []
-    # 大きい成分から順に、bbox が近接する小成分を併合（血しぶきの飛沫など）
+    # 大きい成分から順に、bbox が近接する小成分を併合（血しぶきの飛沫など）。各グループは成分ラベルの集合も持つ
     comps.sort(key=lambda c: -c[4]); groups = []
     for c in comps:
         for gph in groups:
             if c[0] <= gph[1] + min_gap and c[1] >= gph[0] - min_gap and c[2] <= gph[3] + min_gap * 3 and c[3] >= gph[2] - min_gap * 3:
-                gph[0], gph[1], gph[2], gph[3] = min(gph[0], c[0]), max(gph[1], c[1]), min(gph[2], c[2]), max(gph[3], c[3]); break
-        else: groups.append(list(c[:4]))
-    frames = sorted([(g0, g1) for g0, g1, _, _ in groups if g1 - g0 >= min_width])
+                gph[0], gph[1], gph[2], gph[3] = min(gph[0], c[0]), max(gph[1], c[1]), min(gph[2], c[2]), max(gph[3], c[3]); gph[4].add(c[5]); break
+        else: groups.append(list(c[:4]) + [{c[5]}])
+    frames = sorted([(g0, g1, ids) for g0, g1, _, _, ids in groups if g1 - g0 >= min_width], key=lambda f: f[:2])
     # 1 コマ指定なら、離れた付属物（浮遊するハート・飛沫など）も含めて 1 コマにまとめる
-    if expect == 1 and len(frames) > 1: frames = [(min(f[0] for f in frames), max(f[1] for f in frames))]
+    if expect == 1 and len(frames) > 1: frames = [(min(f[0] for f in frames), max(f[1] for f in frames), set().union(*(f[2] for f in frames)))]
+    # 期待コマ数があるとき、画素数が最大コマの 3% 未満の「コマ」は欠片（飛沫・杖の火花など）とみなし最寄りのコマに帰属させる
+    if expect and len(frames) > 1:
+        size = {c[5]: c[4] for c in comps}; cnt = [sum(size[i] for i in f[2]) for f in frames]; big = max(cnt)
+        keep = [f for f, n in zip(frames, cnt) if n >= big * 0.03]; debris = [f for f, n in zip(frames, cnt) if n < big * 0.03]
+        for f in debris:
+            cx = (f[0] + f[1]) / 2; near = min(keep, key=lambda k: abs((k[0] + k[1]) / 2 - cx)); near[2].update(f[2])
+        frames = keep
     # 期待フレーム数に足りない場合、最も幅の広いフレームを「列占有が最小の位置」で割る（接触した物体の分離）
     occ = a.sum(axis=0)
     while expect and len(frames) < expect and frames:
-        i = max(range(len(frames)), key=lambda k: frames[k][1] - frames[k][0]); x0, x1 = frames[i]
+        i = max(range(len(frames)), key=lambda k: frames[k][1] - frames[k][0]); x0, x1, ids = frames[i]
         if x1 - x0 < min_width * 2: break
         cut = min(range(x0 + min_width, x1 - min_width), key=lambda x: (occ[x], abs(x - (x0 + x1) / 2)))
-        frames[i:i + 1] = [(x0, cut), (cut, x1)]
-    return frames
+        frames[i:i + 1] = [(x0, cut, ids), (cut, x1, ids)]
+    # 幅 min_width 未満で捨てられた小グループ（柱の先端・飛沫など）は、中心 x を含むコマに帰属させる（x 範囲切りだった頃と同じ扱い）
+    used = set().union(*(f[2] for f in frames)) if frames else set()
+    for g0, g1, _, _, ids in groups:
+        if ids & used: continue
+        cx = (g0 + g1) / 2
+        for f in frames:
+            if f[0] <= cx < f[1]: f[2].update(ids); break
+    # マスク: そのコマに属する成分だけ（x 範囲で切っただけだと、隣コマの飛び出た部品＝balloons の目玉が carousel に混入する: BUG-013）
+    out = []
+    for x0, x1, ids in frames:
+        m = np.isin(labels, list(ids)); m[:, :x0] = False; m[:, x1:] = False; out.append((x0, x1, m))
+    return out
 
 
+
+
+def trim_border(im, max_px=8, std_max=6):
+    """外周から内側へ、色がほぼ一様な行・列を縁とみなして落とす（各辺最大 max_px）。額縁を描いてしまった一枚絵に使う"""
+    a = np.asarray(im.convert('RGB')).astype(int); h, w = a.shape[:2]; t = b = l = r = 0
+    while t < max_px and a[t, :, :].std(axis=0).mean() < std_max: t += 1
+    while b < max_px and a[h - 1 - b, :, :].std(axis=0).mean() < std_max: b += 1
+    while l < max_px and a[:, l, :].std(axis=0).mean() < std_max: l += 1
+    while r < max_px and a[:, w - 1 - r, :].std(axis=0).mean() < std_max: r += 1
+    if t + b + l + r: print(f'  trimmed border t{t} b{b} l{l} r{r}')
+    return im.crop((l, t, w - r, h - b))
 
 
 def strip_caption(im, max_h=16, gap=2):
@@ -252,11 +285,13 @@ def main():
     ap.add_argument('--nosplit', action='store_true', help='複数物体でも 1 枚として扱う（背景層・タイル帯）')
     ap.add_argument('--strip-caption', action='store_true', help='物体の下に描き足されたラベル文字を落とす')
     ap.add_argument('--fill-holes', action='store_true', help='キーで抜けた内部の穴を隣接色で埋める（装飾・キャラ）')
+    ap.add_argument('--trim-border', action='store_true', help='外周の一様色の縁（額縁）を最大 8 px 落とす（nokey の一枚絵向け）')
     ap.add_argument('--trim-thin-bottom', action='store_true', help='下端の細い滴などを落として接地面を広い部分にする（血溜まり）')
     a = ap.parse_args()
     bw, bh = (int(v) for v in a.logical.split('x'))
     im = Image.open(a.src).convert('RGBA') if a.nokey else key_out(Image.open(a.src), a.tol)
     logical, px, py = extract_cells(im)
+    if a.trim_border: logical = trim_border(logical)
     if a.keep_bottom: logical = logical.crop((0, int(logical.height * (1 - a.keep_bottom)), logical.width, logical.height))
     if not a.nokey and not a.keep_bottom: logical = strip_shadow(logical)
     logical = quantize_shared(logical, a.colors, a.palette)
@@ -275,10 +310,11 @@ def main():
         out.save(a.dst); meta.update(info(out))
         Path(a.dst).with_suffix('.json').write_text(json.dumps(meta, indent=1)); print(json.dumps(meta)); return
     names = a.names.split(',') if a.names else []
-    frames = split_frames(logical, min_gap=2, min_width=8, expect=len(names)); names = names or [f'f{i}' for i in range(len(frames))]
+    frames = split_frames_masked(logical, min_gap=2, min_width=8, expect=len(names)); names = names or [f'f{i}' for i in range(len(frames))]
     Path(a.dst).mkdir(parents=True, exist_ok=True); meta['frames'] = []
-    for i, (x0, x1) in enumerate(frames[:len(names)]):
-        out = logical.crop((x0, 0, x1, logical.height))
+    for i, (x0, x1, mask) in enumerate(frames[:len(names)]):
+        arr = np.asarray(logical).copy(); arr[~mask] = 0  # 隣コマに属する成分を消す
+        out = Image.fromarray(arr, 'RGBA').crop((x0, 0, x1, logical.height))
         if a.strip_caption: out = strip_caption(out)
         if a.fill_holes: out, nh = fill_holes(out); nh and print(f'  filled {nh} hole cells in {names[i]}')
         out = crop_alpha(out)

@@ -32,6 +32,7 @@ def build(name, sp):
     if sp.get('strip_caption'): pal_arg += ['--strip-caption']
     if sp.get('fill_holes'): pal_arg += ['--fill-holes']
     if sp.get('trim_thin_bottom'): pal_arg += ['--trim-thin-bottom']
+    if sp.get('trim_border'): pal_arg += ['--trim-border']  # 一枚絵の額縁を落とす（エンディング）
     if sp.get('kind') in ('bg', 'tiles'): pal_arg += ['--nosplit']
     if sp.get('keep_bottom'): pal_arg += ['--keep-bottom', str(sp['keep_bottom'])]
     if sp['frames'] == 1:
@@ -112,6 +113,7 @@ def main():
     for name in targets:
         sp = SPECS['sprites'][name]; print(f'[{name}]')
         for key, dst in build(name, sp):
+            if key in sp.get('skip_out', []): continue  # 別 spec に移した出力（例: tiles/press → gimmick-press）は manifest に載せない
             meta = json.loads(dst.with_suffix('.json').read_text())
             manifest[key] = {'src': str(dst.relative_to(ROOT)), 'w': meta['w'], 'h': meta['h'], 'fits': meta['fits'], 'colors': meta['colors'], 'anchor': sp['anchor']}
             qa_player_frame(key, dst, manifest)

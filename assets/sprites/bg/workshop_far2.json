@@ -1,15 +1,15 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-workshop-far2-v1.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-workshop-far2-v3.png",
  "pitch": [
   4.0,
   4.0
  ],
  "max_box": [
-  400,
-  300
+  260,
+  150
  ],
- "w": 237,
- "h": 59,
+ "w": 247,
+ "h": 116,
  "fits": true,
  "colors": 32
 }

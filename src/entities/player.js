@@ -182,7 +182,13 @@ export class Player {
     if (this.hurtT > 0) return 'hurt';
     if (!this.onGround) return this.attackT > 0 ? 'attack' : (this.vy < 0 ? 'jump' : 'fall');
     // 走りながら撃っても足は止めない（超魔界村準拠）。連射すると attack コマに固定されて滑走に見えるため、立ち撃ちのみ attack
-    if (this.vx !== 0) return ['run1', 'run2', 'run3', 'run4'][Math.floor(this.runT * 10) % 4];
+    if (this.vx !== 0) {
+      const ph = Math.floor(this.runT * 10) % 4, rf = ['run1', 'run2', 'run3', 'run4'][ph];
+      // 走り撃ち専用コマ（run1s / run3s: 足は接地コマと同じ、上半身だけ射撃）。通過コマは杖が描かれなかったので
+      // 射撃中は接地コマ 2 枚を 12 tick ずつ交互に出す（足は止まらない）。素材が無い衣装は走りコマのまま（IMP-016）
+      const sf = ph < 2 ? 'run1s' : 'run3s';
+      return this.attackT > 0 && this.world.assets?.player?.[this.costume]?.[sf] ? sf : rf;
+    }
     if (this.attackT > 0) return 'attack';
     return 'idle';
   }

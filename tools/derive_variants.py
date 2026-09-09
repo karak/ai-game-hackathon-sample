@@ -189,8 +189,15 @@ def main():
     manifest = json.loads(MANIFEST.read_text())
     hm = derive_hat(); manifest['player/hat'] = {'src': 'assets/sprites/player/hat.png', 'anchor': 'center', **hm}
     print('hat', hm)
-    frames = ['idle', 'run1', 'run2', 'run3', 'run4', 'jump', 'fall', 'attack', 'crouch', 'hurt', 'hurt2', 'dead']
+    frames = ['idle', 'run1', 'run2', 'run3', 'run4', 'run1s', 'run3s', 'jump', 'fall', 'attack', 'crouch', 'hurt', 'hurt2', 'dead']  # run1s/run3s = 走り撃ち 2 コマ（IMP-016。通過ポーズは杖が描かれず不採用）
     hat_img = load('hat')
+    # 走り撃ち run*s: 帽子あり生成が大きく描かれたため、帽子なしコマを複製して帽子を合成する（ensure_hat が後段で載せる）
+    for n in ('run1s', 'run3s'):
+        src = SPR / f'{n}_nohat.png'
+        if src.exists() and not (SPR / f'{n}.png').exists():
+            (SPR / f'{n}.png').write_bytes(src.read_bytes()); im = load(n)
+            manifest[f'player/{n}'] = {'src': f'assets/sprites/player/{n}.png', 'w': im.width, 'h': im.height, 'anchor': 'bottom', 'fits': True, 'colors': len([c for c in im.getcolors(9999) if c[1][3] > 0])}
+            print('run-shoot frame', n, '<- nohat copy (hat composited below)')
     # hurt2 = 被弾の点滅コマ。生成では「白く光る」指示が白い幽霊（帽子なし・別の顔）になったので、hurt を白へ 55% 寄せて作る（リクエスト不要、寸法は hurt と同一）
     for src, dst in (('hurt', 'hurt2'), ('hurt_nohat', 'hurt2_nohat')):
         if not (SPR / f'{src}.png').exists(): continue

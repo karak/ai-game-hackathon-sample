@@ -1,17 +1,15 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/gimmick-workshop-v1.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/gimmick-press-v1.png",
  "pitch": [
   5.0,
   5.0
  ],
  "max_box": [
-  100,
-  120
+  150,
+  140
  ],
- "frames": null,
- "w": 47,
- "h": 56,
- "fits": true,
- "colors": 15,
- "name": "press"
+ "w": 157,
+ "h": 147,
+ "fits": false,
+ "colors": 15
 }
