@@ -1,5 +1,5 @@
 {
- "_doc": "各素材の仕様。box=[w,h] は論理セルの最大値（検査用。出力は自然サイズ）。frames=1リクエスト内のフレーム数(最大2)。実測: キャンバス一杯のキャラ ≈ 100 セル。",
+ "_doc": "各素材の仕様。box=[w,h] は論理セルの最大値（検査用。出力は自然サイズ）。frames=1リクエスト内のフレーム数(最大2)。実測: キャンバス一杯のキャラ ≈ 100 セル。 style=スタイル契約ファイル（既定 _style.txt。挿絵級は _illust_style.txt）。style_refs=毎回添付する参照画像（1 枚目 画風の尊重物、2 枚目 キャラ立ち絵ベース。IMP-022）。",
  "cell": 8,
  "canvas": 1024,
  "baseline_px": 960,
@@ -2368,8 +2368,13 @@
     "cutin/heart",
     "cutin/wax"
    ],
-   "colors": 24,
-   "crop_top": 12
+   "colors": 32,
+   "style": "_illust_style.txt",
+   "style_refs": [
+    "assets/sprites/ending/scene1.png",
+    "assets/gen/ref/lyrica-illust-gold.png"
+   ],
+   "crop_bottom": 12
   }
  }
 }

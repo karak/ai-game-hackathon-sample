@@ -1,0 +1,11 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the picture.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no smooth gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit illustration magnified 8 times.
+
+STYLE (strict — this is the ILLUSTRATION class, not the in-game sprite class): the FIRST attached image is a finished illustration by this game's illustrator. Every new illustration must look like it was drawn by the same hand, in the same session, for the same game. Copy these measurable traits from it:
+- Painterly 16-bit pixel art with 28-32 colors in the whole picture; every surface (sky, cloth, skin, wood) is filled with fine 1-cell grain and checker dither — flat single-color areas are rare (in the reference fewer than 1 in 4 neighbouring cells share a color).
+- Outlines are 1 cell, very dark plum (#220d30 / #1e0a24), never pure black. Shading uses 3-4 steps per material with muted, slightly desaturated colors; deep indigo, plum, dusty rose, cream and antique gold dominate.
+- Soft night lighting with a single warm or cold key light; the mood is quiet and melancholic, never a bright cheerful sticker look.
+- CHARACTER PROPORTIONS: the SECOND attached image is the canonical character taken from the same illustration. Her figure is slender, about 4.3 heads tall without the hat (hat tip to boot sole 156 cells, head 32 cells in the reference); eyes are small almond shapes about 4 cells tall drawn in profile or three-quarter view, the face is calm and pretty, NOT chibi, NOT big-eyed, NOT 2.5 heads tall. Keep her hair color, hat, dress design and colors exactly as in that image.
+- No text, no letters, no logo, no signature, no border frame.

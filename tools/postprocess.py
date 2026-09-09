@@ -226,13 +226,18 @@ def strip_top_banner(im, max_frac=0.2, flat=0.6):
     return im
 
 
-def trim_border(im, max_px=8, std_max=6):
-    """外周から内側へ、色がほぼ一様な行・列を縁とみなして落とす（各辺最大 max_px）。額縁を描いてしまった一枚絵に使う"""
+def trim_border(im, max_px=8, std_max=6, uniq_max=None):
+    """外周から内側へ、色がほぼ一様な行・列を縁とみなして落とす（各辺最大 max_px）。額縁を描いてしまった一枚絵に使う。
+    uniq_max を与えると「その行・列の色数が uniq_max 以下」も条件にする。粒子（1 セルの市松・グレイン）で満ちた空は
+    std が小さくても色数が 100 を超えるので、額縁と区別できる（cutin-set v2 heart の上端 24 行が落ちた件）"""
     a = np.asarray(im.convert('RGB')).astype(int); h, w = a.shape[:2]; t = b = l = r = 0
-    while t < max_px and a[t, :, :].std(axis=0).mean() < std_max: t += 1
-    while b < max_px and a[h - 1 - b, :, :].std(axis=0).mean() < std_max: b += 1
-    while l < max_px and a[:, l, :].std(axis=0).mean() < std_max: l += 1
-    while r < max_px and a[:, w - 1 - r, :].std(axis=0).mean() < std_max: r += 1
+    def flat(line):
+        if line.std(axis=0).mean() >= std_max: return False
+        return uniq_max is None or len({tuple(c) for c in line}) <= uniq_max
+    while t < max_px and flat(a[t, :, :]): t += 1
+    while b < max_px and flat(a[h - 1 - b, :, :]): b += 1
+    while l < max_px and flat(a[:, l, :]): l += 1
+    while r < max_px and flat(a[:, w - 1 - r, :]): r += 1
     if t + b + l + r: print(f'  trimmed border t{t} b{b} l{l} r{r}')
     return im.crop((l, t, w - r, h - b))
 
@@ -321,6 +326,7 @@ def main():
     ap.add_argument('--crop-key', action='store_true', help='キー色（純緑）の余白を落として絵の矩形だけ残す（nokey の不透明パネル = カットイン）')
     ap.add_argument('--grid', help='RxC の格子に並んだ不透明パネルを、緑の隙間で切って個別に処理する（1 リクエストで 4 枚のカットインを同じ画風で描かせる用）')
     ap.add_argument('--crop-top', type=int, default=0, help='各パネルの上端をこのセル数だけ切る（モデルが焼き込んだ題名の帯を落とす。実測 11〜12 セル）')
+    ap.add_argument('--crop-bottom', type=int, default=0, help='各パネルの下端をこのセル数だけ切る（題名の帯が下に来た版用）')
     ap.add_argument('--trim-thin-bottom', action='store_true', help='下端の細い滴などを落として接地面を広い部分にする（血溜まり）')
     a = ap.parse_args()
     bw, bh = (int(v) for v in a.logical.split('x'))
@@ -385,7 +391,9 @@ def grid_main(a, bw, bh):
     rows, cols = (int(v) for v in a.grid.lower().split('x'))
     keyed = key_out(Image.open(a.src), a.tol)
     al = np.asarray(keyed.split()[3]) > 0
-    ybands = grid_bands(al, min_gap=6, min_size=60)
+    # 帯の判定は「不透明画素が 5% 未満の行／列」で行う。モデルが隙間の緑をパレットに寄せて描く（実測 #71a85f、v2）と
+    # キーの許容差から漏れる画素が残り、any() では隙間が見つからない（v2: 幅 11 px の縦の隙間に 5% 未満の残り）
+    ybands = grid_bands(al.mean(axis=1) > 0.05, min_gap=6, min_size=60)
     names = (a.names or '').split(',') if a.names else []
     Path(a.dst).mkdir(parents=True, exist_ok=True)
     meta = {'source': a.src, 'grid': [rows, cols], 'frames': []}
@@ -394,15 +402,16 @@ def grid_main(a, bw, bh):
     panels = []
     for (y0, y1) in ybands[:rows]:
         band = al[y0:y1]
-        xbands = grid_bands(band.T, min_gap=6, min_size=60)
+        xbands = grid_bands(band.mean(axis=0) > 0.05, min_gap=6, min_size=60)
         if len(xbands) != cols: print(f'  WARN grid: 行 {y0}-{y1} の列の帯が {len(xbands)} 本（期待 {cols}）: {xbands}')
         for (x0, x1) in xbands[:cols]: panels.append((x0, y0, x1, y1))
     for i, (x0, y0, x1, y1) in enumerate(panels):
         name = names[i] if i < len(names) else f'p{i}'
         sub = Image.open(a.src).convert('RGBA').crop((x0, y0, x1, y1))
         logical, px, py = extract_cells(sub)
-        logical = trim_border(crop_key(logical), max_px=28, std_max=10)   # パネルの外に残った緑・一様色の縁を落とす
+        logical = trim_border(crop_key(logical), max_px=28, std_max=10, uniq_max=6)   # パネルの外に残った緑・一様色の縁を落とす（粒子の空は色数で除外）
         if a.crop_top and logical.height > a.crop_top * 2: logical = logical.crop((0, a.crop_top, logical.width, logical.height))  # 焼き込まれた題名の帯（実測 11〜12 セル）を落とす。名前はゲーム側のテロップで出す
+        if a.crop_bottom and logical.height > a.crop_bottom * 2: logical = logical.crop((0, 0, logical.width, logical.height - a.crop_bottom))  # 同じ帯が下端に来る版（v2）用
         logical = quantize_shared(logical, a.colors, a.palette)
         dst = Path(a.dst) / f'{name}.png'
         logical.save(dst)

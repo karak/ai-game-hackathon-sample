@@ -1,5 +1,5 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/cutin-set-v1.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/cutin-set-v2.png",
  "grid": [
   2,
   2
@@ -7,69 +7,69 @@
  "frames": [
   {
    "name": "stardust",
-   "w": 93,
-   "h": 139,
+   "w": 129,
+   "h": 112,
    "fits": true,
-   "colors": 24,
+   "colors": 32,
    "pitch": [
     4.0,
     4.0
    ],
    "box": [
-    30,
-    36,
-    390,
-    620
+    12,
+    12,
+    505,
+    506
    ]
   },
   {
    "name": "mirror",
-   "w": 91,
-   "h": 136,
+   "w": 125,
+   "h": 114,
    "fits": true,
-   "colors": 24,
+   "colors": 32,
    "pitch": [
     4.0,
     4.0
    ],
    "box": [
-    414,
-    36,
-    775,
-    620
+    517,
+    12,
+    1011,
+    506
    ]
   },
   {
    "name": "heart",
-   "w": 92,
-   "h": 124,
+   "w": 126,
+   "h": 117,
    "fits": true,
-   "colors": 24,
+   "colors": 32,
    "pitch": [
     4.0,
     4.0
    ],
    "box": [
-    30,
-    645,
-    390,
-    1198
+    12,
+    518,
+    505,
+    1011
    ]
   }
  ],
  "name": "wax",
- "w": 93,
- "h": 121,
+ "w": 126,
+ "h": 113,
  "fits": true,
- "colors": 24,
+ "colors": 32,
  "pitch": [
   4.0,
   4.0
  ],
  "box": [
-  415,
-  645,
-  775,
-  1198
+  517,
+  518,
+  1011,
+  1011
  ]
 }

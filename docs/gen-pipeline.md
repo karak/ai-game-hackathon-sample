@@ -14,6 +14,7 @@
 | 色数 | キャラ 12〜15 色。輪郭は暗紫/暗茶 1 セル（純黒禁止） |
 
 プロンプト本文は `assets/gen/prompts/_style.txt`（スタイル契約）＋ 各素材の記述で構成する。
+挿絵級（カットイン・エンディング等の一枚絵）は specs の `style: "_illust_style.txt"` で契約を差し替え、`style_refs` に **画風の尊重物（`assets/sprites/ending/scene1.png` or `scene6.png`）＋キャラ立ち絵ベース（`assets/gen/ref/lyrica-illust*.png`）** を置いて毎回添付する（IMP-022、`docs/art-standard.md` §1.3・§2.6）。生成後は `tools/style_check.py` で尊重物と並べて測る。
 
 ## 1.1 実測で分かったモデルの挙動（2026-09-08）
 

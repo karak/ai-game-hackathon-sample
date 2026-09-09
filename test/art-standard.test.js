@@ -34,7 +34,7 @@ test('§2.1 enemies are 60-135 tall (0.6-1.3x player) and bosses 130-200 tall', 
 
 test('§2.2 every generated sprite has 10-15 colors and fits its spec box', () => {
   for (const [k, v] of entries) {
-    if (k.startsWith('cutin/')) { expect(v.colors, k).toBeLessThanOrEqual(24); continue; } // カットインは不透明パネル（24 色まで、箱は目安）
+    if (k.startsWith('cutin/')) { expect(v.colors, k).toBeLessThanOrEqual(32); continue; } // カットインは挿絵級の不透明パネル（尊重物と同じ 32 色まで。§2.6。箱は目安）
     if (k === 'player/hat' || k.includes('hurt2')) continue; // 帽子は色抽出の単品、hurt2 は白飛びフレーム
     if (k.startsWith('bg/') || k.startsWith('tiles/') || k.startsWith('ending/')) { expect(v.colors, k).toBeLessThanOrEqual(32); continue; } // 背景・地形・エンディング絵は 32 色まで（箱は目安）
     if (k.startsWith('shots/') || k.startsWith('items/') || k.startsWith('deco/')) { expect(v.colors, k).toBeGreaterThanOrEqual(3); expect(v.colors, k).toBeLessThanOrEqual(15); expect(v.fits, k).toBe(true); continue; } // 小物は 5 色以上
@@ -66,5 +66,24 @@ test('§2.5 background layers: each theme has sky + far A/B + mid; far variants 
     for (const l of ['sky', 'far', 'far2', 'mid']) expect(bg[th + '_' + l], th + '_' + l).toBeTruthy();
     for (const l of ['far', 'far2']) { const v = bg[th + '_' + l]; expect(v.h, th + l).toBeGreaterThanOrEqual(60); expect(v.h, th + l).toBeLessThanOrEqual(160); expect(v.w, th + l).toBeGreaterThanOrEqual(200); expect(v.w, th + l).toBeLessThanOrEqual(330); }
     const a = bg[th + '_far'].h, b = bg[th + '_far2'].h; expect(Math.max(a, b) / Math.min(a, b), th + ' far A/B height ratio').toBeLessThanOrEqual(1.4);
+  }
+});
+
+// §2.6 挿絵級（カットイン・エンディング）は尊重物 ending/scene1・scene6 と同じ物差し（tools/style_check.py が manifest に書き足す flat / dither / outline）で比べる。
+// 帯: 色数 28〜32、flat ≤ 0.28（尊重物 0.16 / 0.20）、dither ≥ 0.07、輪郭は暗紫〜暗い葡萄色（hue 255〜335、明度 ≤ 0.23。尊重物 276/286・0.19/0.14。
+// 上限は尊重物と同じ手順で描いた cutin v2 の暖色パネル（薔薇の空・蝋燭の光）が 315〜328・0.23 に出たことから置いた。tools/style_check.py と同値）。
+// PENDING は 2026-09-10 計測で帯の外にある既存絵（IMP-022 の修正対象。scene3/4/5 は flat 0.30〜0.38）。直したら外す。ここに無い挿絵級が帯を外れたら失敗する
+test('§2.6 illustration-class images match the canon (ending/scene1, scene6) on colors, grain and outline', () => {
+  const PENDING = new Set(['ending/scene3', 'ending/scene4', 'ending/scene5']);
+  const illust = entries.filter(([k]) => k.startsWith('cutin/') || k.startsWith('ending/'));
+  expect(illust.length).toBeGreaterThanOrEqual(10);
+  for (const [k, v] of illust) {
+    expect(typeof v.flat, k + ' has style metrics (run tools/style_check.py --manifest)').toBe('number');
+    if (PENDING.has(k)) continue;
+    expect(v.colors, k).toBeGreaterThanOrEqual(28); expect(v.colors, k).toBeLessThanOrEqual(32);
+    expect(v.flat, k + ' flat').toBeLessThanOrEqual(0.28);
+    expect(v.dither, k + ' dither').toBeGreaterThanOrEqual(0.07);
+    expect(v.outline_hue, k + ' outline hue').toBeGreaterThanOrEqual(255); expect(v.outline_hue, k + ' outline hue').toBeLessThanOrEqual(335);
+    expect(v.outline_val, k + ' outline val').toBeLessThanOrEqual(0.23);
   }
 });

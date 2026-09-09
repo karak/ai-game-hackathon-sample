@@ -101,6 +101,9 @@ def size_block(name: str) -> tuple[str, dict]:
              f"- The drawing must fit inside that box and should use most of it (at least {max(1, int(h*0.85))} cells of the {h}-cell height)."]
     if frames == 1:
         lines.append(f"- Exactly ONE sprite, horizontally centered on the canvas.")
+    elif sp.get('grid'):  # 格子シート（カットイン 4 枚など）: 横一列ではなく RxC で並べる
+        r, c = sp['grid'].lower().split('x')
+        lines.append(f"- Exactly {frames} panels arranged in a grid of {r} rows x {c} columns, separated by clear gaps of green, the group centered on the canvas. Same scale and same palette for every panel.")
     else:
         lines.append(f"- Exactly {frames} figures side by side in one row, separated by clear gaps of green, the group centered horizontally. Same scale and same palette for every figure.")
     if sp['anchor'] == 'bottom':
@@ -153,10 +156,19 @@ if __name__ == '__main__':
     ap.add_argument('--n', type=int, default=1); ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
     size, sp = size_block(a.name)
-    style = (PROMPTS / '_style.txt').read_text(); subject = (PROMPTS / sp['subject']).read_text()
+    # style: スタイル契約。既定 _style.txt（スプライト級・チビ体型）。挿絵級（カットイン・エンディング）は _illust_style.txt（IMP-022）
+    style = (PROMPTS / sp.get('style', '_style.txt')).read_text(); subject = (PROMPTS / sp['subject']).read_text()
     prompt = f"{style}\n\n{size}\n\n{subject}"
     refs = [Path(r) for r in a.ref]
     if sp.get('skip'): sys.exit(f'{a.name} is marked skip')
     if sp.get('ref'): refs.insert(0, latest_raw(sp['ref'])); prompt += "\n\nREFERENCE: the attached image is the canonical design of this character (same pixel grid). Keep design, colors and proportions identical."
+    # style_refs: 毎回必ず添付する参照（1 枚目 = 画風の尊重物 ending/scene1 or scene6、2 枚目 = キャラ立ち絵ベース assets/gen/ref/lyrica-illust*.png）。
+    # 別リクエストで描くと画風が別人になる（Sprint L）ので、挿絵級はこれ無しで生成しない（ユーザー指示 2026-09-10「かならずベースになるキャラ画像を入れる」）
+    if sp.get('style_refs'):
+        srefs = [ROOT / r for r in sp['style_refs']]
+        for r in srefs:
+            if not r.exists(): sys.exit(f'style_ref not found: {r}')
+        refs = srefs + refs
+        prompt += "\n\nREFERENCES: image 1 is a finished illustration by this game's illustrator — reproduce its style exactly (grain, dither, outline color, palette, proportions). Image 2 is the canonical character cut from that illustration — keep her design, colors and body proportions identical."
     if a.dry_run: print(prompt); print('refs:', refs); sys.exit(0)
     generate(a.name, prompt, refs, a.n)

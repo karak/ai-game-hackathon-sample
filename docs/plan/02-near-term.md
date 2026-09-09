@@ -210,3 +210,19 @@
 
 検証: Vitest **118 件**通過、Playwright **9 件**通過（8 面ボット自走を含む）。公開 URL 再デプロイ（Version `b2dcf89b`）、素材 282/282 読込・エラー 0・bootMs 507 ms・転送 1.23 MB。
 未達: IMP-021（毒沼の緑と `=` 足場の絵がテーマに合っていない）、実機ゲームパッド、テスター計測。生成台帳 **225/250**。
+
+## Sprint M — 「挿絵級の画風統一（IMP-022）」（2026-09-10）
+
+ユーザー指示: 「画風は `assets/sprites` の scene1, scene6 が尊重物。このフォルダの外の画像は不統一の修正対象。かならずベースになるキャラ画像を入れるなど、絵柄とキャラ立ち絵ベースのデザインを統一する方法を考えよ」。
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| 尊重物の計測と基準化 | `ending/scene1`・`scene6` を挿絵級の尊重物として art-standard §1.3・§2.6 に登録。`tools/style_check.py` が同じ関数で色数・最暗色（輪郭）・flat（隣接同色率）・dither・彩度/明度を測り、manifest に書き足す。頭身は `--grid` の 4 倍格子で目視 | 尊重物: 32 色・flat 0.16/0.20・輪郭 #220d30/#1e0a24・主人公 4.3 頭身（帽子なし）。旧カットイン: 24 色・flat 0.35〜0.40・2.5 頭身。scene3/4/5: flat 0.30〜0.38。`test-results/shots/canon_vs_cutin_v1.png` |
+| 原因 | スプライト級の契約 `_style.txt`（チビ 2.5 頭身）とスプライト `idle_gold.png` を参照に渡していたため、絵師がスプライト側に寄った | v1 プロンプト `assets/gen/prompts/cutin-set-v1.txt` |
+| 方法 | ①scene1 からキャラ立ち絵ベースを切り出し `assets/gen/ref/lyrica-illust.png`（桃）、衣装帯（襟〜裾 y 35〜67%）だけ色相を金へ回した `lyrica-illust-gold.png`（0 リクエスト）②挿絵級の契約 `_illust_style.txt`（尊重物の実測値を文章化）③specs の `style` / `style_refs` で**毎回 尊重物 1 枚＋立ち絵ベース 1 枚を添付**（`gemini_gen.py`。無ければ停止）④`build_sprites.py` が挿絵級を尊重物と比べて QA を出し、`test/art-standard.test.js` §2.6 が帯を検査（外れている既存絵は PENDING 列挙） | `tools/style_check.py`、`assets/gen/prompts/_illust_style.txt`、`assets/gen/specs.json cutin-set` |
+| カットイン 4 枚の再生成 | 2×2 シート 1 リクエスト（台帳 **226**）。32 色・flat **0.17〜0.23**・輪郭 val 0.19〜0.23・腰上構図（頭 ≈ パネル高の 1/4）。stardust 129×112 / mirror 125×114 / heart 126×117 / wax 126×113。題名は下端に焼き込まれたため `crop_bottom: 12` | `test-results/shots/cutin_v2_vs_v1.png`（上 v1・下 v2・右 立ち絵ベース）、`super_star.png` 〜 `super_candle_after.png`（実機） |
+| 後処理の修正 2 件 | 格子の隙間判定を any() から「不透明 5% 未満の行・列」に（モデルが隙間の緑をパレットに寄せて #71a85f で描き、キーから漏れた画素で隙間が見つからなかった）。`trim_border` に行の色数条件 `uniq_max`（粒子で満ちた薔薇の空は std が小さく、額縁と誤認して heart の上 24 行が落ちた） | `tools/postprocess.py grid_main / trim_border` |
+| 輪郭の帯 | 尊重物 2 枚（hue 276/286・val 0.19/0.14）から置いた上限 320/0.22 を、同じ手順の v2 暖色パネルが 315〜328 / 0.23 に出たため **335 / 0.23** に広げた（要否はユーザー判断） | `tools/style_check.py`、`test/art-standard.test.js` §2.6 |
+
+検証: Vitest **119 件**通過（§2.6 を追加）、Playwright `e2e/magic.spec.js` 通過（4 武器のカットイン表示・エラー 0）。
+未達: ending scene3/4/5 の再生成（3 リクエスト、PENDING）、IMP-021、実機ゲームパッド、テスター計測。生成台帳 **226/250**。未決: ゲーム内スプライト（チビ）を統一対象に含めるか（約 200 リクエストで予算外。挿絵級だけ揃える前提で進めた）。

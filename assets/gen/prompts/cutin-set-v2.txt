@@ -1,0 +1,32 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the picture.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no smooth gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit illustration magnified 8 times.
+
+STYLE (strict — this is the ILLUSTRATION class, not the in-game sprite class): the FIRST attached image is a finished illustration by this game's illustrator. Every new illustration must look like it was drawn by the same hand, in the same session, for the same game. Copy these measurable traits from it:
+- Painterly 16-bit pixel art with 28-32 colors in the whole picture; every surface (sky, cloth, skin, wood) is filled with fine 1-cell grain and checker dither — flat single-color areas are rare (in the reference fewer than 1 in 4 neighbouring cells share a color).
+- Outlines are 1 cell, very dark plum (#220d30 / #1e0a24), never pure black. Shading uses 3-4 steps per material with muted, slightly desaturated colors; deep indigo, plum, dusty rose, cream and antique gold dominate.
+- Soft night lighting with a single warm or cold key light; the mood is quiet and melancholic, never a bright cheerful sticker look.
+- CHARACTER PROPORTIONS: the SECOND attached image is the canonical character taken from the same illustration. Her figure is slender, about 4.3 heads tall without the hat (hat tip to boot sole 156 cells, head 32 cells in the reference); eyes are small almond shapes about 4 cells tall drawn in profile or three-quarter view, the face is calm and pretty, NOT chibi, NOT big-eyed, NOT 2.5 heads tall. Keep her hair color, hat, dress design and colors exactly as in that image.
+- No text, no letters, no logo, no signature, no border frame.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 200 cells wide x 200 cells tall (= 1600 x 1600 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 170 cells of the 200-cell height).
+- Exactly 4 panels arranged in a grid of 2 rows x 2 columns, separated by clear gaps of green, the group centered on the canvas. Same scale and same palette for every panel.
+- Vertically centered on the canvas.
+
+SUBJECT: ONE SHEET containing FOUR special-attack cut-in panels for the same game, arranged in a 2x2 GRID, all four drawn by the same illustrator as image 1, with the SAME character, the SAME palette family and the SAME body proportions in every panel.
+LAYOUT (mandatory): four rectangular opaque panels of equal size (each a little taller than wide) in two rows of two. Between and around the panels leave clear gaps of flat pure green #00FF00 at least 24 px wide, so the four panels are separated. Each panel is filled edge to edge with its own artwork; no green inside a panel, no lettering, no title, no border frame, no signature.
+CHARACTER in all four panels (she must look identical in each and identical to image 2): the witch girl from image 2, shown from the WAIST UP so that her head is about one quarter of the panel height — slender, calm, pretty face in three-quarter view, small almond eyes about 4 cells tall, NOT chibi, NOT big-eyed. Pale pink hair with mauve shadows, a wide dark plum witch hat with a pale ribbon, and her FULL BLOOM DRESS exactly as in image 2: antique GOLD and cream fabric with amber shadows, gold bodice with lacing, cream puff sleeves and collar (this is the golden costume, never the pink dress).
+RENDERING in all four panels: painterly 16-bit pixel art like image 1 — every surface filled with fine 1-cell grain and checker dither, muted desaturated colors, 1-cell very dark plum outlines (#220d30), soft night lighting from one key light. 28-32 colors on the whole sheet.
+TOP-LEFT PANEL — "Stardust Cortege": she raises her star-tipped wand overhead, lips parted; behind her a deep indigo night sky with pale-gold comets streaking down and two tiny white ghosts carrying a small star-shaped coffin.
+TOP-RIGHT PANEL — "Mirror Waltz": she holds a slim silver knife across her chest; tall gilt standing mirrors behind her each show a paler hollow-eyed reflection of herself with a thin black-toothed grin; background is a lavender and dusty-rose checker floor fading into darkness.
+BOTTOM-LEFT PANEL — "Heart Garden": she presses one hand to her own chest, eyes half closed with a serene smile; beside her anatomical hearts grow on green thorny stems like flowers, two split open with dark red petals and blood drops arcing upward; background is a rose and crimson dusk sky.
+BOTTOM-RIGHT PANEL — "Wax Choir": she sings, lit from below by candle flame; beside her towering church candles of dripping wax with tall flames, and small wax ghosts with open singing mouths growing out of the molten wax; background is a dark brown chapel interior.
+
+
+REFERENCES: image 1 is a finished illustration by this game's illustrator — reproduce its style exactly (grain, dither, outline color, palette, proportions). Image 2 is the canonical character cut from that illustration — keep her design, colors and body proportions identical.
+
+[refs] /Users/yasushi/projects/poc-square/assets/sprites/ending/scene1.png, /Users/yasushi/projects/poc-square/assets/gen/ref/lyrica-illust-gold.png

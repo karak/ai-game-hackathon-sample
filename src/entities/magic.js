@@ -330,7 +330,7 @@ export class CutIn {
   update(dt) { this.t += dt; if (this.t > CUTIN_IN + CUTIN_HOLD + CUTIN_OUT) this.dead = true; }
   draw(g, A, W, H) {
     const spr = A?.generated?.cutin?.[this.name]; if (!spr) return;
-    // 4 枚を 1 リクエストで描かせたため 1 枚は 92x130 セル前後。整数 2 倍で表示する（1 セル = 2 画面 px。art-standard §2.1 の整数倍表示）
+    // 4 枚を 1 リクエストで描かせたため 1 枚は 92x130 セル前後（v2 = 尊重物 scene1 の画風に揃えた版は 125〜129x112〜117。IMP-022）。整数 2 倍で表示する（1 セル = 2 画面 px。art-standard §2.1 の整数倍表示）
     const w = (spr.w ?? spr.r.width / HD_SCALE) * CUTIN_SCALE, h = (spr.h ?? spr.r.height / HD_SCALE) * CUTIN_SCALE;
     // 地表の演出（火柱・花園・鏡像）を隠さないよう、帯は画面の上寄り 28% に置く（HUD 26 単位より下）
     const k = this.slide, x = Math.round(-w + (W * 0.52 + w) * k - w * 0.02), y = Math.round(H * 0.28);

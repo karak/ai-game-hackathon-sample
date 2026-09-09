@@ -7,7 +7,7 @@
 from __future__ import annotations
 import json, subprocess, sys
 from pathlib import Path
-import optimize_pngs
+import optimize_pngs, style_check
 
 ROOT = Path(__file__).resolve().parent.parent
 SPECS = json.loads((ROOT / 'assets/gen/specs.json').read_text())
@@ -37,6 +37,7 @@ def build(name, sp):
     if sp.get('crop_key'): pal_arg += ['--crop-key']        # 不透明パネルの緑余白を落とす（カットイン）
     if sp.get('grid'): pal_arg += ['--grid', sp['grid']]    # 格子に並んだ複数パネルを 1 枚から切り出す（カットイン 4 枚）
     if sp.get('crop_top'): pal_arg += ['--crop-top', str(sp['crop_top'])]  # パネル上端の題名帯を落とす
+    if sp.get('crop_bottom'): pal_arg += ['--crop-bottom', str(sp['crop_bottom'])]  # 題名帯が下端に来た版
     if sp.get('kind') in ('bg', 'tiles'): pal_arg += ['--nosplit']
     if sp.get('keep_bottom'): pal_arg += ['--keep-bottom', str(sp['keep_bottom'])]
     if sp['frames'] == 1:
@@ -121,6 +122,11 @@ def main():
             meta = json.loads(dst.with_suffix('.json').read_text())
             manifest[key] = {'src': str(dst.relative_to(ROOT)), 'w': meta['w'], 'h': meta['h'], 'fits': meta['fits'], 'colors': meta['colors'], 'anchor': sp['anchor']}
             qa_player_frame(key, dst, manifest)
+    style_check.annotate_manifest(manifest)  # 挿絵級（cutin/ending）に尊重物との比較値を書き足す（IMP-022、test/art-standard.test.js §2.6）
+    for key, v in manifest.items():
+        if key.split('/')[0] in style_check.ILLUST_GROUPS and key in {k for name in targets for k in SPECS['sprites'][name]['out']}:
+            bad = style_check.verdict(style_check.metrics(ROOT / v['src']))
+            if bad: print(f'  QA {key}: 尊重物（ending/scene1, scene6）と乖離 -> ' + '; '.join(bad))
     MANIFEST.write_text(json.dumps(manifest, indent=1, sort_keys=True)); print('manifest ->', MANIFEST.relative_to(ROOT), len(manifest), 'entries')
     optimize_pngs.main([str(OUT / '**' / '*.png')])  # 出力をパレット PNG に（可逆、転送量 -57%。IMP-019）
 
