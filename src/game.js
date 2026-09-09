@@ -6,7 +6,8 @@ import { SONGS } from './audio.js';
 import { drawBackground } from './gfx/background.js';
 import { blit } from './gfx/sprite.js';
 import { drawBackgroundHD } from './gfx/hdworld.js';
-import { PROLOGUE, ENDING, ENDING_SCENES, ENDING_TRUE, CREDITS } from './story.js';
+import { story } from './story.js';
+import { t, setLang, LANGS, LANG_LABEL } from './i18n.js';
 import { irisRadius, IRIS_T, BOSS_INTRO_T } from './fx.js';
 import { DemoRecorder, DemoInput, DEMO_MAX_T, DEMO_IDLE_T } from './demo.js';
 import { DEMOS } from './demos.js';
@@ -16,7 +17,7 @@ import { defaultSettings, saveSettings, volumeGain, bind, codesFor, keyName, key
 
 // オプション画面の行。kind: volume / mute / key(action) / reset / back
 export const NO_MISS_BONUS = 5000; // クリア画面: 面をノーミスで抜けたときの加点
-const OPTION_ROWS = [{ kind: 'volume' }, { kind: 'mute' }, ...REBINDABLE.map(a => ({ kind: 'key', action: a })), { kind: 'reset' }, { kind: 'back' }];
+const OPTION_ROWS = [{ kind: 'volume' }, { kind: 'mute' }, { kind: 'lang' }, ...REBINDABLE.map(a => ({ kind: 'key', action: a })), { kind: 'reset' }, { kind: 'back' }];
 
 export class Game {
   // settings: settings.js の loadSettings() 結果。storage は保存先（省略時 localStorage）
@@ -32,14 +33,15 @@ export class Game {
     this.recorder = null; this.demo = null; this.demoIdx = 0; // デモ記録／再生
     this.deathLog = loadDeathLog(this.storage); this.loop = 0; this.continued = false; // 死亡地点ログ（IMP-007）／周回（0=1 周目）／コンティニュー後はハイスコアに記録しない
     this.audio.setVolume(volumeGain(this.settings.volume)); this.audio.setMuted(this.settings.muted);
+    setLang(this.settings.lang); this.onLangChange = null; // 表示言語（IMP-008）。main.js が index.html の説明文を差し替えるコールバックを置く
   }
   setState(s) { (this.trace ??= []).push(`${this.state}>${s}@${Math.round(performance.now())}`); if (this.trace.length > 20) this.trace.shift(); this.state = s; this.stateT = 0; }
   save() { return saveSettings(this.settings, this.storage); }
   // タイトルメニュー項目（進行があれば「つづきから」）
-  titleMenu() { const m = [{ id: 'new', label: 'はじめから' }]; if (this.settings.progress.stage > 0) m.push({ id: 'continue', label: `つづきから（第${this.settings.progress.stage + 1}章）` }); if (this.settings.progress.cleared) m.push({ id: 'loop2', label: '2 周目（真の結末）' }); m.push({ id: 'options', label: 'オプション' }); return m; }
+  titleMenu() { const m = [{ id: 'new', label: t('はじめから') }]; if (this.settings.progress.stage > 0) m.push({ id: 'continue', label: t('つづきから（第{n}章）', { n: this.settings.progress.stage + 1 }) }); if (this.settings.progress.cleared) m.push({ id: 'loop2', label: t('2 周目（真の結末）') }); m.push({ id: 'options', label: t('オプション') }); return m; }
   // ポーズメニュー／ゲームオーバーメニュー
-  pauseMenu() { return [{ id: 'resume', label: 'つづける' }, { id: 'restart', label: '面の はじめから' }, { id: 'title', label: 'タイトルへ' }]; }
-  gameOverMenu() { return [{ id: 'continue', label: 'コンティニュー（面の はじめから）' }, { id: 'title', label: 'タイトルへ' }]; }
+  pauseMenu() { return [{ id: 'resume', label: t('つづける') }, { id: 'restart', label: t('面の はじめから') }, { id: 'title', label: t('タイトルへ') }]; }
+  gameOverMenu() { return [{ id: 'continue', label: t('コンティニュー（面の はじめから）') }, { id: 'title', label: t('タイトルへ') }]; }
 
   // ---- 遷移 ----
   startGame(stage = 0, loop = 0) {
@@ -109,7 +111,7 @@ export class Game {
         if (this.wipe.t >= IRIS_T) { const w = this.wipe; this.wipe = null; w.then(); }
         break;
       case 'prologue':
-        if (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) { if (this.stateT < PROLOGUE.length * 0.9) this.stateT = PROLOGUE.length * 0.9 + 0.1; else this.startStage(); }
+        if (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) { const n = story().prologue.length; if (this.stateT < n * 0.9) this.stateT = n * 0.9 + 0.1; else this.startStage(); }
         break;
       case 'intro':
         if (this.stateT > 2.8 || (this.stateT > 0.5 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')))) { this.setState('play'); this.audio.playBgm(SONGS[this.world.level.theme]); }
@@ -220,6 +222,7 @@ export class Game {
     const dir = (inp.hit('right') ? 1 : 0) - (inp.hit('left') ? 1 : 0), ok = inp.hit('start') || inp.hit('shoot') || inp.hit('jump');
     if (row.kind === 'volume' && dir) { this.settings.volume = Math.max(0, Math.min(VOLUME_MAX, this.settings.volume + dir)); this.audio.setVolume(volumeGain(this.settings.volume)); this.audio.sfx('select'); }
     else if (row.kind === 'mute' && (dir || ok)) this.toggleMute();
+    else if (row.kind === 'lang' && (dir || ok)) this.setLanguage(LANGS[(LANGS.indexOf(this.settings.lang) + (dir || 1) + LANGS.length) % LANGS.length]);
     else if (row.kind === 'key' && ok) {
       this.capturing = row.action; this.audio.sfx('select');
       this.input.captureNext(r => {
@@ -231,18 +234,21 @@ export class Game {
     else if (row.kind === 'reset' && ok) { this.settings.keys = { ...DEFAULT_KEYS }; this.settings.pad = { ...DEFAULT_PAD }; this.input.setKeys(this.settings.keys); this.input.setPad(this.settings.pad); this.save(); this.audio.sfx('select'); }
     else if (row.kind === 'back' && ok) this.leaveOptions();
   }
+  // 表示言語を切り替えて保存する（IMP-008）。index.html の説明文は onLangChange で差し替える
+  setLanguage(l) { this.settings.lang = setLang(l); this.save(); this.audio.sfx('select'); this.onLangChange?.(this.settings.lang); }
   leaveOptions() { this.input.cancelCapture(); this.capturing = null; this.save(); this.audio.sfx('select'); this.setState('title'); }
   optionRowText(row) {
     switch (row.kind) {
-      case 'volume': return ['おんりょう', `◀ ${'■'.repeat(this.settings.volume)}${'□'.repeat(VOLUME_MAX - this.settings.volume)} ▶`];
-      case 'mute': return ['ミュート', this.settings.muted ? 'ON' : 'OFF'];
+      case 'volume': return [t('おんりょう'), `◀ ${'■'.repeat(this.settings.volume)}${'□'.repeat(VOLUME_MAX - this.settings.volume)} ▶`];
+      case 'mute': return [t('ミュート'), this.settings.muted ? 'ON' : 'OFF'];
+      case 'lang': return [t('げんご'), `◀ ${LANG_LABEL[this.settings.lang] ?? this.settings.lang} ▶`];
       case 'key': {
-        if (this.capturing === row.action) return [ACTION_LABEL[row.action], 'キー か ボタン を おしてください'];
+        if (this.capturing === row.action) return [t(ACTION_LABEL[row.action]), t('キー か ボタン を おしてください')];
         const k = codesFor(this.settings.keys, row.action).map(keyName).join(' '), p = codesFor(this.settings.pad, row.action).map(padName).join(' ');
-        return [ACTION_LABEL[row.action], `${k || '--'}  /  PAD ${p || '--'}`];
+        return [t(ACTION_LABEL[row.action]), `${k || '--'}  /  PAD ${p || '--'}`];
       }
-      case 'reset': return ['そうさを しょきかに もどす', ''];
-      case 'back': return ['タイトルへ もどる', ''];
+      case 'reset': return [t('そうさを しょきかに もどす'), ''];
+      case 'back': return [t('タイトルへ もどる'), ''];
     }
   }
   drawOptions(g) {
@@ -251,7 +257,7 @@ export class Game {
     const x = LAYOUT.MARGIN, w = LAYOUT.W - LAYOUT.MARGIN * 2, h = pad * 2 + rowHeight(LAYOUT.FONT) + 6 + rows.length * line;
     const y = Math.floor((LAYOUT.H - h) / 2);
     drawWindow(g, x, y, w, h);
-    text(g, 'オプション', 128, y + pad, { align: 'center', color: '#ff8fc8' });
+    text(g, t('オプション'), 128, y + pad, { align: 'center', color: '#ff8fc8' });
     let cy = y + pad + rowHeight(LAYOUT.FONT) + 6;
     rows.forEach((row, i) => {
       const [label, value] = this.optionRowText(row), sel = i === this.optIdx;
@@ -272,7 +278,7 @@ export class Game {
       case 'options': this.drawOptions(g); break;
       case 'demo': this.drawDemo(g); break;
       case 'wipe': this.drawState(g, this.wipe.from); this.drawIris(g, irisRadius(this.wipe.t, false, W, H)); break;
-      case 'prologue': this.drawScroll(g, PROLOGUE, 'prologue'); break;
+      case 'prologue': this.drawScroll(g, story().prologue, 'prologue'); break;
       case 'intro': this.world.draw(g); this.drawIris(g, irisRadius(this.stateT, true, W, H)); this.drawIntro(g); break;
       case 'play':
         this.world.draw(g); drawHud(g, this.world, this);
@@ -301,9 +307,9 @@ export class Game {
     // ゾンビ
     const z = this.assets.enemies[Math.floor(this.stateT * 4) % 2 ? 'zombie1' : 'zombie2']; if (z) { blit(g, z, true, 190, 176 - z.h); blit(g, z, true, 18, 176 - z.h); }
     // タイトル
-    const r = textBox(g, [{ t: 'マジカル☆リリカと', color: '#ff8fc8' }, { t: '血塗られたおとぎの国', color: '#fdfbf7' }, { t: ' ', size: 6 }], { y: 28, minWidth: 224 });
+    const r = textBox(g, [{ t: t('マジカル☆リリカと'), color: '#ff8fc8' }, { t: t('血塗られたおとぎの国'), color: '#fdfbf7' }, { t: ' ', size: 6 }], { y: 28, minWidth: 224 });
     g.fillStyle = '#d9262b'; g.fillRect(r.x + 24, r.y + r.h - 12, r.w - 48, 1);
-    const sub = 'MAGICAL LYRICA AND THE BLOODSTAINED FAIRYLAND';
+    const sub = t('MAGICAL LYRICA AND THE BLOODSTAINED FAIRYLAND'); // 英語 UI では副題が日本語になる
     mini(g, sub, miniX(sub), r.y + r.h - 10, '#cbaaf5');
     // メニュー（はじめから / つづきから / オプション）。主人公の帽子の上端（y≈140、計測値）に掛からないよう下端を 131 に
     const menu = this.titleMenu(), mh = menu.length * 14, my = 131 - mh;
@@ -333,7 +339,7 @@ export class Game {
     if (shown >= lines.length && Math.floor(this.stateT * 2) % 2) mini(g, 'PUSH START', miniX('PUSH START'), 210, '#ffe860');
   }
   // ---- エンディング ----
-  endingScenes() { const E = this.assets.generated?.ending ?? {}; const scenes = ENDING_SCENES.map((lines, i) => ({ lines, img: E['scene' + (i + 1)] })); if (this.loop > 0) scenes.push({ lines: ENDING_TRUE, img: E.scene7 ?? E.scene5 }); return scenes; } // 2 周目は「真の結末」1 場面を追加
+  endingScenes() { const E = this.assets.generated?.ending ?? {}; const st = story(); const scenes = st.scenes.map((lines, i) => ({ lines, img: E['scene' + (i + 1)] })); if (this.loop > 0) scenes.push({ lines: st.trueEnd, img: E.scene7 ?? E.scene5 }); return scenes; } // 2 周目は「真の結末」1 場面を追加
   drawEnding(g) {
     const scenes = this.endingScenes(), i = this.endingIdx ?? 0;
     if (i < scenes.length) {
@@ -353,6 +359,7 @@ export class Game {
     // クレジット: 下から上へスクロール
     g.fillStyle = '#0e0a18'; g.fillRect(0, 0, W, H);
     const y0 = H - this.stateT * 14;
+    const CREDITS = story().credits;
     CREDITS.forEach((line, k) => { const y = y0 + k * LAYOUT.LINE; if (y > -20 && y < H + 20) text(g, line, 128, y, { align: 'center', color: k === 0 || line === 'THANK YOU FOR PLAYING' ? '#ff8fc8' : '#fdfbf7', size: line === CREDITS[0] ? 16 : 12 }); });
     const sc = 'SCORE ' + String(this.score).padStart(7, '0'); mini(g, sc, miniX(sc), 4, '#ff8fc8');
   }
@@ -360,7 +367,7 @@ export class Game {
   drawIntro(g) {
     g.fillStyle = 'rgba(14,10,24,0.6)'; g.fillRect(0, 0, W, H);
     const st = STAGES[this.stageIndex];
-    textBox(g, [{ t: st.title, color: '#ff8fc8' }, { t: st.subtitle }], { minWidth: 224 });
+    textBox(g, [{ t: t(st.title), color: '#ff8fc8' }, { t: t(st.subtitle) }], { minWidth: 224 });
   }
   drawPause(g) {
     const menu = this.pauseMenu(), rows = [{ t: 'PAUSE', color: '#ffe860' }, { t: ' ', size: 6 }, ...menu.map((m, i) => ({ t: (i === this.pauseIdx ? '▶ ' : '　 ') + m.label, color: i === this.pauseIdx ? '#ffe860' : '#fdfbf7' }))];
@@ -368,7 +375,7 @@ export class Game {
   }
   drawClear(g) {
     if (this.stateT < 1.2) return;
-    const r = textBox(g, [{ t: 'ステージクリア！', color: '#ffe860' }, { t: ' ', size: 14 }, { t: this.stageIndex + 1 < STAGES.length ? '次の章へ…' : '最終決戦へ…', color: '#cbaaf5' }], { minWidth: 192 });
+    const r = textBox(g, [{ t: t('ステージクリア！'), color: '#ffe860' }, { t: ' ', size: 14 }, { t: t(this.stageIndex + 1 < STAGES.length ? '次の章へ…' : '最終決戦へ…'), color: '#cbaaf5' }], { minWidth: 192 });
     const tb = 'TIME BONUS   ' + String(this.timeBonus).padStart(5, '0'), nm = 'NO MISS      ' + (this.noMissBonus ? String(this.noMissBonus).padStart(5, '0') : '  ---'), kl = 'KILLS        ' + String(this.kills ?? 0).padStart(5, ' '), sc = 'SCORE      ' + String(this.score).padStart(7, '0');
     mini(g, tb, miniX(tb), r.y + 30, '#fdfbf7');
     mini(g, nm, miniX(nm), r.y + 39, this.noMissBonus ? '#ffe860' : '#a5a5b8');
@@ -378,7 +385,7 @@ export class Game {
   drawGameOver(g) {
     g.fillStyle = 'rgba(122,15,31,0.45)'; g.fillRect(0, 0, W, H);
     const menu = this.gameOverMenu(), shown = this.stateT > 1.0;
-    const rows = [{ t: 'GAME OVER', color: '#ff6a6a' }, { t: 'おとぎの国は赤いまま' }, { t: ' ', size: 6 }, ...(shown ? menu.map((m, i) => ({ t: (i === this.goIdx ? '▶ ' : '　 ') + m.label, color: i === this.goIdx ? '#ffe860' : '#fdfbf7' })) : []), { t: ' ', size: 6 }];
+    const rows = [{ t: 'GAME OVER', color: '#ff6a6a' }, { t: t('おとぎの国は赤いまま') }, { t: ' ', size: 6 }, ...(shown ? menu.map((m, i) => ({ t: (i === this.goIdx ? '▶ ' : '　 ') + m.label, color: i === this.goIdx ? '#ffe860' : '#fdfbf7' })) : []), { t: ' ', size: 6 }];
     const r = textBox(g, rows, { minWidth: 208, window: { top: '#3a1650', bottom: '#150a22' } });
     const sc = 'SCORE ' + String(this.score).padStart(7, '0') + (this.continued ? '  (CONTINUE)' : '');
     mini(g, sc, miniX(sc), r.y + r.h - 12, '#fdfbf7');

@@ -4,6 +4,7 @@ import { Input } from './input.js';
 import { Game } from './game.js';
 import { W, H, SCALE } from './world.js';
 import { loadSettings } from './settings.js';
+import { setLang } from './i18n.js';
 
 async function boot() {
   const canvas = document.getElementById('game');
@@ -29,11 +30,16 @@ async function boot() {
   let lastDraw = 0;
   const assets = await buildAssets((done, total) => { const now = performance.now(); if (now - lastDraw > 50 || done === total) { lastDraw = now; drawLoading(`NOW LOADING  ${done}/${total}`, 0.1 + 0.9 * done / total); } });
   g.textAlign = 'left'; g.textBaseline = 'alphabetic'; // ロード画面で変えた文字設定を戻す
-  const settings = loadSettings(localStorage); // キー/パッド割り当て・音量・進行・ハイスコア
+  const settings = loadSettings(localStorage); // キー/パッド割り当て・音量・進行・ハイスコア・表示言語
+  setLang(settings.lang);
+  // index.html の説明文（#info 内の [data-lang]）を表示言語に合わせる。オプションで切り替えた直後にも呼ばれる
+  const applyLang = l => { document.documentElement.lang = l; document.querySelectorAll('#info [data-lang]').forEach(el => { el.hidden = el.dataset.lang !== l; }); };
+  applyLang(settings.lang);
   const audio = new Audio();
   const input = new Input(window, settings);
   const game = new Game(assets, audio, input, settings, localStorage);
   window.__game = game; // デバッグ用
+  game.onLangChange = applyLang;
   game.bootMs = Math.round(performance.now() - t0); // 初回ロード時間（M6 の出口条件 3 秒以内の計測用）
 
   // 最初のキー/タップで AudioContext を起動
@@ -46,8 +52,10 @@ async function boot() {
   const fit = () => {
     const wrap = document.getElementById('wrap');
     const cw = W * SCALE, ch = H * SCALE;
-    const sw = Math.floor(window.innerWidth / cw), sh = Math.floor((window.innerHeight - (window.innerWidth < 600 ? 150 : 40)) / ch);
-    const s = Math.max(1, Math.min(sw, sh));
+    const reserve = window.innerWidth < 600 ? 150 : 40; // 下部の説明文／タッチパッドの高さ
+    const sw = Math.floor(window.innerWidth / cw), sh = Math.floor((window.innerHeight - reserve) / ch);
+    // 整数倍で入るならその最大倍率。768 幅が入らない画面（スマホ縦）は幅に合わせて縮小する（M6 モバイル簡易対応。従来は最小 1 倍で横にはみ出していた）
+    const s = sw >= 1 ? Math.max(1, Math.min(sw, sh)) : Math.min(window.innerWidth / cw, Math.max(0.2, (window.innerHeight - reserve) / ch));
     canvas.style.width = `${cw * s}px`; canvas.style.height = `${ch * s}px`;
     wrap.style.width = `${cw * s}px`;
   };

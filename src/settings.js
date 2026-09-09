@@ -1,4 +1,5 @@
 // 設定とセーブ（localStorage）。純粋関数群。ストレージは注入可能（テスト用）
+import { LANGS, detectLang } from './i18n.js';
 export const STORAGE_KEY = 'lyrica_save';
 export const LEGACY_HI_KEY = 'lyrica_hi';
 export const ACTIONS = ['left', 'right', 'up', 'down', 'shoot', 'jump', 'start', 'pause', 'mute'];
@@ -32,6 +33,7 @@ export const DEFAULTS = Object.freeze({
   muted: false,
   progress: { stage: 0, cleared: false }, // 「つづきから」で始められる最大ステージ index／1 周クリア済み（2 周目を開放）
   hi: 0,
+  lang: 'ja',         // 表示言語 'ja' | 'en'（IMP-008）。保存が無ければ loadSettings がブラウザ言語から決める
 });
 
 export function defaultSettings() { return { ...DEFAULTS, keys: { ...DEFAULT_KEYS }, pad: { ...DEFAULT_PAD }, progress: { ...DEFAULTS.progress } }; }
@@ -50,8 +52,9 @@ function cleanMap(m, fallback) {
   return out;
 }
 
-export function loadSettings(storage) {
-  const s = defaultSettings();
+// nav: 保存済みの言語が無いときに detectLang() で参照する navigator（テストでは差し替え）
+export function loadSettings(storage, nav = globalThis.navigator) {
+  const s = defaultSettings(); s.lang = detectLang(nav);
   let raw = null;
   try { raw = storage?.getItem(STORAGE_KEY); } catch {}
   if (raw) {
@@ -64,6 +67,7 @@ export function loadSettings(storage) {
         if (isMap(j.progress) && Number.isInteger(j.progress.stage) && j.progress.stage >= 0) s.progress.stage = j.progress.stage;
         if (isMap(j.progress)) s.progress.cleared = j.progress.cleared === true;
         if (Number.isFinite(j.hi) && j.hi >= 0) s.hi = Math.floor(j.hi);
+        if (LANGS.includes(j.lang)) s.lang = j.lang;
       }
     } catch {}
   }
@@ -73,7 +77,7 @@ export function loadSettings(storage) {
 }
 
 export function saveSettings(s, storage) {
-  try { storage?.setItem(STORAGE_KEY, JSON.stringify({ version: 1, keys: s.keys, pad: s.pad, volume: s.volume, muted: s.muted, progress: s.progress, hi: s.hi })); return true; }
+  try { storage?.setItem(STORAGE_KEY, JSON.stringify({ version: 1, keys: s.keys, pad: s.pad, volume: s.volume, muted: s.muted, progress: s.progress, hi: s.hi, lang: s.lang })); return true; }
   catch { return false; }
 }
 

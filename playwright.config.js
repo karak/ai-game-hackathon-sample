@@ -6,6 +6,7 @@ export default defineConfig({
   timeout: 180_000,
   retries: 0,
   reporter: [['list']],
+  outputDir: 'test-results/pw', // Playwright は実行ごとに outputDir を空にする。証跡の test-results/shots/ を消さないよう分ける
   use: { baseURL: 'http://127.0.0.1:5174', headless: true, viewport: { width: 900, height: 760 } },
   webServer: { command: 'npx vite --port 5174 --host 127.0.0.1 --strictPort', url: 'http://127.0.0.1:5174/index.html', reuseExistingServer: true, timeout: 60_000 },
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],

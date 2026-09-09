@@ -18,6 +18,8 @@ import { HD_SCALE as HD } from './gfx/sprite.js';
 import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine } from './entities/gimmicks.js';
 import { resolveDecoMap } from './decomap.js';
 import { updateCamera, snapCamera } from './camera.js';
+import { BOSS_NAMES } from './story.js';
+import { t } from './i18n.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
@@ -111,7 +113,7 @@ export class World {
   onBossDefeated() {
     if (this.bossIdx + 1 < this.level.bosses.length) { // 連戦: 次のボスへ（部屋を開放して先へ進ませる）
       this.bossIdx++; this.boss = null; this.arena = null; this.bossState = 'none'; this.cutscene = false; this.enemies = this.enemies.filter(e => !e.isBoss && !e.head);
-      this.player.invT = Math.max(this.player.invT, 1.5); this.time = Math.max(this.time, 90); this.toast('先へ進め'); this.audio.playBgm(SONGS[this.level.theme]); return;
+      this.player.invT = Math.max(this.player.invT, 1.5); this.time = Math.max(this.time, 90); this.toast(t('先へ進め')); this.audio.playBgm(SONGS[this.level.theme]); return;
     }
     this.cleared = true; this.cutscene = true; this.player.vx = 0; this.game.stageClear();
   }
@@ -132,7 +134,7 @@ export class World {
     p.update(dt, input);
 
     // チェックポイント
-    for (const c of this.level.checkpoints) if (p.centerX > c.x && this.checkpoint.x < c.x) { this.checkpoint = { ...c }; this.toast('祈りの十字路：ここから再開できる'); this.audio.sfx('select'); }
+    for (const c of this.level.checkpoints) if (p.centerX > c.x && this.checkpoint.x < c.x) { this.checkpoint = { ...c }; this.toast(t('祈りの十字路：ここから再開できる')); this.audio.sfx('select'); }
 
     // ボス戦開始
     const trig0 = this.level.bossTriggers[this.bossIdx];
@@ -182,7 +184,7 @@ export class World {
     this.audio.playBgm(SONGS[this.level.bossSong ?? 'boss']); // 最終章は bossFinal
     this.fx.bossIntro(this.bossName());
   }
-  bossName(kind = this.level.bosses[this.bossIdx] ?? this.level.boss) { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', noirw: '生まれ直す魔法少女 ノワール', serpent: '涙の大蛇 ララバイ', machine: '人形師の機械 マザーグース', ringmaster: '大観覧車の主 グランギニョル', mirrorqueen: '鏡の女王 ヴァニタス', sugarqueen: '砂糖の女王 マリー' }[kind] ?? 'BOSS'; }
+  bossName(kind = this.level.bosses[this.bossIdx] ?? this.level.boss) { const n = BOSS_NAMES[kind]; return n ? t(n) : 'BOSS'; }
 
   collide() {
     const p = this.player;

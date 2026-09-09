@@ -3,6 +3,7 @@ import { PlayerShot, WEAPONS } from './projectiles.js';
 import { blit } from '../gfx/sprite.js';
 import { castMagic, MAGIC } from './magic.js';
 import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConveyor, ladderAt, ladderBelow, LADDER_SPEED } from './gimmicks.js';
+import { t } from '../i18n.js';
 
 const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196; // 単発ジャンプ 42 世界px(2.6タイル)
 const STAND_H = 28, CROUCH_H = 18; // 当たり判定（世界単位）。スプライトは生成 PNG のサイズに従う（docs/art-standard.md §2.1）
@@ -153,7 +154,7 @@ export class Player {
     this.invT = 1.8; this.hurtT = 0.35;
     this.vx = (source && source.x + (source.w ?? 0) / 2 > this.centerX ? -1 : 1) * 50; this.vy = -120; this.onGround = false;
     w.audio.sfx('undress'); w.shake(4); w.fx?.hitStop();
-    w.toast('変身が解けた…！');
+    w.toast(t('変身が解けた…！'));
     return true;
   }
 

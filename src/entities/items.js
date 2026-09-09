@@ -2,6 +2,7 @@ import { grand } from '../util.js';
 import { TILE, moveBody } from '../physics.js';
 import { WEAPON_ORDER } from './projectiles.js';
 import { blit } from '../gfx/sprite.js';
+import { t } from '../i18n.js';
 
 // 宝箱（プレゼント箱）: 撃つと開いてアイテムが飛び出す
 export class TreasureBox {
@@ -55,10 +56,10 @@ export class Item {
   pickup(player) {
     const w = this.world; this.dead = true;
     switch (this.kind) {
-      case 'dress': player.setCostume('dress'); w.audio.sfx('dress'); w.addScore(500); w.toast('魔法のドレス！'); break;
-      case 'golddress': player.setCostume('gold'); w.audio.sfx('dress'); w.addScore(1000); w.toast('フルブルームドレス！ためうちが使える'); break;
-      case 'oneup': w.lives++; w.audio.sfx('dress'); w.toast('リリカ人形 ＋１'); break;
-      case 'potion': w.addScore(300); w.audio.sfx('pickup'); w.toast('いちごポーション'); break;
+      case 'dress': player.setCostume('dress'); w.audio.sfx('dress'); w.addScore(500); w.toast(t('魔法のドレス！')); break;
+      case 'golddress': player.setCostume('gold'); w.audio.sfx('dress'); w.addScore(1000); w.toast(t('フルブルームドレス！ためうちが使える')); break;
+      case 'oneup': w.lives++; w.audio.sfx('dress'); w.toast(t('リリカ人形 ＋１')); break;
+      case 'potion': w.addScore(300); w.audio.sfx('pickup'); w.toast(t('いちごポーション')); break;
       case 'candy': w.addScore(200); w.audio.sfx('pickup'); break;
       default: player.weapon = this.kind; w.audio.sfx('pickup'); w.addScore(200); w.toast(`${w.weaponName(this.kind)}を手に入れた`); break;
     }
