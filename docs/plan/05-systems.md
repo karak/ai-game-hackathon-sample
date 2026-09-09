@@ -80,4 +80,4 @@
 | E2E | Playwright でボット自走（3→8 面）を CI 実行 | 🟡（ローカル `npm run e2e` 8 件: 8 面自走・設定・デモ・ポーズ／コンティニュー／2 周目・実キー回帰・ロード時間・英語 UI・スマホ縦。CI 未設定） | M2 |
 | パフォーマンス | 描画呼び出し計測、背景キャッシュ、粒子上限 400 | 🟡（2026-09-09 実測: update 0.01〜0.03 ms、draw 0.07〜0.16 ms/フレーム、drawImage 18〜42 回（塔のみ 215 回）、rAF 間隔 avg 13.3 ms（75 Hz 表示）で 20 ms 超 0 回。バッチ化・背景キャッシュは不要と判断。粒子上限 400 は `particles.js PARTICLE_MAX`、`test/particles.test.js`） | M6 |
 | 生成台帳 | ファイルロック、失敗理由の分類 | 🟡（fcntl ロック済み。失敗理由の分類は未） | M1 |
-| 配信 | `vite build` → itch.io / GitHub Pages | 🟡（build は `copySprites` で素材を同梱し `tools/check_dist.mjs` で preview 検証済み。原稿 `docs/release/itch-page.md`、GIF 済み。公開は人手で未） | M7 |
+| 配信 | `vite build` → Cloudflare（Workers Static Assets）。itch.io は任意 | ✅（`wrangler.jsonc` assets.directory=dist、`npm run deploy`。https://magical-lyrica.karak97.workers.dev。`tools/check_dist.mjs <URL>` で素材 235 読込・エラー 0。`docs/release/deploy.md`） | M7 |

@@ -181,4 +181,6 @@
 | itch.io ページ | 手順（HTML zip、Viewport 900×760、タグ、注意表示）と本文（日英） | `docs/release/itch-page.md` |
 | トレーラー GIF | `tools/make_trailer.mjs`: ボット自走を 8 fps で撮影（タイトル＋8 章の序盤・中盤＋最終ボス、180 コマ）。`trailer.gif` 384×336（整数 1/2）5.2 MB、`trailer_256.gif` 256×224（世界解像度）2.55 MB（カバー用、3 MB 未満） | `docs/release/trailer*.gif`、`test-results/shots/trailer_contact_2.png` |
 
-未達（人手）: itch.io への実際の公開（アカウント・アップロード）、公開 URL の記入、バグ報告フォーム（GitHub Issues はリポジトリ公開後）。
+| 公開（ユーザー指示 2026-09-10「Cloudflare の静的ページに専用プロジェクト」） | wrangler 4.130 を devDependency に追加。`wrangler pages project create` は Workers デプロイに転送されてエラー（Pages 新規は非推奨）→ Workers Static Assets の専用 Worker `magical-lyrica`（`wrangler.jsonc` assets.directory=dist）。`npm run deploy` / `deploy:preview`。449 ファイル、Version `b1d45468` | https://magical-lyrica.karak97.workers.dev、`node tools/check_dist.mjs <URL>`: 素材 235・エラー 0・bootMs 初回 6640 ms（TTFB 2443）／エッジ HIT 後 627 ms、転送 3.4 MB（フォント 2.07 MB）。`test-results/shots/deploy_title.png` |
+
+未達: バグ報告フォーム（GitHub Issues はリポジトリ公開後）、itch.io 掲載（任意、原稿は `itch-page.md`）、初回ロード 3 秒（IMP-019: フォントのサブセット化・長期キャッシュヘッダ・アトラス化）。

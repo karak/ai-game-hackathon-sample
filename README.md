@@ -1,10 +1,11 @@
 # マジカル☆リリカと血塗られたおとぎの国
 
-**Magical Lyrica and the Bloodstained Fairyland** — ブラウザで動く 2D 横スクロールアクション。全 8 章、ボス 9 体、2 周目あり。日本語／英語 UI（オプションで切替、初回はブラウザ言語）。
+**Magical Lyrica and the Bloodstained Fairyland** — ブラウザで動く 2D 横スクロールアクション。**遊ぶ: https://magical-lyrica.karak97.workers.dev**
+全 8 章、ボス 9 体、2 周目あり。日本語／英語 UI（オプションで切替、初回はブラウザ言語）。
 1995 年のスクウェア RPG（聖剣伝説2・ロマサガ3・クロノ・トリガー）風の 16bit ドット絵の世界観に、
 超魔界村スタイルのアクション（固定軌道ジャンプ・二段ジャンプ・被弾で装備喪失・武器切替）を載せています。
 
-配信用の文章・既知の問題・トレーラーは `docs/release/`（`itch-page.md` / `known-issues.md` / `trailer.gif`）。
+配信は Cloudflare Workers Static Assets（`docs/release/deploy.md`、`npm run deploy`）。配信用の文章・既知の問題・トレーラーは `docs/release/`（`itch-page.md` / `known-issues.md` / `trailer.gif`）。
 
 主人公は 15 歳の魔法少女リリカ。敵は見た目こそファンシーですが、攻撃手段はえげつない
 （血・毒・蛆・臓物・酸の涙）。ジャンルの反転がテーマです。
@@ -19,6 +20,7 @@ npm run dev      # Vite: http://127.0.0.1:5173/ （catalog.html でデザイン�
 npm test         # Vitest 98 件: 物理・レベル・ギミック・音・設定・i18n・アート基準（manifest）
 npm run e2e      # Playwright 8 件: 8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目・実キー・ロード時間・英語 UI・スマホ縦
 npm run build    # dist/ に静的ビルド（index.html と catalog.html、相対パス）。npm run preview で確認
+npm run deploy   # build → wrangler deploy（Cloudflare Worker magical-lyrica、要 wrangler login）
 ```
 
 Node 20 以上。`npm run e2e` は初回に `npx playwright install chromium` が必要。

@@ -32,10 +32,10 @@
 
 ## 動作環境
 
-- 確認済み: Chromium（Playwright headless）、macOS。初回ロード（フォント＋素材 235 枚の事前デコード）は localhost で 0.1〜0.3 秒（`window.__game.bootMs`）。ネット越しの実測は未
+- 確認済み: Chromium（Playwright headless）、macOS。初回ロード（フォント＋素材 235 枚の事前デコード）は localhost で 0.1〜0.3 秒、公開 URL（https://magical-lyrica.karak97.workers.dev）でエッジ未キャッシュ時 6.6 秒・キャッシュ後 0.6 秒（`window.__game.bootMs`、IMP-019）
 - 60 fps 固定ステップ。処理落ち時は 1 フレームに最大 5 ステップまで進める
 - 描画コスト実測: update 0.03 ms、draw 0.16 ms 以下／フレーム（`docs/plan/05-systems.md` 5.6）
 
 ## バグ報告
 
-GitHub Issues（リポジトリ公開後）。報告には「章・座標（ポーズ画面の位置は未表示なので、おおよその場所）・ブラウザ・再現手順」と、可能なら `localStorage` の `lyrica_deaths`（死亡地点ログ）を添えてください。
+GitHub Issues（リポジトリ公開後）。公開先は https://magical-lyrica.karak97.workers.dev（`deploy.md`）。報告には「章・座標（ポーズ画面の位置は未表示なので、おおよその場所）・ブラウザ・再現手順」と、可能なら `localStorage` の `lyrica_deaths`（死亡地点ログ）を添えてください。

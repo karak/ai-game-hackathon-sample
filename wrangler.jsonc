@@ -1,0 +1,13 @@
+{
+  // Cloudflare の静的配信（Workers Static Assets）。専用 Worker「magical-lyrica」が dist/ をそのまま配る。
+  // 2026-09 時点で Cloudflare Pages の新規作成は Workers に転送される（wrangler 4.130 `pages project create` → Workers deploy）ため Pages ではなくこちらを使う。
+  // `npm run deploy` = build → `wrangler deploy`（本番）。`npm run deploy:preview` = プレビュー版（URL を返す、本番は変えない）
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "magical-lyrica",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page" // 404.html は無いので既定の 404。SPA ではないため index.html へのフォールバックはしない
+  },
+  "observability": { "enabled": true }
+}
