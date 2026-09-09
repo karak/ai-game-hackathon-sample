@@ -1,5 +1,5 @@
 {
- "requests": 133,
+ "requests": 135,
  "entries": [
   {
    "name": "player-base",
@@ -1024,6 +1024,22 @@
    "secs": 19.0,
    "text": "",
    "ts": 1788930891.576263
+  },
+  {
+   "name": "enemy-zombie-rise",
+   "v": 1,
+   "ok": true,
+   "secs": 15.0,
+   "text": "",
+   "ts": 1788931170.282057
+  },
+  {
+   "name": "player-run-b-hat",
+   "v": 3,
+   "ok": true,
+   "secs": 14.4,
+   "text": "",
+   "ts": 1788931482.6076522
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

@@ -61,8 +61,8 @@
   },
   "player-run-b": {
    "box": [
-    90,
-    130
+    100,
+    135
    ],
    "frames": 2,
    "anchor": "bottom",
@@ -346,8 +346,8 @@
   },
   "player-run-b-hat": {
    "box": [
-    90,
-    130
+    100,
+    135
    ],
    "frames": 2,
    "anchor": "bottom",
@@ -1441,6 +1441,20 @@
     "bosses/ringmaster2"
    ],
    "palette": "bosses/ringmaster1"
+  },
+  "enemy-zombie-rise": {
+   "box": [
+    96,
+    80
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "enemy-zombie-rise.txt",
+   "ref": "enemy-zombie",
+   "out": [
+    "enemies/zombieRise"
+   ],
+   "palette": "enemies/zombie1"
   }
  }
 }

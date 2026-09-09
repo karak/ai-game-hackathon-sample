@@ -41,7 +41,7 @@ def derive_hat():
     white = (r > 180) & (g > 180) & (b > 180)                      # 白いリボン帯
     gold = (r > 150) & (g > 100) & (b < 110) & (r > b + 60)        # 金具
     ys = np.arange(h)[:, None]
-    hatmask = al & (indigo | white | gold) & (ys < h * 0.30)  # 目より上の領域だけ（顔の誤検出を避ける）
+    hatmask = al & (indigo | white | gold) & (ys < h * 0.42)  # 目より上の領域だけ（顔の誤検出を避ける）。帽子は base_hat の 0.40 まで届く（0.30 だとつばの下 10 行が欠けた）
     # 帯・金具は本体に隣接するものだけ（髪のハイライト等の誤検出を避ける）
     yy, xx = np.nonzero(hatmask)
     if yy.size == 0: raise SystemExit('hat not found')
@@ -59,7 +59,7 @@ def derive_hat():
 def hat_mask(im):
     a = np.asarray(im); al = a[..., 3] > 0; r, g, b = (a[..., i].astype(int) for i in range(3)); h = a.shape[0]
     ys = np.arange(h)[:, None]
-    return al & (b > r + 10) & (r < 120) & (g < 110) & (ys < h * 0.30)
+    return al & (b > r + 10) & (r < 120) & (g < 110) & (ys < h * 0.45)  # 帽子は base_hat の行 0〜44/111（0.40）まで。0.30 で切るとつばの下 10 行が欠けて合成が浮く
 
 
 def hair_top_center(im):
@@ -68,8 +68,8 @@ def hair_top_center(im):
     pink = al & (r > 180) & (b > 120) & (g < r - 30)
     ys, xs = np.nonzero(pink)
     if ys.size == 0: return None
-    top = ys.min(); row = xs[ys <= top + 3]
-    return int(top), float(row.mean())
+    top = ys.min(); head = xs[ys <= top + 25]  # 頭部（髪上端から 25 セル）の x 中心。最上 3 行だと前髪の偏りで 6〜10 セルずれた
+    return int(top), float((head.min() + head.max()) / 2)
 
 
 _HAT_OFF = None
@@ -85,10 +85,17 @@ def hat_offsets_from_base():
     hat = al & (b > r + 10) & (r < 120) & (g < 110) & (np.arange(h)[:, None] < h * 0.4)
     pink = al & (r > 180) & (b > 120) & (g < r - 30)
     if hat.sum() < 20 or pink.sum() < 20: return _HAT_OFF
-    hy, hx = np.nonzero(hat); py, px = np.nonzero(pink)
-    hat_top = int(hy.min()); hair_top = int(py.min())
-    hat_cx = float((hx.min() + hx.max()) / 2); hair_cx = float(px[py <= hair_top + 3].mean())
-    _HAT_OFF = (max(0, hair_top - hat_top), hat_cx - hair_cx)
+    hy, hx = np.nonzero(hat)
+    hat_top = int(hy.min()); hat_cx = float((hx.min() + hx.max()) / 2)
+    # 頭頂は帽子なし原画（idle_nohat）で測る。base_hat の見える髪の上端は帽子に隠れた分だけ低い。足元揃え・中央揃えで座標を合わせる
+    nh = SPR / 'idle_nohat.png'
+    if nh.exists():
+        n = np.asarray(Image.open(nh).convert('RGBA')); nal = n[..., 3] > 0; nr, ng, nb = (n[..., i].astype(int) for i in range(3))
+        npink = nal & (nr > 180) & (nb > 120) & (ng < nr - 30); ny, nx = np.nonzero(npink)
+        crown = int(ny.min()) + (im.height - n.shape[0]); hd = nx[ny <= ny.min() + 25]; head_cx = float((hd.min() + hd.max()) / 2) + (im.width - n.shape[1]) / 2
+    else:
+        py, px = np.nonzero(pink); crown = int(py.min()); hd = px[py <= crown + 25]; head_cx = float((hd.min() + hd.max()) / 2)
+    _HAT_OFF = (max(0, crown - hat_top), hat_cx - head_cx)
     print('hat offsets from base_hat: up', _HAT_OFF[0], 'dx', round(_HAT_OFF[1], 1))
     return _HAT_OFF
 

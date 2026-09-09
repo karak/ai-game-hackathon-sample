@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-zombie-rise-v1.png",
+ "pitch": [
+  6.0,
+  8.0
+ ],
+ "max_box": [
+  96,
+  80
+ ],
+ "w": 57,
+ "h": 63,
+ "fits": true,
+ "colors": 11
+}

@@ -1,3 +1,4 @@
-SUBJECT: the reference character (Lyrica WEARING her witch hat, exactly as in the LEFT figure of the reference) RUNNING to the RIGHT, side view. Two frames of a 4-frame run cycle, and these two frames must show the OPPOSITE legs from the second attached image (which shows the right leg forward): FRAME 3 = contact pose with the LEFT leg forward (toe pointing right, in front of the body) and the RIGHT leg kicked back behind the body, right arm swinging forward; FRAME 4 = passing pose with the right leg crossing in front of the left, body 1 cell higher, hair and skirt swinging. Same colors, same head, same proportions as the reference.
-
-The witch hat must stay on her head in every frame (it may tilt slightly with motion).
+SUBJECT: the reference character (Lyrica WEARING her witch hat, exactly as in the LEFT figure of the first reference) RUNNING to the RIGHT, side view. Two frames of a 4-frame run cycle.
+FRAME 3 = contact pose with the legs the OPPOSITE way round from frame 1: the leg NEAREST the viewer (drawn in front, with the darker boot) is stretched straight BACK toward the LEFT edge of the figure, and the FAR leg (behind) is lifted and bent FORWARD to the RIGHT with the knee up. The arm nearest the viewer swings forward. Compare the second attached image: it shows the near leg forward — draw the reverse.
+FRAME 4 = passing pose: both legs together under the body, the far leg crossing in front, body 1 cell higher, hair and skirt swinging.
+Same colors, same head, same proportions as the reference. The witch hat must stay on her head in every frame.

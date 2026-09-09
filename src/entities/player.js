@@ -181,8 +181,9 @@ export class Player {
     if (this.crouch) return 'crouch';
     if (this.hurtT > 0) return 'hurt';
     if (!this.onGround) return this.attackT > 0 ? 'attack' : (this.vy < 0 ? 'jump' : 'fall');
-    if (this.attackT > 0) return 'attack';
+    // 走りながら撃っても足は止めない（超魔界村準拠）。連射すると attack コマに固定されて滑走に見えるため、立ち撃ちのみ attack
     if (this.vx !== 0) return ['run1', 'run2', 'run3', 'run4'][Math.floor(this.runT * 10) % 4];
+    if (this.attackT > 0) return 'attack';
     return 'idle';
   }
 
