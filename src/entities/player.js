@@ -51,7 +51,7 @@ export class Player {
       this.jumps = 0;
       this.vx = this.crouch ? 0 : dir * SPEED;
       if (dir) this.facing = dir;
-      if (dir && !this.crouch) this.runT += dt; else this.runT = 0;
+      if (dir && !this.crouch) this.runT += dt; // 止まっても位相は保つ（キー連打でコマが 1 に戻り、片足で滑るように見えるのを防ぐ）
       if (ctrl && input.hit('jump') && !this.crouch) {
         this.vy = JUMP_V; this.jumps = 1; this.onGround = false; this.world.audio.sfx('jump');
         this.world.particles.emit('dust', this.centerX, this.y + this.h, 3);
@@ -203,16 +203,15 @@ export class Player {
   _drawBody(g, cam, assets, dy) {
     const fr = this.frame();
     const sheet = assets.player[this.costume];
-    const spr = sheet[fr] ?? sheet.idle; if (!spr) return;
+    let spr = sheet[fr] ?? sheet.idle; if (!spr) return;
+    if (this.state === 'dying' && this.deathReason !== 'bog' && this.costume !== 'plain' && assets.player.nohat?.[fr]) spr = assets.player.nohat[fr]; // 帽子が飛ぶ間は帽子なし原画
     // スプライト箱の底辺中央を当たり判定の底辺中央に合わせる
     const px = Math.floor(this.centerX - spr.w / 2 - cam.x), py = Math.floor(this.y + this.h - spr.h - cam.y + dy);
     blit(g, spr, this.facing < 0, px, py);
-    const hat = assets.hat; const hatDy = -(hat.h - (hat.brim ?? 2)); // つばが髪に少しかかる
-    if (this.costume !== 'plain' && this.state === 'normal') {
-      const hy = (spr.headY ?? (fr === 'crouch' ? Math.floor(spr.h * 0.15) : 0)); // 髪の上端（生成コマは高さが違う）
-      blit(g, hat, this.facing < 0, this.centerX - hat.w / 2 - cam.x, py + hatDy + hy);
-    }
-    if (this.state === 'dying' && this.deathReason !== 'bog') {
+    // 帽子は各コマの原画に描き込まれている（生成時に帽子ありで描かせ、脱落したコマだけ tools/derive_variants.py が合成）。
+    // 実行時の重ね描きは二重になって浮くので行わない。死亡時のみ帽子なし原画に差し替えて帽子を飛ばす
+    const hat = assets.hat; const hatDy = assets.hatTopOffset !== undefined ? -assets.hatTopOffset : -(hat.h - (hat.brim ?? 2)); // 帽子上端 = 髪上端 − hatTopOffset（元デザインの実測 3）。生成前の旧式: つばが髪に少しかかる
+    if (this.state === 'dying' && this.deathReason !== 'bog' && this.costume !== 'plain') {
       // 帽子が飛ぶ
       const t = this.deathT; const hx = this.centerX - hat.w / 2 - cam.x + t * 20 * -this.facing, hy = py + (spr.headY ?? 0) + hatDy - (60 * t - 90 * t * t);
       blit(g, hat, this.facing < 0, hx, Math.min(hy, py + spr.h * 0.5));

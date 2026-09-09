@@ -72,6 +72,27 @@ def hair_top_center(im):
     return int(top), float(row.mean())
 
 
+_HAT_OFF = None
+def hat_offsets_from_base():
+    """base_hat.png（帽子込みの原画）から、帽子上端と髪上端の差（セル）、帽子中心と髪中心の x 差（セル）を測る"""
+    global _HAT_OFF
+    if _HAT_OFF is not None: return _HAT_OFF
+    _HAT_OFF = (9, 0)
+    src = SPR / 'base_hat.png'
+    if not src.exists(): return _HAT_OFF
+    im = Image.open(src).convert('RGBA'); a = np.asarray(im); al = a[..., 3] > 0
+    r, g, b = (a[..., i].astype(int) for i in range(3)); h = a.shape[0]
+    hat = al & (b > r + 10) & (r < 120) & (g < 110) & (np.arange(h)[:, None] < h * 0.4)
+    pink = al & (r > 180) & (b > 120) & (g < r - 30)
+    if hat.sum() < 20 or pink.sum() < 20: return _HAT_OFF
+    hy, hx = np.nonzero(hat); py, px = np.nonzero(pink)
+    hat_top = int(hy.min()); hair_top = int(py.min())
+    hat_cx = float((hx.min() + hx.max()) / 2); hair_cx = float(px[py <= hair_top + 3].mean())
+    _HAT_OFF = (max(0, hair_top - hat_top), hat_cx - hair_cx)
+    print('hat offsets from base_hat: up', _HAT_OFF[0], 'dx', round(_HAT_OFF[1], 1))
+    return _HAT_OFF
+
+
 def ensure_hat(frame_name, hat_img):
     """帽子ありセットのフレームに帽子が無ければ、抽出済み帽子を髪の上に合成する。"""
     im = load(frame_name)
@@ -82,7 +103,10 @@ def ensure_hat(frame_name, hat_img):
     ht = hair_top_center(im)
     if not ht: return False
     top, cx = ht
-    hx = int(round(cx - hat_img.width * 0.55)); hy = top + 6 - hat_img.height  # つばを髪に 6 セルかぶせる
+    # 位置は元デザイン（base_hat: 帽子を描き込んだ原画）の実測に合わせる: 帽子の上端は髪の上端より hat_up セル上、
+    # 帽子の中心 x は髪の中心 x から hat_dx セルずれる（既定 9 / 0。base_hat があれば計測で上書き）
+    hat_up, hat_dx = hat_offsets_from_base()
+    hx = int(round(cx + hat_dx - hat_img.width / 2)); hy = int(round(top - hat_up))
     pad_top = max(0, -hy); pad_l = max(0, -hx); pad_r = max(0, hx + hat_img.width - im.width)
     canvas = Image.new('RGBA', (im.width + pad_l + pad_r, im.height + pad_top), (0, 0, 0, 0))
     canvas.paste(im, (pad_l, pad_top), im); canvas.paste(hat_img, (hx + pad_l, hy + pad_top), hat_img)

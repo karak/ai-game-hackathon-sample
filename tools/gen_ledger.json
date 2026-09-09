@@ -1,5 +1,5 @@
 {
- "requests": 131,
+ "requests": 133,
  "entries": [
   {
    "name": "player-base",
@@ -1008,6 +1008,22 @@
    "secs": 12.9,
    "text": "",
    "ts": 1788895146.9820201
+  },
+  {
+   "name": "player-run-b",
+   "v": 2,
+   "ok": true,
+   "secs": 13.5,
+   "text": "",
+   "ts": 1788930757.669546
+  },
+  {
+   "name": "player-run-b-hat",
+   "v": 2,
+   "ok": true,
+   "secs": 19.0,
+   "text": "",
+   "ts": 1788930891.576263
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"
