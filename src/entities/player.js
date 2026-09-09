@@ -2,7 +2,7 @@ import { TILE, moveBody } from '../physics.js';
 import { PlayerShot, WEAPONS } from './projectiles.js';
 import { blit } from '../gfx/sprite.js';
 import { castMagic, MAGIC, magicName, CHARGE_T, SUPER_T } from './magic.js';
-import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConveyor, ladderAt, ladderBelow, LADDER_SPEED } from './gimmicks.js';
+import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConveyor, ladderAt, ladderBelow, LADDER_SPEED, trampolineAt, TRAMPOLINE_V } from './gimmicks.js';
 import { t } from '../i18n.js';
 
 const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196; // 単発ジャンプ 42 世界px(2.6タイル)
@@ -93,6 +93,11 @@ export class Player {
     if (res.hitTop) this.vy = 0;
     landOnPlatforms(this, this.world.platforms ?? [], prevBottom);
     if (this.onGround) triggerCrumbles(this, this.world.crumbles ?? []);
+    // 綿あめのトランポリン（第二章）: 着地した瞬間に大きく跳ね返る。二段ジャンプは残す（ほうきで軌道を変えられる）
+    if (this.onGround && res.hitBottom && trampolineAt(map, this)) {
+      this.vy = TRAMPOLINE_V; this.onGround = false; this.jumps = 1;
+      this.world.audio.sfx('djump'); this.world.particles.emit('stuffing', this.centerX, this.y + this.h, 10);
+    }
     applyFlow(this, map, dt);                              // 水流（地上）／風（空中）
     applyConveyor(this, map, dt);                          // ベルトコンベア（地上）
     if (this.onGround && this.hurtT > 0) this.vx = 0;

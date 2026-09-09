@@ -15,7 +15,7 @@ import { SAFE_SHOT_T, LOOP2 } from './balance.js';
 import { Fx } from './fx.js';
 import { seedGame, hashSeed } from './util.js';
 import { HD_SCALE as HD } from './gfx/sprite.js';
-import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine, SyrupDripper } from './entities/gimmicks.js';
+import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine, SyrupDripper, isTrampoline } from './entities/gimmicks.js';
 import { resolveDecoMap } from './decomap.js';
 import { updateCamera, snapCamera } from './camera.js';
 import { BOSS_NAMES } from './story.js';
@@ -62,7 +62,7 @@ export class World {
     this.classes = { EnemyShot };
 
     this.enemies = []; this.shots = []; this.enemyShots = []; this.fires = []; this.pools = []; this.items = []; this.boxes = [];
-    this.platforms = []; this.crumbles = []; this.presses = []; // ギミック（spawnAll で配置）
+    this.platforms = []; this.crumbles = []; this.presses = []; this.drippers = []; // ギミック（spawnAll で配置）
     this.effects = []; // 溜め魔法などの一時エンティティ（update/draw/dead）
     this.screenFx = []; // 画面に固定して最後に描く演出（強化魔法のカットイン）。update/draw(g)/dead
     this.cam = { x: 0, y: 0 }; this.arena = null; this.boss = null; this.bossState = 'none'; this.bossIdx = 0; // 連戦の何体目か
@@ -85,6 +85,9 @@ export class World {
   spawnAll() {
     this.enemies = []; this.boxes = []; this.items = []; this.enemyShots = []; this.shots = []; this.fires = []; this.pools = []; this.effects = []; this.screenFx = [];
     this.platforms = []; this.presses = []; this.crumbles = this.level.crumbles.map(c => new CrumbleTile(this, c.tx, c.ty));
+    // 糖蜜のしずく（第二章）: マップの 'D' タイルごとにノズルを置く
+    this.drippers = [];
+    for (let ty = 0; ty < this.level.map.height; ty++) for (let tx = 0; tx < this.level.map.width; tx++) if (this.level.map.at(tx, ty) === 'D') this.drippers.push(new SyrupDripper(this, tx, ty));
     for (const c of this.crumbles) this.level.map.set(c.tx, c.ty, '!'); // 消えていた足場を戻す
     for (const s of this.level.spawns) {
       if (s.type === 'wheel') { this.platforms.push(...makeWheel(this, s.tx, s.ty)); continue; }
@@ -132,6 +135,7 @@ export class World {
     for (const q of this.platforms) q.update(dt);   // 足場は主人公より先に動かす（乗り物処理のため）
     for (const c of this.crumbles) c.update(dt);
     for (const q of this.presses) q.update(dt);
+    for (const q of this.drippers) if (q.x > this.cam.x - 64 && q.x < this.cam.x + W + 64) q.update(dt); // 画面内のノズルだけ滴らせる
     p.update(dt, input);
 
     // チェックポイント
@@ -259,6 +263,7 @@ export class World {
       const sx = x - cam.x + shake, sy = y - cam.y;
       if (kind === 'island' && G.island) return drawGen(G.island, sx, sy - 2, w, TILE);
       if (kind === 'plank' && G.plank) return drawGen(G.plank, sx, sy, w, TILE);
+      if (kind === 'candyplank' && G.candyplank) return drawGen(G.candyplank, sx, sy, w, TILE); // 第二章の飴の板（IMP-020）
       const n = Math.round(w / TILE);
       for (let i = 0; i < n; i++) {
         if (this.hdTiles) { const v = (i * 7) % this.hdTiles.cols; g.drawImage(this.hdTiles.plat[v], Math.round(sx + i * TILE), Math.round(sy), TILE, TILE); }
@@ -278,7 +283,17 @@ export class World {
       if (G.hub) { const sw = G.hub.r.width / HD, sh = G.hub.r.height / HD; g.drawImage(G.hub.r, Math.round(c.cx - sw / 2 - cam.x), Math.round(c.cy - sh / 2 - cam.y), sw, sh); }
       else { g.fillStyle = '#d9262b'; g.fillRect(Math.round(c.cx - 3 - cam.x), Math.round(c.cy - 3 - cam.y), 6, 6); }
     }
-    for (const c of this.crumbles) if (c.state !== 'gone' && c.x + TILE > cam.x && c.x < cam.x + W) plat(c.x, c.y, TILE, c.shake, 'plank');
+    for (const c of this.crumbles) if (c.state !== 'gone' && c.x + TILE > cam.x && c.x < cam.x + W) plat(c.x, c.y, TILE, c.shake, this.level.theme === 'candyforest' && G.candyplank ? 'candyplank' : 'plank');
+    // 綿あめのトランポリン 'W' と糖蜜のノズル 'D'（第二章）
+    { const map3 = this.level.map, tx0 = Math.floor(cam.x / TILE), tx1 = tx0 + W / TILE + 1;
+      for (let ty = 0; ty < map3.height; ty++) for (let tx = tx0; tx <= tx1; tx++) {
+        const c = map3.at(tx, ty);
+        if (c !== 'W' && c !== 'D') continue;
+        const spr = c === 'W' ? G.trampoline : G.dripper; const x = tx * TILE - cam.x, y = ty * TILE - cam.y;
+        if (spr) { const sw = spr.r.width / HD, sh = spr.r.height / HD; g.drawImage(spr.r, Math.round(x + (TILE - sw) / 2), Math.round(c === 'W' ? y + TILE - sh : y), sw, sh); }
+        else { g.fillStyle = c === 'W' ? '#f7b8d8' : '#7a0f1f'; g.fillRect(x, y + (c === 'W' ? TILE - 6 : 0), TILE, 6); }
+      }
+    }
     // プレス機: 吊り鎖 + ブロック（生成絵 tiles/press があれば使う）
     for (const q of this.presses) {
       if (q.x + q.w < cam.x || q.x > cam.x + W) continue;

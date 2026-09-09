@@ -994,7 +994,7 @@
  "enemies/cocoon1": {
   "anchor": "bottom",
   "colors": 15,
-  "fits": false,
+  "fits": true,
   "h": 137,
   "src": "assets/sprites/enemies/cocoon1.png",
   "w": 49
@@ -1002,7 +1002,7 @@
  "enemies/cocoon2": {
   "anchor": "bottom",
   "colors": 15,
-  "fits": false,
+  "fits": true,
   "h": 137,
   "src": "assets/sprites/enemies/cocoon2.png",
   "w": 58

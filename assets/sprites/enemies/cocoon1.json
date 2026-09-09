@@ -6,12 +6,12 @@
  ],
  "max_box": [
   96,
-  130
+  145
  ],
  "frames": null,
  "w": 49,
  "h": 137,
- "fits": false,
+ "fits": true,
  "colors": 15,
  "name": "cocoon1"
 }

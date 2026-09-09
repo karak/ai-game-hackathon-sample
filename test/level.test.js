@@ -55,15 +55,16 @@ test('ground-bound enemies, boxes and checkpoints stand above solid ground (not 
 test('every hazard gap is crossable: at most 3 tiles wide at ground level, or has a platform stepping stone', () => {
   for (const stage of STAGES) {
     const lvl = parseLevel(stage); const map = lvl.map;
-    // 各列の「最も高い立てる面」を求める（地面 or 足場）
-    const standY = tx => { for (let ty = 0; ty < map.height; ty++) if (map.isSolid(tx, ty) || map.isOneWay(tx, ty)) return ty; return null; };
+    // 各列の「最も高い立てる面」を求める（地面 or 足場）。row 0-2 は天井（城の上端・第二章の回廊）なので数えない。
+    // 以前は row 0 から探していたため、天井のある章は全列が「立てる面なし」になり、この検査が丸ごと飛んでいた（2026-09-10 修正）
+    const CEILING_ROWS = 3;
+    const standY = tx => { for (let ty = CEILING_ROWS; ty < map.height; ty++) if (map.isSolid(tx, ty) || map.isOneWay(tx, ty)) return ty; return null; };
     // 動く足場・浮島（マーカー）も足場として数える（幅 = PLATFORM[kind].w タイル）
     const platCols = new Set(); for (const s of lvl.spawns) { if (s.type === 'wheel') { for (let i = -3; i <= 4; i++) platCols.add(s.tx + i); continue; } if (s.type === 'cart') { for (let i = 0; i <= 24 + 3; i++) platCols.add(s.tx + i); continue; } if (PLATFORM[s.type]) for (let i = 0; i < PLATFORM[s.type].w; i++) platCols.add(s.tx + i); } // 観覧車は中心 ±48（3 タイル）、ジェットコースターは 24 タイル走る
     let gapStart = null;
     for (let tx = 0; tx <= map.width; tx++) {
       const y = tx < map.width ? standY(tx) : 0;
-      // 天井のみ(城の row0-1)は立てる面ではない
-      const usable = (y !== null && y >= 3) || platCols.has(tx);
+      const usable = y !== null || platCols.has(tx);
       if (!usable && gapStart === null) gapStart = tx;
       if (usable && gapStart !== null) {
         const width = tx - gapStart;

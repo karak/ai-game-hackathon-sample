@@ -1,7 +1,7 @@
 // 装飾記号 → 生成装飾スプライト名（テーマ別）。World の描画とカタログ「タイル・装飾」の表が同じ定義を使う
 export const DECO_MAP = {
   graveyard:   { t: 'tomb', c: 'cross', f: 'flowers', v: 'candle', y: 'tree', x: 'blood', o: 'bones' },
-  candyforest: { t: 'tomb', c: 'cross', f: 'flowers', v: 'candle', y: 'tree', x: 'blood', o: 'bones', k: 'lollipop' },
+  candyforest: { t: 'candytomb', c: 'canecross', f: 'sugarflowers', v: 'cakecandle', y: 'tree', x: 'blood', o: 'bones', l: 'lollipop' }, // 'k' は腐ったケーキの敵マーカーと衝突して棒付き飴が出ていなかったので 'l' に変更（IMP-020）。IMP-020: 第一章と共有していた墓石・十字架・花・蝋燭を菓子版に差し替え（共有は tree/blood/bones の 3 点のみ。いずれも菓子の森向けに描いたもの）
   river:       { y: 'willow', n: 'bridgepost', f: 'reeds', o: 'dollhead', x: 'blood', t: 'tomb' },
   workshop:    { n: 'dressform', c: 'scissors', y: 'spool', o: 'stuffing', x: 'blood', w: 'window', v: 'candelabra' },
   park:        { n: 'booth', f: 'balloons', y: 'carousel', c: 'popcorn', x: 'blood', o: 'bones' },

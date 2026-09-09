@@ -3,6 +3,8 @@ import { parseLevel } from '../src/level.js';
 import { TILE } from '../src/physics.js';
 import { Player } from '../src/entities/player.js';
 import { MovingPlatform, PressMachine, PRESS, CONVEYOR_SPEED, PLATFORM, makeWheel } from '../src/entities/gimmicks.js';
+import { trampolineAt, TRAMPOLINE_V, SyrupDripper, DRIP_INTERVAL } from '../src/entities/gimmicks.js';
+import { STAGES } from '../src/levels/index.js';
 
 const STEP = 1 / 60;
 const inputOf = (held = [], pressed = []) => ({ down: a => held.includes(a), hit: a => pressed.includes(a) });
@@ -57,4 +59,45 @@ test('wheel spawns 4 one-way platforms on a circle of radius 48 that complete a 
   const start = [c.x, c.y]; w.step(NONE, 480);
   expect(c.x).toBeCloseTo(start[0], 1); expect(c.y).toBeCloseTo(start[1], 1);
   w.step(NONE, 240); expect(Math.hypot(c.x - start[0], c.y - start[1])).toBeCloseTo(96, 0); // 半周で反対側
+});
+
+// ---- 第二章のギミック（IMP-020）: 綿あめのトランポリンと糖蜜のノズル ----
+
+test('cotton-candy trampoline: landing on a W tile throws the player up harder than a jump, and the broom jump is still available', () => {
+  const w = worldOf(['.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '..P.............', '.'.repeat(16), '#####WWW########', '#'.repeat(16), '#'.repeat(16)]);
+  const p = w.player; p.x = 6 * TILE; p.y = 8 * TILE; p.vy = 60;
+  expect(trampolineAt(w.level.map, p)).toBeNull();        // まだ空中（足元にトランポリンなし）
+  let bounced = 0;
+  for (let i = 0; i < 90; i++) { w.step(NONE, 1); if (p.vy < -250) { bounced = p.vy; break; } }
+  expect(bounced).toBeCloseTo(TRAMPOLINE_V, 0);
+  expect(p.onGround).toBe(false);
+  expect(p.jumps).toBe(1);                                 // ほうきの二段ジャンプが 1 回残る
+  expect(TRAMPOLINE_V).toBeLessThan(-300);                 // 単発ジャンプ -218 より強い
+});
+
+test('syrup dripper: a D nozzle drops one syrup shot every DRIP_INTERVAL, and none during the respawn grace', () => {
+  const w = worldOf(['#'.repeat(16), '....D...........', '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '.'.repeat(16), '..P.............', '.'.repeat(16), '#'.repeat(16), '#'.repeat(16), '#'.repeat(16)]);
+  w.enemyShots = []; w.safeT = 0;
+  const d = new SyrupDripper(w, 4, 1);
+  expect(d.x).toBe(4 * TILE);
+  d.t = 0; for (let i = 0; i < Math.ceil(60 * DRIP_INTERVAL) + 1; i++) d.update(STEP);
+  expect(w.enemyShots.length).toBe(1);
+  const s = w.enemyShots[0]; expect(s.kind).toBe('syrup'); expect(s.vy).toBeGreaterThan(0); expect(s.def.pool).toBe(true);
+  w.safeT = 2; w.enemyShots.length = 0; d.t = 0;           // 復活直後は敵弾を出さない（balance.js SAFE_SHOT_T）
+  for (let i = 0; i < Math.ceil(60 * DRIP_INTERVAL) + 1; i++) d.update(STEP);
+  expect(w.enemyShots.length).toBe(0);
+});
+
+test('stage 2 is no longer a copy of stage 1: exclusive enemies, its own gimmicks, and no graveyard roster', () => {
+  const s1 = parseLevel(STAGES[0]), s2 = parseLevel(STAGES[1]);
+  const kinds = lvl => new Set(lvl.spawns.filter(s => !['treasure', 'heartitem'].includes(s.type)).map(s => s.type));
+  const k1 = kinds(s1), k2 = kinds(s2);
+  expect([...k2].filter(k => !k1.has(k)).sort()).toEqual(['cocoon', 'syruparm']); // 第二章専用の敵 2 種
+  for (const gone of ['zombie', 'angel', 'eye']) expect(k2.has(gone), `${gone} は第二章から外す`).toBe(false);
+  const sym = ch => STAGES[1].rows.reduce((n, r) => n + [...r].filter(c => c === ch).length, 0);
+  expect(sym('W'), 'トランポリン').toBeGreaterThanOrEqual(3);
+  expect(sym('D'), '糖蜜のノズル').toBeGreaterThanOrEqual(4);
+  expect(sym('!'), '飴の板').toBeGreaterThanOrEqual(3);
+  const sym1 = ch => STAGES[0].rows.reduce((n, r) => n + [...r].filter(c => c === ch).length, 0);
+  for (const ch of ['W', 'D', '!']) expect(sym1(ch), `第一章には ${ch} を置かない`).toBe(0);
 });

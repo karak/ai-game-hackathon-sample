@@ -2,6 +2,7 @@
 // 使い方: node tools/check_dist.mjs（先に npm run build）。出力: 読めた素材数・[loader] 警告・bootMs・test-results/shots/dist_title.png
 //        node tools/check_dist.mjs https://magical-lyrica.karak97.workers.dev  — 公開 URL を直接検証（preview は起こさない、撮影は deploy_title.png）
 import { spawn } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { chromium } from '@playwright/test';
 
 const PORT = 4174;
@@ -27,7 +28,8 @@ try {
   await page.waitForTimeout(2500);
   const imgs = await page.evaluate(() => document.querySelectorAll('canvas, img').length);
   await browser.close();
-  const ok = r.loaded === 235 && warns.length === 0 && errors.length === 0 && r.playerHd;
-  console.log(JSON.stringify({ url: BASE, ...r, wallMs, loaderWarnings: warns.length, errors, catalogNodes: imgs, ok }, null, 1));
+  const expected = Object.keys(JSON.parse(readFileSync(new URL('../src/gfx/manifest.json', import.meta.url)))).length; // manifest の全エントリが読めること（件数は増えるので固定値にしない）
+  const ok = r.loaded === expected && warns.length === 0 && errors.length === 0 && r.playerHd;
+  console.log(JSON.stringify({ url: BASE, ...r, expected, wallMs, loaderWarnings: warns.length, errors, catalogNodes: imgs, ok }, null, 1));
   process.exitCode = ok ? 0 : 1;
 } finally { server?.kill(); }
