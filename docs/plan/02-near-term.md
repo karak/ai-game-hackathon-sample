@@ -157,3 +157,28 @@
 | 実キー回帰テスト | Space / X / K でジャンプ、右へ 20 秒で面が変わらない | `e2e/keyboard.spec.js`（ユーザー報告の切り分け。原因は DevTools タブへの私の操作） |
 
 残: モバイル簡易対応の確認（タッチパッドは実装済み、実機未確認）、英語 UI（IMP-008）、粒子上限、初回ロード時間の実測（`game.bootMs`）。
+
+## Sprint I — 「M6 後半: 英語 UI・粒子上限・ロード計測・スマホ確認」（2026-09-09）
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| IMP-008 英語 UI | `src/i18n.js`（日本語文字列がキー、`EN` 辞書、`t()` / `pick()`）。メニュー・ポーズ・ゲームオーバー・クリア・オプション・トースト・章題 8・副題 8・ボス名 9・操作名を翻訳。物語本文（プロローグ 10 行・エンディング 6 場面＋真の結末・クレジット）は `story.js` に両言語、`story()` で選択。設定 `lang`（保存が無ければ `navigator.language`、ja 以外は en）。オプションに「げんご / Language」行。`index.html` の説明文は `[data-lang]` で切替 | `test/i18n.test.js` 5 件（t() の全呼び出し・章題・ボス名・操作名に英語があること、場面数・行数の一致、保存と復元）、`e2e/boot.spec.js` 英語 UI、`test-results/shots/en_title.png` / `en_options.png` / `en_intro.png` |
+| 粒子上限 | `PARTICLE_MAX = 400`、超過分は古いものから捨てる | `test/particles.test.js` |
+| 初回ロード時間 | `game.bootMs` を E2E で計測し 3 秒未満を検証。実測 110〜445 ms（localhost、Chromium headless、4 並列時が最大） | `e2e/boot.spec.js` |
+| スマホ縦 | `main.js fit()` が 768 幅の入らない画面で幅に合わせて縮小（従来は最小 1 倍で横にはみ出していた）。iPhone 13 エミュレーションでキャンバス幅 ≤ 画面幅、タッチパッド表示、▶▶ で開始・X でジャンプ・▶ 長押しで前進 | `e2e/mobile.spec.js`、`test-results/shots/mobile_title.png` / `mobile_play.png` |
+| 証跡の保全 | Playwright の `outputDir` を `test-results/pw` に分離（実行ごとに空にされるため `test-results/shots/` が消えていた） | `playwright.config.js` |
+
+未達: 実機スマホ・実機パッド（繰延）。ネット越しのロード時間（公開後に計測）。武器名・溜め魔法名（`projectiles.js` / `magic.js` の `name`）はカタログ専用のため未翻訳。
+
+## Sprint J — 「M7: リリース準備」（2026-09-09）
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| `npm run build` | **BUG-014**: dist に PNG が 0 枚（`loader.js` が `import.meta.url` 基準で `../../assets/…` を解決し、dist ではサイトの外を指していた）。ページ URL（`document.baseURI`）基準に変更し、`vite.config.js` の `copySprites` プラグインで `assets/sprites` を dist にコピー。dist 6.0 MB、PNG 237 | `node tools/check_dist.mjs`（vite preview → 素材 235 読込・loader 警告 0・エラー 0・bootMs 138）、`test-results/shots/dist_title.png` |
+| ライセンス | `LICENSE`（MIT、コード）。生成素材・フォント OFL・自作音源の注記 | `LICENSE` |
+| README | 8 章・ギミック・2 周目・言語・テスト件数・ビルド・配信文書への導線 | `README.md` |
+| 既知の問題 | `docs/release/known-issues.md`（08-backlog の ID と対応） | 同ファイル |
+| itch.io ページ | 手順（HTML zip、Viewport 900×760、タグ、注意表示）と本文（日英） | `docs/release/itch-page.md` |
+| トレーラー GIF | `tools/make_trailer.mjs`: ボット自走を 8 fps で撮影（タイトル＋8 章の序盤・中盤＋最終ボス、180 コマ）。`trailer.gif` 384×336（整数 1/2）5.2 MB、`trailer_256.gif` 256×224（世界解像度）2.55 MB（カバー用、3 MB 未満） | `docs/release/trailer*.gif`、`test-results/shots/trailer_contact_2.png` |
+
+未達（人手）: itch.io への実際の公開（アカウント・アップロード）、公開 URL の記入、バグ報告フォーム（GitHub Issues はリポジトリ公開後）。

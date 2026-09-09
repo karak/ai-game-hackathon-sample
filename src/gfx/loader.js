@@ -15,11 +15,15 @@ function toCanvas(img) {
 
 // manifest: { "player/idle": {src,w,h,anchor}, ... } → { "player/idle": {r,l,w,h,anchor} }
 // onProgress(done, total) を画像 1 枚ごとに呼ぶ（ロード画面の進捗バー用）
+// src はプロジェクトルート相対（assets/sprites/…）。ページ（index.html / catalog.html）の URL を基準に解決する。
+// import.meta.url 基準だと `vite build` 後は dist/assets/main-*.js が基準になり、../../ がサイトの外を指して全素材が読めなかった（M7 で発覚）。
+// dist には vite.config.js のプラグインが assets/sprites をそのままコピーする
 export async function loadManifest(manifest, base = '', onProgress = null) {
   const out = {}; const entries = Object.entries(manifest); let done = 0;
+  const root = typeof document !== 'undefined' ? document.baseURI : import.meta.url;
   await Promise.all(entries.map(async ([key, m]) => {
     try {
-      const img = await loadImage(new URL(base + m.src, import.meta.url).href);
+      const img = await loadImage(new URL(base + m.src, root).href);
       const r = toCanvas(img);
       out[key] = { r, l: flipH(r), w: r.width / HD_SCALE, h: r.height / HD_SCALE, hd: true, anchor: m.anchor, brim: m.brim_overlap ? m.brim_overlap / HD_SCALE : undefined }; // w,h は世界単位
     } catch (e) { console.warn('[loader]', e.message); }

@@ -14,6 +14,8 @@ ID は種別＋連番。優先: P1（次スプリント）/ P2（次マイルス
 | BUG-006 | 私服の袖口・襟の色分けが単純（規則置換の限界） | カタログ主人公シート | P3 | 手修正 or 置換規則の細分化 |
 | BUG-007 | hurt2（白飛び）コマが未使用 | — | P3 | 被弾点滅に使う or 削除 |
 | BUG-008 | 中景 B/C が主中景と高さが違う場合に連結から除外されるため、城は 1 種のみ | 3 面 | P2 | 城用に壁面 2 種を生成 |
+| BUG-014 | `npm run build` の dist に生成素材 PNG が 1 枚も入らず、preview で全素材がフォールバック表示になる（`loader.js` が `import.meta.url` 基準で `../../assets/…` を解決し、dist/assets/main-*.js からはサイトの外を指す） | `npm run build && npm run preview` | 済 | ページ URL（`document.baseURI`）基準に変更、`vite.config.js copySprites` が `assets/sprites` を dist にコピー。`tools/check_dist.mjs` で 235 読込を確認（Sprint J） |
+| BUG-015 | スマホ縦（幅 390）でキャンバスが 768 px のまま横にはみ出す（`fit()` の最小倍率が 1） | iPhone 13 エミュレーション | 済 | 整数倍で入らないときは幅に合わせて縮小。`e2e/mobile.spec.js`（Sprint I） |
 
 ## 技術的負債（DEBT）
 
@@ -39,7 +41,7 @@ ID は種別＋連番。優先: P1（次スプリント）/ P2（次マイルス
 | IMP-005 | デモ（アトラクト）モード | 済（記録はボット。人手収録で差し替え可） |
 | IMP-006 | 溜め魔法 4 種 | 済（`src/entities/magic.js`） |
 | IMP-007 | 死亡地点ログの収集と可視化（カタログ「ステージ構成」に重ねる） | 済（`src/deathlog.js`: localStorage `lyrica_deaths` に座標・原因・経過秒・周回を 600 件まで。カタログ「ステージ構成」に × を重ね、面ごとに件数・原因・64 単位の多発地点を表示。`tools/gather_deaths.mjs` が無敵なし・残機無限のボットで収集し `docs/plan/logs/deaths-<日付>.json/.md` に書き出す。初回 2026-09-09: 2 周 × 8 面で 118 件） |
-| IMP-008 | 英語 UI | P3 |
+| IMP-008 | 英語 UI | 済（Sprint I: `src/i18n.js`、`story.js` 両言語、設定 `lang`、オプション行、`index.html` 説明文。未翻訳: `projectiles.js` / `magic.js` の武器・魔法名〔カタログ専用〕、`catalog.html`） |
 | IMP-009 | マイルド表現オプション（血の色） | P3 |
 | IMP-010 | プレス機のブロック絵が 47×56 セル（≈1 タイル）で装飾に埋もれる。単体 1 リクエストで 3 タイル級に描き直す | 済（`gimmick-press` spec、PART SIZES 指定で 157×147、台帳 178。`gimmick-workshop` は `skip_out` で press を出さない） |
 | IMP-011 | 工房の遠景 B（237×59）が A（248×140）と高さ不一致で不使用。参照付きで再生成 | 済（2 回目で 247×116、台帳 179〜180。1 回目は PART SIZES を文章で書いても 68 高。箱を 260×150 に絞り「窓 140 セル・箱の上端まで」と部位で書いて通った） |

@@ -1,14 +1,14 @@
-# HANDOFF — 引き継ぎ（2026-09-09 23:30 JST 時点）
+# HANDOFF — 引き継ぎ（2026-09-10 00:00 JST 時点）
 
 次のセッション（人でも Claude でも）が、このリポジトリの現在地・決定事項・残課題・作業手順を 10 分で把握するための文書。詳細は `docs/plan/` が正で、ここは入口。
 
 ## 1. 現在地
 
-- リポジトリ: `/Users/yasushi/projects/poc-square`、HEAD `21855e5`、作業ツリー clean（未コミットなし）
-- 検証: `npm test` Vitest 92 件通過、`npm run e2e` Playwright 5 件通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰）
+- リポジトリ: `/Users/yasushi/projects/poc-square`、HEAD は Sprint I・J のコミット（`git log -2`）、作業ツリー clean
+- 検証: `npm test` Vitest 98 件通過、`npm run e2e` Playwright 8 件通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 235 読込を確認
 - 生成予算: Gemini 台帳 `tools/gen_ledger.json` **186 / 200**（残 14）。逐次実行、並列禁止
-- マイルストーン: M0〜M4 済、M5 は実装分済（出口条件のテスター計測は人手のため繰延）、M6 着手（性能計測・ロード画面済）、M7 未着手。表は `docs/plan/03-roadmap.md`
-- 本日のスプリント: E ビジュアル残課題一掃 → F 死亡ログ・コンティニュー・2 周目・ポーズ → G 音 → H 計測・ロード画面（`docs/plan/02-near-term.md` 末尾）
+- マイルストーン: M0〜M4 済、M5 は実装分済（テスター計測は人手のため繰延）、M6 済（実機確認のみ繰延）、M7 は **itch.io への公開作業（人手）以外済**。表は `docs/plan/03-roadmap.md`
+- 本日のスプリント: E ビジュアル残課題一掃 → F 死亡ログ・コンティニュー・2 周目・ポーズ → G 音 → H 計測・ロード画面 → I 英語 UI・粒子上限・ロード計測・スマホ → J リリース準備（`docs/plan/02-near-term.md` 末尾）
 
 ## 2. 最初に読むもの（順番）
 
@@ -31,15 +31,18 @@
 | コンティニュー | 面の先頭・スコア 0・ハイスコア非記録 | `Game.continueGame` |
 | 死亡ログ | `localStorage lyrica_deaths`（600 件上限）。収集は `node tools/gather_deaths.mjs`（無敵なし・残機無限のボット）→ `docs/plan/logs/`。難易度は人のデータが出るまで動かさない | IMP-007 / IMP-017 |
 | 音 | シーケンサに `arp` / `echo` / `waves` / `once`＋`then`。ジングル 4（開始・クリア・死亡・ゲームオーバー）、最終ボス曲 `bossFinal`（`stage.bossSong`） | 05-systems 5.5 |
-| 性能 | update 0.03 ms・draw 0.16 ms 以下、rAF 20 ms 超 0 回。バッチ化・背景キャッシュは見送り | 05-systems 5.6 |
+| 性能 | update 0.03 ms・draw 0.16 ms 以下、rAF 20 ms 超 0 回。バッチ化・背景キャッシュは見送り。粒子上限 400 | 05-systems 5.6 |
+| 英語 UI | 日本語文字列をキーにした辞書 `src/i18n.js EN` と `t()`。物語本文は `story.js` に両言語（場面数・行数を揃える）。初回はブラウザ言語、以後は保存 `lang`。辞書漏れは `test/i18n.test.js` が t() の呼び出しを走査して検出 | IMP-008 |
+| 素材の URL 解決 | `loader.js` はページ URL（`document.baseURI`）基準。build は `vite.config.js copySprites` が `assets/sprites` を dist にコピー。`import.meta.url` 基準に戻すと dist で全素材が消える | BUG-014 |
+| 配信文書 | `docs/release/`: `itch-page.md`（手順・日英本文）、`known-issues.md`（08-backlog の ID）、`trailer.gif`（384×336, 5.2 MB）/ `trailer_256.gif`（256×224, 2.55 MB）。再生成は `node tools/make_trailer.mjs` | Sprint J |
 
 ## 4. 残課題（優先順。ID は 08-backlog）
 
 **人手待ち（繰延決定済み）**: テスター 5 人の完走率（M5 出口）、IMP-017 死亡多発地点の検証（第三章 x512 棘、涙の川 x1280 沼、工房 x1088 プレス、遊園地 x2688 沼、菓子の森 x2304）、実機ゲームパッド。
 
-**M6 の残り**: IMP-008 英語 UI（`src/game.js` 21 文字列、`world.js` 12、`settings.js` 9、章題 8、ボス名 9、`story.js` 41 行）、粒子上限、モバイル実機確認（タッチパッドは `index.html` に実装済み）、初回ロード秒数の記録（`window.__game.bootMs`）。
+**M7 の残り（人手）**: itch.io へのアップロード（手順は `docs/release/itch-page.md`。`npm run build` → `dist/` を zip）、公開 URL を README と 03-roadmap に記入、バグ報告先（GitHub Issues）。公開後にネット越しの初回ロード秒数（`window.__game.bootMs`）を記録。
 
-**M7（未着手）**: `npm run build` の確認、itch.io ページ、トレーラー GIF、README 更新、ライセンス表記、既知の問題一覧。
+**M6 の繰延**: 実機スマホ（Playwright の iPhone 13 エミュレーションのみ）、実機パッド。
 
 **技術的負債 P2**: DEBT-004 `world.js` 分割、DEBT-008 生成スクリプトが外部 venv/.env 依存（`requirements.txt` と `.env.example` を置く）、DEBT-003 旧文字列ドット絵の残存、BUG-008 城の中景 1 種、IMP-013 本来の強制スクロール。
 
@@ -53,7 +56,9 @@
 # 開発
 npx vite --port 5173 --host 127.0.0.1     # http://127.0.0.1:5173/index.html, /catalog.html
 npm test                                   # Vitest
-npm run e2e                                # Playwright（5174 を自動起動、headless）
+npm run e2e                                # Playwright 8 件（5174 を自動起動、headless）。証跡は test-results/shots/（outputDir は test-results/pw に分離）
+npm run build && node tools/check_dist.mjs # dist を vite preview（4174）で起こし素材 235 の読込を確認
+node tools/make_trailer.mjs                # トレーラー GIF 再生成（5175）。--scale 0.3333 --out docs/release/trailer_256.gif でカバー用
 node tools/gather_deaths.mjs --runs 2 --secs 150   # 死亡ログ収集（5173 が起きていること）
 
 # 素材生成（Python は参照プロジェクトの venv。DEBT-008）
@@ -72,7 +77,7 @@ PY="/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.venv/
 
 | 領域 | ファイル |
 |------|---------|
-| ゲーム進行・画面 | `src/game.js`（状態機械、メニュー、クリア／ゲームオーバー／エンディング）、`src/main.js`（起動・ロード画面・ループ） |
+| ゲーム進行・画面 | `src/game.js`（状態機械、メニュー、クリア／ゲームオーバー／エンディング）、`src/main.js`（起動・ロード画面・ループ・縮小表示・言語の反映）、`src/i18n.js`（表示言語）、`src/story.js`（物語本文 両言語・ボス名） |
 | 世界・物理 | `src/world.js`、`src/physics.js`、`src/camera.js`、`src/level.js`、`src/levels/index.js`（8 面） |
 | キャラ | `src/entities/player.js`（コマ選択 `frame()`）、`enemies.js`、`bosses.js`、`gimmicks.js`、`magic.js`、`projectiles.js` |
 | 描画・素材 | `src/gfx/assets.js`、`loader.js`、`hdworld.js`、`manifest.json`（235 エントリ、生成物） |
@@ -80,7 +85,7 @@ PY="/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.venv/
 | 保存・ログ | `src/settings.js`（`lyrica_save`）、`src/deathlog.js`（`lyrica_deaths`）、`src/balance.js` |
 | 生成 | `assets/gen/specs.json`（`part_sizes`、spec ごとの `use` / `frame_use` / `skip_out` / 後処理フラグ）、`assets/gen/prompts/*.txt`、`assets/gen/raw/`（原画は全保存） |
 | 資料 | `catalog.html` + `src/catalog/`（manifest 駆動。`test/catalog.test.js` が掲載漏れを検出） |
-| 証跡 | `test-results/shots/`（本日の撮影）、`docs/plan/logs/`（死亡ログ） |
+| 証跡 | `test-results/shots/`（本日の撮影。git 管理外）、`docs/plan/logs/`（死亡ログ）、`docs/release/`（配信原稿・GIF） |
 
 ## 7. 既知の注意点
 
