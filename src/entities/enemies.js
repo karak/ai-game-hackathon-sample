@@ -41,7 +41,7 @@ export class Enemy {
     if (this.hp <= 0) this.die(); else this.world.audio.sfx('hit');
   }
   die() {
-    this.dead = true; this.world.addScore(this.score); this.world.fx?.killFlash();
+    this.dead = true; this.world.addScore(this.score); this.world.onEnemyKilled?.(); this.world.fx?.killFlash();
     const p = this.world.particles;
     if (this.gore === 'blood') { p.emit('blood', this.cx, this.cy, 22, { power: 1.2 }); p.emit('gore', this.cx, this.cy, 6); this.world.audio.sfx('splat'); }
     else if (this.gore === 'stuffing') { p.emit('stuffing', this.cx, this.cy, 14); p.emit('blood', this.cx, this.cy, 10); p.emit('gore', this.cx, this.cy, 3); this.world.audio.sfx('squish'); }
@@ -50,7 +50,8 @@ export class Enemy {
   }
   shoot(kind, vx, vy, ox = 0, oy = 0, opts = {}) {
     if (this.world.safeT > 0) return; // 復活直後は敵弾なし（balance.js SAFE_SHOT_T）
-    this.world.enemyShots.push(new EnemyShot(this.world, kind, this.cx + ox, this.cy + oy, vx, vy, { owner: this, ...opts }));
+    const k = this.world.hard?.shotSpeed ?? 1; // 2 周目は弾速 1.5 倍
+    this.world.enemyShots.push(new EnemyShot(this.world, kind, this.cx + ox, this.cy + oy, vx * k, vy * k, { owner: this, ...opts }));
   }
   physics(dt) {
     if (this.gravity) { this.vy += 520 * dt; if (this.vy > 300) this.vy = 300; }
@@ -110,7 +111,7 @@ export class ZombieSpawner {
     const p = this.world.player; if (!p.alive || this.world.boss) return;
     if (Math.abs(p.centerX - this.x) > 150) return;
     this.timer -= dt; if (this.timer > 0) return;
-    this.timer = rand(1.5, 2.6);
+    this.timer = rand(1.5, 2.6) * (this.world.hard?.spawnGap ?? 1); // 2 周目は湧き間隔 0.8 倍
     const alive = this.world.enemies.filter(e => e instanceof ZombieRabbit && !e.dead).length;
     if (alive >= 4) return;
     const map = this.world.level.map;
@@ -381,7 +382,7 @@ export class BalloonGhost extends Enemy {
   hurt(dmg, shot) { if (this.swell > 0) return; this.swell = 0.01; this.flashT = 0.1; this.world.audio.sfx('squish'); }
   burst() { // 血の雨 5 滴を扇状に落とす
     for (let i = -2; i <= 2; i++) this.shoot('rain', i * 26, 40 + Math.abs(i) * 10, 0, 4, { life: 2.5 });
-    this.world.particles.emit('blood', this.cx, this.cy, 18, { power: 1.4 }); this.world.addScore(this.score); this.world.audio.sfx('splat'); this.dead = true; this.world.fx?.killFlash();
+    this.world.particles.emit('blood', this.cx, this.cy, 18, { power: 1.4 }); this.world.addScore(this.score); this.world.onEnemyKilled?.(); this.world.audio.sfx('splat'); this.dead = true; this.world.fx?.killFlash();
   }
   spriteName() { return this.swell > 0 ? 'balloon2' : 'balloon1'; }
 }

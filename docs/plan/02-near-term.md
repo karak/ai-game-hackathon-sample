@@ -122,3 +122,16 @@
 | エンディング場面 5 の額縁 | `--trim-border` で外周の一様色 5 px を除去（場面 4 も 2 px） | `assets/sprites/ending/scene5.png` 265×271 |
 
 未達: 通過コマ（run2s/run4s）に杖を持たせる生成が 2 回とも失敗。hurt のつば幅 1.45x（傾き）。fall_nohat の髪幅 1.39x。台帳 186/200。
+
+## Sprint F — 「M5 前半: 死亡ログ・コンティニュー・2 周目・ポーズ」（2026-09-09）
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| F-1 死亡地点ログ（IMP-007） | `src/deathlog.js`（記録・上限 600・集計）、`Game.logDeath`、カタログ「ステージ構成」に × と表、収集ボット `tools/gather_deaths.mjs` | `test/deathlog.test.js` 3 件、`docs/plan/logs/deaths-2026-09-09.md`（118 件） |
+| F-2 コンティニュー | ゲームオーバーメニュー（コンティニュー／タイトルへ）。面の先頭・スコア 0・ハイスコア非記録 | E2E 4、`test-results/shots/game_gameover_menu_e1.png` |
+| F-3 2 周目 | 1 周クリアで `progress.cleared`、タイトルに「2 周目（真の結末）」。敵弾速 1.5 倍・ゾンビ湧き間隔 0.8 倍（`balance.LOOP2`）。エンディングに真の結末 1 場面 | E2E 4、`test/settings.test.js` |
+| F-4 ポーズメニュー | つづける／面の はじめから／タイトルへ | `test-results/shots/game_pause_menu_e1.png` |
+| F-5 クリア画面 | TIME BONUS／NO MISS 5000／KILLS／SCORE | `Game.stageClear`、`World.kills/deaths` |
+
+死亡ログの所見（ボット 2 周、各面 150 秒）: 多発地点はすべて「足場乗り・沼越え・プレス機のタイミング」で、ボットの行動幅の限界と一致する（IMP-017）。人のテスト前に数値を動かさない。
+未達: 2 周目の専用挿絵（IMP-018）、BGM ジングル・最終ボス曲・シーケンサ拡張（次スプリント）。

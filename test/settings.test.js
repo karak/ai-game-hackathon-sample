@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { loadSettings, saveSettings, bind, codesFor, volumeGain, keyName, padName, DEFAULT_KEYS, DEFAULT_PAD, STORAGE_KEY, LEGACY_HI_KEY, REBINDABLE, ACTIONS } from '../src/settings.js';
+import { defaultSettings, loadSettings, saveSettings, bind, codesFor, volumeGain, keyName, padName, DEFAULT_KEYS, DEFAULT_PAD, STORAGE_KEY, LEGACY_HI_KEY, REBINDABLE, ACTIONS } from '../src/settings.js';
 
 const memStorage = (init = {}) => { const m = new Map(Object.entries(init)); return { getItem: k => m.has(k) ? m.get(k) : null, setItem: (k, v) => m.set(k, String(v)), m }; };
 
@@ -57,4 +57,12 @@ test('volumeGain: 0 → silent, 7 → legacy 0.35, monotonic, clamped', () => {
 test('display names strip prefixes', () => {
   expect(keyName('KeyZ')).toBe('Z'); expect(keyName('ArrowLeft')).toBe('←'); expect(keyName('Digit1')).toBe('1'); expect(keyName('Space')).toBe('SPACE');
   expect(padName('b0')).toBe('A'); expect(padName('b9')).toBe('START'); expect(padName('b20')).toBe('B20');
+});
+
+test('progress.cleared (2nd loop unlock) round-trips and defaults to false', () => {
+  const m = new Map(); const st = { getItem: k => m.get(k) ?? null, setItem: (k, v) => m.set(k, v) };
+  const s = defaultSettings(); expect(s.progress.cleared).toBe(false);
+  s.progress.cleared = true; s.progress.stage = 3; saveSettings(s, st);
+  const back = loadSettings(st); expect(back.progress).toEqual({ stage: 3, cleared: true });
+  m.set(STORAGE_KEY, JSON.stringify({ progress: { stage: 1, cleared: 'yes' } })); expect(loadSettings(st).progress.cleared).toBe(false);
 });

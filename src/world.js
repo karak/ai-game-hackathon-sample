@@ -11,7 +11,7 @@ import { EnemyShot, WEAPONS } from './entities/projectiles.js';
 import { SONGS } from './audio.js';
 import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBogHD, buildSpikeHD } from './gfx/hdworld.js';
 import { THEMES } from './gfx/tiles.js';
-import { SAFE_SHOT_T } from './balance.js';
+import { SAFE_SHOT_T, LOOP2 } from './balance.js';
 import { Fx } from './fx.js';
 import { seedGame, hashSeed } from './util.js';
 import { HD_SCALE as HD } from './gfx/sprite.js';
@@ -63,7 +63,9 @@ export class World {
     this.platforms = []; this.crumbles = []; this.presses = []; // ギミック（spawnAll で配置）
     this.effects = []; // 溜め魔法などの一時エンティティ（update/draw/dead）
     this.cam = { x: 0, y: 0 }; this.arena = null; this.boss = null; this.bossState = 'none'; this.bossIdx = 0; // 連戦の何体目か
-    this.time = this.level.timeLimit; this.t = 0; this.cutscene = false; this.cleared = false;
+    this.time = this.level.timeLimit; this.t = 0; this.cutscene = false; this.cleared = false; this.kills = 0; this.deaths = 0; // クリア画面の集計（撃破数・ミス数）
+    // 2 周目（game.loop > 0）: 敵弾 1.5 倍（弾速）・湧き間隔 0.8 倍（05-systems 5.1「真の結末」ルート）
+    this.loop = game.loop ?? 0; this.hard = this.loop > 0 ? LOOP2 : { shotSpeed: 1, spawnGap: 1 };
     this.shakeT = 0; this.shakeAmp = 0; this.toasts = []; this.tickT = 0; this.safeT = 0; // safeT > 0 の間は敵弾なし
     this.checkpoint = { ...this.level.playerStart };
     this.player = new Player(this, this.level.playerStart.x, this.level.playerStart.y);
@@ -72,6 +74,7 @@ export class World {
   }
   get lives() { return this.game.lives; } set lives(v) { this.game.lives = v; }
   addScore(n) { this.game.score += n; }
+  onEnemyKilled() { this.kills++; }
   weaponName(k) { return WEAPONS[k]?.name ?? k; }
   toast(msg) { this.toasts.push({ msg, t: 0 }); if (this.toasts.length > 2) this.toasts.shift(); }
   shake(a) { this.shakeT = 0.25; this.shakeAmp = Math.max(this.shakeAmp, a); }
@@ -93,7 +96,8 @@ export class World {
   // プレイヤー死亡→復活まわり
   onPlayerDying() { this.audio.stopBgm(); }
   onPlayerDeath() {
-    this.game.lives--;
+    this.game.logDeath?.(this.player.deathReason); // 死亡地点ログ（IMP-007）
+    this.deaths++; this.game.lives--;
     if (this.game.lives < 0) { this.game.gameOver(); return; }
     // チェックポイントから再開。敵は再配置、ボス戦中ならボス戦をリセット
     if (this.boss) { this.boss = null; this.arena = null; this.bossState = 'none'; this.cutscene = false; } // 死亡: 連戦の何体目かは維持（倒したボスは戻らない）

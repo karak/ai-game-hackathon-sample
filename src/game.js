@@ -6,14 +6,16 @@ import { SONGS } from './audio.js';
 import { drawBackground } from './gfx/background.js';
 import { blit } from './gfx/sprite.js';
 import { drawBackgroundHD } from './gfx/hdworld.js';
-import { PROLOGUE, ENDING, ENDING_SCENES, CREDITS } from './story.js';
+import { PROLOGUE, ENDING, ENDING_SCENES, ENDING_TRUE, CREDITS } from './story.js';
 import { irisRadius, IRIS_T, BOSS_INTRO_T } from './fx.js';
 import { DemoRecorder, DemoInput, DEMO_MAX_T, DEMO_IDLE_T } from './demo.js';
 import { DEMOS } from './demos.js';
 import { hashSeed } from './util.js';
+import { loadDeathLog, saveDeathLog, pushDeath } from './deathlog.js';
 import { defaultSettings, saveSettings, volumeGain, bind, codesFor, keyName, keyNameMini, padName, REBINDABLE, ACTION_LABEL, VOLUME_MAX, DEFAULT_KEYS, DEFAULT_PAD } from './settings.js';
 
 // オプション画面の行。kind: volume / mute / key(action) / reset / back
+export const NO_MISS_BONUS = 5000; // クリア画面: 面をノーミスで抜けたときの加点
 const OPTION_ROWS = [{ kind: 'volume' }, { kind: 'mute' }, ...REBINDABLE.map(a => ({ kind: 'key', action: a })), { kind: 'reset' }, { kind: 'back' }];
 
 export class Game {
@@ -28,16 +30,20 @@ export class Game {
     this.paused = false; this.textIdx = 0;
     this.menuIdx = 0; this.optIdx = 0; this.capturing = null; // タイトルメニュー / オプションのカーソル、キー割り当て待ちの操作名
     this.recorder = null; this.demo = null; this.demoIdx = 0; // デモ記録／再生
+    this.deathLog = loadDeathLog(this.storage); this.loop = 0; this.continued = false; // 死亡地点ログ（IMP-007）／周回（0=1 周目）／コンティニュー後はハイスコアに記録しない
     this.audio.setVolume(volumeGain(this.settings.volume)); this.audio.setMuted(this.settings.muted);
   }
   setState(s) { (this.trace ??= []).push(`${this.state}>${s}@${Math.round(performance.now())}`); if (this.trace.length > 20) this.trace.shift(); this.state = s; this.stateT = 0; }
   save() { return saveSettings(this.settings, this.storage); }
   // タイトルメニュー項目（進行があれば「つづきから」）
-  titleMenu() { const m = [{ id: 'new', label: 'はじめから' }]; if (this.settings.progress.stage > 0) m.push({ id: 'continue', label: `つづきから（第${this.settings.progress.stage + 1}章）` }); m.push({ id: 'options', label: 'オプション' }); return m; }
+  titleMenu() { const m = [{ id: 'new', label: 'はじめから' }]; if (this.settings.progress.stage > 0) m.push({ id: 'continue', label: `つづきから（第${this.settings.progress.stage + 1}章）` }); if (this.settings.progress.cleared) m.push({ id: 'loop2', label: '2 周目（真の結末）' }); m.push({ id: 'options', label: 'オプション' }); return m; }
+  // ポーズメニュー／ゲームオーバーメニュー
+  pauseMenu() { return [{ id: 'resume', label: 'つづける' }, { id: 'restart', label: '面の はじめから' }, { id: 'title', label: 'タイトルへ' }]; }
+  gameOverMenu() { return [{ id: 'continue', label: 'コンティニュー（面の はじめから）' }, { id: 'title', label: 'タイトルへ' }]; }
 
   // ---- 遷移 ----
-  startGame(stage = 0) {
-    this.score = 0; this.lives = 2; this.stageIndex = Math.max(0, Math.min(STAGES.length - 1, stage));
+  startGame(stage = 0, loop = 0) {
+    this.score = 0; this.lives = 2; this.stageIndex = Math.max(0, Math.min(STAGES.length - 1, stage)); this.loop = loop; this.continued = false;
     if (this.stageIndex === 0) { this.setState('prologue'); this.textIdx = 0; this.audio.playBgm(SONGS.title); }
     else this.startStage();
   }
@@ -47,14 +53,24 @@ export class Game {
   }
   // アイリスワイプで閉じてから then() を実行する（画面遷移）
   startWipe(then) { if (this.state === 'wipe') return; this.wipe = { from: this.state, t: 0, then }; this.setState('wipe'); }
-  gameOver() { if (this.state === 'demo') { this.endDemo(); return; } this.setState('gameover'); this.audio.stopBgm(); this.audio.sfx('bossdie'); this.saveHi(); }
+  gameOver() { if (this.state === 'demo') { this.endDemo(); return; } this.setState('gameover'); this.goIdx = 0; this.audio.stopBgm(); this.audio.sfx('bossdie'); this.saveHi(); }
+  // コンティニュー: 面の先頭からスコア 0 で再開。回数無制限、ハイスコアには記録しない（05-systems 5.1）
+  continueGame() { this.continued = true; this.score = 0; this.lives = 2; this.startStage(); }
   stageClear() {
     if (this.state === 'demo') { this.endDemo(); return; }
-    this.timeBonus = Math.ceil(this.world.time) * 10; this.score += this.timeBonus; this.setState('clear'); this.audio.sfx('clear');
+    this.timeBonus = Math.ceil(this.world.time) * 10; this.noMissBonus = this.world.deaths === 0 ? NO_MISS_BONUS : 0; this.kills = this.world.kills;
+    this.score += this.timeBonus + this.noMissBonus; this.setState('clear'); this.audio.sfx('clear');
     // 進行を保存（次章から「つづきから」で再開できる）
     if (this.stageIndex + 1 < STAGES.length && this.stageIndex + 1 > this.settings.progress.stage) { this.settings.progress.stage = this.stageIndex + 1; this.save(); }
   }
-  saveHi() { if (this.score > this.hi) { this.hi = this.score; this.settings.hi = this.hi; this.save(); } }
+  // 死亡地点を記録（デモ中は記録しない）。座標は世界単位、t は面の経過秒
+  logDeath(reason) {
+    if (this.state === 'demo' || !this.world) return;
+    const p = this.world.player;
+    this.deathLog = pushDeath(this.deathLog, { s: STAGES[this.stageIndex].name, x: p.centerX, y: p.y + p.h, r: reason, t: this.world.t, l: this.loop, at: Date.now() });
+    saveDeathLog(this.deathLog, this.storage);
+  }
+  saveHi() { if (this.continued) return; if (this.score > this.hi) { this.hi = this.score; this.settings.hi = this.hi; this.save(); } }
   toggleMute() { this.settings.muted = this.audio.toggleMute(); this.save(); }
 
   update(dt) {
@@ -74,6 +90,7 @@ export class Game {
           const sel = menu[this.menuIdx].id;
           if (sel === 'new') this.startGame(0);
           else if (sel === 'continue') this.startGame(this.settings.progress.stage);
+          else if (sel === 'loop2') this.startGame(0, 1);
           else { this.optIdx = 0; this.capturing = null; this.setState('options'); }
         }
         break;
@@ -98,8 +115,18 @@ export class Game {
         if (this.stateT > 2.8 || (this.stateT > 0.5 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')))) { this.setState('play'); this.audio.playBgm(SONGS[this.world.level.theme]); }
         break;
       case 'play':
-        if (inp.hit('pause') || inp.hit('start')) { this.paused = !this.paused; this.audio.sfx('select'); } // パッドの START でもポーズ
-        if (this.paused) break;
+        if (inp.hit('pause') || (inp.hit('start') && !this.paused)) { this.paused = !this.paused; this.pauseIdx = 0; this.audio.sfx('select'); } // パッドの START でもポーズ
+        if (this.paused) { // ポーズメニュー: つづける／面の先頭から／タイトルへ
+          const menu = this.pauseMenu();
+          if (inp.hit('up')) { this.pauseIdx = (this.pauseIdx + menu.length - 1) % menu.length; this.audio.sfx('select'); }
+          if (inp.hit('down')) { this.pauseIdx = (this.pauseIdx + 1) % menu.length; this.audio.sfx('select'); }
+          if (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) {
+            const sel = menu[this.pauseIdx].id; this.paused = false; this.audio.sfx('select');
+            if (sel === 'restart') this.startWipe(() => this.startStage());
+            else if (sel === 'title') this.startWipe(() => { this.world = null; this.setState('title'); this.audio.playBgm(SONGS.title); });
+          }
+          break;
+        }
         this.debugKeys(inp);
         this.irisT += dt;
         if (this.recorder) this.recorder.record(inp);
@@ -110,13 +137,22 @@ export class Game {
         if (this.stateT > 2 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) || this.stateT > 7) {
           this.startWipe(() => {
             this.stageIndex++;
-            if (this.stageIndex >= STAGES.length) { this.setState('ending'); this.endingIdx = 0; this.audio.playBgm(SONGS.ending); this.saveHi(); }
+            if (this.stageIndex >= STAGES.length) { this.setState('ending'); this.endingIdx = 0; this.audio.playBgm(SONGS.ending); this.saveHi(); if (!this.settings.progress.cleared) { this.settings.progress.cleared = true; this.save(); } } // 1 周クリアで 2 周目を開放
             else this.startStage();
           });
         }
         break;
       case 'gameover':
-        if (this.stateT > 1.5 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump'))) this.startWipe(() => { this.setState('title'); this.audio.playBgm(SONGS.title); });
+        if (this.stateT > 1.0) {
+          const menu = this.gameOverMenu();
+          if (inp.hit('up')) { this.goIdx = (this.goIdx + menu.length - 1) % menu.length; this.audio.sfx('select'); }
+          if (inp.hit('down')) { this.goIdx = (this.goIdx + 1) % menu.length; this.audio.sfx('select'); }
+          if (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) {
+            this.audio.sfx('select');
+            if (menu[this.goIdx].id === 'continue') this.startWipe(() => this.continueGame());
+            else this.startWipe(() => { this.world = null; this.setState('title'); this.audio.playBgm(SONGS.title); });
+          }
+        }
         break;
       case 'ending': {
         // 場面 1〜6（各 6 秒、1.5 秒後から入力で送れる）→ クレジット（スクロール）→ タイトル
@@ -297,7 +333,7 @@ export class Game {
     if (shown >= lines.length && Math.floor(this.stateT * 2) % 2) mini(g, 'PUSH START', miniX('PUSH START'), 210, '#ffe860');
   }
   // ---- エンディング ----
-  endingScenes() { const E = this.assets.generated?.ending ?? {}; return ENDING_SCENES.map((lines, i) => ({ lines, img: E['scene' + (i + 1)] })); }
+  endingScenes() { const E = this.assets.generated?.ending ?? {}; const scenes = ENDING_SCENES.map((lines, i) => ({ lines, img: E['scene' + (i + 1)] })); if (this.loop > 0) scenes.push({ lines: ENDING_TRUE, img: E.scene7 ?? E.scene5 }); return scenes; } // 2 周目は「真の結末」1 場面を追加
   drawEnding(g) {
     const scenes = this.endingScenes(), i = this.endingIdx ?? 0;
     if (i < scenes.length) {
@@ -326,18 +362,25 @@ export class Game {
     const st = STAGES[this.stageIndex];
     textBox(g, [{ t: st.title, color: '#ff8fc8' }, { t: st.subtitle }], { minWidth: 224 });
   }
-  drawPause(g) { textBox(g, [{ t: 'PAUSE', color: '#ffe860' }], { minWidth: 80 }); }
+  drawPause(g) {
+    const menu = this.pauseMenu(), rows = [{ t: 'PAUSE', color: '#ffe860' }, { t: ' ', size: 6 }, ...menu.map((m, i) => ({ t: (i === this.pauseIdx ? '▶ ' : '　 ') + m.label, color: i === this.pauseIdx ? '#ffe860' : '#fdfbf7' }))];
+    textBox(g, rows, { minWidth: 176 });
+  }
   drawClear(g) {
     if (this.stateT < 1.2) return;
     const r = textBox(g, [{ t: 'ステージクリア！', color: '#ffe860' }, { t: ' ', size: 14 }, { t: this.stageIndex + 1 < STAGES.length ? '次の章へ…' : '最終決戦へ…', color: '#cbaaf5' }], { minWidth: 192 });
-    const tb = 'TIME BONUS ' + String(this.timeBonus).padStart(5, '0'), sc = 'SCORE      ' + String(this.score).padStart(7, '0');
+    const tb = 'TIME BONUS   ' + String(this.timeBonus).padStart(5, '0'), nm = 'NO MISS      ' + (this.noMissBonus ? String(this.noMissBonus).padStart(5, '0') : '  ---'), kl = 'KILLS        ' + String(this.kills ?? 0).padStart(5, ' '), sc = 'SCORE      ' + String(this.score).padStart(7, '0');
     mini(g, tb, miniX(tb), r.y + 30, '#fdfbf7');
-    mini(g, sc, miniX(sc), r.y + 39, '#ff8fc8');
+    mini(g, nm, miniX(nm), r.y + 39, this.noMissBonus ? '#ffe860' : '#a5a5b8');
+    mini(g, kl, miniX(kl), r.y + 48, '#fdfbf7');
+    mini(g, sc, miniX(sc), r.y + 57, '#ff8fc8');
   }
   drawGameOver(g) {
     g.fillStyle = 'rgba(122,15,31,0.45)'; g.fillRect(0, 0, W, H);
-    const r = textBox(g, [{ t: 'GAME OVER', color: '#ff6a6a' }, { t: 'おとぎの国は赤いまま' }, { t: ' ', size: 6 }], { minWidth: 176, window: { top: '#3a1650', bottom: '#150a22' } });
-    const sc = 'SCORE ' + String(this.score).padStart(7, '0');
+    const menu = this.gameOverMenu(), shown = this.stateT > 1.0;
+    const rows = [{ t: 'GAME OVER', color: '#ff6a6a' }, { t: 'おとぎの国は赤いまま' }, { t: ' ', size: 6 }, ...(shown ? menu.map((m, i) => ({ t: (i === this.goIdx ? '▶ ' : '　 ') + m.label, color: i === this.goIdx ? '#ffe860' : '#fdfbf7' })) : []), { t: ' ', size: 6 }];
+    const r = textBox(g, rows, { minWidth: 208, window: { top: '#3a1650', bottom: '#150a22' } });
+    const sc = 'SCORE ' + String(this.score).padStart(7, '0') + (this.continued ? '  (CONTINUE)' : '');
     mini(g, sc, miniX(sc), r.y + r.h - 12, '#fdfbf7');
   }
 }

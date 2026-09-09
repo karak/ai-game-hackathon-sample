@@ -14,7 +14,7 @@
 | 資料 | デザインカタログ 7 章（キャラ／敵／アイテム／タイル／背景／ステージ／UI） | `catalog.html` |
 | 入力・保存 | キーボード／Gamepad API（standard mapping）／タッチ、キーコンフィグ、`localStorage` セーブ（進行・音量・ミュート・割り当て・ハイスコア） | `src/input.js`、`src/settings.js`、`test/input.test.js`、`test/settings.test.js` |
 | バランス | 復活地点 ±96 湧き禁止、復活後 2 秒敵弾なし、制限時間 300/300/330（歩行×3＋ボス 90 秒） | `src/balance.js`、`test/balance.test.js` |
-| テスト | Vitest 85 件（＋カメラ 3、カタログ掲載漏れ 4、コマ選択 3）＋ Playwright E2E 3 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論） | `npm test`、`npm run e2e` |
+| テスト | Vitest 89 件（＋カメラ 3、カタログ掲載漏れ 4、コマ選択 3、死亡ログ 3、設定 cleared 1）＋ Playwright E2E 4 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ） | `npm test`、`npm run e2e` |
 | ビルド | Vite（index.html / catalog.html） | `npm run build` |
 
 ## 素材（manifest 235 エントリ）
@@ -36,6 +36,6 @@
 ## 既知の課題（要約。詳細は 08-backlog）
 
 - 空だけ 3 px/セル（城は 2）。空を 1 倍化するには縦横 3 分割生成が必要
-- ステージセレクトなし。走り撃ちは 2 コマ運用（通過コマの杖が描けない）
+- ステージセレクトなし。走り撃ちは 2 コマ運用（通過コマの杖が描けない）。2 周目の専用挿絵なし（場面 5 流用）
 - 実機ゲームパッドと人間テスターでの検証が未実施（ボットのみ）
 - E2E がブラウザ手動スクリプト（Playwright 化は Sprint B）

@@ -3,6 +3,7 @@ import { h1, h2, h3, note, table, canvas, el } from '../sheet.js';
 import { STAGES } from '../../levels/index.js';
 import { parseLevel, MARKERS } from '../../level.js';
 import { World } from '../../world.js';
+import { loadDeathLog, summarizeDeaths } from '../../deathlog.js';
 
 const COLORS = { solid: '#6c6c80', oneway: '#c8a060', hazard: '#b45cf5', spike: '#d9262b', player: '#7cff70', checkpoint: '#ffe860', boss: '#ff6a6a', goal: '#ffffff', treasure: '#ff8fc8', enemy: '#ff9040', deco: '#3a3a52' };
 const ENEMY_JP = { zombie: 'ゾンビ湧き', mushroom: 'キノコ妖精', unicorn: 'ユニコーン', cake: 'ケーキ', angel: '天使骸骨', bear: 'テディ', eye: '目玉', heartitem: 'ポーション', treasure: '宝箱' };
@@ -11,6 +12,9 @@ export async function render(main, A) {
   main.appendChild(h1('ステージ構成'));
   main.appendChild(note('俯瞰マップは 1 タイル = 4 px。記号: 緑=開始、黄=中間地点、赤=ボス開始、桃=宝箱、橙=敵、紫=毒沼、赤線=棘。セグメント表は 32 タイル（2 画面）単位。'));
   main.appendChild(el('div', { class: 'legend', html: Object.entries(COLORS).map(([k, c]) => `<span><i style="background:${c}"></i>${k}</span>`).join('') }));
+  // 死亡地点ログ（このブラウザの localStorage、IMP-007）。× 印を俯瞰マップに重ね、面ごとの件数・原因・多発地点を表に出す
+  const deaths = loadDeathLog(globalThis.localStorage), dsum = summarizeDeaths(deaths);
+  main.appendChild(note(`死亡地点ログ: ${deaths.length} 件（このブラウザの localStorage \`lyrica_deaths\`。赤の × が死亡地点、64 世界単位ごとに集計）`));
   for (const [idx, st] of STAGES.entries()) {
     const lvl = parseLevel(st); const map = lvl.map; const S = 4;
     main.appendChild(h2(`${st.title}（${st.theme}、${map.width} タイル = ${map.width * 16} 世界単位 ≈ ${Math.round(map.width / 16)} 画面、制限 ${st.timeLimit} 秒、ボス ${st.boss}）`));
@@ -26,9 +30,14 @@ export async function render(main, A) {
     for (const s of lvl.spawns) mark(s.x, s.y, s.type === 'treasure' || s.type === 'heartitem' ? COLORS.treasure : COLORS.enemy, 2.5);
     mark(lvl.playerStart.x, lvl.playerStart.y, COLORS.player, 4); for (const cp of lvl.checkpoints) mark(cp.x, cp.y, COLORS.checkpoint, 4);
     if (lvl.bossTrigger) mark(lvl.bossTrigger.x, lvl.bossTrigger.y, COLORS.boss, 4);
+    // 死亡地点（×）
+    g.strokeStyle = '#ff3b3b'; g.lineWidth = 1;
+    for (const d of deaths) if (d.s === st.name) { const x = d.x / 16 * S, y = Math.min(map.height * S - 2, d.y / 16 * S); g.beginPath(); g.moveTo(x - 3, y - 3); g.lineTo(x + 3, y + 3); g.moveTo(x + 3, y - 3); g.lineTo(x - 3, y + 3); g.stroke(); }
     // 画面幅の目盛り
     g.fillStyle = '#8f8fb0'; g.font = '9px DotGothic16'; for (let tx = 0; tx <= map.width; tx += 16) { g.fillRect(tx * S, map.height * S, 1, 4); g.fillText(String(tx), tx * S + 2, c.height - 2); }
     main.appendChild(c);
+    const ds = dsum.byStage[st.name];
+    if (ds) main.appendChild(table(['件数', '原因別', '多発地点（x 開始・件数）'], [[ds.total, Object.entries(ds.byReason).map(([r, n]) => `${r}×${n}`).join(' '), ds.hotspots.map(h => `${h.x0}〜${h.x0 + 63}: ${h.n}`).join('　')]]));
     // セグメント表
     const seg = 32; const rows = [];
     for (let s0 = 0; s0 < map.width; s0 += seg) {

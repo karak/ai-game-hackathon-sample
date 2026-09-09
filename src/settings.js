@@ -30,7 +30,7 @@ export const DEFAULTS = Object.freeze({
   keys: DEFAULT_KEYS, pad: DEFAULT_PAD,
   volume: 7,          // 0..10。7 で従来のマスター音量 0.35
   muted: false,
-  progress: { stage: 0 }, // 「つづきから」で始められる最大ステージ index
+  progress: { stage: 0, cleared: false }, // 「つづきから」で始められる最大ステージ index／1 周クリア済み（2 周目を開放）
   hi: 0,
 });
 
@@ -62,6 +62,7 @@ export function loadSettings(storage) {
         if (Number.isFinite(j.volume)) s.volume = Math.round(Math.max(0, Math.min(VOLUME_MAX, j.volume)));
         s.muted = !!j.muted;
         if (isMap(j.progress) && Number.isInteger(j.progress.stage) && j.progress.stage >= 0) s.progress.stage = j.progress.stage;
+        if (isMap(j.progress)) s.progress.cleared = j.progress.cleared === true;
         if (Number.isFinite(j.hi) && j.hi >= 0) s.hi = Math.floor(j.hi);
       }
     } catch {}

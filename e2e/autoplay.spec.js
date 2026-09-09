@@ -87,3 +87,32 @@ test('demo playback is deterministic and any key returns to title', async ({ pag
   expect(r.a).not.toBeNull(); expect(r.a).toEqual(r.b); expect(r.after).toBe('title');
   expect(errors).toEqual([]);
 });
+
+test('pause menu restarts the stage, game over offers continue, clearing unlocks loop 2 with harder rules, deaths are logged', async ({ page }) => {
+  const errors = await boot(page);
+  const r = await page.evaluate(() => {
+    const g = window.__game, STEP = 1 / 60;
+    const tick = n => { for (let i = 0; i < n; i++) { g.update(STEP); g.input.endFrame(); } };
+    const press = a => { g.input.pressed.add(a); tick(1); };
+    g.input.held.clear(); g.startGame(0); g.stageIndex = 1; g.startStage(); g.setState('play'); g.irisT = 99;
+    const w0 = g.world; w0.player.x += 60;
+    // ポーズ → 「面の はじめから」（2 番目）
+    press('pause'); const paused = g.paused && g.state === 'play'; press('down'); press('start');
+    tick(60 * 4); const restarted = g.world !== w0 && g.state === 'play' && Math.abs(g.world.player.x - g.world.level.playerStart.x) < 4;
+    // 残機 0 で死亡 → ゲームオーバー → コンティニュー（1 番目）
+    const deathsBefore = g.deathLog.length; g.lives = 0; g.world.player.die('spike'); tick(60 * 2.5);
+    const gameover = g.state === 'gameover'; const logged = g.deathLog.length === deathsBefore + 1 ? g.deathLog[g.deathLog.length - 1] : null;
+    tick(70); press('start'); tick(60 * 4); const cont = { state: g.state, continued: g.continued, score: g.score, lives: g.lives };
+    g.score = 999999; g.saveHi(); const hiKept = g.hi < 999999; // コンティニュー後はハイスコアに記録しない
+    // 1 周クリア済みなら「2 周目」がメニューに出て、開始すると敵弾 1.5 倍・湧き 0.8 倍
+    g.settings.progress.cleared = true; const menu = g.titleMenu().map(m => m.id);
+    g.startGame(0, 1); g.stageIndex = 0; g.startStage(); const hard = g.world.hard, loop = g.loop, scenes = g.endingScenes().length;
+    g.input.held.clear();
+    return { paused, restarted, gameover, logged, cont, hiKept, menu, hard, loop, scenes };
+  });
+  expect(r.paused).toBe(true); expect(r.restarted).toBe(true); expect(r.gameover).toBe(true);
+  expect(r.logged).toMatchObject({ s: 'stage2', r: 'spike', l: 0 });
+  expect(r.cont).toMatchObject({ state: 'play', continued: true, score: 0, lives: 2 }); expect(r.hiKept).toBe(true);
+  expect(r.menu).toContain('loop2'); expect(r.hard).toEqual({ shotSpeed: 1.5, spawnGap: 0.8 }); expect(r.loop).toBe(1); expect(r.scenes).toBe(7);
+  expect(errors).toEqual([]);
+});
