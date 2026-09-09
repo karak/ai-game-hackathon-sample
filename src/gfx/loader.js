@@ -3,7 +3,9 @@
 import { flipH, HD_SCALE } from './sprite.js';
 
 export async function loadImage(url) {
-  return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('load failed ' + url)); im.src = url; });
+  const im = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('load failed ' + url)); im.src = url; });
+  if (im.decode) { try { await im.decode(); } catch {} } // 事前デコード（初回 drawImage のヒッチを避ける。M6）
+  return im;
 }
 
 function toCanvas(img) {
@@ -12,14 +14,16 @@ function toCanvas(img) {
 }
 
 // manifest: { "player/idle": {src,w,h,anchor}, ... } → { "player/idle": {r,l,w,h,anchor} }
-export async function loadManifest(manifest, base = '') {
-  const out = {};
-  await Promise.all(Object.entries(manifest).map(async ([key, m]) => {
+// onProgress(done, total) を画像 1 枚ごとに呼ぶ（ロード画面の進捗バー用）
+export async function loadManifest(manifest, base = '', onProgress = null) {
+  const out = {}; const entries = Object.entries(manifest); let done = 0;
+  await Promise.all(entries.map(async ([key, m]) => {
     try {
       const img = await loadImage(new URL(base + m.src, import.meta.url).href);
       const r = toCanvas(img);
       out[key] = { r, l: flipH(r), w: r.width / HD_SCALE, h: r.height / HD_SCALE, hd: true, anchor: m.anchor, brim: m.brim_overlap ? m.brim_overlap / HD_SCALE : undefined }; // w,h は世界単位
     } catch (e) { console.warn('[loader]', e.message); }
+    finally { done++; onProgress?.(done, entries.length); }
   }));
   return out;
 }

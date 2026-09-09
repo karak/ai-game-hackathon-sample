@@ -10,6 +10,14 @@ async function boot() {
   canvas.width = W * SCALE; canvas.height = H * SCALE; // 内部解像度 768x672。論理座標（世界単位）は 256x224 を SCALE 倍描画
   const g = canvas.getContext('2d');
   g.imageSmoothingEnabled = false;
+  const t0 = performance.now();
+  // ロード画面（M6）: フォント → 素材 235 枚の順に進捗バーを描く。フォント未読込の間はシステムフォント
+  const drawLoading = (label, frac) => {
+    g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0e0a18'; g.fillRect(0, 0, canvas.width, canvas.height);
+    g.fillStyle = '#3a3a52'; g.fillRect(184, 340, 400, 12); g.fillStyle = '#ff8fc8'; g.fillRect(184, 340, Math.round(400 * frac), 12);
+    g.fillStyle = '#fdfbf7'; g.font = '20px DotGothic16, monospace'; g.textAlign = 'center'; g.fillText(label, 384, 320);
+  };
+  drawLoading('NOW LOADING', 0);
 
   // フォント読み込み（同梱 DotGothic16 / OFL）
   try {
@@ -17,13 +25,16 @@ async function boot() {
     const face = new FontFace('DotGothic16', `url(${fontUrl})`);
     await face.load(); document.fonts.add(face);
   } catch (e) { console.warn('font load failed', e); }
-
-  const assets = await buildAssets();
+  drawLoading('NOW LOADING', 0.1);
+  let lastDraw = 0;
+  const assets = await buildAssets((done, total) => { const now = performance.now(); if (now - lastDraw > 50 || done === total) { lastDraw = now; drawLoading(`NOW LOADING  ${done}/${total}`, 0.1 + 0.9 * done / total); } });
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic'; // ロード画面で変えた文字設定を戻す
   const settings = loadSettings(localStorage); // キー/パッド割り当て・音量・進行・ハイスコア
   const audio = new Audio();
   const input = new Input(window, settings);
   const game = new Game(assets, audio, input, settings, localStorage);
   window.__game = game; // デバッグ用
+  game.bootMs = Math.round(performance.now() - t0); // 初回ロード時間（M6 の出口条件 3 秒以内の計測用）
 
   // 最初のキー/タップで AudioContext を起動
   const unlock = () => { if (audio.ensure()) { audio.resume(); if (game.state === 'title' && !audio.bgm) audio.playBgm(SONGS.title); } };

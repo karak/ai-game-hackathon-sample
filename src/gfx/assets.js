@@ -8,9 +8,9 @@ import { loadManifest, nest } from './loader.js';
 import { HD_SCALE } from './sprite.js';
 
 // 全アセットを起動時に生成。生成済み PNG（manifest）があればそれを優先し、無い分は文字列スプライトで補う。
-export async function buildAssets() {
+export async function buildAssets(onProgress = null) {
   const assets = buildProcedural();
-  const gen = nest(await loadManifest(manifest, '../../'));
+  const gen = nest(await loadManifest(manifest, '../../', onProgress));
   if (gen.player) {
     // 生成済み主人公フレーム。衣装は当面 dress のみ（plain/gold は後段のパレット置換で生成）
     for (const [frame, spr] of Object.entries(gen.player)) {

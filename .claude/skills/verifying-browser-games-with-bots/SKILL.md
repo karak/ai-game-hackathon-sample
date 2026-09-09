@@ -81,3 +81,9 @@ async () => {
 | 「テストは書けないので目視で確認」 | ボットで通しプレイ＋状態遷移トレースは書ける。目視は補助 |
 | 何百フレームも `await sleep` で待つ | `g.update(STEP)` を直接ループで回して早送りする |
 | スクリーンショットに HUD が無い／毎回同じ絵になる | ブラウザ窓が縮んでキャンバス上端が画面外（`canvas.getBoundingClientRect().top < 0`）。`resize_page` で 1340×900 にしてから撮る。キャンバス画素は `getImageData` で直接検査できる |
+
+## ユーザーが見ているタブを操作しない（2026-09-09 の事故）
+
+- Chrome DevTools MCP で `index.html` のタブに `evaluate_script` を打つと、そのタブはユーザーが localhost を開いているのと同じ Chrome である。性能計測で 8 面を順に `startStage` し、`die` を無効化し、`held` に right を入れたまま走らせた結果、ユーザーには「勝手に面が切り替わる」「ジャンプできない」と見えた。
+- 計測・状態遷移の検証・撮影は **Playwright の headless ブラウザ**（`npm run e2e`、`tools/*.mjs`）で行う。DevTools MCP のタブを使うのは撮影だけにし、使ったら必ず `navigate_page reload` で元に戻す。`g.update = () => {}` で止めた状態も残さない。
+- ユーザーから「動かない」と言われたら、まず自分の操作履歴（eval の内容と時刻）を疑い、次に実キー入力の Playwright テスト（`e2e/keyboard.spec.js`）で再現を試す。
