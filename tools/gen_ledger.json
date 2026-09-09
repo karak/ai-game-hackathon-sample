@@ -1,5 +1,5 @@
 {
- "requests": 146,
+ "requests": 158,
  "entries": [
   {
    "name": "player-base",
@@ -1128,6 +1128,102 @@
    "secs": 14.0,
    "text": "",
    "ts": 1788932080.296831
+  },
+  {
+   "name": "bg-stars-sky",
+   "v": 1,
+   "ok": true,
+   "secs": 9.1,
+   "text": "",
+   "ts": 1788932584.464362
+  },
+  {
+   "name": "bg-stars-far",
+   "v": 1,
+   "ok": true,
+   "secs": 11.5,
+   "text": "Here is the far-distance parallax layer you requested, following all your specifications: ",
+   "ts": 1788932596.43951
+  },
+  {
+   "name": "bg-stars-far2",
+   "v": 1,
+   "ok": true,
+   "secs": 14.2,
+   "text": "",
+   "ts": 1788932611.106397
+  },
+  {
+   "name": "bg-stars-mid",
+   "v": 1,
+   "ok": true,
+   "secs": 11.9,
+   "text": "",
+   "ts": 1788932623.4190001
+  },
+  {
+   "name": "bg-stars-mid2",
+   "v": 1,
+   "ok": true,
+   "secs": 10.7,
+   "text": "",
+   "ts": 1788932634.534712
+  },
+  {
+   "name": "bg-stars-mid3",
+   "v": 1,
+   "ok": true,
+   "secs": 11.2,
+   "text": "",
+   "ts": 1788932646.240004
+  },
+  {
+   "name": "tiles-stars",
+   "v": 1,
+   "ok": true,
+   "secs": 9.2,
+   "text": "",
+   "ts": 1788932655.8631198
+  },
+  {
+   "name": "deco-stars",
+   "v": 1,
+   "ok": true,
+   "secs": 11.5,
+   "text": "",
+   "ts": 1788932667.825753
+  },
+  {
+   "name": "boss-noir-white",
+   "v": 1,
+   "ok": true,
+   "secs": 14.9,
+   "text": "",
+   "ts": 1788932683.114793
+  },
+  {
+   "name": "boss-noir-white-b",
+   "v": 1,
+   "ok": true,
+   "secs": 15.0,
+   "text": "",
+   "ts": 1788932698.560789
+  },
+  {
+   "name": "boss-sugarqueen",
+   "v": 1,
+   "ok": true,
+   "secs": 8.3,
+   "text": "",
+   "ts": 1788932707.288515
+  },
+  {
+   "name": "boss-sugarqueen-b",
+   "v": 1,
+   "ok": true,
+   "secs": 14.7,
+   "text": "",
+   "ts": 1788932722.392168
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

@@ -60,6 +60,15 @@ export const THEMES = {
     moon: '#e8e8f4', moonShade: '#a89cc8', star: '#fdfbf7',
     far: '#1c1630', mid: '#161228', near: '#100c1e',
   },
+  stars: { // 最終章 星の墓標: 宇宙・黒〜白。'~' は虚空（落下死）
+    grass: ['#d8d0e8', '#f0ecf8', '#a8a0c0'], grassFlower: ['#fdfbf7', '#cbaaf5', '#ff8fc8'],
+    dirt: ['#1c1830', '#2a2440', '#120e20'], pebble: '#d8d0e8',
+    plat: ['#6a6088', '#8a80a8', '#4a4068'], platMoss: '#fdfbf7',
+    bog: ['#0a0814', '#161228', '#2a2440'], bogGlow: '#cbaaf5', bogBubble: '#fdfbf7',
+    skyTop: '#04030a', skyMid: '#0e0a1c', skyBot: '#1c1830', horizon: '#3a3050',
+    moon: '#fdfbf7', moonShade: '#cbaaf5', star: '#fdfbf7',
+    far: '#14102a', mid: '#0e0a1c', near: '#08060f',
+  },
   castle: {
     grass: ['#6c6c80', '#7c7c90', '#5d5d70'], grassFlower: ['#d9262b', '#7a0f1f', '#a5a5b8'],
     dirt: ['#5d5d70', '#4e4e60', '#6c6c80'], pebble: '#2d1f4c',

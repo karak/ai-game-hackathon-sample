@@ -35,7 +35,7 @@ export const MARKERS = {
 export function parseLevel(stage) {
   const rows = stage.rows.map(r => r.split(''));
   const spawns = [];
-  let playerStart = null, bossTrigger = null, goal = null;
+  let playerStart = null, bossTrigger = null, goal = null; const bossTriggers = [];
   const checkpoints = [];
   for (let ty = 0; ty < rows.length; ty++) {
     for (let tx = 0; tx < rows[ty].length; tx++) {
@@ -45,7 +45,7 @@ export function parseLevel(stage) {
       rows[ty][tx] = '.';
       const pos = { x: tx * TILE, y: ty * TILE };
       if (type === 'player') playerStart = pos;
-      else if (type === 'boss') bossTrigger = pos;
+      else if (type === 'boss') { bossTriggers.push(pos); if (!bossTrigger) bossTrigger = pos; } // 複数の B はボス連戦（stage.bosses の順）
       else if (type === 'goal') goal = pos;
       else if (type === 'checkpoint') checkpoints.push(pos);
       else spawns.push({ type, tx, ty, x: pos.x, y: pos.y });
@@ -61,7 +61,10 @@ export function parseLevel(stage) {
     theme: stage.theme ?? 'graveyard',
     timeLimit: stage.timeLimit ?? 180,
     vertical: !!stage.vertical, // 縦スクロール面（高さ > 14 行、ボスはトリガー行より上で開始）
-    boss: stage.boss ?? null,
+    boss: stage.boss ?? (stage.bosses ? stage.bosses[0] : null),
+    bosses: stage.bosses ?? (stage.boss ? [stage.boss] : []), // トリガー順のボス種別
+    bossHpMul: stage.bossHpMul ?? 1,                          // 連戦での強化倍率
+    bossTriggers: bossTriggers.sort((a, b) => a.x - b.x),
     map, spawns, playerStart, bossTrigger, goal, checkpoints,
   };
 }

@@ -1614,6 +1614,178 @@
     "bosses/mirrorqueen2"
    ],
    "palette": "bosses/mirrorqueen1"
+  },
+  "bg-stars-sky": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-stars-sky.txt",
+   "out": [
+    "bg/stars_sky"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "bg-stars-far": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-stars-far.txt",
+   "out": [
+    "bg/stars_far"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-stars-far2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-stars-far2.txt",
+   "out": [
+    "bg/stars_far2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "ref": "bg-stars-far"
+  },
+  "bg-stars-mid": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-stars-mid.txt",
+   "out": [
+    "bg/stars_mid"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-stars-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-stars-mid2.txt",
+   "out": [
+    "bg/stars_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-stars-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-stars-mid3.txt",
+   "out": [
+    "bg/stars_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "tiles-stars": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-stars.txt",
+   "out": [
+    "tiles/stars"
+   ],
+   "kind": "tiles",
+   "colors": 24
+  },
+  "deco-stars": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-stars.txt",
+   "out": [
+    "deco/startomb",
+    "deco/starrock",
+    "deco/rockinghorse",
+    "deco/lanternpost"
+   ],
+   "colors": 15,
+   "strip_caption": true,
+   "tol": 95
+  },
+  "boss-noir-white": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-noir-white.txt",
+   "ref": "boss-noir",
+   "out": [
+    "bosses/noirw1"
+   ],
+   "palette": "bosses/noir1"
+  },
+  "boss-noir-white-b": {
+   "box": [
+    220,
+    220
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-noir-white-b.txt",
+   "ref": "boss-noir-white",
+   "out": [
+    "bosses/noirw2"
+   ],
+   "palette": "bosses/noirw1"
+  },
+  "boss-sugarqueen": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-sugarqueen.txt",
+   "out": [
+    "bosses/sugarqueen1"
+   ]
+  },
+  "boss-sugarqueen-b": {
+   "box": [
+    240,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-sugarqueen-b.txt",
+   "ref": "boss-sugarqueen",
+   "out": [
+    "bosses/sugarqueen2"
+   ],
+   "palette": "bosses/sugarqueen1"
   }
  }
 }

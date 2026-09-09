@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/boss-sugarqueen-b-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  240,
+  200
+ ],
+ "w": 226,
+ "h": 186,
+ "fits": true,
+ "colors": 15
+}

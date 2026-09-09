@@ -408,6 +408,53 @@ export class MirrorQueen extends Boss {
   }
 }
 
+// ---- 生まれ直すノワール (最終章 第 2 形態): 白いドレス。ノワールの行動に「光の星の環」を加え、常に激昂状態 ----
+// かわいい: 白銀の髪と輝く瞳、整った冠 / えげつない: 手足は黒糸で縫い留められ、背の傷から羽が抜け落ち、唇から血
+export class NoirReborn extends Noir {
+  constructor(world, x, groundY) { super(world, x, groundY); this.hpMax = this.hp = 30; this.fitSprite('noirw1', 0.45, 0.9); this.ringT = 0; }
+  get hpRatio() { return Math.min(0.49, Math.max(0, this.hp / this.hpMax)); } // 常に激昂
+  update(dt) {
+    super.update(dt);
+    if (this.dying || this.state === 'enter') return;
+    this.ringT += dt; // 3.5 秒ごとに 8 方向の星の環
+    if (this.ringT > 3.5) { this.ringT = 0; for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + this.t; this.shoot('bolt', Math.cos(a) * 90, Math.sin(a) * 90, 0, 0, { life: 2.5 }); } this.world.audio.sfx('chargeshot'); this.world.particles.emit('sparkle', this.cx, this.cy, 20); }
+  }
+  spriteName() { return this.state === 'rain' || this.state === 'dash' ? 'noirw2' : 'noirw1'; }
+}
+
+// ---- 砂糖の女王 (第三章): 地上を歩き、ジャムを吐き、飴の破片を扇状に撒き、踏みつける ----
+// かわいい: 飴の冠とメレンゲのドレス、頰紅 / えげつない: ドレスの割れ目から血のジャム、腕を這う砂糖の蟻、杖の先の人形の頭
+export class SugarQueen extends Boss {
+  constructor(world, x, groundY) {
+    super(world, x, groundY - 60, 30, 60); this.spriteOff = [4, 2];
+    this.hpMax = this.hp = 22; this.facing = -1; this.fitSprite('sugarqueen1', 0.5, 0.95); this.enterX = x - 50; this.attackAnim = 0; this.cycle = 0;
+  }
+  update(dt) {
+    if (super.update(dt)) return;
+    const p = this.player, d = this.distX(), enraged = this.hpRatio < 0.5, a = this.world.arena;
+    this.attackAnim = Math.max(0, this.attackAnim - dt);
+    switch (this.state) {
+      case 'enter': this.vx = -20; if (this.x <= this.enterX) { this.vx = 0; this.setState('walk'); this.contact = true; } break;
+      case 'walk': this.facePlayer(); this.vx = this.facing * (enraged ? 22 : 14); if (this.stateT > (enraged ? 1.4 : 2.0)) { this.cycle++; this.vx = 0; this.setState(this.cycle % 3 === 1 ? 'jam' : this.cycle % 3 === 2 ? 'shards' : 'stomp'); } break;
+      case 'jam': // ジャムを放物線で 3 発（酸として溜まる）
+        if (Math.floor(this.stateT * 4) !== Math.floor((this.stateT - dt) * 4) && this.stateT < 0.8) { this.attackAnim = 0.4; this.shoot('acid', Math.sign(d) * rand(50, 110), -170, this.facing * 8, -20); this.world.audio.sfx('poison'); }
+        if (this.stateT > 1.2) this.setState('walk');
+        break;
+      case 'shards': // 飴の破片（骨弾）を扇状に
+        if (this.stateT > 0.3 && !this.shot) { this.shot = true; this.attackAnim = 0.4; const n = enraged ? 5 : 3; for (let i = 0; i < n; i++) this.shoot('bone', this.facing * (60 + i * 20), -120 - i * 15, this.facing * 8, -10, { life: 2 }); this.world.audio.sfx('hit'); }
+        if (this.stateT > 1.0) { this.shot = false; this.setState('walk'); }
+        break;
+      case 'stomp': // 跳んで着地、揺れと血のジャムの飛沫
+        if (this.stateT < 0.05 && this.onGround) { this.vy = -220; this.vx = Math.sign(d) * 50; }
+        if (this.onGround && this.stateT > 0.3) { this.vx = 0; this.world.shake(4); this.attackAnim = 0.3; for (let i = -1; i <= 1; i++) this.shoot('blood', i * 60, -140, 0, 10, { life: 2 }); this.world.audio.sfx('hit'); this.setState('walk'); }
+        break;
+    }
+    this.physics(dt);
+    if (a) { if (this.x < a.x0 + 8) this.x = a.x0 + 8; if (this.x + this.w > a.x1 - 8) this.x = a.x1 - 8 - this.w; }
+  }
+  spriteName() { return this.attackAnim > 0 ? 'sugarqueen2' : 'sugarqueen1'; }
+}
+
 export function createBoss(world, kind, x, groundY) {
   switch (kind) {
     case 'doll': return new WeepingDoll(world, x, groundY);
@@ -417,6 +464,8 @@ export function createBoss(world, kind, x, groundY) {
     case 'machine': return new DollmakerMachine(world, x, groundY);
     case 'ringmaster': return new Ringmaster(world, x, groundY);
     case 'mirrorqueen': return new MirrorQueen(world, x, groundY);
+    case 'noirw': return new NoirReborn(world, x, groundY);
+    case 'sugarqueen': return new SugarQueen(world, x, groundY);
   }
   return null;
 }

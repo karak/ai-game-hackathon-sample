@@ -24,7 +24,7 @@ test('each stage time limit ≥ 3× walk-to-boss time + 90 s boss fight', () => 
   for (const st of STAGES) {
     const L = parseLevel(st);
     expect(L.timeLimit, st.title).toBeGreaterThanOrEqual(minTimeLimit(L.bossTrigger.x));
-    expect(L.timeLimit, st.title).toBeLessThanOrEqual(420); // 7 分以内
+    expect(L.timeLimit, st.title).toBeLessThanOrEqual(420 + 90 * Math.max(0, L.bosses.length - 1)); // 7 分以内（連戦は 1 体につき 90 秒加算）
   }
 });
 

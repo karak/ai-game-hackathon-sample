@@ -18,6 +18,8 @@ export const SPEC = {
 };
 
 export const BOSS_SPEC = {
+  noirw: { jp: '生まれ直す魔法少女 ノワール（最終章 第 2 形態）', hp: 30, states: 'ノワールと同じ行動（常に激昂: 5 連射・雨 2.2 秒・突進 230/s）＋ 3.5 秒ごとに 8 方向の光の星の環（bolt）。白いドレス、冠が直っている', shots: 'darkheart, rain, bolt', death: '同上（長尺演出は M5）' },
+  sugarqueen: { jp: '砂糖の女王 マリー（第三章）', hp: 22, states: 'enter → walk(2.0s、14/s、HP 50% 以下で 22/s) → jam(ジャム 3 発放物線、酸として溜まる) | shards(飴の破片 3〜5 扇状) | stomp(跳んで着地、血の飛沫 3) の循環', shots: 'acid, bone, blood', death: '同上' },
   mirrorqueen: { jp: '鏡の女王 ヴァニタス（第六章）', hp: 30, states: 'enter(1.4s フェードイン) → pose(1.2s) → shards(破片 5 発扇状、HP 50% 以下で 7) | teleport(0.4s で消えて反対側へ) | twin(HP 50% 以下: 鏡像を反対側に置き、破片が鏡像からも同時に飛ぶ) の循環', shots: 'bolt', death: '同上' },
   ringmaster: { jp: '大観覧車の主 グランギニョル（第五章）', hp: 30, states: 'enter → stand(1.4s、HP 50% 以下で 1.0s) → whip(0.3s 後に前方 90 の横薙ぎ、しゃがみで回避) | heads(追尾する人形の頭 3〜5) | stomp(跳んで着地、骨の破片 5) の循環。部屋に観覧車 O', shots: 'darkheart, bone', death: '同上' },
   machine: { jp: '人形師の機械 マザーグース（第四章）', hp: 28, states: 'enter → roll(1.6s、26/s、HP 50% 以下で 40/s) → slam(0.5s 後に主人公の上へ針を落とす) | thread(糸弾 3 発扇状、HP 50% 以下で 5 発) | toss(人形の胴体ブーメラン) の順に循環。部屋の床はベルトコンベア', shots: 'bone, bolt, arm', death: '同上' },

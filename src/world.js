@@ -62,7 +62,7 @@ export class World {
     this.enemies = []; this.shots = []; this.enemyShots = []; this.fires = []; this.pools = []; this.items = []; this.boxes = [];
     this.platforms = []; this.crumbles = []; this.presses = []; // ギミック（spawnAll で配置）
     this.effects = []; // 溜め魔法などの一時エンティティ（update/draw/dead）
-    this.cam = { x: 0, y: 0 }; this.arena = null; this.boss = null; this.bossState = 'none';
+    this.cam = { x: 0, y: 0 }; this.arena = null; this.boss = null; this.bossState = 'none'; this.bossIdx = 0; // 連戦の何体目か
     this.time = this.level.timeLimit; this.t = 0; this.cutscene = false; this.cleared = false;
     this.shakeT = 0; this.shakeAmp = 0; this.toasts = []; this.tickT = 0; this.safeT = 0; // safeT > 0 の間は敵弾なし
     this.checkpoint = { ...this.level.playerStart };
@@ -96,7 +96,7 @@ export class World {
     this.game.lives--;
     if (this.game.lives < 0) { this.game.gameOver(); return; }
     // チェックポイントから再開。敵は再配置、ボス戦中ならボス戦をリセット
-    if (this.boss) { this.boss = null; this.arena = null; this.bossState = 'none'; this.cutscene = false; }
+    if (this.boss) { this.boss = null; this.arena = null; this.bossState = 'none'; this.cutscene = false; } // 死亡: 連戦の何体目かは維持（倒したボスは戻らない）
     this.spawnAll();
     this.player.respawn(this.checkpoint.x, this.checkpoint.y); this.safeT = SAFE_SHOT_T;
     snapCamera(this.cam, this.player, this.level.map, this.arena);
@@ -104,7 +104,13 @@ export class World {
     this.audio.playBgm(SONGS[this.level.theme]);
   }
   onBossDying() { this.cutscene = true; this.audio.stopBgm(); this.fx.bossDefeat(); }
-  onBossDefeated() { this.cleared = true; this.cutscene = true; this.player.vx = 0; this.game.stageClear(); }
+  onBossDefeated() {
+    if (this.bossIdx + 1 < this.level.bosses.length) { // 連戦: 次のボスへ（部屋を開放して先へ進ませる）
+      this.bossIdx++; this.boss = null; this.arena = null; this.bossState = 'none'; this.cutscene = false; this.enemies = this.enemies.filter(e => !e.isBoss && !e.head);
+      this.player.invT = Math.max(this.player.invT, 1.5); this.time = Math.max(this.time, 90); this.toast('先へ進め'); this.audio.playBgm(SONGS[this.level.theme]); return;
+    }
+    this.cleared = true; this.cutscene = true; this.player.vx = 0; this.game.stageClear();
+  }
 
   update(dt, input) {
     dt = this.fx.tick(dt); if (dt <= 0) return; // ヒットストップ中は世界を止める。スロー中は dt が縮む
@@ -125,7 +131,8 @@ export class World {
     for (const c of this.level.checkpoints) if (p.centerX > c.x && this.checkpoint.x < c.x) { this.checkpoint = { ...c }; this.toast('祈りの十字路：ここから再開できる'); this.audio.sfx('select'); }
 
     // ボス戦開始
-    if (this.bossState === 'none' && this.level.bossTrigger && p.alive && (this.level.vertical ? p.y + p.h <= this.level.bossTrigger.y + TILE : p.centerX > this.level.bossTrigger.x)) this.startBoss(); // 縦マップはトリガー行より上に立ったら開始
+    const trig0 = this.level.bossTriggers[this.bossIdx];
+    if (this.bossState === 'none' && trig0 && p.alive && (this.level.vertical ? p.y + p.h <= trig0.y + TILE : p.centerX > trig0.x)) this.startBoss(); // 縦マップはトリガー行より上に立ったら開始
 
     for (const e of this.enemies) e.update(dt);
     for (const s of this.shots) s.update(dt);
@@ -151,7 +158,7 @@ export class World {
   }
 
   startBoss() {
-    const trig = this.level.bossTrigger; const map = this.level.map;
+    const trig = this.level.bossTriggers[this.bossIdx]; const map = this.level.map; const kind = this.level.bosses[this.bossIdx] ?? this.level.boss;
     const x0 = this.level.vertical ? 0 : Math.max(0, Math.min(trig.x - 24, map.pixelWidth - W)); const x1 = Math.min(map.pixelWidth, x0 + W);
     this.arena = { x0, x1 }; this.bossState = 'fight'; this.audio.sfx('boss'); this.shake(3);
     if (map.pixelHeight > H) { const y1 = Math.min(map.pixelHeight, Math.max(H, trig.y + 2 * TILE)); this.arena.y0 = y1 - H; this.arena.y1 = y1; } // 縦マップ: トリガー行を下端近くに含む 1 画面
@@ -159,18 +166,19 @@ export class World {
     const tx = Math.floor((x1 - 40) / TILE); let gy = map.pixelHeight;
     const startTy = Math.max(0, Math.floor((this.player.y + this.player.h) / TILE) - 1);
     for (let ty = startTy; ty < map.height; ty++) if (map.isSolid(tx, ty)) { gy = ty * TILE; break; }
-    if (this.level.boss === 'serpent') { // 大蛇は川に棲む: 部屋の中央列で最初の '~' の上端を水面にする
+    if (kind === 'serpent') { // 大蛇は川に棲む: 部屋の中央列で最初の '~' の上端を水面にする
       const cx = Math.floor((x0 + x1) / 2 / TILE);
       for (let ty = 0; ty < map.height; ty++) if (map.at(cx, ty) === '~') { gy = ty * TILE; break; }
     }
-    this.boss = createBoss(this, this.level.boss, x1 - 48, gy);
+    this.boss = createBoss(this, kind, x1 - 48, gy);
+    if (this.level.bossHpMul !== 1) { this.boss.hpMax = Math.round(this.boss.hpMax * this.level.bossHpMul); this.boss.hp = this.boss.hpMax; } // 連戦強化
     if (this.boss.parts) this.enemies.push(...this.boss.parts); // 胴体（接触判定のみ）
     this.enemies = this.enemies.filter(e => !(e.spawnX >= x0 - 200)); // 周辺の雑魚は消す
     this.enemies.push(this.boss);
     this.audio.playBgm(SONGS.boss);
     this.fx.bossIntro(this.bossName());
   }
-  bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', serpent: '涙の大蛇 ララバイ', machine: '人形師の機械 マザーグース', ringmaster: '大観覧車の主 グランギニョル', mirrorqueen: '鏡の女王 ヴァニタス' }[this.level.boss] ?? 'BOSS'; }
+  bossName(kind = this.level.bosses[this.bossIdx] ?? this.level.boss) { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', noirw: '生まれ直す魔法少女 ノワール', serpent: '涙の大蛇 ララバイ', machine: '人形師の機械 マザーグース', ringmaster: '大観覧車の主 グランギニョル', mirrorqueen: '鏡の女王 ヴァニタス', sugarqueen: '砂糖の女王 マリー' }[kind] ?? 'BOSS'; }
 
   collide() {
     const p = this.player;

@@ -7,6 +7,7 @@ export const DECO_MAP = {
   park:        { n: 'booth', f: 'balloons', y: 'carousel', c: 'popcorn', x: 'blood', o: 'bones' },
   tower:       { n: 'mirror', k: 'gargoyle', v: 'chandelier', o: 'shards', x: 'blood', w: 'window' }, // 's' は敵マーカーなので像は 'k'
   castle:      { n: 'pillar', w: 'window', v: 'candelabra', x: 'blood', o: 'bones', t: 'banner' },
+  stars:       { t: 'startomb', o: 'starrock', y: 'rockinghorse', v: 'lanternpost', x: 'blood', c: 'cross' },
 };
 // テーマの記号表をスプライト実体に解決する（無いものは落とす）
 export function resolveDecoMap(theme, D) {

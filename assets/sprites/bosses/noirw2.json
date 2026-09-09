@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/boss-noir-white-b-v1.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  220,
+  220
+ ],
+ "w": 140,
+ "h": 199,
+ "fits": true,
+ "colors": 14
+}
