@@ -19,25 +19,25 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 152,
+  "h": 81,
   "src": "assets/sprites/bg/candyforest_mid.png",
-  "w": 315
+  "w": 183
  },
  "bg/candyforest_mid2": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 163,
+  "h": 96,
   "src": "assets/sprites/bg/candyforest_mid2.png",
-  "w": 269
+  "w": 194
  },
  "bg/candyforest_mid3": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 182,
+  "h": 95,
   "src": "assets/sprites/bg/candyforest_mid3.png",
-  "w": 266
+  "w": 147
  },
  "bg/candyforest_sky": {
   "anchor": "center",
@@ -115,9 +115,9 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 152,
+  "h": 82,
   "src": "assets/sprites/bg/graveyard_mid.png",
-  "w": 263
+  "w": 246
  },
  "bg/graveyard_mid2": {
   "anchor": "center",
@@ -163,9 +163,9 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 149,
+  "h": 92,
   "src": "assets/sprites/bg/park_mid.png",
-  "w": 243
+  "w": 242
  },
  "bg/park_mid2": {
   "anchor": "center",
@@ -259,9 +259,9 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 55,
+  "h": 46,
   "src": "assets/sprites/bg/stars_mid.png",
-  "w": 205
+  "w": 124
  },
  "bg/stars_mid2": {
   "anchor": "center",

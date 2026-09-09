@@ -1,5 +1,5 @@
 {
- "requests": 170,
+ "requests": 174,
  "entries": [
   {
    "name": "player-base",
@@ -1320,6 +1320,38 @@
    "secs": 9.9,
    "text": "",
    "ts": 1788934222.471872
+  },
+  {
+   "name": "bg-candyforest-mid2",
+   "v": 2,
+   "ok": true,
+   "secs": 10.3,
+   "text": "Here is your pixel art mid-distance parallax layer, adhering to all your specifications: ",
+   "ts": 1788934233.2089012
+  },
+  {
+   "name": "bg-candyforest-mid3",
+   "v": 2,
+   "ok": true,
+   "secs": 9.9,
+   "text": "",
+   "ts": 1788934243.654135
+  },
+  {
+   "name": "bg-park-mid",
+   "v": 2,
+   "ok": true,
+   "secs": 11.0,
+   "text": "",
+   "ts": 1788934255.150354
+  },
+  {
+   "name": "bg-stars-mid",
+   "v": 2,
+   "ok": true,
+   "secs": 9.4,
+   "text": "Here is your 16-bit SNES-era Japanese RPG pixel art parallax layer. ",
+   "ts": 1788934265.214238
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

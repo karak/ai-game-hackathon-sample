@@ -1,5 +1,5 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-graveyard-mid-v2.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-graveyard-mid-v3.png",
  "pitch": [
   4.0,
   4.0
@@ -8,8 +8,8 @@
   400,
   300
  ],
- "w": 263,
- "h": 152,
+ "w": 246,
+ "h": 82,
  "fits": true,
  "colors": 32
 }

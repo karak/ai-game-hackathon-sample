@@ -1,5 +1,5 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-candyforest-mid2-v1.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/bg-candyforest-mid2-v2.png",
  "pitch": [
   4.0,
   4.0
@@ -8,8 +8,8 @@
   400,
   300
  ],
- "w": 269,
- "h": 163,
+ "w": 194,
+ "h": 96,
  "fits": true,
  "colors": 32
 }
