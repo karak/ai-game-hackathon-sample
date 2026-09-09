@@ -1,0 +1,91 @@
+# HANDOFF — 引き継ぎ（2026-09-09 23:30 JST 時点）
+
+次のセッション（人でも Claude でも）が、このリポジトリの現在地・決定事項・残課題・作業手順を 10 分で把握するための文書。詳細は `docs/plan/` が正で、ここは入口。
+
+## 1. 現在地
+
+- リポジトリ: `/Users/yasushi/projects/poc-square`、HEAD `21855e5`、作業ツリー clean（未コミットなし）
+- 検証: `npm test` Vitest 92 件通過、`npm run e2e` Playwright 5 件通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰）
+- 生成予算: Gemini 台帳 `tools/gen_ledger.json` **186 / 200**（残 14）。逐次実行、並列禁止
+- マイルストーン: M0〜M4 済、M5 は実装分済（出口条件のテスター計測は人手のため繰延）、M6 着手（性能計測・ロード画面済）、M7 未着手。表は `docs/plan/03-roadmap.md`
+- 本日のスプリント: E ビジュアル残課題一掃 → F 死亡ログ・コンティニュー・2 周目・ポーズ → G 音 → H 計測・ロード画面（`docs/plan/02-near-term.md` 末尾）
+
+## 2. 最初に読むもの（順番）
+
+1. `CLAUDE.md` — 作業ルール（4 要素報告、codex-review 不使用、既存コメント削除禁止、生成は逐次）
+2. `docs/plan/README.md` → `01-status.md`（現在地）→ `02-near-term.md`（スプリント履歴と受入証跡）→ `08-backlog.md`（未済一覧）
+3. `docs/art-standard.md`、`docs/gen-pipeline.md`（絵と生成の基準）
+4. `.claude/skills/` の 3 スキル: `retro-game-art-direction` / `generating-pixel-art-with-gemini`（`reference/model-behavior.md` に失敗の記録）/ `verifying-browser-games-with-bots`
+5. Claude 用メモリ（`~/.claude/projects/-Users-yasushi-projects-poc-square/memory/MEMORY.md`）: 人手検証と実機パッドは繰延、codex-review 不使用、寸法仕様はパーツ単位の論理 px
+
+## 3. 本日の主な決定（変更するなら理由を docs/plan に書く）
+
+| 決定 | 内容 | 場所 |
+|------|------|------|
+| 寸法仕様はパーツ単位 | 「同じ大きさ」ではなく部位ごとの論理 px（帽子 35 高／つば 57 幅、頭 40 高／髪幅 40、胴 20、スカート 24、脚 18、計 111、私服 103）。`specs.json part_sizes` → `gemini_gen.py` が PART SIZES ブロックを付与 → `build_sprites.py measure_parts` が QA | ユーザー指示。08-backlog BUG-012 |
+| 帽子は原画のもの | 実行時の重ね描き禁止。脱落コマだけ `derive_variants.py ensure_hat` で合成。私服セットは v2 固定 | BUG-009 |
+| 走り撃ちは 2 コマ | `run1s` / `run3s`（帽子なし生成＋帽子合成、杖込み幅 103）。通過コマは 2 回とも杖が描かれず不採用。射撃中は 12 tick ずつ交互 | IMP-016、`player.js frame()` |
+| 分割は連結成分で切る | `postprocess.py split_frames_masked`（隣コマの部品混入防止）、欠片は最寄りコマへ | BUG-013 |
+| 後処理の既定 | 装飾 `fill_holes`＋`trim_thin_bottom`、主人公 `strip_caption`、一枚絵 `trim_border`、背景層に `keep_bottom` 不使用 | 06-asset-pipeline |
+| 2 周目 | `progress.cleared` で開放。敵弾速 1.5 倍・ゾンビ湧き間隔 0.8 倍（`balance.LOOP2`）。真の結末 1 場面（挿絵は場面 5 流用） | 05-systems 5.1 |
+| コンティニュー | 面の先頭・スコア 0・ハイスコア非記録 | `Game.continueGame` |
+| 死亡ログ | `localStorage lyrica_deaths`（600 件上限）。収集は `node tools/gather_deaths.mjs`（無敵なし・残機無限のボット）→ `docs/plan/logs/`。難易度は人のデータが出るまで動かさない | IMP-007 / IMP-017 |
+| 音 | シーケンサに `arp` / `echo` / `waves` / `once`＋`then`。ジングル 4（開始・クリア・死亡・ゲームオーバー）、最終ボス曲 `bossFinal`（`stage.bossSong`） | 05-systems 5.5 |
+| 性能 | update 0.03 ms・draw 0.16 ms 以下、rAF 20 ms 超 0 回。バッチ化・背景キャッシュは見送り | 05-systems 5.6 |
+
+## 4. 残課題（優先順。ID は 08-backlog）
+
+**人手待ち（繰延決定済み）**: テスター 5 人の完走率（M5 出口）、IMP-017 死亡多発地点の検証（第三章 x512 棘、涙の川 x1280 沼、工房 x1088 プレス、遊園地 x2688 沼、菓子の森 x2304）、実機ゲームパッド。
+
+**M6 の残り**: IMP-008 英語 UI（`src/game.js` 21 文字列、`world.js` 12、`settings.js` 9、章題 8、ボス名 9、`story.js` 41 行）、粒子上限、モバイル実機確認（タッチパッドは `index.html` に実装済み）、初回ロード秒数の記録（`window.__game.bootMs`）。
+
+**M7（未着手）**: `npm run build` の確認、itch.io ページ、トレーラー GIF、README 更新、ライセンス表記、既知の問題一覧。
+
+**技術的負債 P2**: DEBT-004 `world.js` 分割、DEBT-008 生成スクリプトが外部 venv/.env 依存（`requirements.txt` と `.env.example` を置く）、DEBT-003 旧文字列ドット絵の残存、BUG-008 城の中景 1 種、IMP-013 本来の強制スクロール。
+
+**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現、IMP-015 デモ未収録（第四章以降）、BUG-006 私服の色分け、BUG-007 hurt2 の用途、DEBT-007 `box` 命名。
+
+**ビジュアル保留**: hurt のつば幅 1.45x（傾いた帽子）、fall_nohat 髪幅 1.39x、走り撃ち通過コマの杖。
+
+## 5. 作業手順（コマンド）
+
+```bash
+# 開発
+npx vite --port 5173 --host 127.0.0.1     # http://127.0.0.1:5173/index.html, /catalog.html
+npm test                                   # Vitest
+npm run e2e                                # Playwright（5174 を自動起動、headless）
+node tools/gather_deaths.mjs --runs 2 --secs 150   # 死亡ログ収集（5173 が起きていること）
+
+# 素材生成（Python は参照プロジェクトの venv。DEBT-008）
+PY="/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.venv/bin/python"
+"$PY" tools/gemini_gen.py <spec> [--ref raw.png]   # 1 件ずつ。台帳に記録される
+"$PY" tools/build_sprites.py <spec…>               # 後処理 → assets/sprites, manifest。QA WARN を読む
+"$PY" tools/derive_variants.py                     # 主人公の帽子合成・衣装・hurt2・run*s
+```
+
+- 生成後は必ず `catalog.html` の該当章（キャラクターシート／敵・ボス／背景レイヤー）をスクリーンショットで確認する。比較画像は新しいファイル名で作る（Read ツールは同名画像をキャッシュする）
+- 撮影・検証は **Playwright の headless ブラウザ**で行う。Chrome DevTools MCP のタブはユーザーが見ている localhost と同じなので、状態を触ったら `reload` で戻す（本日、性能計測をそのタブで走らせて「勝手に面が切り替わる／ジャンプできない」と見えた事故あり。`verifying-browser-games-with-bots/SKILL.md` に記録）
+- 報告は「テスト結果 / ボット結果 / スクリーンショット / 未達と次の手」の 4 要素。主観語は使わない
+- 未達・繰延は `docs/plan/08-backlog.md` に ID を付けて記録し、`02-near-term.md` のスプリント表に証跡を書く
+
+## 6. 主要ファイル
+
+| 領域 | ファイル |
+|------|---------|
+| ゲーム進行・画面 | `src/game.js`（状態機械、メニュー、クリア／ゲームオーバー／エンディング）、`src/main.js`（起動・ロード画面・ループ） |
+| 世界・物理 | `src/world.js`、`src/physics.js`、`src/camera.js`、`src/level.js`、`src/levels/index.js`（8 面） |
+| キャラ | `src/entities/player.js`（コマ選択 `frame()`）、`enemies.js`、`bosses.js`、`gimmicks.js`、`magic.js`、`projectiles.js` |
+| 描画・素材 | `src/gfx/assets.js`、`loader.js`、`hdworld.js`、`manifest.json`（235 エントリ、生成物） |
+| 音 | `src/audio.js`（`SONGS`、`CH_VOL`、`playJingle`） |
+| 保存・ログ | `src/settings.js`（`lyrica_save`）、`src/deathlog.js`（`lyrica_deaths`）、`src/balance.js` |
+| 生成 | `assets/gen/specs.json`（`part_sizes`、spec ごとの `use` / `frame_use` / `skip_out` / 後処理フラグ）、`assets/gen/prompts/*.txt`、`assets/gen/raw/`（原画は全保存） |
+| 資料 | `catalog.html` + `src/catalog/`（manifest 駆動。`test/catalog.test.js` が掲載漏れを検出） |
+| 証跡 | `test-results/shots/`（本日の撮影）、`docs/plan/logs/`（死亡ログ） |
+
+## 7. 既知の注意点
+
+- `src/` や `manifest.json` を書くと Vite の HMR でブラウザが再読み込みされ、撮影用に作った状態は消える。状態を作る→撮る、の間にファイルを書かない
+- ブラウザ窓は 1340×900 に `resize_page` してから撮る（縮むと HUD が画面外）
+- zsh で `for n in $LIST` は分割されない。名前を列挙する
+- `Bash` の `sleep` 連結は使えない。長い処理は `run_in_background` と完了通知
+- 生成の再試行は 2 回まで。3 回目は仕様（部位のセル数・箱の大きさ・参照画像）を変える
