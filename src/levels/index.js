@@ -1177,6 +1177,6 @@ export const STAGES = [
   { name: 'stage-workshop', title: '第五章　綿雪の人形工房', subtitle: 'ここで、わたしたちは作られた', theme: 'workshop', timeLimit: 330, boss: 'machine', rows: stitch(...s5) }, // 歩行 63s×3 + 90 = 279 → 330（逆走ベルトで遅くなる）
   { name: 'stage-park', title: '第六章　骨の遊園地', subtitle: '笑い声は、いつまでも鳴りやまない', theme: 'park', timeLimit: 330, boss: 'ringmaster', rows: stitch(...s6) }, // 歩行 63s×3 + 90 = 279 → 330
   { name: 'stage-tower', title: '第七章　鏡の塔', subtitle: '鏡の中のわたしは、笑っていない', theme: 'tower', vertical: true, timeLimit: 300, boss: 'mirrorqueen', rows: s7 },
-  { name: 'stage-stars', title: '最終章　星の墓標', subtitle: 'ぜんぶ、ここで終わらせる', theme: 'stars', timeLimit: 600, bosses: ['doll', 'teddy', 'machine', 'ringmaster', 'mirrorqueen', 'noir', 'noirw'], bossHpMul: 1.25, rows: stitch(...s8) }, // 連戦 7 体 × ≈60 秒 + 歩行 → 600
+  { name: 'stage-stars', title: '最終章　星の墓標', subtitle: 'ぜんぶ、ここで終わらせる', theme: 'stars', timeLimit: 600, bossSong: 'bossFinal', bosses: ['doll', 'teddy', 'machine', 'ringmaster', 'mirrorqueen', 'noir', 'noirw'], bossHpMul: 1.25, rows: stitch(...s8) }, // 連戦 7 体 × ≈60 秒 + 歩行 → 600
 ];
 

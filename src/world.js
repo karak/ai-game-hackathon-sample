@@ -94,7 +94,7 @@ export class World {
   }
 
   // プレイヤー死亡→復活まわり
-  onPlayerDying() { this.audio.stopBgm(); }
+  onPlayerDying() { this.audio.playJingle(SONGS.jDeath); } // 死亡ジングル（BGM は止まる。復活時に onPlayerDeath がテーマ曲を再開）
   onPlayerDeath() {
     this.game.logDeath?.(this.player.deathReason); // 死亡地点ログ（IMP-007）
     this.deaths++; this.game.lives--;
@@ -179,7 +179,7 @@ export class World {
     if (this.boss.parts) this.enemies.push(...this.boss.parts); // 胴体（接触判定のみ）
     this.enemies = this.enemies.filter(e => !(e.spawnX >= x0 - 200)); // 周辺の雑魚は消す
     this.enemies.push(this.boss);
-    this.audio.playBgm(SONGS.boss);
+    this.audio.playBgm(SONGS[this.level.bossSong ?? 'boss']); // 最終章は bossFinal
     this.fx.bossIntro(this.bossName());
   }
   bossName(kind = this.level.bosses[this.bossIdx] ?? this.level.boss) { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', noirw: '生まれ直す魔法少女 ノワール', serpent: '涙の大蛇 ララバイ', machine: '人形師の機械 マザーグース', ringmaster: '大観覧車の主 グランギニョル', mirrorqueen: '鏡の女王 ヴァニタス', sugarqueen: '砂糖の女王 マリー' }[kind] ?? 'BOSS'; }

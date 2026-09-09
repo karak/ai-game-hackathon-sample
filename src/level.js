@@ -64,6 +64,7 @@ export function parseLevel(stage) {
     boss: stage.boss ?? (stage.bosses ? stage.bosses[0] : null),
     bosses: stage.bosses ?? (stage.boss ? [stage.boss] : []), // トリガー順のボス種別
     bossHpMul: stage.bossHpMul ?? 1,                          // 連戦での強化倍率
+    bossSong: stage.bossSong ?? null,                         // ボス戦 BGM のキー（省略時 SONGS.boss。最終章は bossFinal）
     bossTriggers: bossTriggers.sort((a, b) => a.x - b.x),
     map, spawns, playerStart, bossTrigger, goal, checkpoints,
   };

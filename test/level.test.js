@@ -73,3 +73,9 @@ test('every hazard gap is crossable: at most 3 tiles wide at ground level, or ha
     }
   }
 });
+
+test('parseLevel passes bossSong through (final chapter uses bossFinal, others default to null)', () => {
+  const rows = ['.'.repeat(16), '..P.............', '#'.repeat(16)];
+  assert.equal(parseLevel({ name: 't', rows }).bossSong, null);
+  assert.equal(parseLevel({ name: 't', rows, bossSong: 'bossFinal' }).bossSong, 'bossFinal');
+});

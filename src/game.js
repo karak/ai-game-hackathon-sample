@@ -49,17 +49,17 @@ export class Game {
   }
   startStage() {
     this.world = new World(this, STAGES[this.stageIndex]);
-    this.setState('intro'); this.audio.stopBgm(); this.irisT = 0; // アイリスが開く
+    this.setState('intro'); this.audio.playJingle(SONGS.jStart); this.irisT = 0; // アイリスが開く。開始ジングル → play でテーマ曲
   }
   // アイリスワイプで閉じてから then() を実行する（画面遷移）
   startWipe(then) { if (this.state === 'wipe') return; this.wipe = { from: this.state, t: 0, then }; this.setState('wipe'); }
-  gameOver() { if (this.state === 'demo') { this.endDemo(); return; } this.setState('gameover'); this.goIdx = 0; this.audio.stopBgm(); this.audio.sfx('bossdie'); this.saveHi(); }
+  gameOver() { if (this.state === 'demo') { this.endDemo(); return; } this.setState('gameover'); this.goIdx = 0; this.audio.playJingle(SONGS.jGameOver); this.saveHi(); }
   // コンティニュー: 面の先頭からスコア 0 で再開。回数無制限、ハイスコアには記録しない（05-systems 5.1）
   continueGame() { this.continued = true; this.score = 0; this.lives = 2; this.startStage(); }
   stageClear() {
     if (this.state === 'demo') { this.endDemo(); return; }
     this.timeBonus = Math.ceil(this.world.time) * 10; this.noMissBonus = this.world.deaths === 0 ? NO_MISS_BONUS : 0; this.kills = this.world.kills;
-    this.score += this.timeBonus + this.noMissBonus; this.setState('clear'); this.audio.sfx('clear');
+    this.score += this.timeBonus + this.noMissBonus; this.setState('clear'); this.audio.playJingle(SONGS.jClear);
     // 進行を保存（次章から「つづきから」で再開できる）
     if (this.stageIndex + 1 < STAGES.length && this.stageIndex + 1 > this.settings.progress.stage) { this.settings.progress.stage = this.stageIndex + 1; this.save(); }
   }

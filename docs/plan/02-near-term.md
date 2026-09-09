@@ -135,3 +135,15 @@
 
 死亡ログの所見（ボット 2 周、各面 150 秒）: 多発地点はすべて「足場乗り・沼越え・プレス機のタイミング」で、ボットの行動幅の限界と一致する（IMP-017）。人のテスト前に数値を動かさない。
 未達: 2 周目の専用挿絵（IMP-018）、BGM ジングル・最終ボス曲・シーケンサ拡張（次スプリント）。
+
+## Sprint G — 「M5 後半: 音」（2026-09-09）
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| シーケンサ拡張 | `arp`（和音を 1 ステップずつ分解）、`echo {steps, gain}`、`waves`（チャンネル別波形）、`once`＋`then`（1 回再生→続きの曲） | `src/audio.js playBgm / arpNote / songSteps`、`test/audio-songs.test.js` |
+| 最終ボス曲 | `bossFinal`（172 bpm、ハ短調、アルペジオ＋エコー）。`stage.bossSong` → `parseLevel` → `World` | ブラウザ実測: intro 150（jStart）→ play 88（stars）→ ボス 172 |
+| ジングル 4 | `jStart`（面開始、intro 中）、`jClear`（クリア画面）、`jDeath`（死亡、復活でテーマ再開）、`jGameOver` | `Game.startStage / stageClear / gameOver`、`World.onPlayerDying` |
+| 音量バランス | BGM バス 0.55、`CH_VOL` lead 0.13 / lead2 0.08 / bass 0.28 / arp 0.07 を表として文書化 | 05-systems 5.5 |
+
+未達（M5 出口条件はテスター依存のため繰延）: テスター 5 人の完走率・平均時間、SFX 60 種への拡充、SFX 係数表、繰り返し記法、ADSR。難易度調整は死亡ログ（ボット）を人のデータで裏取りしてから（IMP-017）。
+次: M6（描画のバッチ化・アセット事前デコード・ロード画面・モバイル簡易対応・英語 UI）。

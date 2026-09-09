@@ -88,27 +88,34 @@ export class Audio {
   }
 
   // ---- BGM シーケンサ ----
-  // song: { bpm, lead:[...], bass:[...], drums:[...] } 各要素は 16分音符ごとの 'C4' | '-'(休) | '.'(継続)
-  playBgm(song) {
+  // song: { bpm, lead:[...], lead2:[...], bass:[...], arp:[...], drums:[...], waves?:{ch:type}, echo?:{steps,gain} }
+  //   lead/lead2/bass の各要素は 16 分音符ごとの 'C4' | '-'(休) | '.'(継続)
+  //   arp は和音 'A2 C3 E3'（空白区切り）を書くと 1 ステップごとに構成音を順に鳴らす（アルペジオ）。'-' 休、'.' で前の和音を継続
+  //   echo は steps 後に gain 倍で同じ音を重ねる簡易エコー。opts.once で 1 回だけ再生（ジングル）、終わりに opts.then() を呼ぶ
+  playBgm(song, opts = {}) {
     if (!this.ctx) return;
     this.stopBgm();
-    this.bgm = song; this.bgmStep = 0;
-    const stepDur = 60 / song.bpm / 4;
+    this.bgm = song; this.bgmStep = 0; this.bgmOpts = opts;
+    const stepDur = 60 / song.bpm / 4, total = songSteps(song);
     this.bgmNext = this.ctx.currentTime + 0.05;
     const schedule = () => {
       if (!this.bgm) return;
       while (this.bgmNext < this.ctx.currentTime + 0.25) {
         const s = this.bgmStep;
-        for (const ch of ['lead', 'lead2', 'bass']) {
+        if (opts.once && s >= total) { // 1 回再生の終端: 最後の音が鳴り終わってから then()
+          const rest = Math.max(0, this.bgmNext - this.ctx.currentTime) * 1000 + 150; this.bgm = null; this.bgmTimer = null;
+          if (opts.then) setTimeout(() => { if (!this.bgm) opts.then(); }, rest); return;
+        }
+        for (const ch of ['lead', 'lead2', 'bass', 'arp']) {
           const seq = song[ch]; if (!seq) continue;
-          const n = seq[s % seq.length];
-          if (n && n !== '-' && n !== '.') {
-            let len = 1; while (seq[(s + len) % seq.length] === '.' && len < 16) len++;
-            const f = NOTE[n]; if (!f) continue;
-            const type = ch === 'bass' ? 'triangle' : ch === 'lead2' ? 'square' : 'square';
-            const vol = ch === 'bass' ? 0.28 : ch === 'lead2' ? 0.08 : 0.13;
-            this._bgmNote(type, f, this.bgmNext, stepDur * len * 0.9, vol);
-          }
+          let n = seq[s % seq.length], len = 1;
+          if (ch === 'arp') { n = arpNote(seq, s); if (!n) continue; }
+          else { if (!n || n === '-' || n === '.') continue; while (seq[(s + len) % seq.length] === '.' && len < 16) len++; }
+          const f = NOTE[n]; if (!f) continue;
+          const type = song.waves?.[ch] ?? (ch === 'bass' ? 'triangle' : 'square');
+          const vol = CH_VOL[ch];
+          this._bgmNote(type, f, this.bgmNext, stepDur * len * 0.9, vol);
+          if (song.echo) this._bgmNote(type, f, this.bgmNext + stepDur * song.echo.steps, stepDur * len * 0.9, vol * song.echo.gain);
         }
         if (song.drums) {
           const d = song.drums[s % song.drums.length];
@@ -130,6 +137,20 @@ export class Audio {
     o.connect(g); g.connect(this.bgmBus); o.start(t); o.stop(t + dur + 0.02);
   }
   stopBgm() { this.bgm = null; if (this.bgmTimer) { clearTimeout(this.bgmTimer); this.bgmTimer = null; } }
+  // ジングル: 1 回だけ鳴らし、終わったら then()（例: 面開始 → テーマ曲）
+  playJingle(song, then = null) { this.playBgm(song, { once: true, then }); }
+}
+
+// チャンネル音量（音量バランス表、05-systems 5.5。BGM バス 0.55 の内訳）
+export const CH_VOL = { lead: 0.13, lead2: 0.08, bass: 0.28, arp: 0.07 };
+// 曲の長さ（ステップ数）= 最長チャンネル
+export function songSteps(song) { return Math.max(0, ...['lead', 'lead2', 'bass', 'arp', 'drums'].map(ch => song[ch]?.length ?? 0)); }
+// アルペジオ: 和音列 seq のステップ s で鳴らす 1 音。'.' は直前の和音を継続、'-' は休み
+export function arpNote(seq, s) {
+  let i = s % seq.length, back = 0;
+  while (seq[i] === '.' && back < seq.length) { i = (i - 1 + seq.length) % seq.length; back++; }
+  const chord = seq[i]; if (!chord || chord === '-' || chord === '.') return null;
+  const notes = chord.split(' ').filter(Boolean); return notes[s % notes.length] ?? null;
 }
 
 // ---- 楽曲 ----
@@ -264,6 +285,53 @@ export const SONGS = {
     bass: ['E2', 'E2', R, 'E2', 'E2', R, 'E2', R, 'C2', 'C2', R, 'C2', 'D2', R, 'D2', R,
            'E2', 'E2', R, 'E2', 'E2', R, 'E2', R, 'F2', 'F2', R, 'F2', 'G#1', R, 'G#1', R],
     drums: ['k', '-', 's', '-', 'k', 'k', 's', '-', 'k', '-', 's', 'h', 'k', 'k', 's', 's'],
+  },
+  bossFinal: { // 最終章のボス連戦・ノワール: 速いパッセージ、ハ短調、アルペジオとエコー
+    bpm: 172,
+    lead: ['C5', R, 'G4', 'C5', 'Eb5', R, 'D5', 'C5', 'B4', R, 'G4', R, 'Ab4', 'G4', 'F4', R,
+           'C5', R, 'G4', 'C5', 'Eb5', R, 'F5', 'Eb5', 'D5', R, 'B4', R, 'C5', '.', '.', R,
+           'Ab4', R, 'Eb4', 'Ab4', 'C5', R, 'Bb4', 'Ab4', 'G4', R, 'Eb4', R, 'F4', 'Eb4', 'D4', R,
+           'G4', 'G4', R, 'G4', 'Ab4', R, 'B4', R, 'C5', '.', '.', '.', 'B4', 'C5', 'D5', 'Eb5'],
+    arp: ['C3 Eb3 G3', '.', '.', '.', '.', '.', '.', '.', 'Ab2 C3 Eb3', '.', '.', '.', '.', '.', '.', '.',
+          'C3 Eb3 G3', '.', '.', '.', '.', '.', '.', '.', 'G2 B2 D3', '.', '.', '.', '.', '.', '.', '.',
+          'Ab2 C3 Eb3', '.', '.', '.', '.', '.', '.', '.', 'Eb3 G3 Bb3', '.', '.', '.', '.', '.', '.', '.',
+          'G2 B2 D3', '.', '.', '.', '.', '.', '.', '.', 'C3 Eb3 G3', '.', '.', '.', 'G2 B2 D3', '.', '.', '.'],
+    bass: ['C2', R, 'C2', R, 'C2', 'C2', R, 'C2', 'Ab1', R, 'Ab1', R, 'Ab1', 'Ab1', R, 'Ab1',
+           'C2', R, 'C2', R, 'C2', 'C2', R, 'C2', 'G1', R, 'G1', R, 'G1', 'G1', R, 'G1',
+           'Ab1', R, 'Ab1', R, 'Ab1', 'Ab1', R, 'Ab1', 'Eb2', R, 'Eb2', R, 'Eb2', 'Eb2', R, 'Eb2',
+           'G1', R, 'G1', R, 'G1', 'G1', R, 'G1', 'C2', R, 'C2', R, 'G1', R, 'G1', 'G1'],
+    drums: ['k', '-', 's', 'h', 'k', 'k', 's', '-', 'k', 'h', 's', 'h', 'k', 'k', 's', 's'],
+    echo: { steps: 3, gain: 0.35 }, waves: { lead: 'square', arp: 'triangle' },
+  },
+  // ---- ジングル（1 回再生） ----
+  jStart: { // 面開始: 上昇するファンファーレ
+    bpm: 150,
+    lead: ['G4', 'C5', 'E5', 'G5', '.', '.', 'E5', 'G5', 'C6', '.', '.', '.', '.', '.', R, R],
+    bass: ['C2', '.', '.', '.', 'G2', '.', '.', '.', 'C2', '.', '.', '.', '.', '.', R, R],
+    drums: ['k', '-', '-', '-', 's', '-', '-', '-', 'k', '-', '-', '-', '-', '-', '-', '-'],
+  },
+  jClear: { // 面クリア: 解決する上昇句＋長い終止
+    bpm: 140,
+    lead: ['C5', 'D5', 'E5', 'G5', 'E5', 'G5', 'C6', '.', '.', '.', 'B5', 'C6', 'D6', '.', '.', '.',
+           'E6', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', R, R, R, R],
+    lead2: ['E4', 'F4', 'G4', 'C5', 'G4', 'C5', 'E5', '.', '.', '.', 'D5', 'E5', 'F5', '.', '.', '.',
+            'G5', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', R, R, R, R],
+    bass: ['C2', '.', '.', '.', 'G2', '.', '.', '.', 'F2', '.', '.', '.', 'G2', '.', '.', '.',
+           'C2', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', R, R, R, R],
+    drums: ['k', '-', '-', '-', 'k', '-', '-', '-', 'k', '-', '-', '-', 's', '-', 's', 's', 'k', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+    echo: { steps: 2, gain: 0.3 },
+  },
+  jDeath: { // 死亡: 半音で沈む短句
+    bpm: 100,
+    lead: ['E4', '.', 'Eb4', '.', 'D4', '.', 'Db4', '.', 'C4', '.', '.', '.', '.', '.', R, R],
+    bass: ['A1', '.', '.', '.', 'Ab1', '.', '.', '.', 'F1', '.', '.', '.', '.', '.', R, R],
+    waves: { lead: 'triangle' },
+  },
+  jGameOver: { // ゲームオーバー: 低い和音のアルペジオが止まる
+    bpm: 88,
+    lead: ['C4', '.', '.', '.', 'B3', '.', '.', '.', 'Ab3', '.', '.', '.', 'G3', '.', '.', '.', 'F3', '.', '.', '.', '.', '.', '.', '.', 'E3', '.', '.', '.', '.', '.', '.', '.'],
+    arp: ['C2 Eb2 G2', '.', '.', '.', '.', '.', '.', '.', 'Ab1 C2 Eb2', '.', '.', '.', '.', '.', '.', '.', 'F1 Ab1 C2', '.', '.', '.', '.', '.', '.', '.', 'C2 E2 G2', '.', '.', '.', '-', '-', '-', '-'],
+    waves: { lead: 'triangle', arp: 'triangle' }, echo: { steps: 4, gain: 0.4 },
   },
   ending: {
     bpm: 84,

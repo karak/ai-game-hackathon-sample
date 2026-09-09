@@ -9,12 +9,12 @@
 | 敵 | 雑魚 15 種（＋鏡像リリカ、ガーゴイル人形）、ボス 9 種（砂糖の女王、鏡の女王、ノワール第 2 形態を含む。最終章は 7 体連戦）。溜め魔法 4 種 | `src/entities/enemies.js`, `bosses.js` |
 | 描画 | 768×672、HD スプライト（1 セル = 1 画面 px）、背景 空/遠 A・B/中×3（遠・中 1 px/セル、空 3・城の奥壁 2）、地形帯からのタイル合成、HD 粒子・血痕・毒沼・棘、演出（ヒットストップ・フラッシュ・白飛び＋スロー・アイリス・ボス登場） | `src/gfx/hdworld.js`、`src/fx.js`、`docs/plan/logs/sprintA-*.png` |
 | UI | スクリーン解像度の窓・32px フォント・ミニフォント、実測折り返し、HUD、テロップ、タイトル（はじめから／つづきから／オプション）／オプション（音量・ミュート・キー／パッド割り当て）／導入／クリア／ゲームオーバー／エンディング画面 | `src/ui/*`、`src/game.js`、`test/text.test.js` |
-| 音 | Web Audio 合成 SFX 24 種、BGM 6 曲（簡易シーケンサ） | `src/audio.js`、`test/audio-songs.test.js` |
+| 音 | Web Audio 合成 SFX 24 種、BGM 11 曲（テーマ 8・タイトル・ボス 2・エンディング）＋ジングル 4（開始・クリア・死亡・ゲームオーバー）。シーケンサに arp／echo／waves／once | `src/audio.js`、`test/audio-songs.test.js` |
 | 素材生成 | Gemini 2.5 Flash Image → クロマキー → セル境界検出 → 15 色量子化。仕様表 `specs.json`、台帳、派生（帽子合成・衣装置換） | `tools/*.py`、`docs/gen-pipeline.md` |
 | 資料 | デザインカタログ 7 章（キャラ／敵／アイテム／タイル／背景／ステージ／UI） | `catalog.html` |
 | 入力・保存 | キーボード／Gamepad API（standard mapping）／タッチ、キーコンフィグ、`localStorage` セーブ（進行・音量・ミュート・割り当て・ハイスコア） | `src/input.js`、`src/settings.js`、`test/input.test.js`、`test/settings.test.js` |
 | バランス | 復活地点 ±96 湧き禁止、復活後 2 秒敵弾なし、制限時間 300/300/330（歩行×3＋ボス 90 秒） | `src/balance.js`、`test/balance.test.js` |
-| テスト | Vitest 89 件（＋カメラ 3、カタログ掲載漏れ 4、コマ選択 3、死亡ログ 3、設定 cleared 1）＋ Playwright E2E 4 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ） | `npm test`、`npm run e2e` |
+| テスト | Vitest 92 件（＋カメラ 3、カタログ掲載漏れ 4、コマ選択 3、死亡ログ 3、設定 cleared 1、曲 2、bossSong 1）＋ Playwright E2E 4 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ） | `npm test`、`npm run e2e` |
 | ビルド | Vite（index.html / catalog.html） | `npm run build` |
 
 ## 素材（manifest 235 エントリ）
