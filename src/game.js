@@ -6,7 +6,7 @@ import { SONGS } from './audio.js';
 import { drawBackground } from './gfx/background.js';
 import { blit } from './gfx/sprite.js';
 import { drawBackgroundHD } from './gfx/hdworld.js';
-import { PROLOGUE, ENDING } from './story.js';
+import { PROLOGUE, ENDING, ENDING_SCENES, CREDITS } from './story.js';
 import { irisRadius, IRIS_T, BOSS_INTRO_T } from './fx.js';
 import { DemoRecorder, DemoInput, DEMO_MAX_T, DEMO_IDLE_T } from './demo.js';
 import { DEMOS } from './demos.js';
@@ -110,7 +110,7 @@ export class Game {
         if (this.stateT > 2 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) || this.stateT > 7) {
           this.startWipe(() => {
             this.stageIndex++;
-            if (this.stageIndex >= STAGES.length) { this.setState('ending'); this.audio.playBgm(SONGS.ending); this.saveHi(); }
+            if (this.stageIndex >= STAGES.length) { this.setState('ending'); this.endingIdx = 0; this.audio.playBgm(SONGS.ending); this.saveHi(); }
             else this.startStage();
           });
         }
@@ -118,9 +118,14 @@ export class Game {
       case 'gameover':
         if (this.stateT > 1.5 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump'))) this.startWipe(() => { this.setState('title'); this.audio.playBgm(SONGS.title); });
         break;
-      case 'ending':
-        if (this.stateT > 4 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump'))) { this.setState('title'); this.audio.playBgm(SONGS.title); }
+      case 'ending': {
+        // 場面 1〜6（各 6 秒、1.5 秒後から入力で送れる）→ クレジット（スクロール）→ タイトル
+        const scenes = this.endingScenes();
+        const adv = inp.hit('start') || inp.hit('shoot') || inp.hit('jump');
+        if (this.endingIdx < scenes.length) { if (this.stateT > 6 || (this.stateT > 1.5 && adv)) { this.endingIdx++; this.stateT = 0; } }
+        else if (this.stateT > 2 && (adv || this.stateT > 30)) { this.setState('title'); this.audio.playBgm(SONGS.title); }
         break;
+      }
     }
   }
 
@@ -241,7 +246,7 @@ export class Game {
         break;
       case 'clear': this.world.draw(g); drawHud(g, this.world, this); this.drawClear(g); break;
       case 'gameover': if (this.world) this.world.draw(g); this.drawGameOver(g); break;
-      case 'ending': this.drawScroll(g, ENDING, 'ending'); break;
+      case 'ending': this.drawEnding(g); break;
     }
   }
 
@@ -291,6 +296,31 @@ export class Game {
     if (kind === 'ending' && this.stateT > 4) { { const t = 'SCORE ' + String(this.score).padStart(7, '0'); mini(g, t, miniX(t), 190, '#ff8fc8'); } }
     if (shown >= lines.length && Math.floor(this.stateT * 2) % 2) mini(g, 'PUSH START', miniX('PUSH START'), 210, '#ffe860');
   }
+  // ---- エンディング ----
+  endingScenes() { const E = this.assets.generated?.ending ?? {}; return ENDING_SCENES.map((lines, i) => ({ lines, img: E['scene' + (i + 1)] })); }
+  drawEnding(g) {
+    const scenes = this.endingScenes(), i = this.endingIdx ?? 0;
+    if (i < scenes.length) {
+      const sc = scenes[i];
+      g.fillStyle = '#0e0a18'; g.fillRect(0, 0, W, H);
+      if (sc.img) { // 生成イラスト（1 セル = 1 世界単位 = 3 px、SNES 実解像度）。中央を 256×224 に切り出す
+        const r = sc.img.r, sx = Math.max(0, Math.floor((r.width - W) / 2)), sy = Math.max(0, Math.floor((r.height - H) / 2));
+        const k = Math.min(1, this.stateT / 0.6); g.globalAlpha = k; g.drawImage(r, sx, sy, Math.min(W, r.width), Math.min(H, r.height), 0, 0, Math.min(W, r.width), Math.min(H, r.height)); g.globalAlpha = 1;
+      } else drawBackground(g, this.assets.backgrounds.candyforest, this.stateT * 8, W, H);
+      // 本文（下部の帯）
+      const shown = Math.min(sc.lines.length, Math.floor(this.stateT / 0.9) + 1);
+      g.fillStyle = 'rgba(14,10,24,0.72)'; g.fillRect(0, H - 8 - shown * LAYOUT.LINE - 8, W, shown * LAYOUT.LINE + 16);
+      for (let k = 0; k < shown; k++) text(g, sc.lines[k], 128, H - 8 - (shown - k) * LAYOUT.LINE, { align: 'center', color: i === scenes.length - 1 && k === sc.lines.length - 1 ? '#ffe860' : '#fdfbf7' });
+      const t = `${i + 1} / ${scenes.length}`; mini(g, t, W - 8 - t.length * MINI_W, 4, '#a5a5b8');
+      return;
+    }
+    // クレジット: 下から上へスクロール
+    g.fillStyle = '#0e0a18'; g.fillRect(0, 0, W, H);
+    const y0 = H - this.stateT * 14;
+    CREDITS.forEach((line, k) => { const y = y0 + k * LAYOUT.LINE; if (y > -20 && y < H + 20) text(g, line, 128, y, { align: 'center', color: k === 0 || line === 'THANK YOU FOR PLAYING' ? '#ff8fc8' : '#fdfbf7', size: line === CREDITS[0] ? 16 : 12 }); });
+    const sc = 'SCORE ' + String(this.score).padStart(7, '0'); mini(g, sc, miniX(sc), 4, '#ff8fc8');
+  }
+
   drawIntro(g) {
     g.fillStyle = 'rgba(14,10,24,0.6)'; g.fillRect(0, 0, W, H);
     const st = STAGES[this.stageIndex];

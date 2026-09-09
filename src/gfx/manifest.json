@@ -799,6 +799,54 @@
   "src": "assets/sprites/deco/window.png",
   "w": 46
  },
+ "ending/scene1": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 256,
+  "src": "assets/sprites/ending/scene1.png",
+  "w": 261
+ },
+ "ending/scene2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 265,
+  "src": "assets/sprites/ending/scene2.png",
+  "w": 265
+ },
+ "ending/scene3": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 279,
+  "src": "assets/sprites/ending/scene3.png",
+  "w": 271
+ },
+ "ending/scene4": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 252,
+  "src": "assets/sprites/ending/scene4.png",
+  "w": 258
+ },
+ "ending/scene5": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 275,
+  "src": "assets/sprites/ending/scene5.png",
+  "w": 269
+ },
+ "ending/scene6": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": false,
+  "h": 270,
+  "src": "assets/sprites/ending/scene6.png",
+  "w": 259
+ },
  "enemies/angel1": {
   "anchor": "bottom",
   "colors": 15,

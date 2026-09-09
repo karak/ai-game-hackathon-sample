@@ -1,5 +1,5 @@
 {
- "requests": 158,
+ "requests": 164,
  "entries": [
   {
    "name": "player-base",
@@ -1224,6 +1224,54 @@
    "secs": 14.7,
    "text": "",
    "ts": 1788932722.392168
+  },
+  {
+   "name": "ending-1",
+   "v": 1,
+   "ok": true,
+   "secs": 11.4,
+   "text": "Here's the full-screen illustration for the ending of a 16-bit SNES-era Japanese RPG: ",
+   "ts": 1788932899.7243352
+  },
+  {
+   "name": "ending-2",
+   "v": 1,
+   "ok": true,
+   "secs": 10.8,
+   "text": "Absolutely! Here's the dawn breaking over a flower-field graveyard in a fairy-tale land, rendered in the style you described:\n",
+   "ts": 1788932910.992415
+  },
+  {
+   "name": "ending-3",
+   "v": 1,
+   "ok": true,
+   "secs": 9.4,
+   "text": "Here is the full-screen illustration for your 16-bit SNES-era Japanese RPG ending, as you described:\n ",
+   "ts": 1788932920.8582568
+  },
+  {
+   "name": "ending-4",
+   "v": 1,
+   "ok": true,
+   "secs": 11.1,
+   "text": "Here's the full-screen illustration of Lyrica you requested:\n ",
+   "ts": 1788932932.385789
+  },
+  {
+   "name": "ending-5",
+   "v": 1,
+   "ok": true,
+   "secs": 11.4,
+   "text": "Here's Lyrica flying over a candy forest at sunrise!\n",
+   "ts": 1788932944.193968
+  },
+  {
+   "name": "ending-6",
+   "v": 1,
+   "ok": true,
+   "secs": 12.8,
+   "text": "Okay, I understand all the constraints for the pixel art.\n\nHere is the full-screen illustration for the ending of a 16-bit SNES-era Japanese RPG:\n ",
+   "ts": 1788932957.375705
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

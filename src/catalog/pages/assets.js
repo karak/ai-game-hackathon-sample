@@ -2,7 +2,7 @@
 import { h1, h2, note, table, canvas, drawRaw, rawSize } from '../sheet.js';
 import manifest from '../../gfx/manifest.json';
 
-export const GROUP_JP = { player: '主人公', enemies: '雑魚敵', bosses: 'ボス', shots: '弾・演出', items: 'アイテム', deco: '装飾', tiles: '地形帯・ギミック小物', bg: '背景層' };
+export const GROUP_JP = { player: '主人公', enemies: '雑魚敵', bosses: 'ボス', shots: '弾・演出', items: 'アイテム', deco: '装飾', tiles: '地形帯・ギミック小物', bg: '背景層', ending: 'エンディング場面（256×224 セル、3 px/セルで全画面）' };
 
 export async function render(main, A) {
   main.appendChild(h1('全素材一覧（manifest）'));
@@ -14,7 +14,7 @@ export async function render(main, A) {
     const rows = [];
     // サムネイル帯（1:1、横に並べる。背景層は幅が大きいので 1 枚ずつ）
     const sprOf = k => { const [g, n] = k.split('/'); return g === 'player' ? (A.player.dress[n] ?? A.player.plain?.[n.replace(/_plain$/, '')] ?? A.player.gold?.[n.replace(/_gold$/, '')] ?? A.generated?.player?.[n]) : (A.generated?.[g]?.[n] ?? A[g]?.[n]); };
-    if (gname !== 'bg') {
+    if (gname !== 'bg' && gname !== 'ending') {
       const sizes = list.map(k => { const s = sprOf(k); return s ? rawSize(s) : [32, 32]; });
       const cw = sizes.reduce((a, s) => a + Math.max(s[0], 56) + 10, 10), ch = Math.max(...sizes.map(s => s[1])) + 30;
       const c = canvas(cw, ch); const g = c.getContext('2d'); g.font = '9px DotGothic16'; g.textAlign = 'center'; g.fillStyle = '#ffe860';

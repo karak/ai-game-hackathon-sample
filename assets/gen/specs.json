@@ -1786,6 +1786,96 @@
     "bosses/sugarqueen2"
    ],
    "palette": "bosses/sugarqueen1"
+  },
+  "ending-1": {
+   "box": [
+    260,
+    260
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "ending-1.txt",
+   "out": [
+    "ending/scene1"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "ending-2": {
+   "box": [
+    260,
+    260
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "ending-2.txt",
+   "out": [
+    "ending/scene2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "ending-3": {
+   "box": [
+    260,
+    260
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "ending-3.txt",
+   "out": [
+    "ending/scene3"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "ending-4": {
+   "box": [
+    260,
+    260
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "ending-4.txt",
+   "out": [
+    "ending/scene4"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "ending-5": {
+   "box": [
+    260,
+    260
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "ending-5.txt",
+   "out": [
+    "ending/scene5"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "ending-6": {
+   "box": [
+    260,
+    260
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "ending-6.txt",
+   "out": [
+    "ending/scene6"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
   }
  }
 }
