@@ -17,7 +17,7 @@
 | テスト | Vitest 82 件（＋カメラ 3、カタログ掲載漏れ 4）＋ Playwright E2E 3 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論） | `npm test`、`npm run e2e` |
 | ビルド | Vite（index.html / catalog.html） | `npm run build` |
 
-## 素材（manifest 244 エントリ）
+## 素材（manifest 227 エントリ）
 
 | 種別 | 数 | 備考 |
 |------|----|------|
