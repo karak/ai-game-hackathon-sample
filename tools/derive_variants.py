@@ -68,7 +68,12 @@ def hair_top_center(im):
     pink = al & (r > 180) & (b > 120) & (g < r - 30)
     ys, xs = np.nonzero(pink)
     if ys.size == 0: return None
-    top = ys.min(); head = xs[ys <= top + 25]  # 頭部（髪上端から 25 セル）の x 中心。最上 3 行だと前髪の偏りで 6〜10 セルずれた
+    # 髪の上端 = 桃色が 3 画素以上あり、かつ次の 2 行も桃色が続く最初の行（頭上の残像ノイズ 1〜3 画素を無視する。run4 で 32 行ずれた）
+    rows = pink.sum(axis=1); top = None
+    for y in range(len(rows) - 2):
+        if rows[y] >= 3 and rows[y + 1] >= 3 and rows[y + 2] >= 3: top = y; break
+    if top is None: top = int(ys.min())
+    head = xs[(ys >= top) & (ys <= top + 25)]  # 頭部（髪上端から 25 セル）の x 中心。最上 3 行だと前髪の偏りで 6〜10 セルずれた
     return int(top), float((head.min() + head.max()) / 2)
 
 

@@ -1,16 +1,16 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/player-run-b-hat-v3.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/player-run-b-hat-v5.png",
  "pitch": [
-  4.0,
-  4.0
+  5.0,
+  5.0
  ],
  "max_box": [
   100,
   135
  ],
  "frames": null,
- "w": 69,
- "h": 121,
+ "w": 52,
+ "h": 110,
  "fits": true,
  "colors": 15,
  "name": "run4"

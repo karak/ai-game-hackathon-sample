@@ -49,6 +49,26 @@ def build(name, sp):
     return res
 
 
+def qa_player_frame(key, dst, manifest):
+    """主人公コマの出力チェック（合成可否の当たり）: idle との高さ差、帽子の有無、髪の上端の連続性を WARN で出す。"""
+    if not key.startswith('player/') or key in ('player/hat', 'player/base', 'player/base_hat'): return
+    from PIL import Image
+    import numpy as np
+    name = key.split('/')[1]
+    idle = manifest.get('player/idle_nohat' if name.endswith('_nohat') else 'player/idle'); im = Image.open(dst).convert('RGBA'); a = np.asarray(im); al = a[..., 3] > 0
+    r, g, b = (a[..., i].astype(int) for i in range(3)); h = a.shape[0]
+    if idle and name.replace('_nohat', '') not in ('dead', 'crouch', 'jump', 'hurt2', 'idle'):
+        ratio = im.height / idle['h']
+        if abs(ratio - 1) > 0.12: print(f'  QA {key}: height {im.height} vs idle {idle["h"]} ({ratio:.2f}x) -> 再生成候補（同じ大きさで描かせる）')
+    if not name.endswith('_nohat') and name != 'dead':
+        top = slice(0, max(1, int(h * 0.15))); ind = (b > r + 10) & (r < 120) & (g < 110)
+        has_hat = al[top].sum() and (ind & al)[top].sum() / al[top].sum() > 0.5
+        if not has_hat:
+            pink = al & (r > 180) & (b > 120) & (g < r - 30); rows = pink.sum(axis=1)
+            ys = np.nonzero(rows)[0]; spread = int(rows[ys[0]:ys[0] + 12].max()) if ys.size else 0
+            verdict = '合成可（髪の上端が水平）' if spread >= 8 else '合成不向き（髪が散っている／細い）→ 再生成'
+            print(f'  QA {key}: 帽子なし。{verdict}')
+
 def main():
     targets = sys.argv[1:] or [k for k, v in SPECS['sprites'].items() if not v.get('skip')]
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
@@ -58,6 +78,7 @@ def main():
         for key, dst in build(name, sp):
             meta = json.loads(dst.with_suffix('.json').read_text())
             manifest[key] = {'src': str(dst.relative_to(ROOT)), 'w': meta['w'], 'h': meta['h'], 'fits': meta['fits'], 'colors': meta['colors'], 'anchor': sp['anchor']}
+            qa_player_frame(key, dst, manifest)
     MANIFEST.write_text(json.dumps(manifest, indent=1, sort_keys=True)); print('manifest ->', MANIFEST.relative_to(ROOT), len(manifest), 'entries')
 
 

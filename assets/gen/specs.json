@@ -15,7 +15,8 @@
    "out": [
     "player/idle",
     "player/idle_nohat"
-   ]
+   ],
+   "strip_caption": true
   },
   "player-nohat": {
    "box": [
@@ -29,7 +30,8 @@
    "out": [
     "player/idle"
    ],
-   "skip": true
+   "skip": true,
+   "strip_caption": true
   },
   "player-hat": {
    "box": [
@@ -42,7 +44,8 @@
    "ref": "player-base",
    "out": [
     "player/hat"
-   ]
+   ],
+   "strip_caption": true
   },
   "player-run-a": {
    "box": [
@@ -57,7 +60,8 @@
     "player/run1_nohat",
     "player/run2_nohat"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-run-b": {
    "box": [
@@ -72,7 +76,9 @@
     "player/run3_nohat",
     "player/run4_nohat"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true,
+   "use": "v2"
   },
   "player-jump": {
    "box": [
@@ -87,7 +93,8 @@
     "player/jump_nohat",
     "player/fall_nohat"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-attack": {
    "box": [
@@ -102,7 +109,8 @@
     "player/attack_nohat",
     "player/crouch_nohat"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-hurt": {
    "box": [
@@ -117,7 +125,8 @@
     "player/hurt_nohat",
     "player/hurt2_nohat"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-dead": {
    "box": [
@@ -131,7 +140,8 @@
    "out": [
     "player/dead_nohat"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-plain": {
    "box": [
@@ -144,7 +154,8 @@
    "ref": "player-base",
    "out": [
     "player/idle_plain"
-   ]
+   ],
+   "strip_caption": true
   },
   "player-gold": {
    "box": [
@@ -157,7 +168,8 @@
    "ref": "player-base",
    "out": [
     "player/idle_gold"
-   ]
+   ],
+   "strip_caption": true
   },
   "enemy-zombie": {
    "box": [
@@ -342,7 +354,8 @@
     "player/run1",
     "player/run2"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-run-b-hat": {
    "box": [
@@ -357,7 +370,8 @@
     "player/run3",
     "player/run4"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-jump-hat": {
    "box": [
@@ -372,7 +386,8 @@
     "player/jump",
     "player/fall"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-attack-hat": {
    "box": [
@@ -387,7 +402,8 @@
     "player/attack",
     "player/crouch"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-hurt-hat": {
    "box": [
@@ -402,7 +418,8 @@
     "player/hurt",
     "player/hurt2"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "player-dead-hat": {
    "box": [
@@ -416,7 +433,8 @@
    "out": [
     "player/dead"
    ],
-   "palette": "player/idle"
+   "palette": "player/idle",
+   "strip_caption": true
   },
   "bg-graveyard-sky": {
    "box": [

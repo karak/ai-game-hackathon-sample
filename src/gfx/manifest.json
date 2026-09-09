@@ -1284,17 +1284,17 @@
   "anchor": "bottom",
   "colors": 5,
   "fits": true,
-  "h": 117,
+  "h": 111,
   "src": "assets/sprites/player/hurt2.png",
-  "w": 69
+  "w": 75
  },
  "player/hurt2_gold": {
   "anchor": "bottom",
-  "colors": 8,
+  "colors": 7,
   "fits": true,
-  "h": 117,
+  "h": 111,
   "src": "assets/sprites/player/hurt2_gold.png",
-  "w": 69
+  "w": 75
  },
  "player/hurt2_nohat": {
   "anchor": "bottom",
@@ -1468,17 +1468,17 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 131,
+  "h": 119,
   "src": "assets/sprites/player/run3.png",
-  "w": 85
+  "w": 74
  },
  "player/run3_gold": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 131,
+  "h": 119,
   "src": "assets/sprites/player/run3_gold.png",
-  "w": 85
+  "w": 74
  },
  "player/run3_nohat": {
   "anchor": "bottom",
@@ -1500,17 +1500,17 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 129,
+  "h": 118,
   "src": "assets/sprites/player/run4.png",
-  "w": 71
+  "w": 69
  },
  "player/run4_gold": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 129,
+  "h": 118,
   "src": "assets/sprites/player/run4_gold.png",
-  "w": 71
+  "w": 69
  },
  "player/run4_nohat": {
   "anchor": "bottom",

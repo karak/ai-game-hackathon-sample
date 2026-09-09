@@ -1,4 +1,6 @@
 SUBJECT: the reference character (Lyrica WEARING her witch hat, exactly as in the LEFT figure of the first reference) RUNNING to the RIGHT, side view. Two frames of a 4-frame run cycle.
-FRAME 3 = contact pose with the legs the OPPOSITE way round from frame 1: the leg NEAREST the viewer (drawn in front, with the darker boot) is stretched straight BACK toward the LEFT edge of the figure, and the FAR leg (behind) is lifted and bent FORWARD to the RIGHT with the knee up. The arm nearest the viewer swings forward. Compare the second attached image: it shows the near leg forward — draw the reverse.
-FRAME 4 = passing pose: both legs together under the body, the far leg crossing in front, body 1 cell higher, hair and skirt swinging.
-Same colors, same head, same proportions as the reference. The witch hat must stay on her head in every frame.
+SIZE RULE (most important): copy the SCALE of the two figures in the second attached image exactly — the head is the same size, the body is the same height (the hat brim to the boot sole spans the same number of cells). Do NOT draw the figures larger. Leave generous green space above and below.
+BOTH figures MUST wear the dark purple witch hat with the pink ribbon, firmly on the head (the hat never comes off; it only tilts a little). Never replace the hat with loose hair.
+FRAME 3 = contact pose with the legs the OPPOSITE way round from frame 1: the leg NEAREST the viewer (front, darker boot) stretched straight BACK to the LEFT, the FAR leg lifted and bent FORWARD to the RIGHT with the knee up; near arm swings forward.
+FRAME 4 = passing pose: legs together under the body, far leg crossing in front, body 1 cell higher, skirt swinging, hat on.
+Same colors, same head, same proportions as the reference.

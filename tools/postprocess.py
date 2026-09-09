@@ -184,7 +184,7 @@ def strip_caption(im, max_h=16, gap=2):
     while y2 + 1 < h and occ[y2 + 1]: y2 += 1
     blob_top_h = y2 - top0 + 1; g1 = y2 + 1; n1 = 0
     while g1 < h and not occ[g1]: g1 += 1; n1 += 1
-    if n1 >= gap and g1 < h and blob_top_h <= max_h:
+    if n1 >= gap and g1 < h and (blob_top_h <= max_h or a[top0:y2 + 1].sum() < 12):
         px = im.load()
         for yy in range(top0, y2 + 1):
             for xx in range(im.width): px[xx, yy] = (0, 0, 0, 0)

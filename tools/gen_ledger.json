@@ -1,5 +1,5 @@
 {
- "requests": 164,
+ "requests": 168,
  "entries": [
   {
    "name": "player-base",
@@ -1272,6 +1272,38 @@
    "secs": 12.8,
    "text": "Okay, I understand all the constraints for the pixel art.\n\nHere is the full-screen illustration for the ending of a 16-bit SNES-era Japanese RPG:\n ",
    "ts": 1788932957.375705
+  },
+  {
+   "name": "player-run-b-hat",
+   "v": 4,
+   "ok": true,
+   "secs": 13.6,
+   "text": "",
+   "ts": 1788933529.957647
+  },
+  {
+   "name": "player-run-b-hat",
+   "v": 5,
+   "ok": true,
+   "secs": 20.0,
+   "text": "",
+   "ts": 1788933743.067063
+  },
+  {
+   "name": "player-run-b",
+   "v": 3,
+   "ok": true,
+   "secs": 14.9,
+   "text": "",
+   "ts": 1788933826.864544
+  },
+  {
+   "name": "player-run-b",
+   "v": 4,
+   "ok": true,
+   "secs": 18.6,
+   "text": "",
+   "ts": 1788933890.718713
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"
