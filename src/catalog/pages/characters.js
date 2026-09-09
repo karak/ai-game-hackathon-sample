@@ -21,8 +21,9 @@ export async function render(main, A) {
   // サイズ比較
   main.appendChild(h2('1. サイズ比較（同一基準線・等倍）'));
   const cmp = [{ name: 'リリカ', spr: A.player.dress.idle, hit: HIT.stand }];
-  for (const n of ['zombie1', 'mushroom1', 'unicorn1', 'cake1', 'angel1', 'bear1', 'eye1']) if (A.enemies[n]) cmp.push({ name: n.replace(/1$/, ''), spr: A.enemies[n], left: true });
-  for (const n of ['doll1', 'teddy1', 'noir1']) if (A.bosses[n]) cmp.push({ name: n.replace(/1$/, ''), spr: A.bosses[n], left: true });
+  // manifest にある全ての雑魚（*1）とボス（*1 / *_head1）を並べる（固定リストにすると新章の敵が抜ける）
+  for (const n of Object.keys(A.enemies).filter(k => /1$/.test(k) && A.enemies[k]?.hd).sort()) cmp.push({ name: n.replace(/1$/, ''), spr: A.enemies[n], left: true });
+  for (const n of Object.keys(A.bosses).filter(k => /(^|_head)1$/.test(k) && A.bosses[k]?.hd).sort()) cmp.push({ name: n.replace(/1$/, ''), spr: A.bosses[n], left: true });
   main.appendChild(frameStrip(cmp, { gap: 12 }));
   main.appendChild(table(['対象', '幅×高(px)', '世界単位', '画面高比', '主人公比'], cmp.map(c => { const [w, h] = rawSize(c.spr); const ph = rawSize(A.player.dress.idle)[1]; return [c.name, `${w}x${h}`, `${(w / 3).toFixed(1)}x${(h / 3).toFixed(1)}`, `${(h / 672 * 100).toFixed(0)}%`, `${(h / ph).toFixed(2)}`]; })));
 

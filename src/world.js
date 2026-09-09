@@ -16,6 +16,7 @@ import { Fx } from './fx.js';
 import { seedGame, hashSeed } from './util.js';
 import { HD_SCALE as HD } from './gfx/sprite.js';
 import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine } from './entities/gimmicks.js';
+import { resolveDecoMap } from './decomap.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
@@ -39,13 +40,7 @@ export class World {
       this.hdTiles = sliceTileStrip(strip.r, TILE_BANDS[this.level.theme]);
       // 装飾記号 → 生成装飾スプライト（テーマごとに割り当て）
       const D = gen.deco ?? {};
-      const decoMap = { graveyard: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones },
-                        candyforest: { t: D.tomb, c: D.cross, f: D.flowers, v: D.candle, y: D.tree, x: D.blood, o: D.bones, k: D.lollipop },
-                        castle: { n: D.pillar, w: D.window, v: D.candelabra, x: D.blood, o: D.bones, t: D.banner },
-                        river: { y: D.willow, n: D.bridgepost, f: D.reeds, o: D.dollhead, x: D.blood, t: D.tomb },
-                        workshop: { n: D.dressform, c: D.scissors, y: D.spool, o: D.stuffing, x: D.blood, w: D.window, v: D.candelabra },
-                        park: { n: D.booth, f: D.balloons, y: D.carousel, c: D.popcorn, x: D.blood, o: D.bones } }[this.level.theme] ?? {};
-      for (const k of Object.keys(decoMap)) if (!decoMap[k]) delete decoMap[k];
+      const decoMap = resolveDecoMap(this.level.theme, D); // 記号→装飾名は src/decomap.js（カタログと共通）
       this.chunksHD = renderMapLayerHD(map, this.hdTiles, this.tiles, 512, decoMap, buildSpikeHD(THEMES[this.level.theme]));
       this.bogHD = buildBogHD(THEMES[this.level.theme]);
     }

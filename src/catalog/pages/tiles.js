@@ -3,6 +3,7 @@ import { h1, h2, h3, note, table, canvas, drawRaw, rawSize, state } from '../she
 import { sliceTileStrip, renderMapLayerHD, TILE_BANDS, buildBogHD, buildSpikeHD } from '../../gfx/hdworld.js';
 import { THEMES } from '../../gfx/tiles.js';
 import { TileMap } from '../../physics.js';
+import { DECO_MAP } from '../../decomap.js';
 
 const SAMPLE = ['..........', '..===.....', '..........', '###....###', '###~~^^###', '###~~^^###'];
 
@@ -39,7 +40,17 @@ export async function render(main, A) {
   let x = 12; const base = dc.height - 20; dg.strokeStyle = '#8f8fb0'; dg.setLineDash([2, 3]); dg.beginPath(); dg.moveTo(0, base + 0.5); dg.lineTo(dc.width, base + 0.5); dg.stroke(); dg.setLineDash([]);
   for (const n of names) { const [w, h] = rawSize(D[n]); const cell = Math.max(w, 56); drawRaw(dg, D[n], x + (cell - w) / 2, base - h); if (state.anchor) { dg.fillStyle = '#ffe860'; dg.fillRect(x + cell / 2 - 3, base - 1, 7, 3); } dg.fillStyle = '#ffe860'; dg.font = '10px DotGothic16'; dg.textAlign = 'center'; dg.fillText(n, x + cell / 2, 10); dg.fillStyle = '#8f8fb0'; dg.fillText(`${w}x${h}`, x + cell / 2, base + 14); x += cell + 12; }
   main.appendChild(dc);
-  main.appendChild(table(['記号', '墓地', '菓子の森', '城'], [
-    ['t', 'tomb', 'tomb', 'banner'], ['c', 'cross', 'cross', '-'], ['f', 'flowers', 'flowers', '-'], ['v', 'candle', 'candle', 'candelabra'], ['y', 'tree', 'tree', '-'], ['x', 'blood', 'blood', 'blood'], ['o', 'bones', 'bones', 'bones'], ['k', '-', 'lollipop', '-'], ['n', '-', '-', 'pillar'], ['w', '-', '-', 'window'],
-  ]));
+  // 記号 → 装飾（テーマ別、src/decomap.js と同じ定義）
+  const themes = Object.keys(DECO_MAP), syms = [...new Set(themes.flatMap(t => Object.keys(DECO_MAP[t])))].sort();
+  main.appendChild(table(['記号', ...themes], syms.map(sy => [sy, ...themes.map(t => DECO_MAP[t][sy] ?? '-')])));
+  // ギミック小物（tiles/ 配下でテーマ名でないもの）
+  const gim = Object.keys(gen.tiles ?? {}).filter(k => !THEMES[k]).sort();
+  if (gim.length) {
+    main.appendChild(h2('ギミック小物（生成。World.drawGimmicks が使う）'));
+    main.appendChild(note('ladder: はしご L（縦にテクスチャ繰り返し） / island: 浮島 @ / plank: 崩れる板 ! / press: プレス機 %（判定は絵の寸法） / belt: ベルト ) ( / gear: 装飾 / cart: ジェットコースター R / gondola・hub: 観覧車 O'));
+    const gc = canvas(gim.reduce((a, n) => a + Math.max(rawSize(gen.tiles[n])[0], 56) + 12, 12), Math.max(...gim.map(n => rawSize(gen.tiles[n])[1])) + 40); const gg = gc.getContext('2d');
+    let gx = 12; const gbase = gc.height - 20;
+    for (const n of gim) { const [w, h] = rawSize(gen.tiles[n]); const cell = Math.max(w, 56); drawRaw(gg, gen.tiles[n], gx + (cell - w) / 2, gbase - h); gg.fillStyle = '#ffe860'; gg.font = '10px DotGothic16'; gg.textAlign = 'center'; gg.fillText(`${n} ${w}x${h}`, gx + cell / 2, gbase + 14); gx += cell + 12; }
+    main.appendChild(gc);
+  }
 }

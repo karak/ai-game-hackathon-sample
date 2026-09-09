@@ -8,6 +8,7 @@ import * as tiles from './pages/tiles.js';
 import * as background from './pages/background.js';
 import * as stages from './pages/stages.js';
 import * as ui from './pages/ui.js';
+import * as assets from './pages/assets.js';
 
 const PAGES = [
   ['chars', 'キャラクターシート', characters],
@@ -17,6 +18,7 @@ const PAGES = [
   ['bg', '背景レイヤー', background],
   ['stages', 'ステージ構成', stages],
   ['ui', 'UI', ui],
+  ['assets', '全素材', assets],
 ];
 
 async function boot() {
