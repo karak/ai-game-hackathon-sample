@@ -17,6 +17,7 @@ import { seedGame, hashSeed } from './util.js';
 import { HD_SCALE as HD } from './gfx/sprite.js';
 import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine } from './entities/gimmicks.js';
 import { resolveDecoMap } from './decomap.js';
+import { updateCamera, snapCamera } from './camera.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位
@@ -67,7 +68,7 @@ export class World {
     this.checkpoint = { ...this.level.playerStart };
     this.player = new Player(this, this.level.playerStart.x, this.level.playerStart.y);
     this.spawnAll();
-    this.cam.x = Math.max(0, this.player.centerX - W / 2);
+    snapCamera(this.cam, this.player, map, null);
   }
   get lives() { return this.game.lives; } set lives(v) { this.game.lives = v; }
   addScore(n) { this.game.score += n; }
@@ -98,7 +99,7 @@ export class World {
     if (this.boss) { this.boss = null; this.arena = null; this.bossState = 'none'; this.cutscene = false; }
     this.spawnAll();
     this.player.respawn(this.checkpoint.x, this.checkpoint.y); this.safeT = SAFE_SHOT_T;
-    this.cam.x = Math.max(0, Math.min(this.level.map.pixelWidth - W, this.player.centerX - W / 2));
+    snapCamera(this.cam, this.player, this.level.map, this.arena);
     this.time = Math.max(this.time, 60);
     this.audio.playBgm(SONGS[this.level.theme]);
   }
@@ -143,12 +144,8 @@ export class World {
     this.fires = this.fires.filter(f => !f.dead); this.pools = this.pools.filter(q => !q.dead);
     this.items = this.items.filter(i => !i.dead); this.boxes = this.boxes.filter(b => !b.dead);
 
-    // カメラ
-    const target = p.centerX - W / 2 + (p.facing * 16);
-    let cx = this.cam.x + (target - this.cam.x) * Math.min(1, dt * 6);
-    let minX = 0, maxX = map.pixelWidth - W;
-    if (this.arena) { minX = this.arena.x0; maxX = this.arena.x1 - W; }
-    this.cam.x = Math.max(minX, Math.min(maxX, cx));
+    // カメラ（2 軸。縦は高さ > H のマップだけ動く）
+    updateCamera(this.cam, p, map, this.arena, dt);
     if (this.shakeT > 0) { this.shakeT -= dt; if (this.shakeT <= 0) this.shakeAmp = 0; }
     for (const t of this.toasts) t.t += dt; this.toasts = this.toasts.filter(t => t.t < 2.4);
   }
@@ -157,6 +154,7 @@ export class World {
     const trig = this.level.bossTrigger; const map = this.level.map;
     const x0 = Math.max(0, Math.min(trig.x - 24, map.pixelWidth - W)); const x1 = Math.min(map.pixelWidth, x0 + W);
     this.arena = { x0, x1 }; this.bossState = 'fight'; this.audio.sfx('boss'); this.shake(3);
+    if (map.pixelHeight > H) { const y1 = Math.min(map.pixelHeight, Math.max(H, trig.y + 2 * TILE)); this.arena.y0 = y1 - H; this.arena.y1 = y1; } // 縦マップ: トリガー行を下端近くに含む 1 画面
     // 地面高さを探す
     const tx = Math.floor((x1 - 40) / TILE); let gy = map.pixelHeight;
     const startTy = Math.max(0, Math.floor((this.player.y + this.player.h) / TILE) - 1);
@@ -205,9 +203,9 @@ export class World {
   }
 
   draw(g) {
-    const cam = { x: Math.floor(this.cam.x), y: 0 };
+    const cam = { x: Math.floor(this.cam.x), y: Math.floor(this.cam.y) };
     if (this.shakeAmp > 0) { cam.x += Math.floor((Math.random() - 0.5) * this.shakeAmp * 2); cam.y += Math.floor((Math.random() - 0.5) * this.shakeAmp); }
-    if (this.bgHD) { if (!this.bgHD.sky) drawBackground(g, [this.bg[0]], this.cam.x, W, H); drawBackgroundHD(g, this.bgHD, this.cam.x, W, H); }
+    if (this.bgHD) { if (!this.bgHD.sky) drawBackground(g, [this.bg[0]], this.cam.x, W, H); drawBackgroundHD(g, this.bgHD, this.cam.x, W, H, this.cam.y, this.level.map.pixelHeight); }
     else drawBackground(g, this.bg, this.cam.x, W, H);
     // マップ
     if (this.chunksHD) for (const c of this.chunksHD) { const sx = c.x - cam.x; const cw = c.canvas.width / 3; if (sx > W || sx + cw < 0) continue; g.drawImage(c.canvas, sx, -cam.y, cw, c.canvas.height / 3); }

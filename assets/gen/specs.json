@@ -1456,6 +1456,163 @@
     "enemies/zombieRise"
    ],
    "palette": "enemies/zombie1"
+  },
+  "bg-tower-sky": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-tower-sky.txt",
+   "out": [
+    "bg/tower_sky"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true
+  },
+  "bg-tower-far": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-tower-far.txt",
+   "out": [
+    "bg/tower_far"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-tower-far2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-tower-far2.txt",
+   "out": [
+    "bg/tower_far2"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "ref": "bg-tower-far"
+  },
+  "bg-tower-mid": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-tower-mid.txt",
+   "out": [
+    "bg/tower_mid"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-tower-mid2": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-tower-mid2.txt",
+   "out": [
+    "bg/tower_mid2"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "bg-tower-mid3": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "bg-tower-mid3.txt",
+   "out": [
+    "bg/tower_mid3"
+   ],
+   "kind": "bg",
+   "colors": 32
+  },
+  "tiles-tower": {
+   "box": [
+    400,
+    300
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "tiles-tower.txt",
+   "out": [
+    "tiles/tower"
+   ],
+   "kind": "tiles",
+   "colors": 24
+  },
+  "deco-tower": {
+   "box": [
+    120,
+    160
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-tower.txt",
+   "out": [
+    "deco/mirror",
+    "deco/gargoyle",
+    "deco/chandelier",
+    "deco/shards"
+   ],
+   "colors": 15,
+   "strip_caption": true
+  },
+  "enemy-gargoyle": {
+   "box": [
+    96,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-gargoyle.txt",
+   "out": [
+    "enemies/gargoyle1",
+    "enemies/gargoyle2"
+   ],
+   "strip_caption": true
+  },
+  "boss-mirrorqueen": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-mirrorqueen.txt",
+   "out": [
+    "bosses/mirrorqueen1"
+   ]
+  },
+  "boss-mirrorqueen-b": {
+   "box": [
+    220,
+    200
+   ],
+   "frames": 1,
+   "anchor": "bottom",
+   "subject": "boss-mirrorqueen-b.txt",
+   "ref": "boss-mirrorqueen",
+   "out": [
+    "bosses/mirrorqueen2"
+   ],
+   "palette": "bosses/mirrorqueen1"
   }
  }
 }

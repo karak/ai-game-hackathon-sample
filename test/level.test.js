@@ -26,7 +26,7 @@ test('every stage parses, has a player start, a goal or boss, and no floating ty
     assert.ok(lvl.bossTrigger || lvl.goal, `${stage.name} needs B or G`);
     const widths = new Set(stage.rows.map(r => r.length));
     assert.equal(widths.size, 1, `${stage.name} rows must be equal width`);
-    assert.ok(lvl.map.height <= 14, `${stage.name} must fit 14 rows`);
+    if (!stage.vertical) assert.ok(lvl.map.height <= 14, `${stage.name} must fit 14 rows`); // 縦スクロール面（vertical: true）は高さ制限なし
     // player start must be above solid ground somewhere below
     const tx = lvl.playerStart.x / 16;
     let grounded = false;

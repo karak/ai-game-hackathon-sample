@@ -97,13 +97,15 @@ export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512, decoHD
 // 背景の画素密度: 空 3 画面px/セル（ディザ空は粗くても成立）、遠景 2、中景 1（スプライトと同じ）。
 // 1 リクエストで得られる横幅（約 250 セル）の制約による妥協。docs/art-standard.md §2.4 参照。
 const BG_PX = { sky: 3, far: 1, mid: 1 }; // 遠景は A/B 2 変異体（高さ ≈ 130〜160 セル）を連結して 1 画面 px/セル。空のみ 3 倍のまま（docs/plan/02-near-term.md 課題 1）
-export function drawBackgroundHD(g, layers, camX, W, H) {
+export function drawBackgroundHD(g, layers, camX, W, H, camY = 0, mapH = H) {
   // 下地: 空が画面全体を覆わない場合（城の奥壁 2 px/セル = y174 まで）に前フレームが残らないよう、先に暗色で塗る
   g.fillStyle = layers.base ?? '#150a22'; g.fillRect(0, 0, W, H);
   if (layers.sky) {
     // 空は既定 3 px/セル。layers.skyPx で層ごとに上書き（城の奥壁は 2: 261 セル × 2 = 522 px = 地面線 y174 まで届く）。幅が足りなければ横に繰り返す
     const s = (layers.skyPx ?? BG_PX.sky) / HD_SCALE, sw = layers.sky.r.width * s, sh = layers.sky.r.height * s;
-    for (let x = 0; x < W; x += sw) g.drawImage(layers.sky.r, Math.round(x * HD_SCALE) / HD_SCALE, 0, sw, sh);
+    // 縦スクロール時は空を 0.15 倍で流し、縦にも繰り返す
+    let oy = -((camY * 0.15) % sh); if (oy > 0) oy -= sh;
+    for (let y = oy; y < H; y += sh) for (let x = 0; x < W; x += sw) g.drawImage(layers.sky.r, Math.round(x * HD_SCALE) / HD_SCALE, Math.round(y * HD_SCALE) / HD_SCALE, sw, sh);
   }
   // 遠景の接地線は中景（上端 ≈ y138）より上の y=158 に置き、1 倍化した遠景（高さ 28〜37 世界単位）が中景の背後に隠れないようにする
   for (const [name, speed, bottom] of [['far', 0.2, 158], ['mid', 0.5, 176]]) {
@@ -112,9 +114,12 @@ export function drawBackgroundHD(g, layers, camX, W, H) {
     // 複数バリアントを順に連結した 1 本の帯として繰り返す（両端に余白があるので順序を問わず継ぎ目なし）
     const widths = list.map(L => L.r.width * s); const total = widths.reduce((a, b) => a + b, 0);
     let ox = -((camX * speed) % total); if (ox > 0) ox -= total;
-    for (let x = ox; x < W; x += total) {
+    // 縦スクロール（mapH > H）: 層の接地線を世界の底から測り、camY × 係数で流す。塔では層を一定間隔で縦に繰り返す
+    const vertical = mapH > H; const spacing = 120; const vy = vertical ? (mapH - H) - camY : 0; // 底に立つとき 0
+    const bottoms = vertical ? (() => { const out = []; const b0 = bottom + vy * (1 - speed); for (let by = b0 % spacing; by - spacing < H + 200; by += spacing) if (by > -200 && by < H + 200) out.push(by); return out; })() : [bottom];
+    for (const btm of bottoms) for (let x = ox; x < W; x += total) {
       let cx = x;
-      list.forEach((L, i) => { const lw = widths[i], lh = L.r.height * s; if (cx + lw > 0 && cx < W) g.drawImage(L.r, Math.round(cx * HD_SCALE) / HD_SCALE, bottom - lh, lw, lh); cx += lw; });
+      list.forEach((L, i) => { const lw = widths[i], lh = L.r.height * s; if (cx + lw > 0 && cx < W && btm > 0 && btm - lh < H) g.drawImage(L.r, Math.round(cx * HD_SCALE) / HD_SCALE, Math.round(btm - lh), lw, lh); cx += lw; });
     }
   }
 }
