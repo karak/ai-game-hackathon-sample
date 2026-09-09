@@ -611,7 +611,7 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 113,
+  "h": 104,
   "src": "assets/sprites/enemies/balloon1.png",
   "w": 54
  },
@@ -619,7 +619,7 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 112,
+  "h": 103,
   "src": "assets/sprites/enemies/balloon2.png",
   "w": 69
  },

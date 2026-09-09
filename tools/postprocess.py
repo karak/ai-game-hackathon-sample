@@ -179,6 +179,16 @@ def strip_caption(im, max_h=16, gap=2):
     occ = a.any(axis=1)
     rows = np.where(occ)[0]
     if rows.size == 0: return im
+    # 上側のラベル（物体の上に離れて置かれた高さ max_h 以下の塊）も落とす
+    top0 = rows[0]; y2 = top0
+    while y2 + 1 < h and occ[y2 + 1]: y2 += 1
+    blob_top_h = y2 - top0 + 1; g1 = y2 + 1; n1 = 0
+    while g1 < h and not occ[g1]: g1 += 1; n1 += 1
+    if n1 >= gap and g1 < h and blob_top_h <= max_h:
+        px = im.load()
+        for yy in range(top0, y2 + 1):
+            for xx in range(im.width): px[xx, yy] = (0, 0, 0, 0)
+        a = np.asarray(im.split()[3]) > 0; occ = a.any(axis=1); rows = np.where(occ)[0]
     bottom = rows[-1]
     # 下の塊の上端を探す
     y = bottom

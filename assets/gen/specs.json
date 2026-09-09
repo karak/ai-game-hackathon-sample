@@ -1401,7 +1401,8 @@
    "out": [
     "enemies/balloon1",
     "enemies/balloon2"
-   ]
+   ],
+   "strip_caption": true
   },
   "enemy-clown": {
    "box": [
