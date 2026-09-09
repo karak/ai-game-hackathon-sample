@@ -64,6 +64,7 @@ export class World {
     this.enemies = []; this.shots = []; this.enemyShots = []; this.fires = []; this.pools = []; this.items = []; this.boxes = [];
     this.platforms = []; this.crumbles = []; this.presses = []; // ギミック（spawnAll で配置）
     this.effects = []; // 溜め魔法などの一時エンティティ（update/draw/dead）
+    this.screenFx = []; // 画面に固定して最後に描く演出（強化魔法のカットイン）。update/draw(g)/dead
     this.cam = { x: 0, y: 0 }; this.arena = null; this.boss = null; this.bossState = 'none'; this.bossIdx = 0; // 連戦の何体目か
     this.time = this.level.timeLimit; this.t = 0; this.cutscene = false; this.cleared = false; this.kills = 0; this.deaths = 0; // クリア画面の集計（撃破数・ミス数）
     // 2 周目（game.loop > 0）: 敵弾 1.5 倍（弾速）・湧き間隔 0.8 倍（05-systems 5.1「真の結末」ルート）
@@ -82,7 +83,7 @@ export class World {
   shake(a) { this.shakeT = 0.25; this.shakeAmp = Math.max(this.shakeAmp, a); }
 
   spawnAll() {
-    this.enemies = []; this.boxes = []; this.items = []; this.enemyShots = []; this.shots = []; this.fires = []; this.pools = []; this.effects = [];
+    this.enemies = []; this.boxes = []; this.items = []; this.enemyShots = []; this.shots = []; this.fires = []; this.pools = []; this.effects = []; this.screenFx = [];
     this.platforms = []; this.presses = []; this.crumbles = this.level.crumbles.map(c => new CrumbleTile(this, c.tx, c.ty));
     for (const c of this.crumbles) this.level.map.set(c.tx, c.ty, '!'); // 消えていた足場を戻す
     for (const s of this.level.spawns) {
@@ -149,6 +150,8 @@ export class World {
     for (const b of this.boxes) b.update(dt);
     for (const e of this.effects) e.update(dt);
     this.effects = this.effects.filter(e => !e.dead);
+    for (const e of this.screenFx) e.update(dt);
+    this.screenFx = this.screenFx.filter(e => !e.dead);
     this.particles.update(dt);
     this.collide();
     // 掃除（画面外に大きく離れた敵は残す＝復帰時に再登場）
@@ -234,8 +237,8 @@ export class World {
     for (const i of this.items) i.draw(g, cam, A.pickups);
     for (const e of this.enemies) e.draw(g, cam, A);
     this.player.draw(g, cam, A);
-    for (const f of this.fires) f.draw(g, cam, A.shots);
-    for (const s of this.shots) s.draw(g, cam, A.shots);
+    for (const f of this.fires) f.draw(g, cam, A.shots, A);   // 第 4 引数: 強化魔法の生成素材（magicfx）を引くため
+    for (const s of this.shots) s.draw(g, cam, A.shots, A);
     for (const s of this.enemyShots) s.draw(g, cam, A.shots);
     for (const e of this.effects) e.draw(g, cam, A);
     this.particles.draw(g, cam);
@@ -244,6 +247,8 @@ export class World {
     if (this.player.costume === 'plain' && this.player.alive) { g.fillStyle = 'rgba(180,92,245,0.06)'; g.fillRect(0, 0, W, H); }
     // 撃破フラッシュ / ボス撃破の白飛び
     const fa = this.fx.flashAlpha; if (fa > 0) { g.globalAlpha = fa; g.fillStyle = this.fx.flashColor; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }
+    // 画面固定の演出（カットイン）は最後に、カメラを無視して描く
+    for (const e of this.screenFx) e.draw(g, this.assets, W, H);
   }
   // 動く足場・崩れる足場・はしご（足場画像はテーマの足場タイルを流用。はしごは暫定の幾何描画: 第四章の地形生成で置換予定）
   drawGimmicks(g, cam) {

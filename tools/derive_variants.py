@@ -190,10 +190,10 @@ def main():
     manifest = json.loads(MANIFEST.read_text())
     hm = derive_hat(); manifest['player/hat'] = {'src': 'assets/sprites/player/hat.png', 'anchor': 'center', **hm}
     print('hat', hm)
-    frames = ['idle', 'run1', 'run2', 'run3', 'run4', 'run1s', 'run3s', 'jump', 'fall', 'attack', 'crouch', 'hurt', 'hurt2', 'dead']  # run1s/run3s = 走り撃ち 2 コマ（IMP-016。通過ポーズは杖が描かれず不採用）
+    frames = ['idle', 'run1', 'run2', 'run3', 'run4', 'run1s', 'run3s', 'jump', 'fall', 'attack', 'crouch', 'hurt', 'hurt2', 'dead', 'cast1', 'cast2']  # run1s/run3s = 走り撃ち 2 コマ（IMP-016。通過ポーズは杖が描かれず不採用）、cast1/cast2 = 強化魔法の詠唱・発動（帽子は合成）
     hat_img = load('hat')
-    # 走り撃ち run*s: 帽子あり生成が大きく描かれたため、帽子なしコマを複製して帽子を合成する（ensure_hat が後段で載せる）
-    for n in ('run1s', 'run3s'):
+    # 走り撃ち run*s と詠唱 cast*: 帽子ありを別リクエストで描かせると寸法が揺れるため、帽子なしコマを複製して帽子を合成する（ensure_hat が後段で載せる）
+    for n in ('run1s', 'run3s', 'cast1', 'cast2'):
         src = SPR / f'{n}_nohat.png'
         if src.exists() and not (SPR / f'{n}.png').exists():
             (SPR / f'{n}.png').write_bytes(src.read_bytes()); im = load(n)

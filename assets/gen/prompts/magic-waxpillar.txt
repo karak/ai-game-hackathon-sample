@@ -1,0 +1,5 @@
+SUBJECT: a TOWERING PILLAR OF WAX AND FIRE for a platformer magic effect, two frames side by side, standing on the ground, EXTREMELY TALL AND NARROW: the column must fill the whole height of the box (about 150 cells tall) and be only about 30 cells wide — a proportion of 1 wide to 5 tall, like a cathedral candle taller than a person.
+Lower two thirds: a thick column of cream-colored church wax with ropes of molten wax running down its sides and a pooled wax base. Upper third: one continuous roaring orange flame with a white-hot core, as tall as the wax below it is high.
+FRAME 1 = the flame is a tall narrow spear leaning slightly right, two wax drips on the left side of the column.
+FRAME 2 = the flame is broader with a forked tip leaning left, three wax drips on the right side, one drop falling free near the base (clear flicker between the frames).
+Palette: cream, warm grey, amber, orange, white-hot core, dark brown outline. No floor, no shadow, no text. Each frame is one connected column that runs from the baseline to the top of the box.

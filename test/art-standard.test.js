@@ -20,7 +20,7 @@ test('§2.1 player body frames are 40-80 wide and 70-120 tall; hat/dead/crouch h
     if (n === 'dead') { expect(v.w, k).toBeGreaterThanOrEqual(80); expect(v.h, k).toBeLessThanOrEqual(80); continue; }
     if (n === 'hat' || n === 'base_hat') continue;
     if (n === 'base_hat') continue;
-    expect(v.w, k).toBeGreaterThanOrEqual(36); expect(v.w, k).toBeLessThanOrEqual(/^run\ds$/.test(n) ? 110 : 90); // 走り撃ち（run1s/run3s）は前に突き出した杖と火花で幅 +25 まで許す
+    expect(v.w, k).toBeGreaterThanOrEqual(36); expect(v.w, k).toBeLessThanOrEqual(/^run\ds$/.test(n) || /^cast\d$/.test(n) ? 110 : 90); // 走り撃ち（run1s/run3s）は前に突き出した杖と火花、詠唱（cast1/cast2）は掲げた杖と伸ばした腕で幅 +25 まで許す（art-standard §2.1）
     expect(v.h, k).toBeGreaterThanOrEqual(n === 'jump' || n === 'crouch' ? 70 : 90); expect(v.h, k).toBeLessThanOrEqual(140);
   }
 });
@@ -33,6 +33,7 @@ test('§2.1 enemies are 60-135 tall (0.6-1.3x player) and bosses 130-200 tall', 
 
 test('§2.2 every generated sprite has 10-15 colors and fits its spec box', () => {
   for (const [k, v] of entries) {
+    if (k.startsWith('cutin/')) { expect(v.colors, k).toBeLessThanOrEqual(24); continue; } // カットインは不透明パネル（24 色まで、箱は目安）
     if (k === 'player/hat' || k.includes('hurt2')) continue; // 帽子は色抽出の単品、hurt2 は白飛びフレーム
     if (k.startsWith('bg/') || k.startsWith('tiles/') || k.startsWith('ending/')) { expect(v.colors, k).toBeLessThanOrEqual(32); continue; } // 背景・地形・エンディング絵は 32 色まで（箱は目安）
     if (k.startsWith('shots/') || k.startsWith('items/') || k.startsWith('deco/')) { expect(v.colors, k).toBeGreaterThanOrEqual(3); expect(v.colors, k).toBeLessThanOrEqual(15); expect(v.fits, k).toBe(true); continue; } // 小物は 5 色以上

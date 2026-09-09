@@ -2,7 +2,7 @@ import { test, expect } from 'vitest';
 import { parseLevel } from '../src/level.js';
 import { Player } from '../src/entities/player.js';
 import { Enemy } from '../src/entities/enemies.js';
-import { castMagic, MAGIC, SUPER, CHARGE_T, SUPER_T, Meteor, ShadowClone, HeartBurst, HeartGarden, FirePillar } from '../src/entities/magic.js';
+import { castMagic, MAGIC, SUPER, CHARGE_T, SUPER_T, Meteor, ShadowClone, HeartBurst, HeartGarden, FirePillar, MirrorFrame, Shard, Cortege, CutIn, CUTIN_IN, CUTIN_HOLD, CUTIN_OUT } from '../src/entities/magic.js';
 
 const STEP = 1 / 60;
 // 「その tick に存在した弾」を累積した w.seen（worldOf の tick が貯める）から種類で絞る。
@@ -14,6 +14,7 @@ function worldOf() {
   const level = parseLevel({ name: 't', rows });
   const w = { level, cutscene: false, cleared: false, shots: [], fires: [], effects: [], enemies: [], boxes: [], enemyShots: [], cam: { x: 0, y: 0 }, particles: { emit() {} }, audio: { sfx() {} }, fx: { hitStop() {} }, toast() {}, shake() {}, crumbles: [], platforms: [], presses: [], assets: {}, decals: { splat() {} }, addScore() {} };
   w.player = new Player(w, level.playerStart.x, level.playerStart.y);
+  w.screenFx = []; // カットイン（画面固定演出）
   w.seen = new Set(); // 消えた弾も含め、一度でも存在した弾（shotsSeen で参照する）
   w.tick = n => { for (let i = 0; i < n; i++) { for (const e of w.effects) e.update(STEP); w.effects = w.effects.filter(e => !e.dead); for (const s of w.shots) s.update(STEP); for (const s of w.shots) w.seen.add(s); w.shots = w.shots.filter(s => !s.dead); for (const f of w.fires) f.update(STEP); w.fires = w.fires.filter(f => !f.dead); } };
   return w;
@@ -156,4 +157,55 @@ test('super magic shakes the screen and flashes; L1 does not flash', () => {
   expect(flashes).toBe(0);
   castMagic(w, w.player, 2);
   expect(flashes).toBe(1); expect(Math.max(...shakes)).toBeGreaterThanOrEqual(7);
+});
+
+// ---- 強化魔法の演出（カットイン・鏡の枠・破片・葬列） ----
+
+test('super cast pushes one screen-space cut-in per weapon, sliding in, holding, then leaving', () => {
+  const w = worldOf(); w.player.weapon = 'candle';
+  castMagic(w, w.player, 2);
+  expect(w.screenFx.length).toBe(1);
+  const ci = w.screenFx[0];
+  expect(ci).toBeInstanceOf(CutIn); expect(ci.name).toBe('wax'); expect(ci.slide).toBe(0);
+  ci.update(CUTIN_IN); expect(ci.phase).toBe('hold'); expect(ci.slide).toBe(1);   // 滑り込み完了
+  ci.update(CUTIN_HOLD); expect(ci.phase).toBe('out');
+  ci.update(CUTIN_OUT * 0.5); expect(ci.slide).toBeGreaterThan(0); expect(ci.slide).toBeLessThan(1);
+  ci.update(CUTIN_OUT); expect(ci.dead).toBe(true);
+  const kinds = ['star', 'knife', 'heart'].map(k => { const ww = worldOf(); ww.player.weapon = k; castMagic(ww, ww.player, 2); return ww.screenFx[0].name; });
+  expect(kinds).toEqual(['stardust', 'mirror', 'heart']);
+});
+
+test('mirror waltz breaks four mirrors after 0.25 s, each throwing four shards that fall and fade', () => {
+  const w = worldOf(); w.player.weapon = 'knife'; castMagic(w, w.player, 2);
+  const frames = w.effects.filter(e => e instanceof MirrorFrame);
+  expect(frames.length).toBe(SUPER.knife.clones);
+  expect(frames.every(f => !f.broke)).toBe(true);
+  w.tick(Math.ceil(60 * 0.5)); // 鏡は 0.06 秒ずつ遅れて出るので、最後の 1 枚が割れるのは 0.25 + 0.18 秒
+  expect(frames.every(f => f.broke)).toBe(true);
+  const shards = w.effects.filter(e => e instanceof Shard);
+  expect(shards.length).toBe(SUPER.knife.clones * 4);
+  const y0 = shards[0].y; w.tick(20);
+  expect(shards[0].y).not.toBe(y0);                       // 落ちる
+  w.tick(60); expect(w.effects.some(e => e instanceof Shard)).toBe(false);
+  w.tick(60); expect(w.effects.some(e => e instanceof MirrorFrame)).toBe(false);
+});
+
+test('stardust cortege sends one ghost procession across the sky for about 3 s', () => {
+  const w = worldOf(); w.player.weapon = 'star'; w.player.facing = 1; castMagic(w, w.player, 2);
+  const c = w.effects.find(e => e instanceof Cortege);
+  expect(c).toBeInstanceOf(Cortege);
+  const x0 = c.x; w.tick(60);
+  expect(c.x).toBeGreaterThan(x0);                        // 進行方向へ渡る
+  w.tick(60 * 3); expect(w.effects.some(e => e instanceof Cortege)).toBe(false);
+  const back = worldOf(); back.player.weapon = 'star'; back.player.facing = -1; castMagic(back, back.player, 2);
+  const c2 = back.effects.find(e => e instanceof Cortege); const bx = c2.x; back.tick(60);
+  expect(c2.x).toBeLessThan(bx);
+});
+
+test('L1 magic adds no cut-in, no mirrors and no cortege', () => {
+  for (const weapon of ['star', 'knife', 'heart', 'candle']) {
+    const w = worldOf(); w.player.weapon = weapon; castMagic(w, w.player, 1);
+    expect(w.screenFx.length, weapon).toBe(0);
+    expect(w.effects.some(e => e instanceof MirrorFrame || e instanceof Cortege), weapon).toBe(false);
+  }
 });

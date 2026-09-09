@@ -1,0 +1,4 @@
+SUBJECT: a HEART FLOWER growing from the ground for a magic effect in a platformer, two frames side by side, rooted at the baseline. An anatomical human heart the size of a fist growing as the bud of a plant, on a thick green thorny stem with two dark leaves.
+FRAME 1 = a closed bud: the heart is whole and glossy dark red, veins visible, stem upright, thorns short.
+FRAME 2 = bloomed: the heart has split into four dark red petals curling outward like a flower, the hollow inside is bright crimson, three drops of blood hang from the petal tips, the stem is bent slightly.
+Palette: crimson, dark red, rose, moss green, dark plum outline. No floor, no shadow, no text.

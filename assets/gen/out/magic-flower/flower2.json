@@ -1,0 +1,17 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/magic-flower-v1.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  90,
+  150
+ ],
+ "frames": null,
+ "w": 82,
+ "h": 133,
+ "fits": true,
+ "colors": 15,
+ "name": "flower2"
+}

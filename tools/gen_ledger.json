@@ -1,5 +1,5 @@
 {
- "requests": 186,
+ "requests": 206,
  "entries": [
   {
    "name": "player-base",
@@ -1448,6 +1448,166 @@
    "secs": 18.1,
    "text": "",
    "ts": 1788938107.282733
+  },
+  {
+   "name": "player-cast",
+   "v": 1,
+   "ok": true,
+   "secs": 14.2,
+   "text": "",
+   "ts": 1788969451.158596
+  },
+  {
+   "name": "magic-aura",
+   "v": 1,
+   "ok": true,
+   "secs": 10.2,
+   "text": "",
+   "ts": 1788969461.627549
+  },
+  {
+   "name": "magic-comet",
+   "v": 1,
+   "ok": true,
+   "secs": 10.0,
+   "text": "",
+   "ts": 1788969471.8737102
+  },
+  {
+   "name": "magic-starburst",
+   "v": 1,
+   "ok": true,
+   "secs": 8.9,
+   "text": "",
+   "ts": 1788969481.088725
+  },
+  {
+   "name": "magic-cortege",
+   "v": 1,
+   "ok": true,
+   "secs": 12.2,
+   "text": "Here is the funeral procession of little ghosts you described, in two frames: ",
+   "ts": 1788969499.745665
+  },
+  {
+   "name": "magic-shards",
+   "v": 1,
+   "ok": true,
+   "secs": 9.7,
+   "text": "",
+   "ts": 1788969509.711563
+  },
+  {
+   "name": "magic-mirror",
+   "v": 1,
+   "ok": true,
+   "secs": 9.3,
+   "text": "",
+   "ts": 1788969519.299346
+  },
+  {
+   "name": "magic-flower",
+   "v": 1,
+   "ok": true,
+   "secs": 9.6,
+   "text": "Here is your heart flower sprite:\n",
+   "ts": 1788969529.1706188
+  },
+  {
+   "name": "magic-petals",
+   "v": 1,
+   "ok": true,
+   "secs": 10.5,
+   "text": "",
+   "ts": 1788969546.636891
+  },
+  {
+   "name": "magic-waxpillar",
+   "v": 1,
+   "ok": true,
+   "secs": 11.5,
+   "text": "",
+   "ts": 1788969558.44942
+  },
+  {
+   "name": "magic-choir",
+   "v": 1,
+   "ok": true,
+   "secs": 11.5,
+   "text": "Here are your singing wax ghosts! ",
+   "ts": 1788969570.264812
+  },
+  {
+   "name": "cutin-star",
+   "v": 1,
+   "ok": true,
+   "secs": 11.1,
+   "text": "Here is your 16-bit SNES-style special attack cut-in panel, following all your specifications:\n",
+   "ts": 1788969728.228843
+  },
+  {
+   "name": "cutin-knife",
+   "v": 1,
+   "ok": true,
+   "secs": 10.8,
+   "text": "",
+   "ts": 1788969739.301918
+  },
+  {
+   "name": "cutin-heart",
+   "v": 1,
+   "ok": true,
+   "secs": 10.5,
+   "text": "",
+   "ts": 1788969750.099879
+  },
+  {
+   "name": "cutin-candle",
+   "v": 1,
+   "ok": true,
+   "secs": 11.6,
+   "text": "Here's your 16-bit SNES-style special attack cut-in panel:\n",
+   "ts": 1788969761.963656
+  },
+  {
+   "name": "magic-waxpillar",
+   "v": 2,
+   "ok": true,
+   "secs": 11.4,
+   "text": "Here are two frames of a towering pillar of wax and fire for your platformer magic effect, rendered in a 16-bit SNES-era JRPG pixel art style. ",
+   "ts": 1788969784.892947
+  },
+  {
+   "name": "cutin-star",
+   "v": 2,
+   "ok": true,
+   "secs": 18.0,
+   "text": "",
+   "ts": 1788969885.685028
+  },
+  {
+   "name": "cutin-knife",
+   "v": 2,
+   "ok": true,
+   "secs": 13.6,
+   "text": "",
+   "ts": 1788969899.683095
+  },
+  {
+   "name": "cutin-heart",
+   "v": 2,
+   "ok": true,
+   "secs": 16.0,
+   "text": "",
+   "ts": 1788969916.0120242
+  },
+  {
+   "name": "cutin-candle",
+   "v": 2,
+   "ok": true,
+   "secs": 15.5,
+   "text": "",
+   "ts": 1788969931.816261
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

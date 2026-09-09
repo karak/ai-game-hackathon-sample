@@ -18,6 +18,7 @@ export class Player {
     this.state = 'normal'; this.jumps = 0; this.crouch = false;
     this.invT = 0; this.hurtT = 0; this.attackT = 0; this.runT = 0; this.chargeT = 0; this.deathT = 0;
     this.superReady = false; // 溜めが SUPER_T に達した（強化魔法が出る）。到達時に一度だけ音を鳴らすためのフラグ
+    this.castT = 0;          // 強化魔法の発動ポーズ（cast2）を出す残り秒数
     this.platform = null; this.climbing = false; // 乗っている動く足場 / はしご昇降中
     this.broomT = 0; this.wasShoot = false; this.poisonT = 0;
   }
@@ -32,7 +33,7 @@ export class Player {
     if (this.state !== 'normal') return;
 
     this.invT = Math.max(0, this.invT - dt); this.hurtT = Math.max(0, this.hurtT - dt);
-    this.attackT = Math.max(0, this.attackT - dt); this.broomT = Math.max(0, this.broomT - dt);
+    this.attackT = Math.max(0, this.attackT - dt); this.broomT = Math.max(0, this.broomT - dt); this.castT = Math.max(0, this.castT - dt);
     this.poisonT = Math.max(0, this.poisonT - dt);
     const ctrl = this.hurtT <= 0 && !this.world.cutscene;
 
@@ -143,7 +144,7 @@ export class Player {
     const sx = this.centerX + this.facing * 10;
     if (charged) { // 溜め魔法（武器ごとに別: magic.js）。charged === 2 は強化魔法
       const level = charged === 2 ? 2 : 1;
-      castMagic(this.world, this, level); this.attackT = level === 2 ? 0.45 : 0.3;
+      castMagic(this.world, this, level); this.attackT = level === 2 ? 0.45 : 0.3; if (level === 2) this.castT = 0.55; // 発動ポーズ
       this.world.audio.sfx(level === 2 ? 'supermagic' : 'chargeshot'); this.world.particles.emit('sparkle', sx, sy, level === 2 ? 30 : 14);
       this.world.toast?.(t(magicName(this.weapon, level))); return;
     }
@@ -188,6 +189,10 @@ export class Player {
   // 生成スプライトのフレーム名（idle/run1-4/jump/fall/attack/crouch/hurt/dead）
   frame() {
     if (this.state !== 'normal') return 'dead';
+    // 強化魔法: 溜め切ると詠唱ポーズ（cast1）、発動後は cast2。素材が無い衣装は従来のコマに落とす
+    const sheet = this.world.assets?.player?.[this.costume];
+    if (this.castT > 0 && sheet?.cast2) return 'cast2';
+    if (this.chargeT >= SUPER_T && this.onGround && sheet?.cast1) return 'cast1';
     if (this.climbing) return ['jump', 'fall'][Math.floor(this.runT * 6) % 2]; // 専用コマなし: 上昇／下降コマを交互に
     if (this.crouch) return 'crouch';
     if (this.hurtT > 0) return 'hurt';
@@ -236,11 +241,18 @@ export class Player {
     }
     if (this.broomT > 0) blit(g, assets.broom, this.facing < 0, this.centerX - assets.broom.w / 2 - cam.x, this.y + this.h - 4 - cam.y);
     if (this.chargeT > CHARGE_T && Math.floor(this.chargeT * 20) % 2) blit(g, assets.shots.charge, false, this.centerX + (this.facing > 0 ? 12 : -22) - cam.x, this.y + 8 - cam.y);
-    if (this.chargeT >= SUPER_T) { // 強化魔法が出る合図: 主人公を囲む脈打つ光輪
-      const r = 18 + Math.sin(this.chargeT * 14) * 3;
-      g.save(); g.globalAlpha = 0.75; g.strokeStyle = '#ffe860'; g.lineWidth = 2;
-      g.beginPath(); g.arc(this.centerX - cam.x, this.y + this.h / 2 - cam.y, r, 0, Math.PI * 2); g.stroke();
-      g.globalAlpha = 0.4; g.strokeStyle = '#ff8fc8'; g.beginPath(); g.arc(this.centerX - cam.x, this.y + this.h / 2 - cam.y, r + 4, 0, Math.PI * 2); g.stroke(); g.restore();
+    if (this.chargeT >= SUPER_T) { // 強化魔法が出る合図: 生成した光輪（magicfx/aura、2 コマで回る）。無ければ円で描く
+      const aura = assets.generated?.magicfx, spr = aura && (Math.floor(this.chargeT * 8) % 2 ? aura.aura2 : aura.aura1);
+      const cx = this.centerX - cam.x, cy = this.y + this.h / 2 - cam.y;
+      if (spr) {
+        const w = spr.w ?? spr.r.width / 3, h = spr.h ?? spr.r.height / 3;
+        g.save(); g.globalAlpha = 0.9; g.drawImage(spr.r, cx - w / 2, cy - h / 2, w, h); g.restore();
+      } else {
+        const r = 18 + Math.sin(this.chargeT * 14) * 3;
+        g.save(); g.globalAlpha = 0.75; g.strokeStyle = '#ffe860'; g.lineWidth = 2;
+        g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke();
+        g.globalAlpha = 0.4; g.strokeStyle = '#ff8fc8'; g.beginPath(); g.arc(cx, cy, r + 4, 0, Math.PI * 2); g.stroke(); g.restore();
+      }
     }
   }
 }

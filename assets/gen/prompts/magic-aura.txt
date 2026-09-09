@@ -1,0 +1,4 @@
+SUBJECT: a MAGIC CHARGE HALO for a platformer, two frames side by side, no character (the ring surrounds the hero at runtime, so the middle must be empty). A ring made of alternating five-pointed gold stars and dark thorny rose stems, with a second thinner ring of pink light just outside it.
+FRAME 1 = eight stars evenly spaced on the ring, thorns pointing outward, outer light ring solid.
+FRAME 2 = the ring rotated so the stars sit between the previous positions and each star is one cell larger, thorns pointing inward, outer light ring broken into dashes.
+Palette: gold, white, rose pink, magenta, dark plum outline. The centre of each ring is fully green (empty). No floor, no shadow, no text.

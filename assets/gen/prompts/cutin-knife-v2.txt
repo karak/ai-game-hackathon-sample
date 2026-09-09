@@ -1,0 +1,24 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 130 cells wide x 116 cells tall (= 1040 x 928 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 98 cells of the 116-cell height).
+- Exactly ONE sprite, horizontally centered on the canvas.
+- Vertically centered on the canvas.
+
+SUBJECT: a 16-bit SNES-style SPECIAL ATTACK CUT-IN PANEL (a rectangular opaque illustration, like a Super Famicom RPG special-move portrait), landscape orientation, filled edge to edge with artwork. Center: a close bust portrait of a 15-year-old witch girl with short pink hair and a black witch hat, facing the viewer, holding a silver knife across her chest. Around her, FOUR tall ornate standing mirrors in gilt frames face inward, each showing a paler, hollow-eyed reflection of the same girl smiling with black teeth — the reflections all lean out of their frames. Cracks radiate across two of the mirrors. Palette: lavender, silver, dusty rose and dark plum, with a 1-cell checker dither in the background. 
+CHARACTER COLORS (must match the reference image exactly): hair is BRIGHT PINK (rose pink with magenta shadows), never blonde and never brown; the dress is MAGENTA and cream with a white apron; the witch hat is dark plum with a magenta band; the eyes are large and blue-violet. Skin is pale cream.
+No lettering of any kind, no border frame, no signature. The illustration must fill the ENTIRE canvas edge to edge, leaving no empty margin of any color around it.
+
+
+REFERENCE: the attached image is the canonical design of this character (same pixel grid). Keep design, colors and proportions identical.
+
+[refs] /Users/yasushi/projects/poc-square/assets/gen/raw/player-base-v5.png

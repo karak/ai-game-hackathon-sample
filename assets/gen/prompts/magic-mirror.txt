@@ -1,0 +1,4 @@
+SUBJECT: a TALL ORNATE STANDING MIRROR for a magic effect in a platformer, two frames side by side, standing on the ground. A gilt baroque frame with curled scrollwork at the top, on a small clawed base; the glass is lavender-silver.
+FRAME 1 = the glass is intact and smooth, showing a faint pale reflection of a girl's silhouette.
+FRAME 2 = the glass has burst outward: a jagged hole in the middle, radial cracks, and six shards frozen in mid-air just outside the frame edge; the reflection is gone.
+Palette: gold, lavender, silver, dark plum outline. No floor, no shadow, no text.

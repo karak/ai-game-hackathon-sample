@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/magic-choir-v1.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  120,
+  100
+ ],
+ "frames": [
+  {
+   "w": 29,
+   "h": 75,
+   "fits": true,
+   "colors": 15,
+   "name": "choir1"
+  },
+  {
+   "w": 25,
+   "h": 75,
+   "fits": true,
+   "colors": 15,
+   "name": "choir2"
+  }
+ ]
+}

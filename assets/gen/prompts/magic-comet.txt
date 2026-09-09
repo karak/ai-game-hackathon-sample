@@ -1,0 +1,4 @@
+SUBJECT: a MAGIC COMET projectile for a platformer, two frames side by side, no character. A blazing five-pointed star head with a long tapering tail of fire streaming up and to the right behind it (the comet travels down-left). Pale gold core, white-hot centre, rose-pink and magenta flames in the tail, dark plum outline.
+FRAME 1 = tail long and straight, four sparks breaking off the tail, star head with sharp points.
+FRAME 2 = tail curled slightly and shorter, six sparks scattered, star head rotated so the points sit between the previous ones (clear flicker between the two frames).
+No floor, no shadow, no text, no green glow. Each frame is one connected shape.

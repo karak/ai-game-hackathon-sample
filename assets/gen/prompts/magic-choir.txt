@@ -1,0 +1,4 @@
+SUBJECT: THREE SINGING WAX GHOSTS (a wax choir) for a platformer magic effect, two frames side by side, floating just above the ground. Small hooded figures moulded from dripping cream-colored wax, hollow black eye sockets, mouths open wide in song, wax robes melting into thin tails, a tiny candle flame on each head.
+FRAME 1 = all three mouths wide open, flames upright, robes hanging straight, the middle ghost slightly higher.
+FRAME 2 = mouths half closed, flames bent to the left, robes swaying left, the middle ghost 3 cells lower than in frame 1.
+Palette: cream, warm grey, amber, orange, dark brown outline. No floor, no shadow, no text. The three figures form one connected group per frame.

@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/cutin-knife-v2.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  130,
+  116
+ ],
+ "w": 250,
+ "h": 252,
+ "fits": false,
+ "colors": 24
+}

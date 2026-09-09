@@ -1,0 +1,4 @@
+SUBJECT: a STAR SHOCKWAVE explosion effect for a platformer, two frames side by side, no character. A ring of white-hot star fragments expanding outward, with eight long spikes of light radiating from an empty bright centre.
+FRAME 1 = a smaller thick ring, spikes short and fat, centre solid white.
+FRAME 2 = a wider thinner ring with gaps in it, spikes long and thin, centre hollow (background shows through), small stars scattered outside the ring.
+Palette: white, pale gold, rose pink, lavender, dark plum outline. Concentric 1-cell dither on the inner edge of the ring. No floor, no shadow, no text.

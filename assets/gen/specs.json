@@ -2059,6 +2059,241 @@
     "player/run4s_nohat"
    ],
    "_note": "2 コマ目（通過ポーズ）は v1/v2 とも杖が描かれなかったので不使用。走り撃ちは run1s/run3s の 2 コマ運用（IMP-016）"
+  },
+  "player-cast": {
+   "box": [
+    110,
+    140
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "player-cast.txt",
+   "ref": "player-base",
+   "out": [
+    "player/cast1_nohat",
+    "player/cast2_nohat"
+   ],
+   "palette": "player/idle",
+   "strip_caption": true,
+   "parts": "player_nohat"
+  },
+  "cutin-star": {
+   "box": [
+    130,
+    116
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "cutin-star.txt",
+   "out": [
+    "cutin/stardust"
+   ],
+   "kind": "bg",
+   "colors": 24,
+   "nokey": true,
+   "trim_border": true,
+   "crop_key": true,
+   "ref": "player-base"
+  },
+  "cutin-knife": {
+   "box": [
+    130,
+    116
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "cutin-knife.txt",
+   "out": [
+    "cutin/mirror"
+   ],
+   "kind": "bg",
+   "colors": 24,
+   "nokey": true,
+   "trim_border": true,
+   "crop_key": true,
+   "ref": "player-base"
+  },
+  "cutin-heart": {
+   "box": [
+    130,
+    116
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "cutin-heart.txt",
+   "out": [
+    "cutin/heart"
+   ],
+   "kind": "bg",
+   "colors": 24,
+   "nokey": true,
+   "trim_border": true,
+   "crop_key": true,
+   "ref": "player-base"
+  },
+  "cutin-candle": {
+   "box": [
+    130,
+    116
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "cutin-candle.txt",
+   "out": [
+    "cutin/wax"
+   ],
+   "kind": "bg",
+   "colors": 24,
+   "nokey": true,
+   "trim_border": true,
+   "crop_key": true,
+   "ref": "player-base"
+  },
+  "magic-comet": {
+   "box": [
+    90,
+    110
+   ],
+   "frames": 2,
+   "anchor": "center",
+   "subject": "magic-comet.txt",
+   "out": [
+    "magicfx/comet1",
+    "magicfx/comet2"
+   ],
+   "colors": 15
+  },
+  "magic-starburst": {
+   "box": [
+    140,
+    140
+   ],
+   "frames": 2,
+   "anchor": "center",
+   "subject": "magic-starburst.txt",
+   "out": [
+    "magicfx/starburst1",
+    "magicfx/starburst2"
+   ],
+   "colors": 15
+  },
+  "magic-cortege": {
+   "box": [
+    120,
+    90
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "magic-cortege.txt",
+   "out": [
+    "magicfx/cortege1",
+    "magicfx/cortege2"
+   ],
+   "colors": 15
+  },
+  "magic-shards": {
+   "box": [
+    130,
+    110
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "magic-shards.txt",
+   "out": [
+    "magicfx/shard1",
+    "magicfx/shard2",
+    "magicfx/shard3",
+    "magicfx/shard4"
+   ],
+   "colors": 15
+  },
+  "magic-mirror": {
+   "box": [
+    90,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "magic-mirror.txt",
+   "out": [
+    "magicfx/mirror1",
+    "magicfx/mirror2"
+   ],
+   "colors": 15
+  },
+  "magic-flower": {
+   "box": [
+    90,
+    150
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "magic-flower.txt",
+   "out": [
+    "magicfx/flower1",
+    "magicfx/flower2"
+   ],
+   "colors": 15,
+   "fill_holes": true
+  },
+  "magic-petals": {
+   "box": [
+    120,
+    90
+   ],
+   "frames": 4,
+   "anchor": "center",
+   "subject": "magic-petals.txt",
+   "out": [
+    "magicfx/petal1",
+    "magicfx/petal2",
+    "magicfx/petal3",
+    "magicfx/petal4"
+   ],
+   "colors": 15
+  },
+  "magic-waxpillar": {
+   "box": [
+    60,
+    160
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "magic-waxpillar.txt",
+   "out": [
+    "magicfx/waxpillar1",
+    "magicfx/waxpillar2"
+   ],
+   "colors": 15,
+   "use": "v1"
+  },
+  "magic-choir": {
+   "box": [
+    120,
+    100
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "magic-choir.txt",
+   "out": [
+    "magicfx/choir1",
+    "magicfx/choir2"
+   ],
+   "colors": 15
+  },
+  "magic-aura": {
+   "box": [
+    140,
+    140
+   ],
+   "frames": 2,
+   "anchor": "center",
+   "subject": "magic-aura.txt",
+   "out": [
+    "magicfx/aura1",
+    "magicfx/aura2"
+   ],
+   "colors": 15
   }
  }
 }

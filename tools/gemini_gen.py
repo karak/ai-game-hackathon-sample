@@ -2,7 +2,8 @@
 """Gemini 2.5 Flash Image (nano-banana) でスプライト/背景の元画像を生成する。
 
 - API キーは環境変数 GEMINI_API_KEY、本リポの .env（.env.example を複製、git 管理外）、参照プロジェクトの .env の順に探す（DEBT-008）
-- 生成回数は tools/gen_ledger.json に記録し、BUDGET を超えたら停止する（セッション予算 200）
+- 生成回数は tools/gen_ledger.json に記録し、BUDGET を超えたら停止する
+  セッション予算: 200（当初）＋ 50（強化魔法の素材。ユーザー指示 2026-09-10）= 250
 - 生成物は assets/gen/raw/<name>-v<N>.png、プロンプトは assets/gen/prompts/<name>-v<N>.txt に保存
 
 使い方: python3 tools/gemini_gen.py <name> --prompt-file p.txt [--ref image.png ...] [--n 1]
@@ -17,7 +18,7 @@ LEDGER = ROOT / 'tools/gen_ledger.json'
 # .env の探索順: 本リポ → 参照プロジェクト（後者は従来の場所。外部 HDD が無くても動くようにした。DEBT-008）
 ENV_FILES = [ROOT / '.env', Path('/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.env')]
 MODEL = 'gemini-2.5-flash-image'
-BUDGET = 200
+BUDGET = 250  # 200（当初）＋ 50（強化魔法。2026-09-10 追加）
 
 
 def load_key() -> str:

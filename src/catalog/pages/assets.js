@@ -2,7 +2,7 @@
 import { h1, h2, note, table, canvas, drawRaw, rawSize } from '../sheet.js';
 import manifest from '../../gfx/manifest.json';
 
-export const GROUP_JP = { player: '主人公', enemies: '雑魚敵', bosses: 'ボス', shots: '弾・演出', items: 'アイテム', deco: '装飾', tiles: '地形帯・ギミック小物', bg: '背景層', ending: 'エンディング場面（256×224 セル、3 px/セルで全画面）' };
+export const GROUP_JP = { player: '主人公', enemies: '雑魚敵', bosses: 'ボス', shots: '弾・演出', items: 'アイテム', deco: '装飾', tiles: '地形帯・ギミック小物', bg: '背景層', ending: 'エンディング場面（256×224 セル、3 px/セルで全画面）', magicfx: '強化魔法のエフェクト', cutin: '強化魔法のカットイン（不透明パネル）' };
 
 export async function render(main, A) {
   main.appendChild(h1('全素材一覧（manifest）'));

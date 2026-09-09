@@ -1,0 +1,4 @@
+SUBJECT: a FUNERAL PROCESSION OF LITTLE GHOSTS carrying a star-shaped coffin, for a magic effect in a platformer, two frames side by side, floating (no floor). Three small round white ghosts with hollow black eyes and stubby arms hold up a small coffin shaped like a five-pointed star, made of pale wood with gold trim and a candle burning at its tip. They face LEFT.
+FRAME 1 = ghosts drifting with tails curled left, coffin level, candle flame upright.
+FRAME 2 = ghosts bobbing 3 cells lower with tails curled right, coffin tilted slightly, candle flame bent, one ghost's mouth open in a wail.
+Palette: white, pale lavender, gold, dark plum outline. No floor, no shadow, no text. The three ghosts and the coffin form one connected group in each frame.

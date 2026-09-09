@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/magic-cortege-v1.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  120,
+  90
+ ],
+ "frames": [
+  {
+   "w": 78,
+   "h": 59,
+   "fits": true,
+   "colors": 15,
+   "name": "cortege1"
+  },
+  {
+   "w": 92,
+   "h": 58,
+   "fits": true,
+   "colors": 15,
+   "name": "cortege2"
+  }
+ ]
+}

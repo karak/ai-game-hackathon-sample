@@ -194,6 +194,19 @@ def split_frames_masked(logical, min_gap=2, min_width=8, expect=0):
 
 
 
+def crop_key(im, tol=90):
+    """キー色（純緑）の余白を落として、絵の矩形だけを残す（不透明パネル = カットイン向け）。
+    nokey で読んだ一枚絵は緑背景が絵として残るため、緑でない画素の外接矩形に切る。"""
+    a = np.asarray(im.convert('RGB')).astype(int)
+    green = (a[..., 1] > 150) & (a[..., 0] < 150) & (a[..., 2] < 150) & (a[..., 1] - a[..., 0] > tol) & (a[..., 1] - a[..., 2] > tol)
+    keep = ~green
+    ys, xs = np.nonzero(keep)
+    if ys.size == 0: return im
+    box = (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
+    if box != (0, 0, im.width, im.height): print(f'  cropped key margin to {box[2]-box[0]}x{box[3]-box[1]}')
+    return im.crop(box)
+
+
 def trim_border(im, max_px=8, std_max=6):
     """外周から内側へ、色がほぼ一様な行・列を縁とみなして落とす（各辺最大 max_px）。額縁を描いてしまった一枚絵に使う"""
     a = np.asarray(im.convert('RGB')).astype(int); h, w = a.shape[:2]; t = b = l = r = 0
@@ -286,11 +299,13 @@ def main():
     ap.add_argument('--strip-caption', action='store_true', help='物体の下に描き足されたラベル文字を落とす')
     ap.add_argument('--fill-holes', action='store_true', help='キーで抜けた内部の穴を隣接色で埋める（装飾・キャラ）')
     ap.add_argument('--trim-border', action='store_true', help='外周の一様色の縁（額縁）を最大 8 px 落とす（nokey の一枚絵向け）')
+    ap.add_argument('--crop-key', action='store_true', help='キー色（純緑）の余白を落として絵の矩形だけ残す（nokey の不透明パネル = カットイン）')
     ap.add_argument('--trim-thin-bottom', action='store_true', help='下端の細い滴などを落として接地面を広い部分にする（血溜まり）')
     a = ap.parse_args()
     bw, bh = (int(v) for v in a.logical.split('x'))
     im = Image.open(a.src).convert('RGBA') if a.nokey else key_out(Image.open(a.src), a.tol)
     logical, px, py = extract_cells(im)
+    if a.crop_key: logical = crop_key(logical)
     if a.trim_border: logical = trim_border(logical)
     if a.keep_bottom: logical = logical.crop((0, int(logical.height * (1 - a.keep_bottom)), logical.width, logical.height))
     if not a.nokey and not a.keep_bottom: logical = strip_shadow(logical)

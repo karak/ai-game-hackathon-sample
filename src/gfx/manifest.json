@@ -543,6 +543,38 @@
   "src": "assets/sprites/bosses/teddy2.png",
   "w": 126
  },
+ "cutin/heart": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": false,
+  "h": 202,
+  "src": "assets/sprites/cutin/heart.png",
+  "w": 206
+ },
+ "cutin/mirror": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": false,
+  "h": 252,
+  "src": "assets/sprites/cutin/mirror.png",
+  "w": 250
+ },
+ "cutin/stardust": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": false,
+  "h": 201,
+  "src": "assets/sprites/cutin/stardust.png",
+  "w": 214
+ },
+ "cutin/wax": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": false,
+  "h": 207,
+  "src": "assets/sprites/cutin/wax.png",
+  "w": 212
+ },
  "deco/balloons": {
   "anchor": "bottom",
   "colors": 15,
@@ -1127,6 +1159,198 @@
   "src": "assets/sprites/items/potion.png",
   "w": 25
  },
+ "magicfx/aura1": {
+  "anchor": "center",
+  "colors": 14,
+  "fits": true,
+  "h": 90,
+  "src": "assets/sprites/magicfx/aura1.png",
+  "w": 89
+ },
+ "magicfx/aura2": {
+  "anchor": "center",
+  "colors": 14,
+  "fits": true,
+  "h": 90,
+  "src": "assets/sprites/magicfx/aura2.png",
+  "w": 89
+ },
+ "magicfx/choir1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 75,
+  "src": "assets/sprites/magicfx/choir1.png",
+  "w": 29
+ },
+ "magicfx/choir2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 75,
+  "src": "assets/sprites/magicfx/choir2.png",
+  "w": 25
+ },
+ "magicfx/comet1": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 109,
+  "src": "assets/sprites/magicfx/comet1.png",
+  "w": 44
+ },
+ "magicfx/comet2": {
+  "anchor": "center",
+  "colors": 13,
+  "fits": true,
+  "h": 109,
+  "src": "assets/sprites/magicfx/comet2.png",
+  "w": 45
+ },
+ "magicfx/cortege1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 59,
+  "src": "assets/sprites/magicfx/cortege1.png",
+  "w": 78
+ },
+ "magicfx/cortege2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 58,
+  "src": "assets/sprites/magicfx/cortege2.png",
+  "w": 92
+ },
+ "magicfx/flower1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 146,
+  "src": "assets/sprites/magicfx/flower1.png",
+  "w": 82
+ },
+ "magicfx/flower2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 133,
+  "src": "assets/sprites/magicfx/flower2.png",
+  "w": 82
+ },
+ "magicfx/mirror1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 105,
+  "src": "assets/sprites/magicfx/mirror1.png",
+  "w": 69
+ },
+ "magicfx/mirror2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 105,
+  "src": "assets/sprites/magicfx/mirror2.png",
+  "w": 86
+ },
+ "magicfx/petal1": {
+  "anchor": "center",
+  "colors": 12,
+  "fits": true,
+  "h": 46,
+  "src": "assets/sprites/magicfx/petal1.png",
+  "w": 26
+ },
+ "magicfx/petal2": {
+  "anchor": "center",
+  "colors": 10,
+  "fits": true,
+  "h": 31,
+  "src": "assets/sprites/magicfx/petal2.png",
+  "w": 9
+ },
+ "magicfx/petal3": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 48,
+  "src": "assets/sprites/magicfx/petal3.png",
+  "w": 30
+ },
+ "magicfx/petal4": {
+  "anchor": "center",
+  "colors": 14,
+  "fits": true,
+  "h": 49,
+  "src": "assets/sprites/magicfx/petal4.png",
+  "w": 30
+ },
+ "magicfx/shard1": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 59,
+  "src": "assets/sprites/magicfx/shard1.png",
+  "w": 43
+ },
+ "magicfx/shard2": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 38,
+  "src": "assets/sprites/magicfx/shard2.png",
+  "w": 40
+ },
+ "magicfx/shard3": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 30,
+  "src": "assets/sprites/magicfx/shard3.png",
+  "w": 30
+ },
+ "magicfx/shard4": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 47,
+  "src": "assets/sprites/magicfx/shard4.png",
+  "w": 31
+ },
+ "magicfx/starburst1": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 102,
+  "src": "assets/sprites/magicfx/starburst1.png",
+  "w": 101
+ },
+ "magicfx/starburst2": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 121,
+  "src": "assets/sprites/magicfx/starburst2.png",
+  "w": 119
+ },
+ "magicfx/waxpillar1": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 112,
+  "src": "assets/sprites/magicfx/waxpillar1.png",
+  "w": 39
+ },
+ "magicfx/waxpillar2": {
+  "anchor": "bottom",
+  "colors": 14,
+  "fits": true,
+  "h": 114,
+  "src": "assets/sprites/magicfx/waxpillar2.png",
+  "w": 39
+ },
  "player/attack": {
   "anchor": "bottom",
   "colors": 15,
@@ -1166,6 +1390,70 @@
   "h": 111,
   "src": "assets/sprites/player/base_hat.png",
   "w": 69
+ },
+ "player/cast1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 131,
+  "src": "assets/sprites/player/cast1.png",
+  "w": 70
+ },
+ "player/cast1_gold": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 131,
+  "src": "assets/sprites/player/cast1_gold.png",
+  "w": 70
+ },
+ "player/cast1_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 131,
+  "src": "assets/sprites/player/cast1_nohat.png",
+  "w": 70
+ },
+ "player/cast1_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 131,
+  "src": "assets/sprites/player/cast1_plain.png",
+  "w": 70
+ },
+ "player/cast2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/cast2.png",
+  "w": 97
+ },
+ "player/cast2_gold": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 107,
+  "src": "assets/sprites/player/cast2_gold.png",
+  "w": 97
+ },
+ "player/cast2_nohat": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 99,
+  "src": "assets/sprites/player/cast2_nohat.png",
+  "w": 97
+ },
+ "player/cast2_plain": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 99,
+  "src": "assets/sprites/player/cast2_plain.png",
+  "w": 97
  },
  "player/crouch": {
   "anchor": "bottom",
