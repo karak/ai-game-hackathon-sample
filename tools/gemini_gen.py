@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gemini 2.5 Flash Image (nano-banana) でスプライト/背景の元画像を生成する。
 
-- API キーは参照プロジェクトの .env から読む（本リポには置かない）
+- API キーは環境変数 GEMINI_API_KEY、本リポの .env（.env.example を複製、git 管理外）、参照プロジェクトの .env の順に探す（DEBT-008）
 - 生成回数は tools/gen_ledger.json に記録し、BUDGET を超えたら停止する（セッション予算 200）
 - 生成物は assets/gen/raw/<name>-v<N>.png、プロンプトは assets/gen/prompts/<name>-v<N>.txt に保存
 
@@ -14,7 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / 'assets/gen/raw'; PROMPTS = ROOT / 'assets/gen/prompts'
 LEDGER = ROOT / 'tools/gen_ledger.json'
-ENV_FILE = Path('/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.env')
+# .env の探索順: 本リポ → 参照プロジェクト（後者は従来の場所。外部 HDD が無くても動くようにした。DEBT-008）
+ENV_FILES = [ROOT / '.env', Path('/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.env')]
 MODEL = 'gemini-2.5-flash-image'
 BUDGET = 200
 
@@ -22,10 +23,12 @@ BUDGET = 200
 def load_key() -> str:
     k = os.environ.get('GEMINI_API_KEY')
     if k: return k
-    for line in ENV_FILE.read_text().splitlines():
-        if line.startswith('GEMINI_API_KEY='):
-            return line.split('=', 1)[1].strip().strip('"').strip("'")
-    sys.exit('GEMINI_API_KEY not found')
+    for env in ENV_FILES:
+        if not env.exists(): continue
+        for line in env.read_text().splitlines():
+            if line.startswith('GEMINI_API_KEY='):
+                return line.split('=', 1)[1].strip().strip('"').strip("'")
+    sys.exit('GEMINI_API_KEY not found: 環境変数か .env（.env.example を複製）に置く')
 
 
 def ledger() -> dict:

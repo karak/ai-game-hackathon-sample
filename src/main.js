@@ -22,7 +22,7 @@ async function boot() {
 
   // フォント読み込み（同梱 DotGothic16 / OFL）
   try {
-    const fontUrl = new URL('../assets/fonts/DotGothic16-Regular.ttf', import.meta.url);
+    const fontUrl = new URL('../assets/fonts/DotGothic16-Game.ttf', import.meta.url); // サブセット（tools/subset_font.py）。カタログは全字形を読む
     const face = new FontFace('DotGothic16', `url(${fontUrl})`);
     await face.load(); document.fonts.add(face);
   } catch (e) { console.warn('font load failed', e); }

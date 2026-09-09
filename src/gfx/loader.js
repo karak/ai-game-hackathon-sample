@@ -2,6 +2,8 @@
 // manifest に無いものは呼び出し側が文字列スプライトへフォールバックする。
 import { flipH, HD_SCALE } from './sprite.js';
 
+export const BUILD_ID = typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev';
+
 export async function loadImage(url) {
   const im = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('load failed ' + url)); im.src = url; });
   if (im.decode) { try { await im.decode(); } catch {} } // 事前デコード（初回 drawImage のヒッチを避ける。M6）
@@ -23,7 +25,8 @@ export async function loadManifest(manifest, base = '', onProgress = null) {
   const root = typeof document !== 'undefined' ? document.baseURI : import.meta.url;
   await Promise.all(entries.map(async ([key, m]) => {
     try {
-      const img = await loadImage(new URL(base + m.src, root).href);
+      const u = new URL(base + m.src, root); u.searchParams.set('v', BUILD_ID); // キャッシュ破棄用の版（vite define）。dev では 'dev'
+      const img = await loadImage(u.href);
       const r = toCanvas(img);
       out[key] = { r, l: flipH(r), w: r.width / HD_SCALE, h: r.height / HD_SCALE, hd: true, anchor: m.anchor, brim: m.brim_overlap ? m.brim_overlap / HD_SCALE : undefined }; // w,h は世界単位
     } catch (e) { console.warn('[loader]', e.message); }

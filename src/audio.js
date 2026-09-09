@@ -84,6 +84,12 @@ export class Audio {
       case 'select': this.tone({ f0: 1000, f1: 1000, dur: 0.05, vol: 0.15 }); break;
       case 'tick': this.tone({ f0: 1200, f1: 1200, dur: 0.03, vol: 0.1 }); break;
       case 'fire': this.noiseBurst({ dur: 0.2, vol: 0.15, hp: 1000, lp: 4000 }); break;
+      // 強化魔法（magic.js SUPER）: superready = 溜めが 2 段階目に達した合図（上昇 3 音）、supermagic = 発動（下降ノイズ＋和音）
+      case 'superready': [0, 0.05, 0.1].forEach((d, i) => this.tone({ type: 'triangle', f0: [880, 1174, 1568][i], f1: [880, 1174, 1568][i], dur: 0.12, vol: 0.18, delay: d })); break;
+      case 'supermagic':
+        this.tone({ type: 'sawtooth', f0: 1600, f1: 80, dur: 0.6, vol: 0.32 }); this.noiseBurst({ dur: 0.5, vol: 0.25, hp: 200, lp: 6000 });
+        [0, 0.08, 0.16].forEach((d, i) => this.tone({ type: 'square', f0: [523, 784, 1046][i], f1: [523, 784, 1046][i], dur: 0.45, vol: 0.2, delay: d }));
+        break;
     }
   }
 

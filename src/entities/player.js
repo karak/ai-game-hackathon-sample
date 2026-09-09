@@ -1,7 +1,7 @@
 import { TILE, moveBody } from '../physics.js';
 import { PlayerShot, WEAPONS } from './projectiles.js';
 import { blit } from '../gfx/sprite.js';
-import { castMagic, MAGIC } from './magic.js';
+import { castMagic, MAGIC, magicName, CHARGE_T, SUPER_T } from './magic.js';
 import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConveyor, ladderAt, ladderBelow, LADDER_SPEED } from './gimmicks.js';
 import { t } from '../i18n.js';
 
@@ -17,6 +17,7 @@ export class Player {
     this.costume = 'dress'; this.weapon = 'star';
     this.state = 'normal'; this.jumps = 0; this.crouch = false;
     this.invT = 0; this.hurtT = 0; this.attackT = 0; this.runT = 0; this.chargeT = 0; this.deathT = 0;
+    this.superReady = false; // 溜めが SUPER_T に達した（強化魔法が出る）。到達時に一度だけ音を鳴らすためのフラグ
     this.platform = null; this.climbing = false; // 乗っている動く足場 / はしご昇降中
     this.broomT = 0; this.wasShoot = false; this.poisonT = 0;
   }
@@ -71,9 +72,16 @@ export class Player {
       const shootHeld = input.down('shoot');
       if (input.hit('shoot')) this.shoot(false);
       if (this.costume === 'gold') {
-        if (shootHeld) { this.chargeT += dt; if (this.chargeT > 0.9 && Math.random() < 0.5) this.world.particles.emit('sparkle', this.centerX + this.facing * 8, this.y + 10, 1); }
-        else { if (this.chargeT > 0.9) this.shoot(true); this.chargeT = 0; }
-      } else this.chargeT = 0;
+        // 溜め 2 段階（magic.js）: CHARGE_T で溜め魔法、SUPER_T で強化魔法。粒子は段階で変える
+        if (shootHeld) {
+          this.chargeT += dt;
+          if (this.chargeT > CHARGE_T && Math.random() < 0.5) this.world.particles.emit(this.chargeT >= SUPER_T ? 'blood' : 'sparkle', this.centerX + this.facing * 8, this.y + 10, 1);
+          if (!this.superReady && this.chargeT >= SUPER_T) { this.superReady = true; this.world.audio.sfx('superready'); this.world.particles.emit('sparkle', this.centerX, this.y + this.h / 2, 16); }
+        } else {
+          if (this.chargeT >= SUPER_T) this.shoot(2); else if (this.chargeT > CHARGE_T) this.shoot(true);
+          this.chargeT = 0; this.superReady = false;
+        }
+      } else { this.chargeT = 0; this.superReady = false; }
     }
 
     this.vy += GRAV * dt; if (this.vy > 320) this.vy = 320;
@@ -133,9 +141,11 @@ export class Player {
     if (!charged && mine.length >= W.max) return;
     const sy = this.crouch ? this.y + 6 : this.y + 12;
     const sx = this.centerX + this.facing * 10;
-    if (charged) { // 溜め魔法（武器ごとに別: magic.js）
-      castMagic(this.world, this); this.attackT = 0.3; this.world.audio.sfx('chargeshot'); this.world.particles.emit('sparkle', sx, sy, 14);
-      this.world.toast?.(MAGIC[this.weapon]?.name ?? ''); return;
+    if (charged) { // 溜め魔法（武器ごとに別: magic.js）。charged === 2 は強化魔法
+      const level = charged === 2 ? 2 : 1;
+      castMagic(this.world, this, level); this.attackT = level === 2 ? 0.45 : 0.3;
+      this.world.audio.sfx(level === 2 ? 'supermagic' : 'chargeshot'); this.world.particles.emit('sparkle', sx, sy, level === 2 ? 30 : 14);
+      this.world.toast?.(t(magicName(this.weapon, level))); return;
     }
     this.world.shots.push(new PlayerShot(this.world, this.weapon, sx, sy, this.facing, charged));
     this.attackT = 0.18;
@@ -225,6 +235,12 @@ export class Player {
       blit(g, hat, this.facing < 0, hx, Math.min(hy, py + spr.h * 0.5));
     }
     if (this.broomT > 0) blit(g, assets.broom, this.facing < 0, this.centerX - assets.broom.w / 2 - cam.x, this.y + this.h - 4 - cam.y);
-    if (this.chargeT > 0.9 && Math.floor(this.chargeT * 20) % 2) blit(g, assets.shots.charge, false, this.centerX + (this.facing > 0 ? 12 : -22) - cam.x, this.y + 8 - cam.y);
+    if (this.chargeT > CHARGE_T && Math.floor(this.chargeT * 20) % 2) blit(g, assets.shots.charge, false, this.centerX + (this.facing > 0 ? 12 : -22) - cam.x, this.y + 8 - cam.y);
+    if (this.chargeT >= SUPER_T) { // 強化魔法が出る合図: 主人公を囲む脈打つ光輪
+      const r = 18 + Math.sin(this.chargeT * 14) * 3;
+      g.save(); g.globalAlpha = 0.75; g.strokeStyle = '#ffe860'; g.lineWidth = 2;
+      g.beginPath(); g.arc(this.centerX - cam.x, this.y + this.h / 2 - cam.y, r, 0, Math.PI * 2); g.stroke();
+      g.globalAlpha = 0.4; g.strokeStyle = '#ff8fc8'; g.beginPath(); g.arc(this.centerX - cam.x, this.y + this.h / 2 - cam.y, r + 4, 0, Math.PI * 2); g.stroke(); g.restore();
+    }
   }
 }

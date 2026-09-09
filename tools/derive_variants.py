@@ -11,6 +11,7 @@ import json, collections
 from pathlib import Path
 from PIL import Image
 import numpy as np
+import optimize_pngs
 
 ROOT = Path(__file__).resolve().parent.parent
 SPR = ROOT / 'assets/sprites/player'; MANIFEST = ROOT / 'src/gfx/manifest.json'
@@ -225,6 +226,7 @@ def main():
             out = apply_map(Image.open(src).convert('RGBA'), mp); out.save(SPR / f'{n}_gold.png')
             manifest[f'player/{n}_gold'] = {'src': f'assets/sprites/player/{n}_gold.png', 'w': out.width, 'h': out.height, 'anchor': 'bottom', 'fits': True, 'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0])}
     MANIFEST.write_text(json.dumps(manifest, indent=1, sort_keys=True)); print('manifest updated', len(manifest))
+    optimize_pngs.main([str(SPR / '*.png')])  # 派生コマもパレット PNG に（可逆。IMP-019）
 
 
 if __name__ == '__main__':

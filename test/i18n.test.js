@@ -5,6 +5,7 @@ import { t, setLang, getLang, detectLang, EN, LANGS, pick } from '../src/i18n.js
 import { story, PROLOGUE, PROLOGUE_EN, ENDING_SCENES, ENDING_SCENES_EN, ENDING_TRUE, ENDING_TRUE_EN, CREDITS, CREDITS_EN, BOSS_NAMES } from '../src/story.js';
 import { STAGES } from '../src/levels/index.js';
 import { ACTION_LABEL, REBINDABLE, loadSettings, saveSettings, STORAGE_KEY } from '../src/settings.js';
+import { MAGIC, SUPER, magicName } from '../src/entities/magic.js';
 
 const memStorage = (init = {}) => { const m = new Map(Object.entries(init)); return { getItem: k => m.has(k) ? m.get(k) : null, setItem: (k, v) => m.set(k, String(v)), m }; };
 const walk = dir => readdirSync(dir).flatMap(f => { const p = join(dir, f); return statSync(p).isDirectory() ? walk(p) : p.endsWith('.js') ? [p] : []; });
@@ -34,6 +35,17 @@ test('stage titles/subtitles, boss names and rebindable action labels are all tr
   setLang('en'); expect(t(STAGES[0].title)).toMatch(/^Chapter 1/); expect(t(BOSS_NAMES.noir)).toContain('Noir');
   for (const v of Object.values(EN)) expect(v.trim().length, v).toBeGreaterThan(0);
   setLang('ja');
+});
+
+test('magic names (charge L1 and super L2) are all translated and reachable through magicName()', () => {
+  const missing = [];
+  for (const m of [MAGIC, SUPER]) for (const v of Object.values(m)) if (!(v.name in EN)) missing.push(v.name);
+  expect(missing).toEqual([]);
+  setLang('en');
+  expect(t(magicName('star', 1))).toBe('Meteor Shower'); expect(t(magicName('star', 2))).toBe('Stardust Cortege');
+  expect(t(magicName('candle', 2))).toBe('Wax Choir');
+  setLang('ja');
+  expect(magicName('knife', 2)).toBe('鏡像の舞踏会'); expect(magicName('nope', 2)).toBe('');
 });
 
 test('story(): English texts mirror the Japanese structure (same scene count, same line counts per scene, same credits length)', () => {

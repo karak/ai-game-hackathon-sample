@@ -6,7 +6,7 @@
 |------|------|------|
 | コアアクション | 固定ジャンプ・二段ジャンプ・しゃがみ撃ち・武器 4 種・溜め撃ち・変身解除・残機・制限時間・中間地点 | `src/entities/player.js`、ボット自走 3 ステージクリア |
 | ステージ | 8 面（墓地 272 / 菓子の森 256 / 砂糖城 232 / 涙の川 288 / 人形工房 288 / 骨の遊園地 288 / 鏡の塔 縦 16×122 / 星の墓標 288 ボス連戦 7 体）＋ボス 9 種。エンディング 6 場面＋クレジット。ギミック: 動く足場・浮島・崩れる板・はしご・水流・風・ベルトコンベア・プレス機・観覧車 | `src/levels/index.js`、`src/entities/gimmicks.js`、`test/level.test.js`、`test/gimmicks.test.js` |
-| 敵 | 雑魚 15 種（＋鏡像リリカ、ガーゴイル人形）、ボス 9 種（砂糖の女王、鏡の女王、ノワール第 2 形態を含む。最終章は 7 体連戦）。溜め魔法 4 種 | `src/entities/enemies.js`, `bosses.js` |
+| 敵 | 雑魚 15 種（＋鏡像リリカ、ガーゴイル人形）、ボス 9 種（砂糖の女王、鏡の女王、ノワール第 2 形態を含む。最終章は 7 体連戦）。溜め魔法 4 種＋強化魔法 4 種（溜め 2 段階） | `src/entities/enemies.js`, `bosses.js`, `magic.js` |
 | 描画 | 768×672、HD スプライト（1 セル = 1 画面 px）、背景 空/遠 A・B/中×3（遠・中 1 px/セル、空 3・城の奥壁 2）、地形帯からのタイル合成、HD 粒子・血痕・毒沼・棘、演出（ヒットストップ・フラッシュ・白飛び＋スロー・アイリス・ボス登場） | `src/gfx/hdworld.js`、`src/fx.js`、`docs/plan/logs/sprintA-*.png` |
 | UI | スクリーン解像度の窓・32px フォント・ミニフォント、実測折り返し、HUD、テロップ、タイトル（はじめから／つづきから／2 周目／オプション）／オプション（音量・ミュート・言語・キー／パッド割り当て）／導入／クリア／ゲームオーバー／エンディング画面。日本語／英語（`src/i18n.js`、物語本文は `story.js` に両言語） | `src/ui/*`、`src/game.js`、`test/text.test.js`、`test/i18n.test.js` |
 | 音 | Web Audio 合成 SFX 24 種、BGM 11 曲（テーマ 8・タイトル・ボス 2・エンディング）＋ジングル 4（開始・クリア・死亡・ゲームオーバー）。シーケンサに arp／echo／waves／once | `src/audio.js`、`test/audio-songs.test.js` |
@@ -14,7 +14,7 @@
 | 資料 | デザインカタログ 7 章（キャラ／敵／アイテム／タイル／背景／ステージ／UI） | `catalog.html` |
 | 入力・保存 | キーボード／Gamepad API（standard mapping）／タッチ、キーコンフィグ、`localStorage` セーブ（進行・音量・ミュート・割り当て・ハイスコア） | `src/input.js`、`src/settings.js`、`test/input.test.js`、`test/settings.test.js` |
 | バランス | 復活地点 ±96 湧き禁止、復活後 2 秒敵弾なし、制限時間 300/300/330（歩行×3＋ボス 90 秒） | `src/balance.js`、`test/balance.test.js` |
-| テスト | Vitest 98 件＋ Playwright E2E 8 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦） | `npm test`、`npm run e2e` |
+| テスト | Vitest 107 件＋ Playwright E2E 9 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法） | `npm test`、`npm run e2e` |
 | ビルド・配信 | Vite（index.html / catalog.html、`copySprites` で素材を dist へ）。dist 6.0 MB、`tools/check_dist.mjs` で preview 起動確認。`LICENSE`、`docs/release/`（itch ページ原稿・既知の問題・トレーラー GIF） | `npm run build`、`node tools/check_dist.mjs` |
 
 ## 素材（manifest 235 エントリ）

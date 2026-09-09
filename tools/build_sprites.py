@@ -7,6 +7,7 @@
 from __future__ import annotations
 import json, subprocess, sys
 from pathlib import Path
+import optimize_pngs
 
 ROOT = Path(__file__).resolve().parent.parent
 SPECS = json.loads((ROOT / 'assets/gen/specs.json').read_text())
@@ -118,6 +119,7 @@ def main():
             manifest[key] = {'src': str(dst.relative_to(ROOT)), 'w': meta['w'], 'h': meta['h'], 'fits': meta['fits'], 'colors': meta['colors'], 'anchor': sp['anchor']}
             qa_player_frame(key, dst, manifest)
     MANIFEST.write_text(json.dumps(manifest, indent=1, sort_keys=True)); print('manifest ->', MANIFEST.relative_to(ROOT), len(manifest), 'entries')
+    optimize_pngs.main([str(OUT / '**' / '*.png')])  # 出力をパレット PNG に（可逆、転送量 -57%。IMP-019）
 
 
 if __name__ == '__main__':

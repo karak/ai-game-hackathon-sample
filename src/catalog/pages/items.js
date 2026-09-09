@@ -1,6 +1,6 @@
 // アイテム・弾シート: 寸法、武器パラメータ、敵弾の物理
 import { h1, h2, h3, note, table, frameStrip, paletteStrip } from '../sheet.js';
-import { MAGIC } from '../../entities/magic.js';
+import { MAGIC, SUPER, CHARGE_T, SUPER_T } from '../../entities/magic.js';
 import { WEAPONS, ENEMY_SHOTS } from '../../entities/projectiles.js';
 
 export async function render(main, A) {
@@ -11,7 +11,7 @@ export async function render(main, A) {
     Object.entries(WEAPONS).map(([k, w]) => [k, w.name, w.speed, w.vy0, w.gravity, w.max, w.dmg, w.life, `${w.w}x${w.h}`, k === 'candle' ? '着弾で炎 1.3 秒（0.35 秒毎に 1 ダメージ）' : k === 'heart' ? '放物線・威力 2' : k === 'knife' ? '高速・直線' : '直線・3 発'])
     .concat([['charge', '溜め撃ち', 160, 0, 0, 1, 3, 1.6, '10x10', 'フルブルーム時、0.9 秒長押しで発射。貫通（現在は武器別の溜め魔法に置換。旧仕様の記録）']])));
   // 溜め魔法（武器別。src/entities/magic.js）
-  main.appendChild(h3('溜め魔法（フルブルーム時、0.9 秒長押し → 離す）'));
+  main.appendChild(h3(`溜め魔法（フルブルーム時、${CHARGE_T} 秒長押し → 離す）`));
   main.appendChild(frameStrip([{ name: 'meteor', spr: A.shots.meteor }, { name: 'burst', spr: A.shots.burst }, { name: 'pillar', spr: A.shots.pillar }].filter(f => f.spr)));
   main.appendChild(table(['武器', '魔法', '内容', 'ダメージ', '持続'], [
     ['スター', MAGIC.star.name, `画面上から ${MAGIC.star.count} 発が ${MAGIC.star.interval} 秒間隔で降る（前方 ±${MAGIC.star.spread / 2}、vy ${MAGIC.star.vy}）。貫通`, MAGIC.star.dmg + '/発', `${(MAGIC.star.count * MAGIC.star.interval).toFixed(2)} 秒`],
@@ -19,6 +19,16 @@ export async function render(main, A) {
     ['ハート爆弾', MAGIC.heart.name, `半径 ${MAGIC.heart.radius} の爆発。範囲内の敵と宝箱に 1 回`, String(MAGIC.heart.dmg), `${MAGIC.heart.life} 秒`],
     ['キャンドル', MAGIC.candle.name, `前方 24 から ${MAGIC.candle.gap} 間隔で ${MAGIC.candle.count} 本、高さ ${MAGIC.candle.height}（3 タイル）`, '1/0.35 秒（炎と同じ）', `${MAGIC.candle.life} 秒`],
   ]));
+
+  // 強化魔法（溜め 2 段階目。src/entities/magic.js SUPER）。専用スプライトは持たず、既存の弾・炎・爆発と粒子で組む
+  main.appendChild(h3(`強化魔法（${SUPER_T} 秒まで溜める → 光輪が出たら離す。超魔界村の「黄金の鎧＋ブレスレット」に相当）`));
+  main.appendChild(table(['武器', '強化魔法', '内容', 'ダメージ', '持続'], [
+    ['スター', SUPER.star.name, `流星 ${SUPER.star.count} 発（${SUPER.star.interval} 秒間隔、前方 ±${SUPER.star.spread / 2}、vy ${SUPER.star.vy}、貫通）。着弾ごとに半径 ${SUPER.star.burst} の小爆発。最後に前方へ巨大流星 → 半径 ${SUPER.star.finale.radius} の衝撃波`, `${SUPER.star.dmg}/発、小爆発 ${SUPER.star.burstDmg}、締め ${SUPER.star.finale.dmg}`, `${(SUPER.star.count * SUPER.star.interval).toFixed(2)} 秒＋着弾`],
+    ['ナイフ', SUPER.knife.name, `鏡像 ${SUPER.knife.clones} 体が主人公を中心に半径 ${SUPER.knife.radius}（縦は 0.55 倍の楕円）を角速度 ${SUPER.knife.omega} rad/s で周回し、${SUPER.knife.interval} 秒毎に外向きへナイフ。鏡像は撃つ向きに反転`, '1/発（通常ナイフ）', `${SUPER.knife.duration} 秒`],
+    ['ハート爆弾', SUPER.heart.name, `前方 26 から ${SUPER.heart.gap} 間隔で心臓の花を ${SUPER.heart.seeds} つ（${SUPER.heart.plant} 秒間隔で植える）。各 ${SUPER.heart.delay} 秒後に半径 ${SUPER.heart.radius} で破裂し、血の花びらが舞う`, String(SUPER.heart.dmg), `${(SUPER.heart.seeds * SUPER.heart.plant + SUPER.heart.delay + SUPER.heart.life).toFixed(2)} 秒`],
+    ['キャンドル', SUPER.candle.name, `前方 20 から ${SUPER.candle.gap} 間隔で ${SUPER.candle.count} 本、高さ ${SUPER.candle.height}（4 タイル）。柱に触れた敵弾を焼き落とす（ブーメランは除く）`, '1/0.35 秒（炎と同じ）', `${SUPER.candle.life} 秒`],
+  ]));
+  main.appendChild(note(`溜めは 2 段階。${CHARGE_T} 秒で溜め魔法、${SUPER_T} 秒で強化魔法（到達時に主人公を囲む光輪＋効果音 superready、発動で画面揺れ 7・武器色フラッシュ 0.25 秒・効果音 supermagic・魔法名のテロップ）。強化魔法のための生成リクエストは 0 で、流用スプライトは 星屑の葬列 = meteor・burst / 鏡像の舞踏会 = 主人公のコマ（半透明・反転）と knife / 心臓の花園 = heart・burst / 蝋の聖歌隊 = pillar・fire`));
 
   main.appendChild(h2('2. 敵弾'));
   main.appendChild(frameStrip(Object.keys(ENEMY_SHOTS).filter(k => A.shots[ENEMY_SHOTS[k].sprite]).map(k => ({ name: k, spr: A.shots[ENEMY_SHOTS[k].sprite], left: true }))));

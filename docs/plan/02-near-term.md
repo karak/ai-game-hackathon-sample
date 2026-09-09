@@ -184,3 +184,15 @@
 | 公開（ユーザー指示 2026-09-10「Cloudflare の静的ページに専用プロジェクト」） | wrangler 4.130 を devDependency に追加。`wrangler pages project create` は Workers デプロイに転送されてエラー（Pages 新規は非推奨）→ Workers Static Assets の専用 Worker `magical-lyrica`（`wrangler.jsonc` assets.directory=dist）。`npm run deploy` / `deploy:preview`。449 ファイル、Version `b1d45468` | https://magical-lyrica.karak97.workers.dev、`node tools/check_dist.mjs <URL>`: 素材 235・エラー 0・bootMs 初回 6640 ms（TTFB 2443）／エッジ HIT 後 627 ms、転送 3.4 MB（フォント 2.07 MB）。`test-results/shots/deploy_title.png` |
 
 未達: バグ報告フォーム（GitHub Issues はリポジトリ公開後）、itch.io 掲載（任意、原稿は `itch-page.md`）、初回ロード 3 秒（IMP-019: フォントのサブセット化・長期キャッシュヘッダ・アトラス化）。
+
+## Sprint K — 「強化魔法・初回ロード短縮・生成環境の自立」（2026-09-10）
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| 強化魔法（ユーザー指示 2026-09-10「チャージショットの各武器ごとの強化。エフェクトも派手な、魔法扱い。超魔界村を参考に、この世界観に合ったパワーアップ魔法」） | 溜めを 2 段階にした（0.9 秒 = 溜め魔法、1.8 秒 = 強化魔法）。星屑の葬列／鏡像の舞踏会／心臓の花園／蝋の聖歌隊。到達で光輪＋`superready`、発動で揺れ 7・武器色フラッシュ・`supermagic`・魔法名テロップ。新規生成素材なし（既存スプライト＋粒子で構成） | `test/magic.test.js` 11 件（数・威力・周回半径・外向き・遅延爆発・敵弾焼き・段階判定・演出）、`e2e/magic.spec.js`（4 武器を実機で発動、エラー 0）、`test-results/shots/super_star.png` / `super_knife.png` / `super_heart.png` / `super_candle.png`。05-systems 5.1 |
+| IMP-019 初回ロード短縮 | フォントを使用文字だけに（457 字 143 KB、全字形 2021 KB。`tools/subset_font.py`、字種は `assets/fonts/game-chars.txt`、`test/font-subset.test.js` が文言追加時の漏れを検出）／スプライト PNG をパレット化（`tools/optimize_pngs.py` 2.61 → 1.12 MB、画素比較で可逆を確認、生成パイプラインにも組み込み）／`public/_headers` で `/assets/*` を 1 年 immutable（PNG は `?v=<ビルド ID>`） | 転送 3.4 → **1.28 MB**、bootMs 初回 6640 → **2070 ms**、以後 **474〜613 ms**（`node tools/check_dist.mjs <URL>`）。タイトル描画はパレット化前後で画素差 0 |
+| DEBT-008 生成環境 | 本リポの `.venv` で完結（`requirements.txt`: fonttools/pillow/numpy/google-genai）、`.env.example`、`gemini_gen.py` は 環境変数 → 本リポ `.env` → 参照プロジェクト `.env` の順に探す | `README.md`「素材の生成・更新」、`.venv/bin/python tools/*.py` が動作 |
+| モバイル実機（M6 の繰延分） | ユーザーが公開 URL にスマホでアクセスし、操作可能を確認（2026-09-10） | ユーザー報告。エミュレーションの自動確認は `e2e/mobile.spec.js` |
+| 残課題の登録 | IMP-020 第二章の再設計（計測付き）、IMP-021 毒沼の見え方 | 08-backlog、`test-results/shots/cmp_stage1_vs_2.png`、`tools/shot_stages.mjs`（章の同位置比較を撮る） |
+
+未達: IMP-020 の実施は**生成予算の判断待ち**（残 14、見積り 8〜10）。バグ報告先（GitHub Issues はリポジトリ公開後）。実機ゲームパッド。

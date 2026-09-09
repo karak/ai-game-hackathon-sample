@@ -5,6 +5,8 @@ import { DECO_MAP } from '../src/decomap.js';
 import { THEMES } from '../src/gfx/tiles.js';
 import { GROUP_JP } from '../src/catalog/pages/assets.js';
 import { STAGES } from '../src/levels/index.js';
+import { MAGIC, SUPER } from '../src/entities/magic.js';
+import { readFileSync } from 'node:fs';
 
 // カタログの掲載漏れ検査（DEBT-009）: manifest にある素材は必ずどこかの章の表に載る
 const keys = Object.keys(manifest);
@@ -33,4 +35,12 @@ test('every stage theme has sky, far, mid and a tile strip; every manifest group
   const bg = new Set(names('bg')), tiles = new Set(names('tiles'));
   for (const st of STAGES) { for (const l of ['sky', 'far', 'mid']) expect(bg.has(`${st.theme}_${l}`), `${st.theme}_${l}`).toBe(true); expect(tiles.has(st.theme), `tiles/${st.theme}`).toBe(true); expect(THEMES[st.theme], `THEMES.${st.theme}`).toBeTruthy(); expect(DECO_MAP[st.theme], `DECO_MAP.${st.theme}`).toBeTruthy(); }
   for (const g of new Set(keys.map(k => k.split('/')[0]))) expect(GROUP_JP[g], `group ${g}`).toBeTruthy();
+});
+
+test('the items sheet documents both magic tiers, driven by MAGIC / SUPER so the numbers cannot drift', () => {
+  const src = readFileSync('src/catalog/pages/items.js', 'utf-8');
+  for (const k of Object.keys(SUPER)) expect(src, `SUPER.${k} row`).toContain(`SUPER.${k}.name`);
+  for (const k of Object.keys(MAGIC)) expect(src, `MAGIC.${k} row`).toContain(`MAGIC.${k}.name`);
+  expect(src).toContain('SUPER_T'); expect(src).toContain('CHARGE_T'); // 溜め時間は定数から引く（表に直書きしない）
+  const hard = src.match(/'(0\.9|1\.8) 秒/g); expect(hard, '溜め秒数の直書き').toBeNull();
 });

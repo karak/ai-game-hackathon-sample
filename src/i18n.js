@@ -19,6 +19,9 @@ export const EN = {
   // オプション
   'おんりょう': 'Volume', 'ミュート': 'Mute', 'げんご': 'Language', 'キー か ボタン を おしてください': 'Press a key or button', 'そうさを しょきかに もどす': 'Reset controls', 'タイトルへ もどる': 'Back to title',
   'ひだり': 'Left', 'みぎ': 'Right', 'うえ': 'Up', 'した': 'Down', 'まほう': 'Magic', 'ジャンプ': 'Jump', 'けってい': 'OK', 'ポーズ': 'Pause',
+  // 溜め魔法（L1）と強化魔法（L2）の名前。発動時にトーストで出る（magic.js MAGIC / SUPER）
+  '流星群': 'Meteor Shower', '影の連射': 'Shadow Volley', '大爆発': 'Big Bang', '火柱': 'Fire Pillars',
+  '星屑の葬列': 'Stardust Cortege', '鏡像の舞踏会': 'Mirror Waltz', '心臓の花園': 'Heart Garden', '蝋の聖歌隊': 'Wax Choir',
   // ゲーム内トースト
   '先へ進め': 'Move on', '祈りの十字路：ここから再開できる': 'Prayer crossroads: checkpoint', '変身が解けた…！': 'Transformation broken...!',
   '魔法のドレス！': 'Magic Dress!', 'フルブルームドレス！ためうちが使える': 'Full Bloom Dress! Hold to charge', 'リリカ人形 ＋１': 'Lyrica Doll +1', 'いちごポーション': 'Strawberry Potion',

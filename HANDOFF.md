@@ -1,15 +1,15 @@
-# HANDOFF — 引き継ぎ（2026-09-10 00:15 JST 時点）
+# HANDOFF — 引き継ぎ（2026-09-10 00:50 JST 時点）
 
 次のセッション（人でも Claude でも）が、このリポジトリの現在地・決定事項・残課題・作業手順を 10 分で把握するための文書。詳細は `docs/plan/` が正で、ここは入口。
 
 ## 1. 現在地
 
 - リポジトリ: `/Users/yasushi/projects/poc-square`、HEAD は Sprint I・J のコミット（`git log -2`）、作業ツリー clean
-- 検証: `npm test` Vitest 98 件通過、`npm run e2e` Playwright 8 件通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 235 読込を確認
+- 検証: `npm test` Vitest 107 件通過、`npm run e2e` Playwright 9 件通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 235 読込を確認
 - 生成予算: Gemini 台帳 `tools/gen_ledger.json` **186 / 200**（残 14）。逐次実行、並列禁止
 - **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）
 - マイルストーン: M0〜M4 済、M5 は実装分済（テスター計測は人手のため繰延）、M6 済（実機確認のみ繰延）、M7 公開済（バグ報告先と初回ロード短縮 IMP-019 が残）。表は `docs/plan/03-roadmap.md`
-- 本日のスプリント: E ビジュアル残課題一掃 → F 死亡ログ・コンティニュー・2 周目・ポーズ → G 音 → H 計測・ロード画面 → I 英語 UI・粒子上限・ロード計測・スマホ → J リリース準備・Cloudflare 公開（`docs/plan/02-near-term.md` 末尾）
+- 本日のスプリント: E ビジュアル残課題一掃 → F 死亡ログ・コンティニュー・2 周目・ポーズ → G 音 → H 計測・ロード画面 → I 英語 UI・粒子上限・ロード計測・スマホ → J リリース準備・Cloudflare 公開 → K 強化魔法・初回ロード短縮・生成環境の自立（`docs/plan/02-near-term.md` 末尾）
 
 ## 2. 最初に読むもの（順番）
 
@@ -35,6 +35,8 @@
 | 性能 | update 0.03 ms・draw 0.16 ms 以下、rAF 20 ms 超 0 回。バッチ化・背景キャッシュは見送り。粒子上限 400 | 05-systems 5.6 |
 | 英語 UI | 日本語文字列をキーにした辞書 `src/i18n.js EN` と `t()`。物語本文は `story.js` に両言語（場面数・行数を揃える）。初回はブラウザ言語、以後は保存 `lang`。辞書漏れは `test/i18n.test.js` が t() の呼び出しを走査して検出 | IMP-008 |
 | 素材の URL 解決 | `loader.js` はページ URL（`document.baseURI`）基準。build は `vite.config.js copySprites` が `assets/sprites` を dist にコピー。`import.meta.url` 基準に戻すと dist で全素材が消える | BUG-014 |
+| 溜めは 2 段階 | 0.9 秒 `CHARGE_T` で溜め魔法、1.8 秒 `SUPER_T` で強化魔法（`magic.js SUPER`）。強化魔法は新規生成素材なしで、既存スプライト＋粒子＋画面演出で作る | 05-systems 5.1、Sprint K |
+| 素材の軽量化 | フォントはゲーム用サブセット（`tools/subset_font.py`。文言を足したら作り直す。`test/font-subset.test.js` が漏れを検出）、スプライトはパレット PNG（`tools/optimize_pngs.py`、可逆検査つき）。`/assets/*` は 1 年 immutable なので PNG は `?v=<ビルド ID>` で破棄する | IMP-019、`docs/release/deploy.md` |
 | 配信先 | Cloudflare Pages ではなく Workers Static Assets（wrangler 4.130 で Pages 新規作成が Workers に転送される）。`wrangler.jsonc` の `assets.directory=./dist`、Worker 名 `magical-lyrica`。初回ロードはエッジ未キャッシュで 6.6 秒、HIT 後 0.6 秒 | `docs/release/deploy.md`、IMP-019 |
 | 配信文書 | `docs/release/`: `itch-page.md`（手順・日英本文）、`known-issues.md`（08-backlog の ID）、`trailer.gif`（384×336, 5.2 MB）/ `trailer_256.gif`（256×224, 2.55 MB）。再生成は `node tools/make_trailer.mjs` | Sprint J |
 
@@ -42,7 +44,7 @@
 
 **人手待ち（繰延決定済み）**: テスター 5 人の完走率（M5 出口）、IMP-017 死亡多発地点の検証（第三章 x512 棘、涙の川 x1280 沼、工房 x1088 プレス、遊園地 x2688 沼、菓子の森 x2304）、実機ゲームパッド。
 
-**M7 の残り**: バグ報告先（GitHub Issues はリポジトリ公開後）、IMP-019 初回ロード短縮（フォントのサブセット化・`_headers` 長期キャッシュ・アトラス化）、itch.io 掲載は任意（原稿 `docs/release/itch-page.md`）。
+**次にやること（優先順）**: **IMP-020 第二章「毒沼の菓子の森」の再設計**（ユーザー指摘。敵 7 種すべてが第一章と同じ、装飾 8 個中 7 個が同じ、ギミックは毒沼のみ、地形の起伏もほぼ同型という計測が 08-backlog にある。専用敵 2 種・ギミック小物 2・装飾 3・中景 1 で 8〜10 リクエストの見積り。**生成予算の判断が要る**: 台帳 186/200 で残 14）、IMP-021 毒沼の見え方、バグ報告先（GitHub Issues はリポジトリ公開後）、実機ゲームパッド。itch.io 掲載は任意（原稿 `docs/release/itch-page.md`）。
 
 **M6 の繰延**: 実機スマホ（Playwright の iPhone 13 エミュレーションのみ）、実機パッド。
 
@@ -62,6 +64,9 @@ npm run e2e                                # Playwright 8 件（5174 を自動�
 npm run build && node tools/check_dist.mjs # dist を vite preview（4174）で起こし素材 235 の読込を確認
 npm run deploy                             # Cloudflare へ本番デプロイ（wrangler login 済みが前提）。deploy:preview はプレビュー URL のみ
 node tools/check_dist.mjs https://magical-lyrica.karak97.workers.dev   # 公開 URL の検証（bootMs・素材・エラー）
+node tools/shot_stages.mjs --stages 1,2 --at 0.35,0.7  # 章の同じ位置を撮って比べる（アートの判断材料）
+.venv/bin/python tools/subset_font.py      # 文言を増やしたらフォントのサブセットを作り直す（テストが漏れを検出）
+.venv/bin/python tools/optimize_pngs.py    # スプライト PNG のパレット化（可逆検査つき。build_sprites/derive_variants から自動で呼ばれる）
 node tools/make_trailer.mjs                # トレーラー GIF 再生成（5175）。--scale 0.3333 --out docs/release/trailer_256.gif でカバー用
 node tools/gather_deaths.mjs --runs 2 --secs 150   # 死亡ログ収集（5173 が起きていること）
 

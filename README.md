@@ -32,7 +32,7 @@ Node 20 以上。`npm run e2e` は初回に `npx playwright install chromium` �
 | ← → / A D | 移動 |
 | ↓ / S | しゃがみ（低い姿勢で撃てる） |
 | X / K / Space | ジャンプ。空中でもう一度押すとほうきで二段ジャンプ（方向転換可） |
-| Z / J | 魔法弾。フルブルームドレス時は長押しで溜め撃ち |
+| Z / J | 魔法弾。フルブルームドレス時は長押しで溜め撃ち（0.9 秒で溜め魔法、1.8 秒で強化魔法。光輪が出たら離す） |
 | P / Esc | ポーズ |
 | M | ミュート |
 | Enter | スタート / 決定 |
@@ -46,7 +46,7 @@ Node 20 以上。`npm run e2e` は初回に `npx playwright install chromium` �
 - **魔法のドレス**＝鎧。1 発被弾で変身解除（私服）。私服でもう 1 発当たると死亡。
 - **宝箱（プレゼント箱）** を撃つとアイテム：ドレス / フルブルームドレス（溜め撃ち解放）/ 武器 / 1UP / ポーション。
 - **武器 4 種**：スター（直線）、ナイフ（高速）、ハート爆弾（放物線・威力 2）、キャンドル（着弾後に炎が残る）。
-- **溜め撃ち**（フルブルームドレス時）は武器ごとに違う魔法：流星群・影の連射・大爆発・火柱。
+- **溜め撃ち**（フルブルームドレス時）は武器ごとに違う魔法：流星群・影の連射・大爆発・火柱。さらに **1.8 秒まで溜めると強化魔法**：星屑の葬列（流星 14 発＋巨大流星）・鏡像の舞踏会（鏡像 4 体が周回して連射）・心臓の花園（地面の花が連鎖爆発）・蝋の聖歌隊（火柱 5 本が敵弾を焼き落とす）。
 - **制限時間**、**チェックポイント**（十字路）、**残機**。残機 0 でゲームオーバー → コンティニュー（面の先頭・スコア 0）。
 - **8 章**：花畑の墓地 → 毒沼の菓子の森 → 血染めの砂糖城 → 涙の川 → 綿雪の人形工房 → 骨の遊園地 → 鏡の塔（縦スクロール）→ 星の墓標（ボス 7 体連戦）。各章末にボス、クリアでエンディング 6 場面＋クレジット。
 - **ギミック**：動く足場・浮島・崩れる板・はしご・水流・風・ベルトコンベア・プレス機・観覧車。
@@ -81,13 +81,14 @@ Node 20 以上。`npm run e2e` は初回に `npx playwright install chromium` �
 ### 素材の生成・更新
 
 ```bash
-# 参照プロジェクトの .env にある GEMINI_API_KEY を使う（tools/gemini_gen.py が読む）
-python3 tools/gemini_gen.py enemy-zombie          # specs.json のキーで 1 件生成（台帳 tools/gen_ledger.json に記録）
-python3 tools/build_sprites.py                    # raw → assets/sprites/*.png + src/gfx/manifest.json
-python3 tools/derive_variants.py                  # 帽子抽出・衣装パレット置換（リクエスト不要）
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # 初回のみ（fonttools / pillow / numpy / google-genai）
+cp .env.example .env                              # GEMINI_API_KEY を入れる（.env は git 管理外）
+.venv/bin/python tools/gemini_gen.py enemy-zombie # specs.json のキーで 1 件生成（台帳 tools/gen_ledger.json に記録）
+.venv/bin/python tools/build_sprites.py           # raw → assets/sprites/*.png + src/gfx/manifest.json（パレット PNG に最適化）
+.venv/bin/python tools/derive_variants.py         # 帽子抽出・衣装パレット置換（リクエスト不要）
+.venv/bin/python tools/subset_font.py             # 文言を増やしたらフォントのサブセットを作り直す
+.venv/bin/python tools/optimize_pngs.py           # スプライト PNG をパレット化（可逆、転送量 -57%）
 ```
-
-PIL / numpy / google-genai が入った Python（参照プロジェクトの `.venv`）で実行する。
 
 ```
 src/

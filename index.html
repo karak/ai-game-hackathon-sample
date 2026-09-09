@@ -6,7 +6,8 @@
 <title>マジカル☆リリカと血塗られたおとぎの国</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 fill=%27%232d1f4c%27/%3E%3Cpolygon points=%278,1 11,9 5,9%27 fill=%27%23ff8fc8%27/%3E%3Crect x=%272%27 y=%279%27 width=%2712%27 height=%272%27 fill=%27%23d9262b%27/%3E%3C/svg%3E">
 <style>
-  @font-face { font-family: 'DotGothic16'; src: url('assets/fonts/DotGothic16-Regular.ttf') format('truetype'); }
+  /* ゲームが描く文字だけのサブセット（139 KB。全字形は 2.0 MB）。生成は tools/subset_font.py、字種は assets/fonts/game-chars.txt。IMP-019 */
+  @font-face { font-family: 'DotGothic16'; src: url('assets/fonts/DotGothic16-Game.ttf') format('truetype'); }
   html, body { margin: 0; background: #0e0a18; color: #cbaaf5; font-family: 'DotGothic16', 'Hiragino Kaku Gothic ProN', sans-serif; overflow: hidden; height: 100%; }
   body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
   #wrap { position: relative; }
