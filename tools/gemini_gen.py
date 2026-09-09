@@ -103,7 +103,37 @@ def size_block(name: str) -> tuple[str, dict]:
         lines.append(f"- Feet rest on the baseline y = {base} px (that is {(canvas - base)//cell} cells above the bottom edge). Nothing below the baseline.")
     else:
         lines.append(f"- Vertically centered on the canvas.")
+    if sp.get('parts'):
+        lines.append(part_block(spec['part_sizes'][sp['parts']]))
     return '\n'.join(lines), sp
+
+
+PART_LABELS = {
+    'total_height': 'TOTAL HEIGHT from the top of the sprite (hat tip, or hair top when hatless) to the boot sole: {v} cells when standing upright',
+    'hat_height': 'witch hat: {v} cells tall from the tip to the underside of the brim',
+    'hat_brim_width': 'hat brim: {v} cells wide (the widest row of the hat)',
+    'hat_above_hair': 'the hat tip sits {v} cells above the top of the hair',
+    'head_height': 'head: {v} cells from the top of the hair to the chin',
+    'hair_width': 'hair: {v} cells wide at its widest',
+    'eye_height': 'eyes: {v} cells tall',
+    'eye_from_hair_top': 'the eyes start {v} cells below the top of the hair',
+    'torso_height': 'torso (collar to waist): {v} cells',
+    'shoulder_width': 'shoulders including the puff sleeves: {v} cells wide',
+    'skirt_height': 'skirt (waist to hem): {v} cells',
+    'skirt_hem_width': 'skirt hem: {v} cells wide when hanging still',
+    'legs_height': 'legs (hem to sole, socks + boots): {v} cells',
+    'boot_height': 'boots: {v} cells tall',
+    'boot_width': 'each boot: {v} cells long',
+}
+
+
+def part_block(parts: dict) -> str:
+    """部位ごとの論理ピクセル数を列挙する契約ブロック。高さ比ではなく部位のセル数で指定する（ユーザー指示 2026-09-09）。"""
+    lines = ["- PART SIZES (count them on the grid; 1 cell = 1 logical pixel). Every frame must reproduce these part sizes within 2 cells, whatever the pose:"]
+    for k, v in parts.items():
+        if k in PART_LABELS: lines.append(f"    * {PART_LABELS[k].format(v=v)}")
+    lines.append("- A pose may fold the body (crouch, tuck, lean) and so reduce the TOTAL height, but it must never enlarge the head, hair, hat or eyes. If the drawing is coming out with a bigger head or a wider brim than the numbers above, it is wrong.")
+    return '\n'.join(lines)
 
 
 def latest_raw(name: str) -> Path:

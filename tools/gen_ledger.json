@@ -1,5 +1,5 @@
 {
- "requests": 174,
+ "requests": 177,
  "entries": [
   {
    "name": "player-base",
@@ -1352,6 +1352,30 @@
    "secs": 9.4,
    "text": "Here is your 16-bit SNES-era Japanese RPG pixel art parallax layer. ",
    "ts": 1788934265.214238
+  },
+  {
+   "name": "player-jump-hat",
+   "v": 2,
+   "ok": true,
+   "secs": 14.3,
+   "text": "",
+   "ts": 1788937146.1046422
+  },
+  {
+   "name": "player-jump",
+   "v": 2,
+   "ok": true,
+   "secs": 20.7,
+   "text": "",
+   "ts": 1788937227.8763268
+  },
+  {
+   "name": "enemy-cake",
+   "v": 2,
+   "ok": true,
+   "secs": 11.7,
+   "text": "",
+   "ts": 1788937295.05441
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

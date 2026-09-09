@@ -1,3 +1,7 @@
-SUBJECT: the reference character (Lyrica WEARING her witch hat, exactly as in the LEFT figure of the reference), side view facing RIGHT, two frames: FRAME 1 = JUMP RISING: knees tucked up, both arms raised, skirt flared upward, hair lifted; FRAME 2 = FALLING: legs extended downward with one foot forward, arms slightly out, skirt billowing. Same colors, same head, same proportions as the reference.
+SUBJECT: the reference character (Lyrica WEARING her witch hat, exactly as in the LEFT figure of the reference), side view facing RIGHT, two frames.
+FRAME 1 = JUMP RISING: both knees bent and lifted a little (boots about 12 cells above the baseline within the box), arms raised above the head, skirt lifted, hair lifted. The body stays upright; do not curl into a ball.
+FRAME 2 = FALLING: legs extended downward with one foot forward, arms slightly out, skirt billowing.
+Draw the head, hair, hat and eyes at exactly the PART SIZES above: the head is the same size as in the reference, not bigger. The hat brim is 57 cells wide in both frames.
+Same colors, same head, same proportions as the reference.
 
 The witch hat must stay on her head in every frame (it may tilt slightly with motion).

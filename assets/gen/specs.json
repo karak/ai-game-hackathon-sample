@@ -3,6 +3,40 @@
  "cell": 8,
  "canvas": 1024,
  "baseline_px": 960,
+ "part_sizes": {
+  "_doc": "パーツ単位の論理ピクセル数（1 セル = 1 論理 px）。idle 原画（assets/sprites/player/idle.png 69x111, idle_nohat.png 44x103）の実測 2026-09-09。gemini_gen が PART SIZES ブロックとして prompt に付与し、build_sprites の QA が出力コマで同じ部位を計測して比較する（許容 ±15%）",
+  "player": {
+   "total_height": 111,
+   "hat_height": 35,
+   "hat_brim_width": 57,
+   "hat_above_hair": 8,
+   "head_height": 40,
+   "hair_width": 40,
+   "eye_height": 6,
+   "eye_from_hair_top": 20,
+   "torso_height": 20,
+   "shoulder_width": 30,
+   "skirt_height": 24,
+   "skirt_hem_width": 48,
+   "legs_height": 18,
+   "boot_height": 10,
+   "boot_width": 12
+  },
+  "player_nohat": {
+   "total_height": 103,
+   "head_height": 40,
+   "hair_width": 40,
+   "eye_height": 6,
+   "eye_from_hair_top": 20,
+   "torso_height": 20,
+   "shoulder_width": 30,
+   "skirt_height": 24,
+   "skirt_hem_width": 44,
+   "legs_height": 18,
+   "boot_height": 10,
+   "boot_width": 12
+  }
+ },
  "sprites": {
   "player-base": {
    "box": [
@@ -16,7 +50,8 @@
     "player/idle",
     "player/idle_nohat"
    ],
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player"
   },
   "player-nohat": {
    "box": [
@@ -31,7 +66,8 @@
     "player/idle"
    ],
    "skip": true,
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player_nohat"
   },
   "player-hat": {
    "box": [
@@ -45,7 +81,8 @@
    "out": [
     "player/hat"
    ],
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player"
   },
   "player-run-a": {
    "box": [
@@ -61,7 +98,8 @@
     "player/run2_nohat"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player_nohat"
   },
   "player-run-b": {
    "box": [
@@ -78,7 +116,8 @@
    ],
    "palette": "player/idle",
    "strip_caption": true,
-   "use": "v2"
+   "use": "v2",
+   "parts": "player_nohat"
   },
   "player-jump": {
    "box": [
@@ -94,7 +133,8 @@
     "player/fall_nohat"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player_nohat"
   },
   "player-attack": {
    "box": [
@@ -110,7 +150,8 @@
     "player/crouch_nohat"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player_nohat"
   },
   "player-hurt": {
    "box": [
@@ -126,7 +167,8 @@
     "player/hurt2_nohat"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player_nohat"
   },
   "player-dead": {
    "box": [
@@ -141,7 +183,8 @@
     "player/dead_nohat"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player_nohat"
   },
   "player-plain": {
    "box": [
@@ -155,7 +198,8 @@
    "out": [
     "player/idle_plain"
    ],
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player"
   },
   "player-gold": {
    "box": [
@@ -169,7 +213,8 @@
    "out": [
     "player/idle_gold"
    ],
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player"
   },
   "enemy-zombie": {
    "box": [
@@ -355,7 +400,8 @@
     "player/run2"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player"
   },
   "player-run-b-hat": {
    "box": [
@@ -371,7 +417,8 @@
     "player/run4"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player"
   },
   "player-jump-hat": {
    "box": [
@@ -387,7 +434,11 @@
     "player/fall"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player",
+   "frame_use": {
+    "player/fall": "v1"
+   }
   },
   "player-attack-hat": {
    "box": [
@@ -403,7 +454,8 @@
     "player/crouch"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player"
   },
   "player-hurt-hat": {
    "box": [
@@ -419,7 +471,8 @@
     "player/hurt2"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player"
   },
   "player-dead-hat": {
    "box": [
@@ -434,7 +487,8 @@
     "player/dead"
    ],
    "palette": "player/idle",
-   "strip_caption": true
+   "strip_caption": true,
+   "parts": "player"
   },
   "bg-graveyard-sky": {
    "box": [

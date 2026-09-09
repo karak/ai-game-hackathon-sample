@@ -48,17 +48,51 @@ def build(name, sp):
             dst = OUT / f'{o}.png'; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_bytes(src.read_bytes())
             dst.with_suffix('.json').write_text(src.with_suffix('.json').read_text()); res.append((o, dst))
         else: print(f'  WARN {name}: frame {s} not produced')
+    # frame_use: コマ単位で別の版を採る（例 {"player/fall": "v1"}: 2 コマ中 1 コマだけ良かった版を活かし、リクエストを節約する）
+    for o, ver in sp.get('frame_use', {}).items():
+        raw2 = latest(name, ver)
+        if not raw2 or o not in outs: print(f'  WARN {name}: frame_use {o}={ver} not found'); continue
+        tmp2 = tmp / ver; tmp2.mkdir(exist_ok=True); s = Path(o).name
+        subprocess.run([PY, str(ROOT / 'tools/postprocess.py'), str(raw2), str(tmp2), '--logical', f'{w}x{h}', '--anchor', sp['anchor'], '--split', '--names', ','.join(short), *pal_arg], check=True)
+        src = tmp2 / f'{s}.png'
+        if src.exists():
+            dst = OUT / f'{o}.png'; dst.write_bytes(src.read_bytes()); dst.with_suffix('.json').write_text(src.with_suffix('.json').read_text())
+            res = [(oo, dd) for oo, dd in res if oo != o] + [(o, dst)]; print(f'  {o} <- {raw2.name}')
     return res
 
 
+def measure_parts(im):
+    """主人公コマの部位を色で計測する（論理 px）。帽子＝暗い藍の画素が 40% 超の行、髪＝桃色の画素。
+    値は色の閾値に依存するので、specs の part_sizes（目視実測）とは直接比べず、同じ関数で測った idle と比べる"""
+    import numpy as np
+    a = np.asarray(im.convert('RGBA')); al = a[..., 3] > 0; h = a.shape[0]
+    r, g, b = (a[..., i].astype(int) for i in range(3))
+    hat = al & (b > r + 10) & (r < 120) & (g < 110)
+    skin = al & (r > 220) & (g > 170) & (b > 150) & (r - b > 30)
+    hair = al & (r > 200) & (b > 150) & (g < 200) & (r - g > 40) & ~skin
+    out = {'total_height': h}
+    hatrows = [y for y in range(int(h * 0.5)) if al[y].sum() and hat[y].sum() / al[y].sum() > 0.4]
+    if hatrows: out['hat_height'] = max(hatrows) - min(hatrows) + 1; out['hat_brim_width'] = int(max(hat[y].sum() for y in hatrows))
+    hw = hair.sum(axis=1)
+    if hw.any(): out['hair_width'] = int(hw.max())   # 髪だけの最大幅（腕の肌色は含めない）
+    return out
+
+
 def qa_player_frame(key, dst, manifest):
-    """主人公コマの出力チェック（合成可否の当たり）: idle との高さ差、帽子の有無、髪の上端の連続性を WARN で出す。"""
+    """主人公コマの出力チェック（合成可否の当たり）: 部位サイズ（specs part_sizes）との差、idle との高さ差、帽子の有無、髪の上端の連続性を WARN で出す。"""
     if not key.startswith('player/') or key in ('player/hat', 'player/base', 'player/base_hat'): return
     from PIL import Image
     import numpy as np
     name = key.split('/')[1]
     idle = manifest.get('player/idle_nohat' if name.endswith('_nohat') else 'player/idle'); im = Image.open(dst).convert('RGBA'); a = np.asarray(im); al = a[..., 3] > 0
     r, g, b = (a[..., i].astype(int) for i in range(3)); h = a.shape[0]
+    # 部位サイズ: 帽子つばの幅・髪の幅・帽子の高さは姿勢に依らず一定のはず（±15%）。総高は直立コマだけ比べる
+    if idle and name.replace('_nohat', '') not in ('dead', 'idle') and (ROOT / idle['src']).exists():
+        ref = measure_parts(Image.open(ROOT / idle['src'])); got = measure_parts(im); bad = []
+        # つばの幅・帽子の高さは姿勢で変わらない（±15%）。髪の幅は動きでなびくので ±30% だけ見る
+        for k, tol in (('hat_brim_width', 0.15), ('hat_height', 0.15), ('hair_width', 0.30)):
+            if k in ref and k in got and abs(got[k] / ref[k] - 1) > tol: bad.append(f'{k} {got[k]} vs idle {ref[k]} ({got[k] / ref[k]:.2f}x)')
+        if bad: print(f'  QA {key}: 部位サイズ不一致 -> ' + '; '.join(bad) + ' -> 再生成候補（PART SIZES を守らせる）')
     if idle and name.replace('_nohat', '') not in ('dead', 'crouch', 'jump', 'hurt2', 'idle'):
         ratio = im.height / idle['h']
         if abs(ratio - 1) > 0.12: print(f'  QA {key}: height {im.height} vs idle {idle["h"]} ({ratio:.2f}x) -> 再生成候補（同じ大きさで描かせる）')

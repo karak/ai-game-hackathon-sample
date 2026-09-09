@@ -897,19 +897,19 @@
  },
  "enemies/cake1": {
   "anchor": "bottom",
-  "colors": 15,
+  "colors": 14,
   "fits": true,
-  "h": 77,
+  "h": 72,
   "src": "assets/sprites/enemies/cake1.png",
-  "w": 73
+  "w": 54
  },
  "enemies/cake2": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 100,
+  "h": 74,
   "src": "assets/sprites/enemies/cake2.png",
-  "w": 71
+  "w": 54
  },
  "enemies/clown1": {
   "anchor": "bottom",
@@ -1253,7 +1253,7 @@
   "fits": true,
   "h": 104,
   "src": "assets/sprites/player/fall_nohat.png",
-  "w": 77
+  "w": 80
  },
  "player/fall_plain": {
   "anchor": "bottom",
@@ -1261,7 +1261,7 @@
   "fits": true,
   "h": 104,
   "src": "assets/sprites/player/fall_plain.png",
-  "w": 77
+  "w": 80
  },
  "player/hat": {
   "anchor": "center",
@@ -1282,19 +1282,19 @@
  },
  "player/hurt2": {
   "anchor": "bottom",
-  "colors": 5,
+  "colors": 15,
   "fits": true,
-  "h": 111,
+  "h": 118,
   "src": "assets/sprites/player/hurt2.png",
-  "w": 75
+  "w": 82
  },
  "player/hurt2_gold": {
   "anchor": "bottom",
-  "colors": 7,
+  "colors": 15,
   "fits": true,
-  "h": 111,
+  "h": 118,
   "src": "assets/sprites/player/hurt2_gold.png",
-  "w": 75
+  "w": 82
  },
  "player/hurt2_nohat": {
   "anchor": "bottom",
@@ -1302,7 +1302,7 @@
   "fits": true,
   "h": 114,
   "src": "assets/sprites/player/hurt2_nohat.png",
-  "w": 68
+  "w": 77
  },
  "player/hurt2_plain": {
   "anchor": "bottom",
@@ -1310,7 +1310,7 @@
   "fits": true,
   "h": 114,
   "src": "assets/sprites/player/hurt2_plain.png",
-  "w": 68
+  "w": 77
  },
  "player/hurt_gold": {
   "anchor": "bottom",
@@ -1372,33 +1372,33 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 94,
+  "h": 102,
   "src": "assets/sprites/player/jump.png",
-  "w": 75
+  "w": 70
  },
  "player/jump_gold": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 94,
+  "h": 102,
   "src": "assets/sprites/player/jump_gold.png",
-  "w": 75
+  "w": 70
  },
  "player/jump_nohat": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 76,
+  "h": 97,
   "src": "assets/sprites/player/jump_nohat.png",
-  "w": 64
+  "w": 57
  },
  "player/jump_plain": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 76,
+  "h": 97,
   "src": "assets/sprites/player/jump_plain.png",
-  "w": 64
+  "w": 57
  },
  "player/run1": {
   "anchor": "bottom",

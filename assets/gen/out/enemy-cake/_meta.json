@@ -1,8 +1,8 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-cake-v1.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-cake-v2.png",
  "pitch": [
-  5.0,
-  5.0
+  7.0,
+  7.0
  ],
  "max_box": [
   96,
@@ -10,15 +10,15 @@
  ],
  "frames": [
   {
-   "w": 73,
-   "h": 77,
+   "w": 54,
+   "h": 72,
    "fits": true,
-   "colors": 15,
+   "colors": 14,
    "name": "cake1"
   },
   {
-   "w": 71,
-   "h": 100,
+   "w": 54,
+   "h": 74,
    "fits": true,
    "colors": 15,
    "name": "cake2"

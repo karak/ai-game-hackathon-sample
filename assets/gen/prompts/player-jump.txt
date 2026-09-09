@@ -1,1 +1,5 @@
-SUBJECT: the reference character (hatless Lyrica), side view facing RIGHT, two frames: FRAME 1 = JUMP RISING: knees tucked up, both arms raised, skirt flared upward, hair lifted; FRAME 2 = FALLING: legs extended downward with one foot forward, arms slightly out, skirt billowing. Same colors, same head, same proportions as the reference.
+SUBJECT: the reference character (hatless Lyrica, exactly as in the RIGHT figure of the reference), side view facing RIGHT, two frames.
+FRAME 1 = JUMP RISING: both knees bent and lifted a little (boots about 12 cells above the baseline within the box), arms raised above the head, skirt lifted, hair lifted. The body stays upright; do not curl into a ball.
+FRAME 2 = FALLING: legs extended downward with one foot forward, arms slightly out, skirt billowing.
+Draw the head, hair and eyes at exactly the PART SIZES above: the head is the same size as in the reference, not bigger (hair 40 cells wide, 40 cells from hair top to chin).
+Same colors, same head, same proportions as the reference. No hat in either frame.

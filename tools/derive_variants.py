@@ -125,6 +125,13 @@ def ensure_hat(frame_name, hat_img):
     canvas.save(SPR / f'{frame_name}.png'); return True
 
 
+def flash_frame(im, k=0.55):
+    """不透明画素を白へ k だけ寄せる（輪郭は残る）。SNES の被弾点滅相当"""
+    a = np.asarray(im).astype(int).copy(); al = a[..., 3] > 0
+    for c in range(3): a[..., c][al] = (a[..., c][al] * (1 - k) + 255 * k).astype(int)
+    return Image.fromarray(a.astype(np.uint8), 'RGBA')
+
+
 def rule_map(im, target):
     """衣装色を規則で置換する（生成モデルが衣装変更を守らないため）。
     髪より下（高さ 42% 以下）に主に現れる桃〜赤紫色を衣装色とみなし、
@@ -184,8 +191,14 @@ def main():
     print('hat', hm)
     frames = ['idle', 'run1', 'run2', 'run3', 'run4', 'jump', 'fall', 'attack', 'crouch', 'hurt', 'hurt2', 'dead']
     hat_img = load('hat')
+    # hurt2 = 被弾の点滅コマ。生成では「白く光る」指示が白い幽霊（帽子なし・別の顔）になったので、hurt を白へ 55% 寄せて作る（リクエスト不要、寸法は hurt と同一）
+    for src, dst in (('hurt', 'hurt2'), ('hurt_nohat', 'hurt2_nohat')):
+        if not (SPR / f'{src}.png').exists(): continue
+        out = flash_frame(load(src)); out.save(SPR / f'{dst}.png')
+        manifest[f'player/{dst}'] = {'src': f'assets/sprites/player/{dst}.png', 'w': out.width, 'h': out.height, 'anchor': 'bottom', 'fits': True, 'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0])}
+        print('flash frame', dst, '<-', src)
     for n in frames:
-        if n in ('dead',) or not (SPR / f'{n}.png').exists(): continue
+        if n in ('dead', 'hurt2') or not (SPR / f'{n}.png').exists(): continue  # hurt2 は hurt から派生（白寄せで帽子色が薄まり、帽子なしと誤判定されるので合成しない）
         if ensure_hat(n, hat_img):
             out = load(n); manifest[f'player/{n}'].update({'w': out.width, 'h': out.height}); print('hat composited onto', n)
     # plain: 帽子なしフレーム(*_nohat) に idle_nohat→idle_plain の写像を適用
