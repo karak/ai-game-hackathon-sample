@@ -19,9 +19,25 @@ test('bot clears every stage (invincible, death stubbed) without runtime errors'
     for (let si = 0; si < STAGES.length; si++) {
       g.input.held.clear();
       g.startGame(0); g.stageIndex = si; g.startStage(); g.setState('play'); g.irisT = 99;
-      const w = g.world, p = w.player; p.invT = 1e9; p.die = () => {};
+      const w = g.world, p = w.player, map = w.level.map; p.invT = 1e9; p.die = () => {};
       let frames = 0, lastX = p.x;
+      // 縦スクロール面: 足元の床の 1 つ上にある 'L' へ歩いて上を押す（登攀ボット）
+      const ladderX = () => { const fy = Math.floor((p.y + p.h - 1) / 16); for (const ty of [fy, fy - 1]) for (let tx = 0; tx < map.width; tx++) if (map.at(tx, ty) === 'L') return tx * 16 + 8; return null; };
       while (g.state === 'play' && frames < 60 * 300) {
+        if (w.level.vertical) {
+          g.input.held.clear();
+          if (p.climbing) g.input.held.add('up');
+          else { const lx = ladderX(); let dir = 1; if (lx !== null) { const dx = lx - p.centerX; if (Math.abs(dx) < 3) g.input.held.add('up'); else { dir = dx > 0 ? 1 : -1; g.input.held.add(dir > 0 ? 'right' : 'left'); } } else g.input.held.add('right');
+            // 進行方向の足元に床が無ければ跳ぶ（穴・風の吹き抜け）
+            const ftx = Math.floor((p.centerX + dir * 10) / 16), fty = Math.floor((p.y + p.h + 1) / 16);
+            if (p.onGround && !map.isSolid(ftx, fty) && !map.isOneWay(ftx, fty)) g.input.pressed.add('jump');
+            if (!p.onGround && p.jumps === 1 && p.vy > 0 && frames % 5 === 0) g.input.pressed.add('jump'); }
+          if (frames % 15 === 0) g.input.pressed.add('shoot');
+          if (w.boss && !w.boss.dying && w.boss.state !== 'enter' && frames % 60 === 0) w.boss.hurt(4, null);
+          g.update(STEP); g.input.endFrame(); frames++;
+          if (frames % 600 === 0) await new Promise(r => setTimeout(r, 0));
+          continue;
+        }
         g.input.held.add('right'); if (frames % 20 === 0) g.input.pressed.add('shoot');
         if (frames % 30 === 0) { if (p.x - lastX < 6) g.input.pressed.add('jump'); lastX = p.x; }
         if (!p.onGround && p.jumps === 1 && p.vy > 0 && frames % 7 === 0) g.input.pressed.add('jump');

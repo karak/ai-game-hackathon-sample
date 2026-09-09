@@ -1,5 +1,5 @@
 {
- "requests": 138,
+ "requests": 146,
  "entries": [
   {
    "name": "player-base",
@@ -1064,6 +1064,70 @@
    "secs": 11.9,
    "text": "",
    "ts": 1788931990.623234
+  },
+  {
+   "name": "bg-tower-mid",
+   "v": 1,
+   "ok": true,
+   "secs": 10.2,
+   "text": "",
+   "ts": 1788932001.268827
+  },
+  {
+   "name": "bg-tower-mid2",
+   "v": 1,
+   "ok": true,
+   "secs": 9.5,
+   "text": "Here's a pixel art mid-distance parallax layer for a mirror tower at night, featuring two leaning mirrors, a gargoyle statue, and a torn purple drape.\n",
+   "ts": 1788932011.1680079
+  },
+  {
+   "name": "bg-tower-mid3",
+   "v": 1,
+   "ok": true,
+   "secs": 9.0,
+   "text": "",
+   "ts": 1788932020.5925171
+  },
+  {
+   "name": "tiles-tower",
+   "v": 1,
+   "ok": true,
+   "secs": 9.1,
+   "text": "",
+   "ts": 1788932030.142876
+  },
+  {
+   "name": "deco-tower",
+   "v": 1,
+   "ok": true,
+   "secs": 12.1,
+   "text": "",
+   "ts": 1788932042.6550741
+  },
+  {
+   "name": "enemy-gargoyle",
+   "v": 1,
+   "ok": true,
+   "secs": 9.8,
+   "text": "",
+   "ts": 1788932052.889041
+  },
+  {
+   "name": "boss-mirrorqueen",
+   "v": 1,
+   "ok": true,
+   "secs": 11.8,
+   "text": "",
+   "ts": 1788932065.1722612
+  },
+  {
+   "name": "boss-mirrorqueen-b",
+   "v": 1,
+   "ok": true,
+   "secs": 14.0,
+   "text": "",
+   "ts": 1788932080.296831
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

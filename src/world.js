@@ -125,7 +125,7 @@ export class World {
     for (const c of this.level.checkpoints) if (p.centerX > c.x && this.checkpoint.x < c.x) { this.checkpoint = { ...c }; this.toast('祈りの十字路：ここから再開できる'); this.audio.sfx('select'); }
 
     // ボス戦開始
-    if (this.bossState === 'none' && this.level.bossTrigger && p.centerX > this.level.bossTrigger.x && p.alive) this.startBoss();
+    if (this.bossState === 'none' && this.level.bossTrigger && p.alive && (this.level.vertical ? p.y + p.h <= this.level.bossTrigger.y + TILE : p.centerX > this.level.bossTrigger.x)) this.startBoss(); // 縦マップはトリガー行より上に立ったら開始
 
     for (const e of this.enemies) e.update(dt);
     for (const s of this.shots) s.update(dt);
@@ -152,7 +152,7 @@ export class World {
 
   startBoss() {
     const trig = this.level.bossTrigger; const map = this.level.map;
-    const x0 = Math.max(0, Math.min(trig.x - 24, map.pixelWidth - W)); const x1 = Math.min(map.pixelWidth, x0 + W);
+    const x0 = this.level.vertical ? 0 : Math.max(0, Math.min(trig.x - 24, map.pixelWidth - W)); const x1 = Math.min(map.pixelWidth, x0 + W);
     this.arena = { x0, x1 }; this.bossState = 'fight'; this.audio.sfx('boss'); this.shake(3);
     if (map.pixelHeight > H) { const y1 = Math.min(map.pixelHeight, Math.max(H, trig.y + 2 * TILE)); this.arena.y0 = y1 - H; this.arena.y1 = y1; } // 縦マップ: トリガー行を下端近くに含む 1 画面
     // 地面高さを探す
@@ -170,7 +170,7 @@ export class World {
     this.audio.playBgm(SONGS.boss);
     this.fx.bossIntro(this.bossName());
   }
-  bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', serpent: '涙の大蛇 ララバイ', machine: '人形師の機械 マザーグース', ringmaster: '大観覧車の主 グランギニョル' }[this.level.boss] ?? 'BOSS'; }
+  bossName() { return { doll: '泣き人形 ドロシー', teddy: 'はらわたテディ', noir: '堕ちた魔法少女 ノワール', serpent: '涙の大蛇 ララバイ', machine: '人形師の機械 マザーグース', ringmaster: '大観覧車の主 グランギニョル', mirrorqueen: '鏡の女王 ヴァニタス' }[this.level.boss] ?? 'BOSS'; }
 
   collide() {
     const p = this.player;

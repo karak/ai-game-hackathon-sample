@@ -1,0 +1,15 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/boss-mirrorqueen-v1.png",
+ "pitch": [
+  7.0,
+  7.0
+ ],
+ "max_box": [
+  200,
+  200
+ ],
+ "w": 105,
+ "h": 131,
+ "fits": true,
+ "colors": 15
+}

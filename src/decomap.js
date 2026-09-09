@@ -5,6 +5,7 @@ export const DECO_MAP = {
   river:       { y: 'willow', n: 'bridgepost', f: 'reeds', o: 'dollhead', x: 'blood', t: 'tomb' },
   workshop:    { n: 'dressform', c: 'scissors', y: 'spool', o: 'stuffing', x: 'blood', w: 'window', v: 'candelabra' },
   park:        { n: 'booth', f: 'balloons', y: 'carousel', c: 'popcorn', x: 'blood', o: 'bones' },
+  tower:       { n: 'mirror', k: 'gargoyle', v: 'chandelier', o: 'shards', x: 'blood', w: 'window' }, // 's' は敵マーカーなので像は 'k'
   castle:      { n: 'pillar', w: 'window', v: 'candelabra', x: 'blood', o: 'bones', t: 'banner' },
 };
 // テーマの記号表をスプライト実体に解決する（無いものは落とす）

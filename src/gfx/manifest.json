@@ -239,6 +239,54 @@
   "src": "assets/sprites/bg/river_sky.png",
   "w": 201
  },
+ "bg/tower_far": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 125,
+  "src": "assets/sprites/bg/tower_far.png",
+  "w": 267
+ },
+ "bg/tower_far2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 122,
+  "src": "assets/sprites/bg/tower_far2.png",
+  "w": 262
+ },
+ "bg/tower_mid": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 75,
+  "src": "assets/sprites/bg/tower_mid.png",
+  "w": 137
+ },
+ "bg/tower_mid2": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 108,
+  "src": "assets/sprites/bg/tower_mid2.png",
+  "w": 220
+ },
+ "bg/tower_mid3": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 106,
+  "src": "assets/sprites/bg/tower_mid3.png",
+  "w": 205
+ },
+ "bg/tower_sky": {
+  "anchor": "center",
+  "colors": 32,
+  "fits": true,
+  "h": 268,
+  "src": "assets/sprites/bg/tower_sky.png",
+  "w": 266
+ },
  "bg/workshop_far": {
   "anchor": "center",
   "colors": 32,
@@ -318,6 +366,22 @@
   "h": 188,
   "src": "assets/sprites/bosses/machine2.png",
   "w": 181
+ },
+ "bosses/mirrorqueen1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 131,
+  "src": "assets/sprites/bosses/mirrorqueen1.png",
+  "w": 105
+ },
+ "bosses/mirrorqueen2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 131,
+  "src": "assets/sprites/bosses/mirrorqueen2.png",
+  "w": 121
  },
  "bosses/noir1": {
   "anchor": "bottom",
@@ -471,6 +535,14 @@
   "src": "assets/sprites/deco/carousel.png",
   "w": 79
  },
+ "deco/chandelier": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 82,
+  "src": "assets/sprites/deco/chandelier.png",
+  "w": 49
+ },
  "deco/cross": {
   "anchor": "bottom",
   "colors": 14,
@@ -503,6 +575,14 @@
   "src": "assets/sprites/deco/flowers.png",
   "w": 48
  },
+ "deco/gargoyle": {
+  "anchor": "bottom",
+  "colors": 12,
+  "fits": true,
+  "h": 68,
+  "src": "assets/sprites/deco/gargoyle.png",
+  "w": 62
+ },
  "deco/lollipop": {
   "anchor": "bottom",
   "colors": 12,
@@ -510,6 +590,14 @@
   "h": 71,
   "src": "assets/sprites/deco/lollipop.png",
   "w": 38
+ },
+ "deco/mirror": {
+  "anchor": "bottom",
+  "colors": 13,
+  "fits": true,
+  "h": 96,
+  "src": "assets/sprites/deco/mirror.png",
+  "w": 55
  },
  "deco/pillar": {
   "anchor": "bottom",
@@ -542,6 +630,14 @@
   "h": 95,
   "src": "assets/sprites/deco/scissors.png",
   "w": 41
+ },
+ "deco/shards": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 34,
+  "src": "assets/sprites/deco/shards.png",
+  "w": 72
  },
  "deco/spool": {
   "anchor": "bottom",
@@ -702,6 +798,22 @@
   "h": 65,
   "src": "assets/sprites/enemies/eye2.png",
   "w": 54
+ },
+ "enemies/gargoyle1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 83,
+  "src": "assets/sprites/enemies/gargoyle1.png",
+  "w": 98
+ },
+ "enemies/gargoyle2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 93,
+  "src": "assets/sprites/enemies/gargoyle2.png",
+  "w": 137
  },
  "enemies/mermaid1": {
   "anchor": "bottom",
@@ -1519,6 +1631,14 @@
   "h": 192,
   "src": "assets/sprites/tiles/river.png",
   "w": 262
+ },
+ "tiles/tower": {
+  "anchor": "center",
+  "colors": 24,
+  "fits": true,
+  "h": 99,
+  "src": "assets/sprites/tiles/tower.png",
+  "w": 247
  },
  "tiles/workshop": {
   "anchor": "center",

@@ -22,6 +22,8 @@ export const MARKERS = {
   g: 'balloon',     // 風船の亡霊（漂い、割れると血の雨。第五章）
   j: 'clown',       // ピエロ骸骨（ナイフ投げ。第五章）
   R: 'cart',        // ジェットコースターの車（右へ 60/s で走る足場。24 タイル走って戻る）
+  i: 'mirror',      // 鏡像リリカ（主人公の 1 秒前の動きを鏡の軸で反転して再生。第六章）
+  s: 'gargoyle',    // ガーゴイル人形（止まり木から急降下。第六章）
   M: 'platformH',   // 動く足場（水平往復、3 タイル幅）
   V: 'platformV',   // 動く足場（垂直往復）
   '@': 'island',    // 浮島（上下に揺れるすり抜け足場）
@@ -58,6 +60,7 @@ export function parseLevel(stage) {
     title: stage.title ?? stage.name,
     theme: stage.theme ?? 'graveyard',
     timeLimit: stage.timeLimit ?? 180,
+    vertical: !!stage.vertical, // 縦スクロール面（高さ > 14 行、ボスはトリガー行より上で開始）
     boss: stage.boss ?? null,
     map, spawns, playerStart, bossTrigger, goal, checkpoints,
   };

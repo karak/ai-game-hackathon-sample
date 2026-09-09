@@ -1,5 +1,7 @@
 // カタログの敵・ボス仕様表（DOM 非依存。test/catalog.test.js が manifest との掲載漏れを検査する）
 export const SPEC = {
+  mirror:   { jp: '鏡像リリカ', noSprite: true, anim: '主人公のコマを反転再生（専用スプライトなし）', move: '鏡の軸 x を挟んで主人公の 1 秒前の位置を左右反転。主人公が軸から 200 以上離れると軸で待機（接触なし）', shot: 'なし（接触）', gore: '血', spawn: 'i: 軸の位置' },
+  gargoyle: { jp: 'ガーゴイル人形', anim: '止まり木 / 急降下 2 コマ', move: '70 以内・下方を通ると 170/s で急降下 0.6 秒、90/s で止まり木へ戻る', shot: 'なし（接触）', gore: '骨＋血', spawn: 's' },
   balloon: { jp: '風船の亡霊', anim: '漂い / 膨張 2 コマ', move: '主人公へ 18/s で漂う。28 以内に来るか撃たれると 0.5 秒膨らんで破裂', shot: '破裂時に血の雨 5 滴（扇状）', gore: '血', spawn: 'g: マーカーの 40 上' },
   clown:   { jp: 'ピエロ骸骨', anim: '立ち / 投げ 2 コマ', move: '60 より近いと後退 22/s、160 より遠いと接近 16/s', shot: '200 以内で投げナイフ 2 本（150/s、1.8 秒毎）', gore: '骨＋血', spawn: 'j' },
   dollpart: { jp: '未完成の人形', anim: '立ち / 投げ 2 コマ', move: '150 以内で主人公へ 12/s、遠いと 10/s で往復', shot: '130 以内で腕（arm ブーメラン、2.6 秒毎）', gore: '綿＋血', spawn: 'd' },
@@ -16,6 +18,7 @@ export const SPEC = {
 };
 
 export const BOSS_SPEC = {
+  mirrorqueen: { jp: '鏡の女王 ヴァニタス（第六章）', hp: 30, states: 'enter(1.4s フェードイン) → pose(1.2s) → shards(破片 5 発扇状、HP 50% 以下で 7) | teleport(0.4s で消えて反対側へ) | twin(HP 50% 以下: 鏡像を反対側に置き、破片が鏡像からも同時に飛ぶ) の循環', shots: 'bolt', death: '同上' },
   ringmaster: { jp: '大観覧車の主 グランギニョル（第五章）', hp: 30, states: 'enter → stand(1.4s、HP 50% 以下で 1.0s) → whip(0.3s 後に前方 90 の横薙ぎ、しゃがみで回避) | heads(追尾する人形の頭 3〜5) | stomp(跳んで着地、骨の破片 5) の循環。部屋に観覧車 O', shots: 'darkheart, bone', death: '同上' },
   machine: { jp: '人形師の機械 マザーグース（第四章）', hp: 28, states: 'enter → roll(1.6s、26/s、HP 50% 以下で 40/s) → slam(0.5s 後に主人公の上へ針を落とす) | thread(糸弾 3 発扇状、HP 50% 以下で 5 発) | toss(人形の胴体ブーメラン) の順に循環。部屋の床はベルトコンベア', shots: 'bone, bolt, arm', death: '同上' },
   serpent: { jp: '涙の大蛇 ララバイ（第三章）', hp: 24, states: 'enter(1.5s 浮上) → sweep(川を横切る、周期 ≈11 秒、水面上 26〜52) → 主人公が 70 以内で strike(0.35s で突き出し、口を開く) | 4.5 秒ごとに rain(血の涙を吐き上げ 1 秒)。HP 50% 以下で速度 1.4 倍、雨 2 倍。胴 6 節＋尾は接触のみ（撃てない）', shots: 'rain', death: '同上' },

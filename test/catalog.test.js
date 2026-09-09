@@ -13,7 +13,7 @@ const names = g => keys.filter(k => k.startsWith(g + '/')).map(k => k.split('/')
 test('every enemy in the manifest has a spec row on the enemies sheet (and vice versa)', () => {
   const enemyBases = [...new Set(names('enemies').map(n => n.replace(/(1|2|Rise)$/, '')))];
   for (const b of enemyBases) expect(SPEC[b], `spec row for ${b}`).toBeTruthy();
-  for (const k of Object.keys(SPEC)) expect(names('enemies').includes(k + '1'), `sprite for ${k}`).toBe(true);
+  for (const k of Object.keys(SPEC)) if (!SPEC[k].noSprite) expect(names('enemies').includes(k + '1'), `sprite for ${k}`).toBe(true); // noSprite: 主人公のコマを流用する敵
 });
 
 test('every boss in the manifest has a spec row (multi-part bosses by prefix)', () => {

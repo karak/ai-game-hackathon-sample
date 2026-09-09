@@ -51,6 +51,15 @@ export const THEMES = {
     moon: '#3af0ff', moonShade: '#2ab0c0', star: '#fdfbf7',
     far: '#241838', mid: '#1a1028', near: '#100a1c',
   },
+  tower: { // 第六章 鏡の塔: 銀〜紫、縦スクロール。'~' は鏡の破片の海（即死）
+    grass: ['#8a80a8', '#a89cc8', '#6a6088'], grassFlower: ['#e8e8f4', '#ff8fc8', '#cbaaf5'],
+    dirt: ['#2c2440', '#3a3050', '#201a30'], pebble: '#a89cc8',
+    plat: ['#6a6088', '#8a80a8', '#4a4068'], platMoss: '#e8e8f4',
+    bog: ['#3a3050', '#6a6088', '#a89cc8'], bogGlow: '#e8e8f4', bogBubble: '#ff8fc8',
+    skyTop: '#0e0a1c', skyMid: '#241a3c', skyBot: '#3a3050', horizon: '#6a6088',
+    moon: '#e8e8f4', moonShade: '#a89cc8', star: '#fdfbf7',
+    far: '#1c1630', mid: '#161228', near: '#100c1e',
+  },
   castle: {
     grass: ['#6c6c80', '#7c7c90', '#5d5d70'], grassFlower: ['#d9262b', '#7a0f1f', '#a5a5b8'],
     dirt: ['#5d5d70', '#4e4e60', '#6c6c80'], pebble: '#2d1f4c',

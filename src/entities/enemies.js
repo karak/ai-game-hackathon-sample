@@ -406,6 +406,52 @@ export class ClownSkeleton extends Enemy {
   spriteName() { return this.anim > 0 ? 'clown2' : 'clown1'; }
 }
 
+// ---- 鏡像リリカ (第六章): 鏡の軸 x=axis を挟んで、主人公の 1 秒前の位置・コマを左右反転して再生する。触れると被弾。撃てる（HP 4） ----
+export class MirrorLyrica extends Enemy {
+  constructor(world, axisX, y) {
+    super(world, axisX, y, 12, 28); this.axis = axisX; this.hp = 4; this.score = 500; this.gravity = false; this.gore = 'blood'; this.contact = true;
+    this.hist = []; this.delay = 60; this.frame = 'idle'; this.mirrorFacing = 1;
+  }
+  update(dt) {
+    super.update(dt); const p = this.player;
+    this.hist.push({ x: p.centerX, y: p.y, h: p.h, frame: p.frame(), facing: p.facing, costume: p.costume });
+    if (this.hist.length > this.delay) this.hist.shift();
+    const s = this.hist[0];
+    // 鏡像: x は軸で反転、y はそのまま。主人公が軸から 200 以上離れると軸の位置で待つ
+    const mx = 2 * this.axis - s.x; const far = Math.abs(p.centerX - this.axis) > 200;
+    this.x = (far ? this.axis : mx) - this.w / 2; this.y = s.y + (s.h - this.h); this.h = 28; this.frame = far ? 'idle' : s.frame; this.mirrorFacing = -s.facing;
+    this.contact = !far;
+  }
+  spriteName() { return null; }
+  draw(g, cam, assets) {
+    const sheet = assets.player[this.hist[0]?.costume ?? 'dress'] ?? assets.player.dress; const spr = sheet[this.frame] ?? sheet.idle; if (!spr) return;
+    g.save(); g.globalAlpha = 0.75; g.filter = 'saturate(0.2) brightness(1.15)';
+    if (this.flashT > 0) g.filter = 'brightness(3)';
+    blit(g, spr, this.mirrorFacing < 0, Math.floor(this.x + this.w / 2 - spr.w / 2 - cam.x), Math.floor(this.y + this.h - spr.h - cam.y));
+    g.restore();
+    // 鏡の軸（薄い光の線）
+    g.fillStyle = 'rgba(232,232,244,0.25)'; g.fillRect(Math.round(this.axis - cam.x), 0, 1, 224);
+  }
+}
+
+// ---- ガーゴイル人形 (第六章): 止まり木で待ち、主人公が下を通ると急降下して戻る ----
+export class GargoyleDoll extends Enemy {
+  constructor(world, x, y) {
+    super(world, x, y - 20, 16, 20); this.spriteOff = [2, 2]; this.gravity = false; this.hp = 3; this.score = 300; this.gore = 'bone';
+    this.fitSprite('gargoyle1', 0.6, 0.85); this.perchY = this.y; this.state = 'perch'; this.stateT = 0; this.vx = 0; this.vy = 0; this.contact = true;
+  }
+  update(dt) {
+    super.update(dt); this.stateT += dt; const p = this.player, d = this.distX();
+    this.facing = d < 0 ? -1 : 1;
+    switch (this.state) {
+      case 'perch': if (Math.abs(d) < 70 && p.y > this.y && this.stateT > 0.5) { this.state = 'swoop'; this.stateT = 0; const dy = p.y + p.h / 2 - this.cy, dd = Math.hypot(d, dy) || 1; this.vx = d / dd * 170; this.vy = dy / dd * 170; this.world.audio.sfx('hit'); } break;
+      case 'swoop': this.x += this.vx * dt; this.y += this.vy * dt; if (this.stateT > 0.6 || this.world.level.map.isSolid(Math.floor(this.cx / TILE), Math.floor((this.y + this.h) / TILE))) { this.state = 'return'; this.stateT = 0; } break;
+      case 'return': { const tx = this.x, ty = this.perchY; this.y += Math.sign(ty - this.y) * Math.min(Math.abs(ty - this.y), 90 * dt); if (Math.abs(this.y - ty) < 1) { this.state = 'perch'; this.stateT = 0; } break; }
+    }
+  }
+  spriteName() { return this.state === 'perch' ? 'gargoyle1' : 'gargoyle2'; }
+}
+
 export function createEnemy(world, spawn) {
   const { type, x, y } = spawn;
   switch (type) {
@@ -422,6 +468,8 @@ export function createEnemy(world, spawn) {
     case 'needles': return new NeedleSwarm(world, x, y);
     case 'balloon': return new BalloonGhost(world, x + 1, y);
     case 'clown': return new ClownSkeleton(world, x + 1, y + TILE);
+    case 'mirror': return new MirrorLyrica(world, x + TILE / 2, y);
+    case 'gargoyle': return new GargoyleDoll(world, x, y + TILE);
   }
   return null;
 }

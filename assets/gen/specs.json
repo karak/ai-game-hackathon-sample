@@ -1572,11 +1572,12 @@
     "deco/shards"
    ],
    "colors": 15,
-   "strip_caption": true
+   "strip_caption": true,
+   "tol": 95
   },
   "enemy-gargoyle": {
    "box": [
-    96,
+    140,
     120
    ],
    "frames": 2,

@@ -1,0 +1,41 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/deco-tower-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  120,
+  160
+ ],
+ "frames": [
+  {
+   "w": 55,
+   "h": 96,
+   "fits": true,
+   "colors": 13,
+   "name": "mirror"
+  },
+  {
+   "w": 62,
+   "h": 68,
+   "fits": true,
+   "colors": 12,
+   "name": "gargoyle"
+  },
+  {
+   "w": 49,
+   "h": 82,
+   "fits": true,
+   "colors": 15,
+   "name": "chandelier"
+  },
+  {
+   "w": 72,
+   "h": 34,
+   "fits": true,
+   "colors": 15,
+   "name": "shards"
+  }
+ ]
+}

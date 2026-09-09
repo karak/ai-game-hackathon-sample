@@ -367,6 +367,47 @@ export class Ringmaster extends Boss {
   }
 }
 
+// ---- 鏡の女王 (第六章): 鏡の間を瞬間移動し、破片を扇状に撃つ。HP 50% 以下で鏡像（もう 1 体の判定なし分身）が同時に撃つ ----
+// かわいい: 銀の冠と描かれた微笑み / えげつない: 顔の半分が割れて空洞、鏡の裾から血、杖のガラスに人形の手
+export class MirrorQueen extends Boss {
+  constructor(world, x, groundY) {
+    super(world, x, groundY - 70, 26, 70); this.spriteOff = [4, 2];
+    this.hpMax = this.hp = 30; this.facing = -1; this.fitSprite('mirrorqueen1', 0.5, 0.95); this.enterX = x - 20; this.attackAnim = 0; this.alpha = 1; this.cycle = 0; this.mirrorX = null;
+  }
+  update(dt) {
+    if (super.update(dt)) return;
+    const p = this.player, d = this.distX(), enraged = this.hpRatio < 0.5, a = this.world.arena;
+    this.attackAnim = Math.max(0, this.attackAnim - dt);
+    switch (this.state) {
+      case 'enter': this.alpha = Math.min(1, this.stateT / 1.2); if (this.stateT > 1.4) { this.setState('pose'); this.contact = true; } break;
+      case 'pose': // 主人公を見て 1.2 秒。次は shards → teleport → (enraged) twin の順
+        this.facePlayer(); if (this.stateT > (enraged ? 0.9 : 1.2)) { this.cycle++; this.setState(this.cycle % 3 === 1 ? 'shards' : this.cycle % 3 === 2 ? 'teleport' : enraged ? 'twin' : 'shards'); }
+        break;
+      case 'shards': // 破片を扇状に 5 発（enraged 7）。鏡像がいれば鏡像からも
+        if (Math.floor(this.stateT * 5) !== Math.floor((this.stateT - dt) * 5) && this.stateT < 0.6) { this.attackAnim = 0.4; const n = enraged ? 7 : 5; const base = Math.atan2(p.y + p.h / 2 - this.cy, d); for (let i = 0; i < n; i++) { const ang = base + (i - (n - 1) / 2) * 0.2; this.shoot('bolt', Math.cos(ang) * 130, Math.sin(ang) * 130, this.facing * 8, -20, { life: 2.5 }); if (this.mirrorX !== null) this.world.enemyShots.push(new (this.world.classes.EnemyShot)(this.world, 'bolt', this.mirrorX, this.cy - 20, -Math.cos(ang) * 130, Math.sin(ang) * 130, { owner: this, life: 2.5 })); } this.world.audio.sfx('poison'); }
+        if (this.stateT > 1.0) this.setState('pose');
+        break;
+      case 'teleport': // 0.4 秒で消え、部屋の反対側に現れる
+        this.alpha = this.stateT < 0.4 ? 1 - this.stateT / 0.4 : Math.min(1, (this.stateT - 0.5) / 0.4); this.contact = this.alpha > 0.6;
+        if (this.stateT >= 0.4 && !this.moved) { this.moved = true; const left = this.cx > (a.x0 + a.x1) / 2; this.x = left ? a.x0 + 24 : a.x1 - 24 - this.w; this.world.particles.emit('sparkle', this.cx, this.cy, 16); }
+        if (this.stateT > 0.9) { this.moved = false; this.setState('pose'); }
+        break;
+      case 'twin': // 鏡像を部屋の反対側に置く（3 秒間、破片攻撃に同期）
+        if (this.stateT < 0.05) { this.mirrorX = this.cx < (a.x0 + a.x1) / 2 ? a.x1 - 40 : a.x0 + 40; this.world.particles.emit('sparkle', this.mirrorX, this.cy, 14); this.world.audio.sfx('select'); }
+        if (this.stateT > 0.3) this.setState('shards');
+        break;
+    }
+    if (this.mirrorX !== null && this.state !== 'twin' && this.state !== 'shards') { if (this.stateT > 2.0) this.mirrorX = null; }
+    this.physics(dt);
+    if (a) { if (this.x < a.x0 + 8) this.x = a.x0 + 8; if (this.x + this.w > a.x1 - 8) this.x = a.x1 - 8 - this.w; }
+  }
+  spriteName() { return this.attackAnim > 0 ? 'mirrorqueen2' : 'mirrorqueen1'; }
+  draw(g, cam, assets) {
+    g.save(); g.globalAlpha = Math.max(0, Math.min(1, this.alpha)); super.draw(g, cam, assets); g.restore();
+    if (this.mirrorX !== null) { const spr = assets.bosses[this.spriteName()]; if (spr) { g.save(); g.globalAlpha = 0.5; g.filter = 'saturate(0.2) brightness(1.3)'; blit(g, spr, this.facing > 0, Math.round(this.mirrorX - spr.w / 2 - cam.x), Math.round(this.y + this.h - spr.h - cam.y)); g.restore(); } }
+  }
+}
+
 export function createBoss(world, kind, x, groundY) {
   switch (kind) {
     case 'doll': return new WeepingDoll(world, x, groundY);
@@ -375,6 +416,7 @@ export function createBoss(world, kind, x, groundY) {
     case 'serpent': return new TearSerpent(world, x, groundY);
     case 'machine': return new DollmakerMachine(world, x, groundY);
     case 'ringmaster': return new Ringmaster(world, x, groundY);
+    case 'mirrorqueen': return new MirrorQueen(world, x, groundY);
   }
   return null;
 }

@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-gargoyle-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  140,
+  120
+ ],
+ "frames": [
+  {
+   "w": 98,
+   "h": 83,
+   "fits": true,
+   "colors": 15,
+   "name": "gargoyle1"
+  },
+  {
+   "w": 137,
+   "h": 93,
+   "fits": true,
+   "colors": 15,
+   "name": "gargoyle2"
+  }
+ ]
+}
