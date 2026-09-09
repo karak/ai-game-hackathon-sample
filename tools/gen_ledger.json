@@ -1,5 +1,5 @@
 {
- "requests": 168,
+ "requests": 170,
  "entries": [
   {
    "name": "player-base",
@@ -1304,6 +1304,22 @@
    "secs": 18.6,
    "text": "",
    "ts": 1788933890.718713
+  },
+  {
+   "name": "bg-graveyard-mid",
+   "v": 3,
+   "ok": true,
+   "secs": 10.6,
+   "text": "Here's your pixel art parallax layer:\n",
+   "ts": 1788934212.144788
+  },
+  {
+   "name": "bg-candyforest-mid",
+   "v": 2,
+   "ok": true,
+   "secs": 9.9,
+   "text": "",
+   "ts": 1788934222.471872
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

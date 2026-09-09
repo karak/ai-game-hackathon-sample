@@ -204,6 +204,40 @@ def strip_caption(im, max_h=16, gap=2):
     return im
 
 
+def fill_holes(im):
+    """外周に繋がらない透明領域（キーで抜けた内部の穴。墓石の灰緑の石面など）を、隣接する不透明色で埋める。"""
+    a = np.asarray(im.split()[3]) > 0; h, w = a.shape
+    outside = np.zeros_like(a); stack = [(y, x) for y in range(h) for x in (0, w - 1) if not a[y, x]] + [(y, x) for x in range(w) for y in (0, h - 1) if not a[y, x]]
+    for y, x in stack: outside[y, x] = True
+    while stack:
+        y, x = stack.pop()
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < h and 0 <= nx < w and not a[ny, nx] and not outside[ny, nx]: outside[ny, nx] = True; stack.append((ny, nx))
+    holes = (~a) & (~outside)
+    if not holes.any(): return im, 0
+    px = im.load(); n = int(holes.sum())
+    # 穴の縁から内側へ、隣の不透明色をコピーして埋める（数回繰り返す）
+    for _ in range(max(h, w)):
+        ys, xs = np.nonzero(holes)
+        if ys.size == 0: break
+        filled = False
+        for y, x in zip(ys, xs):
+            for dy, dx in ((0, -1), (0, 1), (-1, 0), (1, 0)):
+                ny, nx = y + dy, x + dx
+                if 0 <= ny < h and 0 <= nx < w and not holes[ny, nx] and px[nx, ny][3] > 0: px[x, y] = px[nx, ny]; holes[y, x] = False; filled = True; break
+        if not filled: break
+    return im, n
+
+
+def trim_thin_bottom(im, frac=0.12):
+    """下端の細い行（最大幅の frac 未満の不透明数: 血の滴など）を落として、接地面を幅の広い部分にする。"""
+    a = np.asarray(im.split()[3]) > 0; rows = a.sum(axis=1); mx = rows.max() if rows.size else 0
+    y = im.height
+    while y > 1 and rows[y - 1] < mx * frac: y -= 1
+    return im.crop((0, 0, im.width, y)) if y < im.height else im
+
+
 def crop_alpha(im):
     bb = im.split()[3].getbbox(); return im.crop(bb) if bb else im
 
@@ -217,6 +251,8 @@ def main():
     ap.add_argument('--keep-bottom', type=float, default=0, help='論理画像の下側この比率だけ残す（背景中景の月などを除く）')
     ap.add_argument('--nosplit', action='store_true', help='複数物体でも 1 枚として扱う（背景層・タイル帯）')
     ap.add_argument('--strip-caption', action='store_true', help='物体の下に描き足されたラベル文字を落とす')
+    ap.add_argument('--fill-holes', action='store_true', help='キーで抜けた内部の穴を隣接色で埋める（装飾・キャラ）')
+    ap.add_argument('--trim-thin-bottom', action='store_true', help='下端の細い滴などを落として接地面を広い部分にする（血溜まり）')
     a = ap.parse_args()
     bw, bh = (int(v) for v in a.logical.split('x'))
     im = Image.open(a.src).convert('RGBA') if a.nokey else key_out(Image.open(a.src), a.tol)
@@ -233,7 +269,10 @@ def main():
             occ = (np.asarray(logical.split()[3]) > 0).sum(axis=0)
             x0, x1 = max(fr, key=lambda f: int(occ[f[0]:f[1]].sum()))
             logical = logical.crop((x0, 0, x1, logical.height))
-        out = crop_alpha(logical); out.save(a.dst); meta.update(info(out))
+        if a.fill_holes: logical, nh = fill_holes(logical); nh and print(f'  filled {nh} hole cells')
+        out = crop_alpha(logical)
+        if a.trim_thin_bottom: out = trim_thin_bottom(out)
+        out.save(a.dst); meta.update(info(out))
         Path(a.dst).with_suffix('.json').write_text(json.dumps(meta, indent=1)); print(json.dumps(meta)); return
     names = a.names.split(',') if a.names else []
     frames = split_frames(logical, min_gap=2, min_width=8, expect=len(names)); names = names or [f'f{i}' for i in range(len(frames))]
@@ -241,7 +280,9 @@ def main():
     for i, (x0, x1) in enumerate(frames[:len(names)]):
         out = logical.crop((x0, 0, x1, logical.height))
         if a.strip_caption: out = strip_caption(out)
+        if a.fill_holes: out, nh = fill_holes(out); nh and print(f'  filled {nh} hole cells in {names[i]}')
         out = crop_alpha(out)
+        if a.trim_thin_bottom: out = trim_thin_bottom(out)
         out.save(Path(a.dst) / f'{names[i]}.png'); fi = info(out); fi['name'] = names[i]; meta['frames'].append(fi)
         (Path(a.dst) / f'{names[i]}.json').write_text(json.dumps({**meta, **fi, 'frames': None}, indent=1))
     (Path(a.dst) / '_meta.json').write_text(json.dumps(meta, indent=1)); print(json.dumps(meta))

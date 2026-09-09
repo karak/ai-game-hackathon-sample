@@ -11,28 +11,28 @@
  "frames": [
   {
    "w": 64,
-   "h": 89,
+   "h": 88,
    "fits": true,
    "colors": 14,
    "name": "booth"
   },
   {
    "w": 52,
-   "h": 129,
+   "h": 128,
    "fits": true,
    "colors": 15,
    "name": "balloons"
   },
   {
    "w": 79,
-   "h": 127,
+   "h": 126,
    "fits": true,
    "colors": 15,
    "name": "carousel"
   },
   {
    "w": 58,
-   "h": 71,
+   "h": 70,
    "fits": true,
    "colors": 15,
    "name": "popcorn"

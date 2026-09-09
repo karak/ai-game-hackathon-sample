@@ -1,17 +1,17 @@
 {
  "bg/candyforest_far": {
   "anchor": "center",
-  "colors": 31,
+  "colors": 32,
   "fits": true,
-  "h": 83,
+  "h": 92,
   "src": "assets/sprites/bg/candyforest_far.png",
-  "w": 248
+  "w": 246
  },
  "bg/candyforest_far2": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 108,
+  "h": 119,
   "src": "assets/sprites/bg/candyforest_far2.png",
   "w": 248
  },
@@ -19,23 +19,23 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 76,
+  "h": 152,
   "src": "assets/sprites/bg/candyforest_mid.png",
-  "w": 316
+  "w": 315
  },
  "bg/candyforest_mid2": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 80,
+  "h": 163,
   "src": "assets/sprites/bg/candyforest_mid2.png",
-  "w": 275
+  "w": 269
  },
  "bg/candyforest_mid3": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 130,
+  "h": 182,
   "src": "assets/sprites/bg/candyforest_mid3.png",
   "w": 266
  },
@@ -51,39 +51,39 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 91,
+  "h": 102,
   "src": "assets/sprites/bg/castle_far.png",
-  "w": 245
+  "w": 254
  },
  "bg/castle_far2": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 95,
+  "h": 105,
   "src": "assets/sprites/bg/castle_far2.png",
-  "w": 243
+  "w": 257
  },
  "bg/castle_mid": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 132,
+  "h": 164,
   "src": "assets/sprites/bg/castle_mid.png",
-  "w": 266
+  "w": 267
  },
  "bg/castle_mid2": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 69,
+  "h": 127,
   "src": "assets/sprites/bg/castle_mid2.png",
-  "w": 276
+  "w": 278
  },
  "bg/castle_mid3": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 37,
+  "h": 74,
   "src": "assets/sprites/bg/castle_mid3.png",
   "w": 269
  },
@@ -99,7 +99,7 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 111,
+  "h": 123,
   "src": "assets/sprites/bg/graveyard_far.png",
   "w": 263
  },
@@ -107,15 +107,15 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 91,
+  "h": 99,
   "src": "assets/sprites/bg/graveyard_far2.png",
-  "w": 267
+  "w": 264
  },
  "bg/graveyard_mid": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 114,
+  "h": 152,
   "src": "assets/sprites/bg/graveyard_mid.png",
   "w": 263
  },
@@ -123,7 +123,7 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 75,
+  "h": 119,
   "src": "assets/sprites/bg/graveyard_mid2.png",
   "w": 265
  },
@@ -131,7 +131,7 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 37,
+  "h": 74,
   "src": "assets/sprites/bg/graveyard_mid3.png",
   "w": 260
  },
@@ -147,9 +147,9 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 90,
+  "h": 89,
   "src": "assets/sprites/bg/park_far.png",
-  "w": 270
+  "w": 269
  },
  "bg/park_far2": {
   "anchor": "center",
@@ -157,15 +157,15 @@
   "fits": true,
   "h": 125,
   "src": "assets/sprites/bg/park_far2.png",
-  "w": 267
+  "w": 266
  },
  "bg/park_mid": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 150,
+  "h": 149,
   "src": "assets/sprites/bg/park_mid.png",
-  "w": 244
+  "w": 243
  },
  "bg/park_mid2": {
   "anchor": "center",
@@ -195,7 +195,7 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 75,
+  "h": 74,
   "src": "assets/sprites/bg/river_far.png",
   "w": 236
  },
@@ -211,7 +211,7 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 103,
+  "h": 101,
   "src": "assets/sprites/bg/river_mid.png",
   "w": 267
  },
@@ -219,9 +219,9 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 105,
+  "h": 108,
   "src": "assets/sprites/bg/river_mid2.png",
-  "w": 253
+  "w": 254
  },
  "bg/river_mid3": {
   "anchor": "center",
@@ -371,9 +371,9 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 83,
+  "h": 82,
   "src": "assets/sprites/bg/workshop_mid3.png",
-  "w": 186
+  "w": 187
  },
  "bg/workshop_sky": {
   "anchor": "center",
@@ -547,7 +547,7 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 129,
+  "h": 128,
   "src": "assets/sprites/deco/balloons.png",
   "w": 52
  },
@@ -563,7 +563,7 @@
   "anchor": "bottom",
   "colors": 10,
   "fits": true,
-  "h": 49,
+  "h": 48,
   "src": "assets/sprites/deco/blood.png",
   "w": 56
  },
@@ -571,7 +571,7 @@
   "anchor": "bottom",
   "colors": 10,
   "fits": true,
-  "h": 34,
+  "h": 33,
   "src": "assets/sprites/deco/bones.png",
   "w": 49
  },
@@ -579,7 +579,7 @@
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 89,
+  "h": 88,
   "src": "assets/sprites/deco/booth.png",
   "w": 64
  },
@@ -611,7 +611,7 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 127,
+  "h": 126,
   "src": "assets/sprites/deco/carousel.png",
   "w": 79
  },
@@ -619,7 +619,7 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 82,
+  "h": 81,
   "src": "assets/sprites/deco/chandelier.png",
   "w": 49
  },
@@ -643,7 +643,7 @@
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 90,
+  "h": 89,
   "src": "assets/sprites/deco/dressform.png",
   "w": 41
  },
@@ -699,7 +699,7 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 71,
+  "h": 70,
   "src": "assets/sprites/deco/popcorn.png",
   "w": 58
  },
@@ -723,7 +723,7 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 95,
+  "h": 94,
   "src": "assets/sprites/deco/scissors.png",
   "w": 41
  },
@@ -795,7 +795,7 @@
   "anchor": "bottom",
   "colors": 14,
   "fits": true,
-  "h": 123,
+  "h": 106,
   "src": "assets/sprites/deco/window.png",
   "w": 46
  },

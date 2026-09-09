@@ -11,14 +11,14 @@
  "frames": [
   {
    "w": 41,
-   "h": 90,
+   "h": 89,
    "fits": true,
    "colors": 14,
    "name": "dressform"
   },
   {
    "w": 41,
-   "h": 95,
+   "h": 94,
    "fits": true,
    "colors": 15,
    "name": "scissors"

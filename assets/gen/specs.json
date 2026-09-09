@@ -463,8 +463,7 @@
     "bg/graveyard_far"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.9
+   "colors": 32
   },
   "bg-graveyard-mid": {
    "box": [
@@ -478,8 +477,7 @@
     "bg/graveyard_mid"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.5
+   "colors": 32
   },
   "bg-candyforest-sky": {
    "box": [
@@ -508,8 +506,7 @@
     "bg/candyforest_far"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.9
+   "colors": 32
   },
   "bg-candyforest-mid": {
    "box": [
@@ -523,8 +520,7 @@
     "bg/candyforest_mid"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.5
+   "colors": 32
   },
   "bg-castle-sky": {
    "box": [
@@ -553,8 +549,7 @@
     "bg/castle_far"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.9
+   "colors": 32
   },
   "bg-castle-mid": {
    "box": [
@@ -568,8 +563,7 @@
     "bg/castle_mid"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.5
+   "colors": 32
   },
   "items-a": {
    "box": [
@@ -630,7 +624,9 @@
     "deco/flowers",
     "deco/candle"
    ],
-   "colors": 15
+   "colors": 15,
+   "fill_holes": true,
+   "trim_thin_bottom": true
   },
   "deco-candy": {
    "box": [
@@ -646,7 +642,9 @@
     "deco/bones",
     "deco/lollipop"
    ],
-   "colors": 15
+   "colors": 15,
+   "fill_holes": true,
+   "trim_thin_bottom": true
   },
   "deco-castle": {
    "box": [
@@ -662,7 +660,9 @@
     "deco/banner",
     "deco/candelabra"
    ],
-   "colors": 15
+   "colors": 15,
+   "fill_holes": true,
+   "trim_thin_bottom": true
   },
   "bg-graveyard-mid2": {
    "box": [
@@ -676,8 +676,7 @@
     "bg/graveyard_mid2"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.5
+   "colors": 32
   },
   "bg-graveyard-mid3": {
    "box": [
@@ -691,8 +690,7 @@
     "bg/graveyard_mid3"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.5
+   "colors": 32
   },
   "bg-candyforest-mid2": {
    "box": [
@@ -706,8 +704,7 @@
     "bg/candyforest_mid2"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.5
+   "colors": 32
   },
   "bg-candyforest-mid3": {
    "box": [
@@ -721,8 +718,7 @@
     "bg/candyforest_mid3"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.5
+   "colors": 32
   },
   "bg-castle-mid2": {
    "box": [
@@ -736,8 +732,7 @@
     "bg/castle_mid2"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.5
+   "colors": 32
   },
   "bg-castle-mid3": {
    "box": [
@@ -751,8 +746,7 @@
     "bg/castle_mid3"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.5
+   "colors": 32
   },
   "shots-enemy-a": {
    "box": [
@@ -854,8 +848,7 @@
     "bg/graveyard_far2"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.9
+   "colors": 32
   },
   "bg-candyforest-far2": {
    "box": [
@@ -869,8 +862,7 @@
     "bg/candyforest_far2"
    ],
    "kind": "bg",
-   "colors": 32,
-   "keep_bottom": 0.9
+   "colors": 32
   },
   "bg-castle-far2": {
    "box": [
@@ -885,7 +877,6 @@
    ],
    "kind": "bg",
    "colors": 32,
-   "keep_bottom": 0.9,
    "ref": "bg-castle-far"
   },
   "bg-river-sky": {
@@ -1002,7 +993,9 @@
     "deco/reeds",
     "deco/dollhead"
    ],
-   "colors": 15
+   "colors": 15,
+   "fill_holes": true,
+   "trim_thin_bottom": true
   },
   "gimmick-river": {
    "box": [
@@ -1203,7 +1196,9 @@
     "deco/stuffing"
    ],
    "colors": 15,
-   "strip_caption": true
+   "strip_caption": true,
+   "fill_holes": true,
+   "trim_thin_bottom": true
   },
   "gimmick-workshop": {
    "box": [
@@ -1390,7 +1385,9 @@
     "deco/popcorn"
    ],
    "colors": 15,
-   "strip_caption": true
+   "strip_caption": true,
+   "fill_holes": true,
+   "trim_thin_bottom": true
   },
   "gimmick-park": {
    "box": [
@@ -1591,7 +1588,9 @@
    ],
    "colors": 15,
    "strip_caption": true,
-   "tol": 95
+   "tol": 95,
+   "fill_holes": true,
+   "trim_thin_bottom": true
   },
   "enemy-gargoyle": {
    "box": [
@@ -1749,7 +1748,9 @@
    ],
    "colors": 15,
    "strip_caption": true,
-   "tol": 95
+   "tol": 95,
+   "fill_holes": true,
+   "trim_thin_bottom": true
   },
   "boss-noir-white": {
    "box": [
