@@ -1,4 +1,4 @@
-# 01. 現在地（2026-09-08 Sprint A 完了時点）
+# 01. 現在地（2026-09-09 Sprint H 時点。M0〜M4 済、M5 実装分済、M6 着手）
 
 ## 実装済み
 
@@ -14,7 +14,7 @@
 | 資料 | デザインカタログ 7 章（キャラ／敵／アイテム／タイル／背景／ステージ／UI） | `catalog.html` |
 | 入力・保存 | キーボード／Gamepad API（standard mapping）／タッチ、キーコンフィグ、`localStorage` セーブ（進行・音量・ミュート・割り当て・ハイスコア） | `src/input.js`、`src/settings.js`、`test/input.test.js`、`test/settings.test.js` |
 | バランス | 復活地点 ±96 湧き禁止、復活後 2 秒敵弾なし、制限時間 300/300/330（歩行×3＋ボス 90 秒） | `src/balance.js`、`test/balance.test.js` |
-| テスト | Vitest 92 件（＋カメラ 3、カタログ掲載漏れ 4、コマ選択 3、死亡ログ 3、設定 cleared 1、曲 2、bossSong 1）＋ Playwright E2E 4 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ） | `npm test`、`npm run e2e` |
+| テスト | Vitest 92 件＋ Playwright E2E 5 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰） | `npm test`、`npm run e2e` |
 | ビルド | Vite（index.html / catalog.html） | `npm run build` |
 
 ## 素材（manifest 235 エントリ）
