@@ -35,6 +35,8 @@ def build(name, sp):
     if sp.get('trim_thin_bottom'): pal_arg += ['--trim-thin-bottom']
     if sp.get('trim_border'): pal_arg += ['--trim-border']  # 一枚絵の額縁を落とす（エンディング）
     if sp.get('crop_key'): pal_arg += ['--crop-key']        # 不透明パネルの緑余白を落とす（カットイン）
+    if sp.get('grid'): pal_arg += ['--grid', sp['grid']]    # 格子に並んだ複数パネルを 1 枚から切り出す（カットイン 4 枚）
+    if sp.get('crop_top'): pal_arg += ['--crop-top', str(sp['crop_top'])]  # パネル上端の題名帯を落とす
     if sp.get('kind') in ('bg', 'tiles'): pal_arg += ['--nosplit']
     if sp.get('keep_bottom'): pal_arg += ['--keep-bottom', str(sp['keep_bottom'])]
     if sp['frames'] == 1:

@@ -1,5 +1,5 @@
 {
- "requests": 206,
+ "requests": 225,
  "entries": [
   {
    "name": "player-base",
@@ -1608,6 +1608,158 @@
    "secs": 15.5,
    "text": "",
    "ts": 1788969931.816261
+  },
+  {
+   "name": "enemy-cocoon",
+   "v": 1,
+   "ok": true,
+   "secs": 11.2,
+   "text": "Here are the two frames of the Cotton-Candy Cocoon enemy sprite: ",
+   "ts": 1788970495.3946822
+  },
+  {
+   "name": "enemy-syruparm",
+   "v": 1,
+   "ok": true,
+   "secs": 10.9,
+   "text": "Here are two frames of a \"Syrup Arm\" enemy sprite, done in a 16-bit SNES-era JRPG pixel art style, with a flat green background. ",
+   "ts": 1788970506.617444
+  },
+  {
+   "name": "gimmick-candy",
+   "v": 1,
+   "ok": true,
+   "secs": 11.7,
+   "text": "Here are your three platformer gimmick objects for a candy-forest stage, rendered in 16-bit SNES-era Japanese RPG pixel art style: ",
+   "ts": 1788970518.5799239
+  },
+  {
+   "name": "deco-candy2",
+   "v": 1,
+   "ok": true,
+   "secs": 12.8,
+   "text": "",
+   "ts": 1788970531.7004428
+  },
+  {
+   "name": "cutin-star",
+   "v": 3,
+   "ok": true,
+   "secs": 19.4,
+   "text": "",
+   "ts": 1788970889.3031218
+  },
+  {
+   "name": "cutin-knife",
+   "v": 3,
+   "ok": true,
+   "secs": 21.5,
+   "text": "",
+   "ts": 1788970911.105649
+  },
+  {
+   "name": "cutin-heart",
+   "v": 3,
+   "ok": true,
+   "secs": 16.8,
+   "text": "",
+   "ts": 1788970928.216757
+  },
+  {
+   "name": "cutin-candle",
+   "v": 3,
+   "ok": true,
+   "secs": 17.3,
+   "text": "",
+   "ts": 1788970945.8002229
+  },
+  {
+   "name": "cutin-star",
+   "v": 4,
+   "ok": true,
+   "secs": 15.2,
+   "text": "",
+   "ts": 1788971038.073298
+  },
+  {
+   "name": "cutin-knife",
+   "v": 4,
+   "ok": true,
+   "secs": 16.3,
+   "text": "",
+   "ts": 1788971054.60541
+  },
+  {
+   "name": "cutin-heart",
+   "v": 4,
+   "ok": true,
+   "secs": 14.7,
+   "text": "",
+   "ts": 1788971069.602048
+  },
+  {
+   "name": "cutin-candle",
+   "v": 4,
+   "ok": true,
+   "secs": 15.6,
+   "text": "",
+   "ts": 1788971085.465101
+  },
+  {
+   "name": "cutin-star",
+   "v": 5,
+   "ok": true,
+   "secs": 17.6,
+   "text": "",
+   "ts": 1788971143.586571
+  },
+  {
+   "name": "cutin-knife",
+   "v": 5,
+   "ok": true,
+   "secs": 11.5,
+   "text": "",
+   "ts": 1788971155.328848
+  },
+  {
+   "name": "cutin-candle",
+   "v": 5,
+   "ok": true,
+   "secs": 16.4,
+   "text": "",
+   "ts": 1788971171.9894662
+  },
+  {
+   "name": "cutin-knife",
+   "v": 6,
+   "ok": true,
+   "secs": 11.8,
+   "text": "",
+   "ts": 1788971369.4227562
+  },
+  {
+   "name": "cutin-heart",
+   "v": 5,
+   "ok": true,
+   "secs": 15.5,
+   "text": "",
+   "ts": 1788971385.230734
+  },
+  {
+   "name": "cutin-candle",
+   "v": 6,
+   "ok": true,
+   "secs": 12.8,
+   "text": "",
+   "ts": 1788971398.283256
+  },
+  {
+   "name": "cutin-set",
+   "v": 1,
+   "ok": true,
+   "secs": 11.7,
+   "text": "",
+   "ts": 1788971515.25122
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

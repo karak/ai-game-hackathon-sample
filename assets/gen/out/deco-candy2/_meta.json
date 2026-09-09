@@ -1,0 +1,41 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/deco-candy2-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  130,
+  150
+ ],
+ "frames": [
+  {
+   "w": 50,
+   "h": 62,
+   "fits": true,
+   "colors": 15,
+   "name": "candytomb"
+  },
+  {
+   "w": 50,
+   "h": 70,
+   "fits": true,
+   "colors": 15,
+   "name": "canecross"
+  },
+  {
+   "w": 58,
+   "h": 75,
+   "fits": true,
+   "colors": 15,
+   "name": "sugarflowers"
+  },
+  {
+   "w": 67,
+   "h": 76,
+   "fits": true,
+   "colors": 15,
+   "name": "cakecandle"
+  }
+ ]
+}

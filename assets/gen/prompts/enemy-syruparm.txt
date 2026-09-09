@@ -1,0 +1,4 @@
+SUBJECT: "Syrup Arm" enemy for a candy-forest stage, rising out of a pool of syrup, facing LEFT, two frames side by side. A slender arm made of thick amber-pink syrup reaching up out of a glossy puddle; the syrup drips off the fingers in long strings and the surface of the puddle bulges. Inside the translucent syrup you can see swallowed candies and one small white bone.
+FRAME 1 = the arm is half risen from the puddle, elbow still submerged, fingers curled downward, three drip strings.
+FRAME 2 = the arm is fully extended and swiping to the LEFT, fingers spread like a claw, the puddle stretched into a cone beneath it, five drip strings and two flying droplets close to the hand.
+The puddle base must sit on the baseline and be wider than the arm. No floor line, no shadow, no text. Each frame is one connected shape.

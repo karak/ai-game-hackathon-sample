@@ -93,6 +93,7 @@ export const ENEMY_SHOTS = {
   arm:       { sprite: 'arm',       w: 11, h: 5, gravity: 0, boomerang: true, spin: true },
   rain:      { sprite: 'blood',     w: 4, h: 4, gravity: 260, splat: true },
   cknife:    { sprite: 'knife',     w: 12, h: 3, gravity: 0, spin: true }, // ピエロ骸骨の投げナイフ（主人公のナイフ絵を流用）
+  syrup:     { sprite: 'blood',     w: 5, h: 6, gravity: 300, pool: true },  // 糖蜜のしずく（第二章のノズル。着弾で粘る溜まり。血の滴の絵を流用）
 };
 
 export class EnemyShot {

@@ -1,0 +1,27 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 200 cells wide x 200 cells tall (= 1600 x 1600 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 170 cells of the 200-cell height).
+- Exactly 4 figures side by side in one row, separated by clear gaps of green, the group centered horizontally. Same scale and same palette for every figure.
+- Vertically centered on the canvas.
+
+SUBJECT: ONE SHEET containing FOUR special-attack cut-in panels for the same game, arranged in a 2x2 GRID, all four drawn by the same hand in the same style, with the SAME character, the SAME palette and the SAME chibi proportions in every panel.
+LAYOUT (mandatory): four rectangular opaque panels of equal size in two rows of two. Between and around the panels leave clear gaps of flat pure green #00FF00 at least 24 px wide, so the four panels are separated. Each panel is filled edge to edge with its own artwork; no green inside a panel, no lettering, no border frame, no signature.
+CHARACTER in all four panels (she must look identical in each): a CHIBI witch girl 2.5 heads tall — big head, short body, exactly the proportions of the attached sprite — drawn as a 16-bit sprite with 1-cell dark plum outlines and flat 3-4 step shading. NOT a smooth anime illustration: no soft gradients, no thin delicate line work, no realistic proportions. Hair BRIGHT PINK (rose with magenta shadows, never blonde, never orange, never brown). She wears her FULL BLOOM DRESS: pale GOLD and cream fabric with amber-gold shadows and gold trim, a white apron, and a dark plum witch hat with a GOLD band. Large blue-violet eyes, pale cream skin.
+TOP-LEFT PANEL — "Stardust Cortege": the girl raises her star-tipped wand overhead, mouth open shouting; behind her a deep indigo night sky with pale-gold comets streaking down and two tiny white ghosts carrying a small star-shaped coffin.
+TOP-RIGHT PANEL — "Mirror Waltz": the girl stands holding a silver knife across her chest; four tall gilt standing mirrors surround her, each showing a paler hollow-eyed reflection of the same chibi girl grinning with black teeth; background is a lavender and dusty-rose checker pattern.
+BOTTOM-LEFT PANEL — "Heart Garden": the girl presses one hand to her own chest, eyes half closed with a serene smile; beside her three fist-sized anatomical hearts grow on green thorny stems like flowers, two split open with dark red petals and blood drops arcing upward; background is a rose and crimson dusk sky.
+BOTTOM-RIGHT PANEL — "Wax Choir": the girl sings, lit from below by candle flame; beside her five towering church candles of dripping wax with tall orange flames, and small wax ghosts with open singing mouths growing out of the molten wax; background is a dark brown chapel interior.
+Every panel uses 1-cell checker dither in its background gradients. The four panels must share one palette family so they look like a set.
+
+
+[refs] assets/sprites/player/idle_gold.png

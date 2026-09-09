@@ -1,0 +1,20 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 110 cells wide x 120 cells tall (= 880 x 960 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 102 cells of the 120-cell height).
+- Exactly 2 figures side by side in one row, separated by clear gaps of green, the group centered horizontally. Same scale and same palette for every figure.
+- Feet rest on the baseline y = 960 px (that is 8 cells above the bottom edge). Nothing below the baseline.
+
+SUBJECT: "Syrup Arm" enemy for a candy-forest stage, rising out of a pool of syrup, facing LEFT, two frames side by side. A slender arm made of thick amber-pink syrup reaching up out of a glossy puddle; the syrup drips off the fingers in long strings and the surface of the puddle bulges. Inside the translucent syrup you can see swallowed candies and one small white bone.
+FRAME 1 = the arm is half risen from the puddle, elbow still submerged, fingers curled downward, three drip strings.
+FRAME 2 = the arm is fully extended and swiping to the LEFT, fingers spread like a claw, the puddle stretched into a cone beneath it, five drip strings and two flying droplets close to the hand.
+The puddle base must sit on the baseline and be wider than the arm. No floor line, no shadow, no text. Each frame is one connected shape.

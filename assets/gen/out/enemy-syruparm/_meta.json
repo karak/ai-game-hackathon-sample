@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-syruparm-v1.png",
+ "pitch": [
+  5.0,
+  4.0
+ ],
+ "max_box": [
+  110,
+  120
+ ],
+ "frames": [
+  {
+   "w": 82,
+   "h": 88,
+   "fits": true,
+   "colors": 15,
+   "name": "syruparm1"
+  },
+  {
+   "w": 90,
+   "h": 89,
+   "fits": true,
+   "colors": 15,
+   "name": "syruparm2"
+  }
+ ]
+}

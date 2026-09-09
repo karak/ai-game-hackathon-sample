@@ -15,7 +15,7 @@ import { SAFE_SHOT_T, LOOP2 } from './balance.js';
 import { Fx } from './fx.js';
 import { seedGame, hashSeed } from './util.js';
 import { HD_SCALE as HD } from './gfx/sprite.js';
-import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine } from './entities/gimmicks.js';
+import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine, SyrupDripper } from './entities/gimmicks.js';
 import { resolveDecoMap } from './decomap.js';
 import { updateCamera, snapCamera } from './camera.js';
 import { BOSS_NAMES } from './story.js';

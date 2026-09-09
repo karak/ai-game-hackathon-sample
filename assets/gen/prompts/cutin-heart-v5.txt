@@ -1,0 +1,25 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 210 cells wide x 200 cells tall (= 1680 x 1600 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 170 cells of the 200-cell height).
+- Exactly ONE sprite, horizontally centered on the canvas.
+- Vertically centered on the canvas.
+
+SUBJECT: a 16-bit SNES-style SPECIAL ATTACK CUT-IN PANEL for the magic "Heart Garden" — a rectangular opaque illustration in landscape orientation, like a Super Famicom RPG special-move panel.
+CHARACTER (must match the attached sprite exactly — it is the same character in the same style): a CHIBI witch girl 2.5 heads tall (big head, short body, exactly the proportions of the attached sprite), drawn as a 16-bit sprite with 1-cell dark plum outlines and flat 3-4 step shading — NOT a smooth anime illustration, no soft gradients, no thin delicate line work. Hair BRIGHT PINK (rose with magenta shadows, never blonde, never orange). She wears her FULL BLOOM DRESS: pale GOLD and cream fabric with amber-gold shadows and gold trim, white apron, dark plum witch hat with a GOLD band. Large blue-violet eyes, pale cream skin.
+COMPOSITION: on the right the chibi girl stands with one hand pressed to her own chest, eyes half closed, a serene smile. On the left a bed of dark soil where THREE fist-sized anatomical hearts grow on green thorny stems like flowers, two split open with dark red petals unfurling and blood drops arcing upward. Background: a dusk sky of rose and crimson with 1-cell dither.
+The artwork fills the ENTIRE rectangle edge to edge with no empty margin and no green anywhere. No lettering, no border frame, no signature.
+
+
+REFERENCE: the attached image is the canonical design of this character (same pixel grid). Keep design, colors and proportions identical.
+
+[refs] /Users/yasushi/projects/poc-square/assets/gen/raw/player-base-v5.png, assets/sprites/player/idle_gold.png

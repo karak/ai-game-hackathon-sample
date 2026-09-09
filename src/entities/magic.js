@@ -317,6 +317,7 @@ export class Cortege {
 
 // ---- カットイン（画面固定）: 斜めの帯とともに武器ごとの一枚絵が滑り込み、0.5 秒とどまって抜ける ----
 export const CUTIN_IN = 0.16, CUTIN_HOLD = 0.5, CUTIN_OUT = 0.18;
+export const CUTIN_SCALE = 2; // カットインの表示倍率（整数倍のみ）
 export class CutIn {
   constructor(kind) { this.kind = kind; this.name = CUTIN[kind]; this.t = 0; this.dead = false; }
   get phase() { return this.t < CUTIN_IN ? 'in' : this.t < CUTIN_IN + CUTIN_HOLD ? 'hold' : 'out'; }
@@ -329,7 +330,8 @@ export class CutIn {
   update(dt) { this.t += dt; if (this.t > CUTIN_IN + CUTIN_HOLD + CUTIN_OUT) this.dead = true; }
   draw(g, A, W, H) {
     const spr = A?.generated?.cutin?.[this.name]; if (!spr) return;
-    const w = spr.w ?? spr.r.width / HD_SCALE, h = spr.h ?? spr.r.height / HD_SCALE;
+    // 4 枚を 1 リクエストで描かせたため 1 枚は 92x130 セル前後。整数 2 倍で表示する（1 セル = 2 画面 px。art-standard §2.1 の整数倍表示）
+    const w = (spr.w ?? spr.r.width / HD_SCALE) * CUTIN_SCALE, h = (spr.h ?? spr.r.height / HD_SCALE) * CUTIN_SCALE;
     // 地表の演出（火柱・花園・鏡像）を隠さないよう、帯は画面の上寄り 28% に置く（HUD 26 単位より下）
     const k = this.slide, x = Math.round(-w + (W * 0.52 + w) * k - w * 0.02), y = Math.round(H * 0.28);
     g.save();

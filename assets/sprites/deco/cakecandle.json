@@ -1,0 +1,17 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/deco-candy2-v1.png",
+ "pitch": [
+  4.0,
+  4.0
+ ],
+ "max_box": [
+  130,
+  150
+ ],
+ "frames": null,
+ "w": 67,
+ "h": 76,
+ "fits": true,
+ "colors": 15,
+ "name": "cakecandle"
+}

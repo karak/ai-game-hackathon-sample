@@ -546,34 +546,34 @@
  "cutin/heart": {
   "anchor": "center",
   "colors": 24,
-  "fits": false,
-  "h": 202,
+  "fits": true,
+  "h": 124,
   "src": "assets/sprites/cutin/heart.png",
-  "w": 206
+  "w": 92
  },
  "cutin/mirror": {
   "anchor": "center",
   "colors": 24,
-  "fits": false,
-  "h": 252,
+  "fits": true,
+  "h": 136,
   "src": "assets/sprites/cutin/mirror.png",
-  "w": 250
+  "w": 91
  },
  "cutin/stardust": {
   "anchor": "center",
   "colors": 24,
-  "fits": false,
-  "h": 201,
+  "fits": true,
+  "h": 139,
   "src": "assets/sprites/cutin/stardust.png",
-  "w": 214
+  "w": 93
  },
  "cutin/wax": {
   "anchor": "center",
   "colors": 24,
-  "fits": false,
-  "h": 207,
+  "fits": true,
+  "h": 121,
   "src": "assets/sprites/cutin/wax.png",
-  "w": 212
+  "w": 93
  },
  "deco/balloons": {
   "anchor": "bottom",
@@ -623,6 +623,14 @@
   "src": "assets/sprites/deco/bridgepost.png",
   "w": 42
  },
+ "deco/cakecandle": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 76,
+  "src": "assets/sprites/deco/cakecandle.png",
+  "w": 67
+ },
  "deco/candelabra": {
   "anchor": "bottom",
   "colors": 15,
@@ -638,6 +646,22 @@
   "h": 43,
   "src": "assets/sprites/deco/candle.png",
   "w": 30
+ },
+ "deco/candytomb": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 62,
+  "src": "assets/sprites/deco/candytomb.png",
+  "w": 50
+ },
+ "deco/canecross": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 70,
+  "src": "assets/sprites/deco/canecross.png",
+  "w": 50
  },
  "deco/carousel": {
   "anchor": "bottom",
@@ -799,6 +823,14 @@
   "src": "assets/sprites/deco/stuffing.png",
   "w": 61
  },
+ "deco/sugarflowers": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 75,
+  "src": "assets/sprites/deco/sugarflowers.png",
+  "w": 58
+ },
  "deco/tomb": {
   "anchor": "bottom",
   "colors": 11,
@@ -959,6 +991,22 @@
   "src": "assets/sprites/enemies/clown2.png",
   "w": 111
  },
+ "enemies/cocoon1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": false,
+  "h": 137,
+  "src": "assets/sprites/enemies/cocoon1.png",
+  "w": 49
+ },
+ "enemies/cocoon2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": false,
+  "h": 137,
+  "src": "assets/sprites/enemies/cocoon2.png",
+  "w": 58
+ },
  "enemies/dollpart1": {
   "anchor": "bottom",
   "colors": 15,
@@ -1054,6 +1102,22 @@
   "h": 82,
   "src": "assets/sprites/enemies/needles2.png",
   "w": 74
+ },
+ "enemies/syruparm1": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 88,
+  "src": "assets/sprites/enemies/syruparm1.png",
+  "w": 82
+ },
+ "enemies/syruparm2": {
+  "anchor": "bottom",
+  "colors": 15,
+  "fits": true,
+  "h": 89,
+  "src": "assets/sprites/enemies/syruparm2.png",
+  "w": 90
  },
  "enemies/umbrella1": {
   "anchor": "bottom",
@@ -2048,6 +2112,14 @@
   "src": "assets/sprites/tiles/candyforest.png",
   "w": 265
  },
+ "tiles/candyplank": {
+  "anchor": "bottom",
+  "colors": 12,
+  "fits": true,
+  "h": 21,
+  "src": "assets/sprites/tiles/candyplank.png",
+  "w": 48
+ },
  "tiles/cart": {
   "anchor": "bottom",
   "colors": 12,
@@ -2063,6 +2135,14 @@
   "h": 143,
   "src": "assets/sprites/tiles/castle.png",
   "w": 189
+ },
+ "tiles/dripper": {
+  "anchor": "bottom",
+  "colors": 9,
+  "fits": true,
+  "h": 60,
+  "src": "assets/sprites/tiles/dripper.png",
+  "w": 23
  },
  "tiles/gear": {
   "anchor": "bottom",
@@ -2159,6 +2239,14 @@
   "h": 99,
   "src": "assets/sprites/tiles/tower.png",
   "w": 247
+ },
+ "tiles/trampoline": {
+  "anchor": "bottom",
+  "colors": 12,
+  "fits": true,
+  "h": 43,
+  "src": "assets/sprites/tiles/trampoline.png",
+  "w": 56
  },
  "tiles/workshop": {
   "anchor": "center",

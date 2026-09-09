@@ -160,6 +160,31 @@ def rule_map(im, target):
     return mp
 
 
+def hair_colors(im, frac=0.42):
+    """髪・顔の位置（上から frac まで）に主に現れる色の集合。衣装写像から外すためのガード。"""
+    a = np.asarray(im); al = a[..., 3] > 0; h = a.shape[0]
+    pos = {}
+    for y in range(h):
+        for x in range(a.shape[1]):
+            if not al[y, x]: continue
+            pos.setdefault(tuple(int(v) for v in a[y, x, :3]), []).append(y)
+    return {c for c, ys in pos.items() if np.mean(ys) < h * frac}
+
+
+def costume_map(frame_names, target, guard):
+    """全コマから規則で衣装写像を作って束ねる（BUG-006 / ユーザー指摘 2026-09-10「衣装がゴールドになっていない」）。
+    idle 1 コマから作った写像では、他のコマにしか出ないピンクの陰影（例 cast1 の #b85170）が置換されずに残る。
+    rule_map は色 → 色の決定的な関数なので、コマごとに作って束ねても矛盾しない。guard（髪・顔の色）は除く。"""
+    mp = {}
+    for n in frame_names:
+        p = SPR / f'{n}.png'
+        if not p.exists(): continue
+        for c, t in rule_map(Image.open(p).convert('RGBA'), target).items():
+            if c in guard: continue
+            mp[c] = t
+    return mp
+
+
 def learn_map(src, dst):
     """src と dst を足元中央で重ね、src 色 → dst 色 の多数決写像を作る（一致率 60% 未満の色は変えない）"""
     ox, oy = overlay_offsets(src, dst)  # dst を src 座標系へ: dst(x,y) は src(x+ox, y+oy)
@@ -209,17 +234,19 @@ def main():
         if n in ('dead', 'hurt2') or not (SPR / f'{n}.png').exists(): continue  # hurt2 は hurt から派生（白寄せで帽子色が薄まり、帽子なしと誤判定されるので合成しない）
         if ensure_hat(n, hat_img):
             out = load(n); manifest[f'player/{n}'].update({'w': out.width, 'h': out.height}); print('hat composited onto', n)
-    # plain: 帽子なしフレーム(*_nohat) に idle_nohat→idle_plain の写像を適用
+    # plain: 帽子なしフレーム(*_nohat) に、全コマから作った衣装写像を適用（コマ固有の陰影も置換する）
     if (SPR / 'idle_nohat.png').exists():
-        mp = rule_map(load('idle_nohat'), 'plain'); print('plain mapped colors', len(mp))
+        guard = hair_colors(load('idle_nohat'))
+        mp = costume_map([f'{n}_nohat' for n in frames], 'plain', guard); print('plain mapped colors', len(mp))
         for n in frames:
             src = SPR / f'{n}_nohat.png'
             if not src.exists(): continue
             out = apply_map(Image.open(src).convert('RGBA'), mp); out.save(SPR / f'{n}_plain.png')
             manifest[f'player/{n}_plain'] = {'src': f'assets/sprites/player/{n}_plain.png', 'w': out.width, 'h': out.height, 'anchor': 'bottom', 'fits': True, 'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0])}
-    # gold: 帽子ありフレームに idle_nohat→idle_gold の衣装写像を適用（帽子色は写像に含まれない）
+    # gold: 帽子ありフレームに、全コマから作った衣装写像を適用（帽子と髪の色は guard で除く）
     if (SPR / 'idle.png').exists():
-        mp = rule_map(load('idle_nohat'), 'gold'); print('gold mapped colors', len(mp))
+        guard = hair_colors(load('idle_nohat'))
+        mp = costume_map(frames, 'gold', guard); print('gold mapped colors', len(mp))
         for n in frames:
             src = SPR / f'{n}.png'
             if not src.exists(): continue

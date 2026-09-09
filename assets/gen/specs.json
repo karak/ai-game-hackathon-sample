@@ -2079,8 +2079,8 @@
   },
   "cutin-star": {
    "box": [
-    130,
-    116
+    210,
+    300
    ],
    "frames": 1,
    "anchor": "center",
@@ -2092,13 +2092,12 @@
    "colors": 24,
    "nokey": true,
    "trim_border": true,
-   "crop_key": true,
-   "ref": "player-base"
+   "crop_key": true
   },
   "cutin-knife": {
    "box": [
-    130,
-    116
+    210,
+    200
    ],
    "frames": 1,
    "anchor": "center",
@@ -2110,13 +2109,12 @@
    "colors": 24,
    "nokey": true,
    "trim_border": true,
-   "crop_key": true,
-   "ref": "player-base"
+   "crop_key": true
   },
   "cutin-heart": {
    "box": [
-    130,
-    116
+    210,
+    200
    ],
    "frames": 1,
    "anchor": "center",
@@ -2133,8 +2131,8 @@
   },
   "cutin-candle": {
    "box": [
-    130,
-    116
+    210,
+    200
    ],
    "frames": 1,
    "anchor": "center",
@@ -2146,8 +2144,7 @@
    "colors": 24,
    "nokey": true,
    "trim_border": true,
-   "crop_key": true,
-   "ref": "player-base"
+   "crop_key": true
   },
   "magic-comet": {
    "box": [
@@ -2294,6 +2291,85 @@
     "magicfx/aura2"
    ],
    "colors": 15
+  },
+  "enemy-cocoon": {
+   "box": [
+    96,
+    130
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-cocoon.txt",
+   "out": [
+    "enemies/cocoon1",
+    "enemies/cocoon2"
+   ],
+   "colors": 15
+  },
+  "enemy-syruparm": {
+   "box": [
+    110,
+    120
+   ],
+   "frames": 2,
+   "anchor": "bottom",
+   "subject": "enemy-syruparm.txt",
+   "out": [
+    "enemies/syruparm1",
+    "enemies/syruparm2"
+   ],
+   "colors": 15
+  },
+  "gimmick-candy": {
+   "box": [
+    130,
+    130
+   ],
+   "frames": 3,
+   "anchor": "bottom",
+   "subject": "gimmick-candy.txt",
+   "out": [
+    "tiles/trampoline",
+    "tiles/candyplank",
+    "tiles/dripper"
+   ],
+   "colors": 15
+  },
+  "deco-candy2": {
+   "box": [
+    130,
+    150
+   ],
+   "frames": 4,
+   "anchor": "bottom",
+   "subject": "deco-candy2.txt",
+   "out": [
+    "deco/candytomb",
+    "deco/canecross",
+    "deco/sugarflowers",
+    "deco/cakecandle"
+   ],
+   "colors": 15,
+   "fill_holes": true,
+   "trim_thin_bottom": true
+  },
+  "cutin-set": {
+   "box": [
+    200,
+    200
+   ],
+   "frames": 4,
+   "grid": "2x2",
+   "anchor": "center",
+   "subject": "cutin-set.txt",
+   "out": [
+    "cutin/stardust",
+    "cutin/mirror",
+    "cutin/heart",
+    "cutin/wax"
+   ],
+   "colors": 24,
+   "crop_top": 12
   }
  }
 }

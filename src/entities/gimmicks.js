@@ -1,5 +1,6 @@
 // 地形ギミック（docs/plan/05-systems.md 5.2）: 動く足場 M/V、浮島 @、崩れる足場 !、はしご L、水流 > <、風 } {
 import { TILE, overlapsSolid } from '../physics.js';
+import { EnemyShot } from './projectiles.js';
 import { HD_SCALE } from '../gfx/sprite.js';
 
 export const FLOW_SPEED = 40;          // 水流・風で加わる速度（世界単位/s）
@@ -157,6 +158,32 @@ export function applyFlow(body, map, dt) {
   const dx = f.dir * FLOW_SPEED * dt;
   if (!overlapsSolid(map, body.x + dx, body.y, body.w, body.h)) { body.x += dx; return dx; }
   return 0;
+}
+
+// 綿あめのトランポリン（タイル 'W'）: 上に着地すると跳ね返る。地面として立てるが、着地の瞬間に上向きの速度をもらう
+export const TRAMPOLINE_V = -330;   // 単発ジャンプ JUMP_V -218 の 1.5 倍（2 段ジャンプ相当の高さまで一気に上がる）
+export const isTrampoline = (map, tx, ty) => map.at(tx, ty) === 'W';
+// body の足元がトランポリンか（着地判定の直後に呼ぶ）
+export function trampolineAt(map, body) {
+  const x0 = Math.floor(body.x / TILE), x1 = Math.floor((body.x + body.w - 0.001) / TILE), ty = Math.floor((body.y + body.h + 0.5) / TILE);
+  for (let tx = x0; tx <= x1; tx++) if (isTrampoline(map, tx, ty)) return { tx, ty };
+  return null;
+}
+
+// 糖蜜のしずく（タイル 'D'）: 天井のノズルから周期的に落ちる。落ちたしずくは敵弾 'syrup'（着弾で溜まり）
+export const DRIP_INTERVAL = 1.6;
+export class SyrupDripper {
+  constructor(world, tx, ty) { this.world = world; this.tx = tx; this.ty = ty; this.t = (tx % 4) * 0.4; this.dead = false; } // 位相をずらす
+  get x() { return this.tx * TILE; } get y() { return this.ty * TILE; }
+  update(dt) {
+    this.t += dt;
+    if (this.t < DRIP_INTERVAL) return;
+    this.t -= DRIP_INTERVAL;
+    if (this.world.safeT > 0) return;                       // 復活直後は敵弾なし（balance.js）
+    const k = this.world.hard?.shotSpeed ?? 1;              // 2 周目は落下も速い
+    this.world.enemyShots.push(new EnemyShot(this.world, 'syrup', this.x + TILE / 2, this.y + TILE * 0.8, 0, 40 * k));
+    this.world.particles?.emit('blood', this.x + TILE / 2, this.y + TILE * 0.8, 2);
+  }
 }
 
 // はしご

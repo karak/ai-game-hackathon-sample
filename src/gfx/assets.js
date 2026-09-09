@@ -12,14 +12,7 @@ export async function buildAssets(onProgress = null) {
   const assets = buildProcedural();
   const gen = nest(await loadManifest(manifest, '', onProgress)); // src はルート相対、ページ URL 基準（loader.js）
   if (gen.player) {
-    // 生成済み主人公フレーム。衣装は当面 dress のみ（plain/gold は後段のパレット置換で生成）
-    for (const [frame, spr] of Object.entries(gen.player)) {
-      if (frame === 'hat' || frame === 'base') continue;
-      if (frame.endsWith('_nohat')) { (assets.player.nohat ??= {})[frame.replace(/_nohat$/, '')] = spr; continue; } // 帽子なし原画（死亡演出で帽子を飛ばすときに使う）
-      const m = frame.match(/^(.+)_(plain|gold)$/);
-      if (m) assets.player[m[2]][m[1]] = spr;             // 衣装別フレーム
-      else for (const c of Object.keys(assets.player)) assets.player[c][frame] = spr; // 共通フレーム
-    }
+    assignPlayerFrames(assets.player, gen.player);
     assets.player.generated = true;
     if (gen.player.hat) assets.hat = gen.player.hat;
     // 帽子はコマごとの「髪の上端」に載せる（コマの高さが 94〜135 セルと違うため、スプライト上端基準では浮く）
@@ -30,6 +23,24 @@ export async function buildAssets(onProgress = null) {
   for (const g of ['enemies', 'bosses', 'items', 'shots']) if (gen[g]) Object.assign(assets[g], gen[g]);
   assets.generated = gen;
   return assets;
+}
+
+// 生成済み主人公フレームを衣装別シートに割り当てる。
+// 2 パスで行う: (1) 共通コマ（衣装の接尾辞なし）を全衣装へ、(2) `_plain` / `_gold` で上書き。
+// 1 パスでキーの順に処理すると、manifest の読み込み完了順（loadManifest は Promise.all なので不定）によって
+// 共通コマが衣装別コマを上書きし、私服や金衣装にドレスのコマが混ざる（BUG-016。デプロイ版でユーザーが発見）。
+export function assignPlayerFrames(player, gen) {
+  const costumes = Object.keys(player).filter(c => typeof player[c] === 'object' && player[c] !== null);
+  const specific = [];
+  for (const [frame, spr] of Object.entries(gen)) {
+    if (frame === 'hat' || frame === 'base' || frame === 'base_hat') continue;
+    if (frame.endsWith('_nohat')) { (player.nohat ??= {})[frame.replace(/_nohat$/, '')] = spr; continue; } // 帽子なし原画（死亡演出で帽子を飛ばすときに使う）
+    const m = frame.match(/^(.+)_(plain|gold)$/);
+    if (m) { specific.push(m); continue; }
+    for (const c of costumes) player[c][frame] = spr;      // (1) 共通コマ
+  }
+  for (const [, frame, costume] of specific) if (player[costume]) player[costume][frame] = gen[`${frame}_${costume}`]; // (2) 衣装別で上書き
+  return player;
 }
 
 // 髪色（桃色: r>190, b>140, r-g>45）の最上段の行（スクリーン px）。見つからなければ 0

@@ -8,7 +8,7 @@ docs/gen-pipeline.md §2 の I/F。
   postprocess.py RAW.png OUTDIR/ --logical WxH --split --names a,b [--palette BASE.png]
 """
 from __future__ import annotations
-import argparse, json, collections
+import argparse, json, collections, sys
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -194,17 +194,36 @@ def split_frames_masked(logical, min_gap=2, min_width=8, expect=0):
 
 
 
-def crop_key(im, tol=90):
-    """キー色（純緑）の余白を落として、絵の矩形だけを残す（不透明パネル = カットイン向け）。
-    nokey で読んだ一枚絵は緑背景が絵として残るため、緑でない画素の外接矩形に切る。"""
+def crop_key(im, tol=15):
+    """キー色の余白を落として、絵の矩形だけを残す（不透明パネル = カットイン向け）。
+    nokey で読んだ一枚絵は緑背景が絵として残るため、緑でない画素の外接矩形に切る。
+    モデルは純緑ではなく「くすんだ緑の額縁」を描くこともあるので、緑寄り（g が r と b より tol 以上大きい）を余白とみなす。
+    絵の内側にある緑（草・茎）は外接矩形に影響しない。"""
     a = np.asarray(im.convert('RGB')).astype(int)
-    green = (a[..., 1] > 150) & (a[..., 0] < 150) & (a[..., 2] < 150) & (a[..., 1] - a[..., 0] > tol) & (a[..., 1] - a[..., 2] > tol)
+    green = (a[..., 1] - a[..., 0] > tol) & (a[..., 1] - a[..., 2] > tol) & (a[..., 1] > 90)
     keep = ~green
     ys, xs = np.nonzero(keep)
     if ys.size == 0: return im
     box = (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
     if box != (0, 0, im.width, im.height): print(f'  cropped key margin to {box[2]-box[0]}x{box[3]-box[1]}')
     return im.crop(box)
+
+
+def strip_top_banner(im, max_frac=0.2, flat=0.6):
+    """パネル上端に焼き込まれた題名の帯を落とす。
+    帯は「行の画素の 60% 以上が 2 色以内」で占められる平坦な背景＋文字なので、上端からその条件が続く行数を切る。
+    絵（ディザの空・格子模様）は色数が多いので条件を満たさない。"""
+    a = np.asarray(im.convert('RGB')).astype(int); h, w = a.shape[:2]
+    lim = int(h * max_frac); k = 0
+    while k < lim:
+        row = a[k].reshape(-1, 3)
+        cnt = collections.Counter(map(tuple, row.tolist()))
+        if sum(n for _, n in cnt.most_common(2)) < w * flat: break
+        k += 1
+    if k >= 3:
+        print(f'  stripped top banner {k} rows')
+        return im.crop((0, k, w, h))
+    return im
 
 
 def trim_border(im, max_px=8, std_max=6):
@@ -300,12 +319,16 @@ def main():
     ap.add_argument('--fill-holes', action='store_true', help='キーで抜けた内部の穴を隣接色で埋める（装飾・キャラ）')
     ap.add_argument('--trim-border', action='store_true', help='外周の一様色の縁（額縁）を最大 8 px 落とす（nokey の一枚絵向け）')
     ap.add_argument('--crop-key', action='store_true', help='キー色（純緑）の余白を落として絵の矩形だけ残す（nokey の不透明パネル = カットイン）')
+    ap.add_argument('--grid', help='RxC の格子に並んだ不透明パネルを、緑の隙間で切って個別に処理する（1 リクエストで 4 枚のカットインを同じ画風で描かせる用）')
+    ap.add_argument('--crop-top', type=int, default=0, help='各パネルの上端をこのセル数だけ切る（モデルが焼き込んだ題名の帯を落とす。実測 11〜12 セル）')
     ap.add_argument('--trim-thin-bottom', action='store_true', help='下端の細い滴などを落として接地面を広い部分にする（血溜まり）')
     a = ap.parse_args()
     bw, bh = (int(v) for v in a.logical.split('x'))
+    if a.grid:
+        sys.exit(grid_main(a, bw, bh))
     im = Image.open(a.src).convert('RGBA') if a.nokey else key_out(Image.open(a.src), a.tol)
     logical, px, py = extract_cells(im)
-    if a.crop_key: logical = crop_key(logical)
+    if a.crop_key: logical = trim_border(crop_key(logical), max_px=28, std_max=10)  # 純緑の余白を落としてから、モデルが描いた一様色の縁（くすんだ緑など）も落とす
     if a.trim_border: logical = trim_border(logical)
     if a.keep_bottom: logical = logical.crop((0, int(logical.height * (1 - a.keep_bottom)), logical.width, logical.height))
     if not a.nokey and not a.keep_bottom: logical = strip_shadow(logical)
@@ -337,6 +360,59 @@ def main():
         out.save(Path(a.dst) / f'{names[i]}.png'); fi = info(out); fi['name'] = names[i]; meta['frames'].append(fi)
         (Path(a.dst) / f'{names[i]}.json').write_text(json.dumps({**meta, **fi, 'frames': None}, indent=1))
     (Path(a.dst) / '_meta.json').write_text(json.dumps(meta, indent=1)); print(json.dumps(meta))
+
+
+def grid_bands(mask, min_gap=8, min_size=40):
+    """不透明マスクの投影から、内容が続く帯（開始, 終了）を返す。帯の間に min_gap 以上の空白があれば別の帯。"""
+    occ = mask.any(axis=1) if mask.ndim == 2 else mask
+    bands = []; start = None; gap = 0
+    for i, v in enumerate(occ):
+        if v:
+            if start is None: start = i
+            gap = 0
+        elif start is not None:
+            gap += 1
+            if gap >= min_gap:
+                if i - gap - start >= min_size: bands.append((start, i - gap))
+                start = None; gap = 0
+    if start is not None and len(occ) - start >= min_size: bands.append((start, len(occ)))
+    return bands
+
+
+def grid_main(a, bw, bh):
+    """格子に並んだ不透明パネル（カットイン 4 枚など）を緑の隙間で切り、パネルごとにセル抽出・量子化して保存する。
+    1 リクエストで全パネルを描かせられるので、パネル間で画風が揃う（ユーザー指示 2026-09-10）。"""
+    rows, cols = (int(v) for v in a.grid.lower().split('x'))
+    keyed = key_out(Image.open(a.src), a.tol)
+    al = np.asarray(keyed.split()[3]) > 0
+    ybands = grid_bands(al, min_gap=6, min_size=60)
+    names = (a.names or '').split(',') if a.names else []
+    Path(a.dst).mkdir(parents=True, exist_ok=True)
+    meta = {'source': a.src, 'grid': [rows, cols], 'frames': []}
+    if len(ybands) != rows:
+        print(f'  WARN grid: 行の帯が {len(ybands)} 本（期待 {rows}）: {ybands}')
+    panels = []
+    for (y0, y1) in ybands[:rows]:
+        band = al[y0:y1]
+        xbands = grid_bands(band.T, min_gap=6, min_size=60)
+        if len(xbands) != cols: print(f'  WARN grid: 行 {y0}-{y1} の列の帯が {len(xbands)} 本（期待 {cols}）: {xbands}')
+        for (x0, x1) in xbands[:cols]: panels.append((x0, y0, x1, y1))
+    for i, (x0, y0, x1, y1) in enumerate(panels):
+        name = names[i] if i < len(names) else f'p{i}'
+        sub = Image.open(a.src).convert('RGBA').crop((x0, y0, x1, y1))
+        logical, px, py = extract_cells(sub)
+        logical = trim_border(crop_key(logical), max_px=28, std_max=10)   # パネルの外に残った緑・一様色の縁を落とす
+        if a.crop_top and logical.height > a.crop_top * 2: logical = logical.crop((0, a.crop_top, logical.width, logical.height))  # 焼き込まれた題名の帯（実測 11〜12 セル）を落とす。名前はゲーム側のテロップで出す
+        logical = quantize_shared(logical, a.colors, a.palette)
+        dst = Path(a.dst) / f'{name}.png'
+        logical.save(dst)
+        info = {'name': name, 'w': logical.width, 'h': logical.height, 'fits': logical.width <= bw and logical.height <= bh,
+                'colors': len([c for c in logical.getcolors(99999) if c[1][3] > 0]), 'pitch': [px, py], 'box': [x0, y0, x1, y1]}
+        dst.with_suffix('.json').write_text(json.dumps({**meta, **info}, indent=1))
+        meta['frames'].append(info)
+        print(f'  panel {name}: {logical.width}x{logical.height} colors {info["colors"]} pitch {px}x{py}')
+    print(json.dumps(meta))
+    return 0 if len(meta['frames']) == rows * cols else 1
 
 
 if __name__ == '__main__':

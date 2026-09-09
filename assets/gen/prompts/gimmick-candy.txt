@@ -1,0 +1,5 @@
+SUBJECT: THREE platformer gimmick objects for a candy-forest stage, in a row with equal spacing, flat side view, same pixel scale for all three:
+(1) a COTTON-CANDY TRAMPOLINE 3 tiles wide and 1 tile tall: a taut dome of pale pink cotton candy stretched between two candy-cane posts, its top surface springy and bulging upward, sugar dust puffing at the edges (a bounce pad the hero lands on);
+(2) a CANDY PLANK 2 tiles wide and half a tile tall: a flat slab of translucent amber barley sugar with a hairline crack across the middle and two chipped corners (a brittle platform that breaks);
+(3) a SYRUP DRIPPER 1 tile wide and 1.5 tiles tall: a fat sugar-glass nozzle hanging from a stub of ceiling, a bead of dark red syrup swelling at its tip and one drop falling free just below.
+Clear green gaps between the three objects, no shadows, no text.

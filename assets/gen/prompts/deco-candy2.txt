@@ -1,0 +1,6 @@
+SUBJECT: FOUR candy-forest decorations for a platformer, in a row with equal spacing, flat side view, same pixel scale, same baseline:
+(1) a CANDY GRAVESTONE: a headstone carved from striped red-and-white hard candy, cracked down the middle, syrup weeping from the crack, a bite taken out of one corner;
+(2) a CANDY-CANE CROSS: two candy canes lashed together as a grave cross stuck in the ground, the shorter one snapped and hanging, wrapped with a tattered pink ribbon;
+(3) a SUGAR FLOWER BED: a clump of five sugar-paste flowers on wire stems, wilting, two heads drooping and furred with grey mould, dark syrup pooling at the roots;
+(4) a MELTED LAYER CAKE with a candle: a three-tier cake slumping to one side, cream oozing, a half-burned candle leaning on top with a small flame, one cherry rolled to the base.
+Clear green gaps between the four objects, no shadows, no text, no floor line.

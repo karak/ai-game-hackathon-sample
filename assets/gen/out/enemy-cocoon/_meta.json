@@ -1,0 +1,27 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/enemy-cocoon-v1.png",
+ "pitch": [
+  6.0,
+  6.0
+ ],
+ "max_box": [
+  96,
+  130
+ ],
+ "frames": [
+  {
+   "w": 49,
+   "h": 137,
+   "fits": false,
+   "colors": 15,
+   "name": "cocoon1"
+  },
+  {
+   "w": 58,
+   "h": 137,
+   "fits": false,
+   "colors": 15,
+   "name": "cocoon2"
+  }
+ ]
+}

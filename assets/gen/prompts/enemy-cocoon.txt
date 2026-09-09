@@ -1,0 +1,4 @@
+SUBJECT: "Cotton-Candy Cocoon" enemy for a candy-forest stage, hanging from above by a thread, facing LEFT, two frames side by side. A fist-sized bundle of pale pink cotton candy hanging from a sticky sugar thread; the fluff is matted and stained with syrup, and something is moving inside — a fat pale grub with two black eyes shows through a split in the fluff, and one clawed leg pokes out. Sugar crystals cling to the bottom.
+FRAME 1 = the cocoon is closed: only a dark split and two glinting eyes show, the thread is straight, three sugar crystals hanging below.
+FRAME 2 = the cocoon has torn open: the grub's head and two legs are out, its mouth open with tiny teeth and a string of syrup drool, the fluff hangs in shreds, the thread is bent and stretched 4 cells longer.
+The thread must be part of the sprite, going straight up from the top of the fluff. No floor, no shadow, no text. Each frame is one connected shape.

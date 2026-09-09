@@ -453,6 +453,59 @@ export class GargoyleDoll extends Enemy {
   spriteName() { return this.state === 'perch' ? 'gargoyle1' : 'gargoyle2'; }
 }
 
+// ---- 綿あめの繭（第二章）: 天井から糸で吊り下がり、真下を通ると落ちてきて這う ----
+export class CottonCocoon extends Enemy {
+  constructor(world, x, y) {
+    super(world, x, y, 14, 16); this.spriteOff = [1, 1]; this.gravity = false;
+    this.hp = 2; this.score = 220; this.gore = 'stuffing'; this.state = 'hang'; this.hangY = this.y; this.crawlT = 0;
+    this.fitSprite('cocoon1', 0.5, 0.45); this.y = this.hangY; // 糸を含む縦長スプライトなので判定は下半分だけ
+  }
+  update(dt) {
+    super.update(dt);
+    const d = this.distX();
+    if (this.state === 'hang') {
+      this.y = this.hangY + Math.sin(this.t * 2.5) * 2;                       // 糸で揺れる
+      if (Math.abs(d) < 26 && this.player.y > this.y) { this.state = 'drop'; this.gravity = true; this.world.particles.emit('stuffing', this.cx, this.y, 4); }
+      return;
+    }
+    if (this.state === 'drop') {
+      const res = this.physics(dt);
+      if (res.hitBottom) { this.state = 'crawl'; this.facePlayer(); this.world.particles.emit('stuffing', this.cx, this.y + this.h, 6); this.world.audio.sfx('squish'); }
+      return;
+    }
+    this.crawlT += dt;
+    this.facing = Math.sign(d) || this.facing;
+    this.vx = this.facing * (18 + Math.sin(this.crawlT * 8) * 8);             // にじり寄る（脈打つ速度）
+    const res = this.physics(dt);
+    if (res.hitWall) this.facing *= -1;
+  }
+  spriteName() { return this.state === 'hang' ? 'cocoon1' : 'cocoon2'; }
+}
+
+// ---- シロップの腕（第二章）: 溜まりから伸び上がって薙ぎ払う。沈んでいる間は無敵 ----
+export class SyrupArm extends Enemy {
+  constructor(world, x, y) {
+    super(world, x, y, 20, 18); this.spriteOff = [1, 1]; this.gravity = false;
+    this.hp = 3; this.score = 260; this.gore = 'blood'; this.state = 'sunk'; this.stateT = rand(0.4, 1.4); this.contact = false;
+    this.fitSprite('syruparm1', 0.55, 0.8); this.baseY = this.y + this.h;
+  }
+  update(dt) {
+    super.update(dt);
+    this.stateT -= dt;
+    if (this.stateT <= 0) {
+      if (this.state === 'sunk') { this.state = 'rise'; this.stateT = 0.4; this.contact = true; this.world.particles.emit('blood', this.cx, this.baseY - 4, 5); }
+      else if (this.state === 'rise') { this.state = 'swipe'; this.stateT = 0.5; this.facePlayer(); this.world.audio.sfx('squish'); }
+      else if (this.state === 'swipe') { this.state = 'sink'; this.stateT = 0.4; }
+      else { this.state = 'sunk'; this.stateT = rand(1.0, 1.8); this.contact = false; }
+    }
+    // 伸び上がりに合わせて判定の上端を動かす（沈んでいる間は当たらない）
+    const up = this.state === 'sunk' ? 0 : this.state === 'rise' ? 1 - this.stateT / 0.4 : this.state === 'sink' ? this.stateT / 0.4 : 1;
+    this.y = this.baseY - this.h * Math.max(0.15, up);
+  }
+  hurt(dmg, shot) { if (this.state === 'sunk') { this.world.audio.sfx('tick'); return; } super.hurt(dmg, shot); } // 沈んでいる間は撃てない
+  spriteName() { return this.state === 'swipe' ? 'syruparm2' : 'syruparm1'; }
+}
+
 export function createEnemy(world, spawn) {
   const { type, x, y } = spawn;
   switch (type) {
@@ -471,6 +524,8 @@ export function createEnemy(world, spawn) {
     case 'clown': return new ClownSkeleton(world, x + 1, y + TILE);
     case 'mirror': return new MirrorLyrica(world, x + TILE / 2, y);
     case 'gargoyle': return new GargoyleDoll(world, x, y + TILE);
+    case 'cocoon': return new CottonCocoon(world, x + 1, y);
+    case 'syruparm': return new SyrupArm(world, x, y + TILE);
   }
   return null;
 }
