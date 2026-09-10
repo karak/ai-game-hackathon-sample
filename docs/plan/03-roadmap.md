@@ -21,7 +21,7 @@ M0 POC(3面)  ──▶ M1 遊べる3面 ──▶ M2 ギミック基盤+4面 �
 | M6 | 磨き・最適化 | 描画のバッチ化、アセット事前デコード、ロード画面、モバイル簡易対応、英語 UI | 60fps（CPU 30% 以下）、初回ロード 3 秒以内 | 3 | 5 |
 |    |  | 済（2026-09-09、Sprint H・I）: 計測（バッチ化は不要と判断）、事前デコード＋ロード画面、粒子上限 400、英語 UI、スマホ縦の縮小＋タッチ（エミュレーション）。初回ロード 110〜445 ms（localhost）。**未達**: 実機スマホ・実機パッド、ネット越しのロード時間 | | | |
 | M7 | リリース v1.0 | itch.io ページ、トレーラー GIF、README、ライセンス表記、既知の問題一覧 | 公開 URL。バグ報告フォーム | 2 | 3 |
-|    |  | 済（2026-09-09、Sprint J）: build の素材欠落（BUG-014）修正と preview 検証、LICENSE、README、`docs/release/known-issues.md`、`itch-page.md`（手順＋日英本文）、`trailer.gif` / `trailer_256.gif`。公開（2026-09-10）: Cloudflare Workers Static Assets の専用 Worker `magical-lyrica` → https://magical-lyrica.karak97.workers.dev（`docs/release/deploy.md`。Pages 新規作成は wrangler で Workers に転送されるため Workers を採用）。**未達**: バグ報告先（GitHub Issues はリポジトリ公開後）、初回ロード 3 秒（エッジ未キャッシュ時 6.6 秒、IMP-019） 。バグ報告フォーム: GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（公開リポジトリ ai-game-hackathon-sample、2026-09-10） | | | 0 |
+|    |  | 済（2026-09-09、Sprint J）: build の素材欠落（BUG-014）修正と preview 検証、LICENSE、README、`docs/release/known-issues.md`、`itch-page.md`（手順＋日英本文）、`trailer.gif` / `trailer_256.gif`。公開（2026-09-10）: Cloudflare Workers Static Assets の専用 Worker `magical-lyrica` → https://magical-lyrica.karak97.workers.dev（`docs/release/deploy.md`。Pages 新規作成は wrangler で Workers に転送されるため Workers を採用）。**未達（当時）**: 初回ロード 3 秒（エッジ未キャッシュ時 6.6 秒。IMP-019 で 2.07 秒に短縮、Sprint K）。バグ報告フォーム: GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（公開リポジトリ ai-game-hackathon-sample、2026-09-10） | | | 0 |
 
 合計: 工数 ≈ 29 セッション、生成 ≈ 130 リクエスト（現セッション予算 200 の残 131 と概ね一致。超える場合は追加予算を相談）。
 
