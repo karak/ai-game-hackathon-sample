@@ -6,3 +6,5 @@ test-results/
 .wrangler/
 .venv/
 .env
+__pycache__/
+*.pyc
