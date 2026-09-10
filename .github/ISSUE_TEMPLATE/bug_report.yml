@@ -1,0 +1,41 @@
+name: 不具合報告 / Bug report
+description: ゲームの不具合・詰まり・表示の崩れ。オプション画面の「テスター報告を コピー」の内容を貼ってください / Paste the "Copy tester report" text from the Options screen
+title: "[bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ありがとうございます。**オプション → テスター報告を コピー** でクリップボードに入る JSON（バージョン・ブラウザ・パッド名・章の到達・死亡数。個人を特定する情報は含みません）を下の欄に貼ると原因の切り分けが早くなります。
+        Thank you. Pasting the JSON from **Options → Copy tester report** (build id, browser, gamepad name, chapters reached, deaths; no personal data) speeds things up.
+  - type: textarea
+    id: what
+    attributes:
+      label: 何が起きたか / What happened
+      placeholder: 第二章の沼で…／In chapter 2, at the bog…
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順 / Steps to reproduce
+      placeholder: |
+        1. はじめから → 第二章
+        2. …
+  - type: dropdown
+    id: input
+    attributes:
+      label: 操作方法 / Input
+      options: [キーボード / Keyboard, ゲームパッド / Gamepad, タッチ（スマホ） / Touch]
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: テスター報告（オプション → テスター報告を コピー） / Tester report JSON
+      render: json
+  - type: textarea
+    id: shot
+    attributes:
+      label: スクリーンショット / Screenshot
+      description: 画像をドラッグ＆ドロップ / Drag and drop an image

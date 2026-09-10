@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 遊ぶ / Play
+    url: https://magical-lyrica.karak97.workers.dev
+    about: 公開中のビルド（Cloudflare Workers Static Assets）

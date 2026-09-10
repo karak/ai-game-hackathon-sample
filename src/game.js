@@ -12,12 +12,14 @@ import { irisRadius, IRIS_T, BOSS_INTRO_T } from './fx.js';
 import { DemoRecorder, DemoInput, DEMO_MAX_T, DEMO_IDLE_T } from './demo.js';
 import { DEMOS } from './demos.js';
 import { hashSeed } from './util.js';
-import { loadDeathLog, saveDeathLog, pushDeath } from './deathlog.js';
+import { loadDeathLog, saveDeathLog, pushDeath, summarizeDeaths } from './deathlog.js';
+import { loadRuns, saveRuns, newRun, pushRun, buildReport } from './runlog.js';
+import { BUILD_ID } from './gfx/loader.js';
 import { defaultSettings, saveSettings, volumeGain, bind, codesFor, keyName, keyNameMini, padName, REBINDABLE, ACTION_LABEL, VOLUME_MAX, DEFAULT_KEYS, DEFAULT_PAD } from './settings.js';
 
 // オプション画面の行。kind: volume / mute / key(action) / reset / back
 export const NO_MISS_BONUS = 5000; // クリア画面: 面をノーミスで抜けたときの加点
-const OPTION_ROWS = [{ kind: 'volume' }, { kind: 'mute' }, { kind: 'lang' }, ...REBINDABLE.map(a => ({ kind: 'key', action: a })), { kind: 'reset' }, { kind: 'back' }];
+const OPTION_ROWS = [{ kind: 'volume' }, { kind: 'mute' }, { kind: 'lang' }, { kind: 'pad' }, ...REBINDABLE.map(a => ({ kind: 'key', action: a })), { kind: 'reset' }, { kind: 'report' }, { kind: 'back' }]; // pad = 接続中のパッドと押下ボタンの診断表示、report = テスター報告をクリップボードへ
 
 export class Game {
   // settings: settings.js の loadSettings() 結果。storage は保存先（省略時 localStorage）
@@ -32,6 +34,7 @@ export class Game {
     this.menuIdx = 0; this.optIdx = 0; this.capturing = null; // タイトルメニュー / オプションのカーソル、キー割り当て待ちの操作名
     this.recorder = null; this.demo = null; this.demoIdx = 0; // デモ記録／再生
     this.deathLog = loadDeathLog(this.storage); this.loop = 0; this.continued = false; // 死亡地点ログ（IMP-007）／周回（0=1 周目）／コンティニュー後はハイスコアに記録しない
+    this.runs = loadRuns(this.storage); this.run = null; this.reportMsg = null; // 通しプレイの記録（runlog.js、テスター計測）／オプションの「コピーしました」表示
     this.audio.setVolume(volumeGain(this.settings.volume)); this.audio.setMuted(this.settings.muted);
     setLang(this.settings.lang); this.onLangChange = null; // 表示言語（IMP-008）。main.js が index.html の説明文を差し替えるコールバックを置く
   }
@@ -46,6 +49,7 @@ export class Game {
   // ---- 遷移 ----
   startGame(stage = 0, loop = 0) {
     this.score = 0; this.lives = 2; this.stageIndex = Math.max(0, Math.min(STAGES.length - 1, stage)); this.loop = loop; this.continued = false;
+    this.finishRun(); this.run = newRun({ loop, start: this.stageIndex, lang: this.settings.lang }); this.runs = pushRun(this.runs, this.run); this.saveRuns();
     if (this.stageIndex === 0) { this.setState('prologue'); this.textIdx = 0; this.audio.playBgm(SONGS.title); }
     else this.startStage();
   }
@@ -55,9 +59,23 @@ export class Game {
   }
   // アイリスワイプで閉じてから then() を実行する（画面遷移）
   startWipe(then) { if (this.state === 'wipe') return; this.wipe = { from: this.state, t: 0, then }; this.setState('wipe'); }
-  gameOver() { if (this.state === 'demo') { this.endDemo(); return; } this.setState('gameover'); this.goIdx = 0; this.audio.playJingle(SONGS.jGameOver); this.saveHi(); }
+  gameOver() { if (this.state === 'demo') { this.endDemo(); return; } this.setState('gameover'); this.goIdx = 0; this.audio.playJingle(SONGS.jGameOver); this.saveHi(); this.saveRuns(); }
+  // ---- 通しプレイの記録（runlog.js）。run は startGame で開き、エンディング到達かタイトル復帰で閉じる ----
+  saveRuns() { saveRuns(this.runs, this.storage); }
+  finishRun() { if (this.run && this.run.end == null) { this.run.end = Date.now(); this.saveRuns(); } this.run = null; }
+  // テスター報告をクリップボードへ（オプション「テスター報告を コピー」）。戻り値は Promise<boolean>
+  reportText() {
+    const nav = globalThis.navigator, scr = globalThis.screen;
+    return buildReport({ runs: this.runs, deaths: this.deathLog, settings: { ...this.settings, keysChanged: JSON.stringify(this.settings.keys) !== JSON.stringify(DEFAULT_KEYS) || JSON.stringify(this.settings.pad) !== JSON.stringify(DEFAULT_PAD) },
+      env: { version: BUILD_ID, ua: nav?.userAgent ?? '', lang: nav?.language ?? '', screen: scr ? `${scr.width}x${scr.height}` : '', pad: this.input.padId, touch: typeof window !== 'undefined' && 'ontouchstart' in window }, summarizeDeaths, stages: STAGES.length });
+  }
+  async copyReport() {
+    const txt = this.reportText(); let ok = false;
+    try { await globalThis.navigator?.clipboard?.writeText(txt); ok = true; } catch { ok = false; }
+    this.lastReport = txt; this.reportMsg = { ok, t: 2.5 }; this.audio.sfx('select'); return ok;
+  }
   // コンティニュー: 面の先頭からスコア 0 で再開。回数無制限、ハイスコアには記録しない（05-systems 5.1）
-  continueGame() { this.continued = true; this.score = 0; this.lives = 2; this.startStage(); }
+  continueGame() { this.continued = true; this.score = 0; this.lives = 2; if (this.run) { this.run.continues++; this.saveRuns(); } this.startStage(); }
   stageClear() {
     if (this.state === 'demo') { this.endDemo(); return; }
     this.timeBonus = Math.ceil(this.world.time) * 10; this.noMissBonus = this.world.deaths === 0 ? NO_MISS_BONUS : 0; this.kills = this.world.kills;
@@ -71,6 +89,7 @@ export class Game {
     const p = this.world.player;
     this.deathLog = pushDeath(this.deathLog, { s: STAGES[this.stageIndex].name, x: p.centerX, y: p.y + p.h, r: reason, t: this.world.t, l: this.loop, at: Date.now() });
     saveDeathLog(this.deathLog, this.storage);
+    if (this.run) { this.run.deaths++; this.saveRuns(); }
   }
   saveHi() { if (this.continued) return; if (this.score > this.hi) { this.hi = this.score; this.settings.hi = this.hi; this.save(); } }
   toggleMute() { this.settings.muted = this.audio.toggleMute(); this.save(); }
@@ -125,12 +144,12 @@ export class Game {
           if (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) {
             const sel = menu[this.pauseIdx].id; this.paused = false; this.audio.sfx('select');
             if (sel === 'restart') this.startWipe(() => this.startStage());
-            else if (sel === 'title') this.startWipe(() => { this.world = null; this.setState('title'); this.audio.playBgm(SONGS.title); });
+            else if (sel === 'title') this.startWipe(() => { this.world = null; this.finishRun(); this.setState('title'); this.audio.playBgm(SONGS.title); });
           }
           break;
         }
         this.debugKeys(inp);
-        this.irisT += dt;
+        this.irisT += dt; if (this.run) this.run.sec += dt;
         if (this.recorder) this.recorder.record(inp);
         this.world.update(dt, inp);
         break;
@@ -139,7 +158,8 @@ export class Game {
         if (this.stateT > 2 && (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) || this.stateT > 7) {
           this.startWipe(() => {
             this.stageIndex++;
-            if (this.stageIndex >= STAGES.length) { this.setState('ending'); this.endingIdx = 0; this.audio.playBgm(SONGS.ending); this.saveHi(); if (!this.settings.progress.cleared) { this.settings.progress.cleared = true; this.save(); } } // 1 周クリアで 2 周目を開放
+            if (this.run) { this.run.stage = Math.max(this.run.stage, Math.min(STAGES.length - 1, this.stageIndex)); if (this.stageIndex >= STAGES.length) this.run.cleared = true; this.saveRuns(); }
+            if (this.stageIndex >= STAGES.length) { this.setState('ending'); this.endingIdx = 0; this.audio.playBgm(SONGS.ending); this.saveHi(); this.finishRun(); if (!this.settings.progress.cleared) { this.settings.progress.cleared = true; this.save(); } } // 1 周クリアで 2 周目を開放
             else this.startStage();
           });
         }
@@ -152,7 +172,7 @@ export class Game {
           if (inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) {
             this.audio.sfx('select');
             if (menu[this.goIdx].id === 'continue') this.startWipe(() => this.continueGame());
-            else this.startWipe(() => { this.world = null; this.setState('title'); this.audio.playBgm(SONGS.title); });
+            else this.startWipe(() => { this.world = null; this.finishRun(); this.setState('title'); this.audio.playBgm(SONGS.title); });
           }
         }
         break;
@@ -214,6 +234,7 @@ export class Game {
 
   // ---- オプション（音量 / ミュート / キー・パッド割り当て） ----
   updateOptions(inp) {
+    if (this.reportMsg && (this.reportMsg.t -= 1 / 60) <= 0) this.reportMsg = null;
     if (this.capturing) return; // Input.captureNext のコールバック待ち
     const rows = OPTION_ROWS, row = rows[this.optIdx];
     if (inp.hit('up')) { this.optIdx = (this.optIdx + rows.length - 1) % rows.length; this.audio.sfx('select'); }
@@ -232,10 +253,12 @@ export class Game {
       });
     }
     else if (row.kind === 'reset' && ok) { this.settings.keys = { ...DEFAULT_KEYS }; this.settings.pad = { ...DEFAULT_PAD }; this.input.setKeys(this.settings.keys); this.input.setPad(this.settings.pad); this.save(); this.audio.sfx('select'); }
+    else if (row.kind === 'report' && ok) this.copyReport();
     else if (row.kind === 'back' && ok) this.leaveOptions();
   }
   // 表示言語を切り替えて保存する（IMP-008）。index.html の説明文は onLangChange で差し替える
   setLanguage(l) { this.settings.lang = setLang(l); this.save(); this.audio.sfx('select'); this.onLangChange?.(this.settings.lang); }
+  optionRow(i) { return OPTION_ROWS[i]; } // オプション行（E2E がカーソル位置の行種を読む）
   leaveOptions() { this.input.cancelCapture(); this.capturing = null; this.save(); this.audio.sfx('select'); this.setState('title'); }
   optionRowText(row) {
     switch (row.kind) {
@@ -247,6 +270,12 @@ export class Game {
         const k = codesFor(this.settings.keys, row.action).map(keyName).join(' '), p = codesFor(this.settings.pad, row.action).map(padName).join(' ');
         return [t(ACTION_LABEL[row.action]), `${k || '--'}  /  PAD ${p || '--'}`];
       }
+      case 'pad': { // 診断: 接続中のパッド名（先頭 22 字）と今押されているボタン。実機で「認識されているか」「どのボタンが何番か」を見る
+        if (!this.input.padConnected) return [t('ゲームパッド'), t('みけんしゅつ')];
+        const id = String(this.input.padId ?? 'PAD').replace(/\s*\(.*$/, '').slice(0, 22), pressed = [...this.input.padButtons].map(i => padName('b' + i)).join(' ');
+        return [t('ゲームパッド'), `${id}${pressed ? '  [' + pressed + ']' : ''}`];
+      }
+      case 'report': return [t('テスター報告を コピー'), this.reportMsg ? t(this.reportMsg.ok ? 'コピーしました' : 'コピーできません') : ''];
       case 'reset': return [t('そうさを しょきかに もどす'), ''];
       case 'back': return [t('タイトルへ もどる'), ''];
     }

@@ -12,9 +12,9 @@
 | 音 | Web Audio 合成 SFX 24 種、BGM 11 曲（テーマ 8・タイトル・ボス 2・エンディング）＋ジングル 4（開始・クリア・死亡・ゲームオーバー）。シーケンサに arp／echo／waves／once | `src/audio.js`、`test/audio-songs.test.js` |
 | 素材生成 | Gemini 2.5 Flash Image → クロマキー → セル境界検出 → 15 色量子化。仕様表 `specs.json`、台帳、派生（帽子合成・衣装置換）。挿絵級は尊重物 `ending/scene1`・`scene6`＋立ち絵ベースを毎回添付し `tools/style_check.py` で比べる（IMP-022） | `tools/*.py`、`docs/gen-pipeline.md`、`docs/art-standard.md` §1.3・§2.6 |
 | 資料 | デザインカタログ 7 章（キャラ／敵／アイテム／タイル／背景／ステージ／UI） | `catalog.html` |
-| 入力・保存 | キーボード／Gamepad API（standard mapping）／タッチ、キーコンフィグ、`localStorage` セーブ（進行・音量・ミュート・割り当て・ハイスコア） | `src/input.js`、`src/settings.js`、`test/input.test.js`、`test/settings.test.js` |
+| 入力・保存 | キーボード／Gamepad API（standard mapping、オプションに診断行）／タッチ、キーコンフィグ、`localStorage` セーブ（進行・音量・ミュート・割り当て・ハイスコア）、通しプレイ記録 `lyrica_runs`（テスター報告のコピー、`src/runlog.js`） | `src/input.js`、`src/settings.js`、`test/input.test.js`、`test/settings.test.js` |
 | バランス | 復活地点 ±96 湧き禁止、復活後 2 秒敵弾なし、制限時間 300/300/330（歩行×3＋ボス 90 秒） | `src/balance.js`、`test/balance.test.js` |
-| テスト | Vitest 119 件＋ Playwright E2E 9 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法） | `npm test`、`npm run e2e` |
+| テスト | Vitest 122 件＋ Playwright E2E 10 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド） | `npm test`、`npm run e2e` |
 | ビルド・配信 | Vite（index.html / catalog.html、`copySprites` で素材を dist へ）。dist 6.0 MB、`tools/check_dist.mjs` で preview 起動確認。`LICENSE`、`docs/release/`（itch ページ原稿・既知の問題・トレーラー GIF） | `npm run build`、`node tools/check_dist.mjs` |
 
 ## 素材（manifest 235 エントリ）

@@ -15,7 +15,7 @@ export class Input {
     this.held = new Set();      // キーボード/タッチで押下中
     this.padHeld = new Set();   // パッドで押下中
     this.pressed = new Set();
-    this.anyKey = false; this.padConnected = false; this.capture = null;
+    this.anyKey = false; this.padConnected = false; this.padId = null; this.capture = null;
     this.getPads = opts.getPads ?? (() => (typeof navigator !== 'undefined' && navigator.getGamepads ? navigator.getGamepads() : []));
     this.padButtons = new Set(); // 前回ポーリングで押されていたボタン番号
     if (target?.addEventListener) {
@@ -51,7 +51,7 @@ export class Input {
   poll() {
     let gp = null;
     try { for (const p of this.getPads() ?? []) if (p && p.connected !== false) { gp = p; break; } } catch { gp = null; }
-    this.padConnected = !!gp;
+    this.padConnected = !!gp; this.padId = gp?.id ?? null; // オプション画面の診断行（実機パッド確認用）が読む
     const now = new Set(), buttons = new Set();
     if (gp) {
       const bs = gp.buttons ?? [];

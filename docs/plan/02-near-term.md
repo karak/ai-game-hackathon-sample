@@ -242,3 +242,17 @@
 | 周辺への影響 | すべて `THEMES.candyforest.bogStyle = 'syrup'` で分岐。他 7 テーマの沼 2 コマ・`=`・地表タイルの画素ハッシュは変更前後で一致 | `tools/hash_tiles.mjs`（before/after の JSON 比較、8 テーマ中 candyforest の bog/plat だけ変化） |
 
 検証: Vitest 119 件、Playwright 9 件、build → check_dist、デプロイ。
+
+## Sprint O — 「残課題の再開: テスター計測・実機パッド・報告経路」（2026-09-10、0 リクエスト）
+
+ユーザー指示「resume them」（残っていた 3 件: バグ報告先・実機ゲームパッド・テスター計測）。人待ちの部分を、人が動けばすぐ測れる形にした。
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| IMP-023 テスター計測 | `src/runlog.js`: 開始 1 回 = 1 run（開始章・到達章・クリア・死亡・コンティニュー・プレイ秒）、`lyrica_runs` に 50 件。`Game` が startGame / logDeath / continueGame / clear / ending / タイトル復帰で更新。オプション「テスター報告を コピー」が JSON（版・UA・言語・画面・パッド名・run 集計・死亡集計）をクリップボードへ。手引き `docs/release/tester-guide.md`、集計 `tools/tester_stats.mjs` | `test/runlog.test.js` 3 件（丸め・上限・集計・JSON の鍵）、`e2e/gamepad.spec.js`（コピーした JSON に版・パッド名・run・死亡が入る） |
+| IMP-024 実機パッド | オプション「ゲームパッド」行にパッド名（先頭 22 字）と押下中のボタン名 `[A] [B]…`。`Input.padId` | `e2e/gamepad.spec.js`: 偽装 standard パッドで START → プロローグ → play、A でジャンプ（vy<0）、十字キー右／左スティックで 30 フレームに 20 単位以上移動、診断行 `Fake Pad` / `Fake Pad  [B]`、「ジャンプ」行で RB を割り当て → 保存。`test-results/shots/options_gamepad.png` |
+| IMP-025 報告経路 | Issue テンプレート（日英、テスター報告 JSON 欄・操作方法・スクリーンショット）、README の節、known-issues の更新 | `.github/ISSUE_TEMPLATE/bug_report.yml`、`config.yml`。**残: リポジトリ作成・公開（ユーザー判断）** |
+| 文言 | 5 語を i18n に追加、フォントサブセット再生成（463 字・146 KB） | `test/i18n.test.js`、`test/font-subset.test.js` |
+
+検証: Vitest 122 件、Playwright 10 件、build → check_dist、デプロイ。
+未達（人待ち）: 実機パッドの確認、テスター 5 人の計測、リポジトリ公開と Issues URL。
