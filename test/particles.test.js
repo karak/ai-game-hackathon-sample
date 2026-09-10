@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { Particles, PARTICLE_MAX } from '../src/entities/particles.js';
+import { Particles, PARTICLE_MAX } from '../src/stage/entities/particles.js';
 
 test('particle count is capped at PARTICLE_MAX and the newest particles survive', () => {
   const ps = new Particles({});

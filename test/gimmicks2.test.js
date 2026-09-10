@@ -1,10 +1,10 @@
 import { test, expect } from 'vitest';
-import { parseLevel } from '../src/level.js';
-import { TILE } from '../src/physics.js';
-import { Player } from '../src/entities/player.js';
-import { MovingPlatform, PressMachine, PRESS, CONVEYOR_SPEED, PLATFORM, makeWheel } from '../src/entities/gimmicks.js';
-import { trampolineAt, TRAMPOLINE_V, SyrupDripper, DRIP_INTERVAL } from '../src/entities/gimmicks.js';
-import { STAGES } from '../src/levels/index.js';
+import { parseLevel } from '../src/stage/level.js';
+import { TILE } from '../src/stage/physics.js';
+import { Player } from '../src/stage/entities/player.js';
+import { MovingPlatform, PressMachine, PRESS, CONVEYOR_SPEED, PLATFORM, makeWheel } from '../src/stage/entities/gimmicks.js';
+import { trampolineAt, TRAMPOLINE_V, SyrupDripper, DRIP_INTERVAL } from '../src/stage/entities/gimmicks.js';
+import { STAGES } from '../src/content/levels/index.js';
 
 const STEP = 1 / 60;
 const inputOf = (held = [], pressed = []) => ({ down: a => held.includes(a), hit: a => pressed.includes(a) });

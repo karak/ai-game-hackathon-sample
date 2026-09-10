@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { stitch } from '../src/levels/stitch.js';
+import { stitch } from '../src/content/levels/stitch.js';
 
 test('stitch joins segments row by row', () => {
   expect(stitch(['ab', 'cd'], ['e', 'f'])).toEqual(['abe', 'cdf']);

@@ -37,8 +37,8 @@ catalog ──▶ なんでも
 
 ## 3. 切り分けの根拠（リファクタリング前の計測、2026-09-11）
 
-- `world.js` 395 行のうち描画（`draw` / `drawGimmicks` / `drawWeather` / `drawBog` / `drawPitWalls` / `drawShore`）が 170 行、当たり判定 `collide` が 30 行（DEBT-004）。→ `stage/render.js`・`stage/collision.js` へ。
-- `game.js` 422 行のうち各状態の画面描画（`drawTitle` 〜 `drawGameOver`、`drawOptions`、`drawIris`、`drawBossIntro`）が 190 行、オプションの行定義と操作が 70 行。→ `app/screens.js`・`app/options.js` へ。状態機械・遷移・記録は `Game` に残す。
+- `world.js` 395 行のうち描画（`draw` / `drawGimmicks` / `drawWeather` / `drawBog` / `drawPitWalls` / `drawShore`）が 170 行、当たり判定 `collide` が 30 行（DEBT-004）。→ `stage/render.js`・`stage/collision.js` へ（結果: world.js 202 行）。
+- `game.js` 422 行のうち各状態の画面描画（`drawTitle` 〜 `drawGameOver`、`drawOptions`、`drawIris`、`drawBossIntro`）が 190 行、オプションの行定義と操作が 70 行。→ `app/screens.js`・`app/options.js` へ。状態機械・遷移・記録は `Game` に残す（結果: game.js 229 行）。
 - `input.js`（プラットフォーム）が `settings.js`（進行の永続化）から既定割り当てを読んでいた（下位が上位に依存）。→ 既定割り当てを `platform/keymap.js` に置き、`settings.js` がそれを読む向きに反転。
 - `ui/hud.js` が `entities/projectiles.js` の `WEAPONS` を読む: 表示が領域の定数を読むのは許容（UI → stage）。
 - `camera.js` が `world.js` の `W, H` を読む（同じコンテキスト内、循環は無い）。

@@ -40,4 +40,4 @@ export function miniBitmap(g, str, x, y, color = '#fdfbf7', shadow = true) {
 }
 // ミニフォント 1 文字の幅（論理 px）
 export const MINI_W = 4 * DOT / 3;
-
+export const miniX = str => Math.round(128 - str.length * MINI_W / 2); // ミニフォントの中央揃え x

@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { SONGS, NOTE, songSteps, arpNote, CH_VOL } from '../src/audio.js';
+import { SONGS, NOTE, songSteps, arpNote, CH_VOL } from '../src/platform/audio.js';
 
 test('every song note name resolves to a frequency and tracks are 16-step aligned', () => {
   for (const [name, song] of Object.entries(SONGS)) {

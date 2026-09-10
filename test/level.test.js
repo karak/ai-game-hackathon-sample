@@ -1,8 +1,8 @@
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
-import { parseLevel } from '../src/level.js';
-import { STAGES } from '../src/levels/index.js';
-import { PLATFORM } from '../src/entities/gimmicks.js';
+import { parseLevel } from '../src/stage/level.js';
+import { STAGES } from '../src/content/levels/index.js';
+import { PLATFORM } from '../src/stage/entities/gimmicks.js';
 
 test('parseLevel extracts markers and leaves tiles clean', () => {
   const rows = [

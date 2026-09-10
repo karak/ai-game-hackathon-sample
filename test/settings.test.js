@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { defaultSettings, loadSettings, saveSettings, bind, codesFor, volumeGain, keyName, padName, DEFAULT_KEYS, DEFAULT_PAD, STORAGE_KEY, LEGACY_HI_KEY, REBINDABLE, ACTIONS } from '../src/settings.js';
+import { defaultSettings, loadSettings, saveSettings, bind, codesFor, volumeGain, keyName, padName, DEFAULT_KEYS, DEFAULT_PAD, STORAGE_KEY, LEGACY_HI_KEY, REBINDABLE, ACTIONS } from '../src/app/settings.js';
 
 const memStorage = (init = {}) => { const m = new Map(Object.entries(init)); return { getItem: k => m.has(k) ? m.get(k) : null, setItem: (k, v) => m.set(k, String(v)), m }; };
 

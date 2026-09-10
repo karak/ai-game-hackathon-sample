@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest';
-import { parseLevel } from '../src/level.js';
-import { TILE } from '../src/physics.js';
-import { Player } from '../src/entities/player.js';
-import { MovingPlatform, CrumbleTile, FLOW_SPEED, CRUMBLE_SHAKE_T, CRUMBLE_RESPAWN_T, LADDER_SPEED, PLATFORM } from '../src/entities/gimmicks.js';
+import { parseLevel } from '../src/stage/level.js';
+import { TILE } from '../src/stage/physics.js';
+import { Player } from '../src/stage/entities/player.js';
+import { MovingPlatform, CrumbleTile, FLOW_SPEED, CRUMBLE_SHAKE_T, CRUMBLE_RESPAWN_T, LADDER_SPEED, PLATFORM } from '../src/stage/entities/gimmicks.js';
 
 const STEP = 1 / 60;
 // 入力スタブ: held の集合と 1 回きりの pressed

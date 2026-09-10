@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import { MAP, Input } from '../src/input.js';
-import { DEFAULT_PAD, bind } from '../src/settings.js';
+import { MAP, Input } from '../src/platform/input.js';
+import { DEFAULT_PAD, bind } from '../src/app/settings.js';
 
 // 最小のイベントターゲット（keydown/keyup を手で発火）
 const fakeTarget = () => { const ls = {}; return { addEventListener: (t, f) => (ls[t] = f), fire: (t, e) => ls[t]?.({ preventDefault() {}, ...e }) }; };

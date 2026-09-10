@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest';
-import { encodeRLE, decodeRLE, maskOf, DemoRecorder, DemoInput, DEMO_ACTIONS } from '../src/demo.js';
-import { seedGame, grand, rand, hashSeed } from '../src/util.js';
-import { parseLevel } from '../src/level.js';
-import { MushroomFairy, ZombieSpawner } from '../src/entities/enemies.js';
+import { encodeRLE, decodeRLE, maskOf, DemoRecorder, DemoInput, DEMO_ACTIONS } from '../src/app/demo.js';
+import { seedGame, grand, rand, hashSeed } from '../src/shared/util.js';
+import { parseLevel } from '../src/stage/level.js';
+import { MushroomFairy, ZombieSpawner } from '../src/stage/entities/enemies.js';
 
 const inputOf = (held = [], pressed = []) => ({ down: a => held.includes(a), hit: a => pressed.includes(a) });
 

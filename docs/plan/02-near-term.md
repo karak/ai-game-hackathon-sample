@@ -256,3 +256,18 @@
 
 検証: Vitest 122 件、Playwright 10 件、build → check_dist、デプロイ。
 未達（人待ち）: 実機パッドの確認、テスター 5 人の計測、リポジトリ公開と Issues URL。
+
+## Sprint P — 「境界づけられたコンテキストへの整理とリファクタリング（DEBT-011 / DEBT-004）」（2026-09-11、0 リクエスト）
+
+ユーザー指示「DDD の概念でコンテクストを切り、コンポーネントを整理。次にそれに基づき、回帰テストの保護を入れつつリファクタリング」。
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| コンテキスト設計 | 進行（app）／ステージ（stage）／コンテンツ（content）／描画基盤（gfx）／UI 部品（ui）／プラットフォーム（platform）／共有カーネル（shared）／制作ツール（catalog, tools）。依存の向きを許可リストで定義 | `docs/architecture.md` §1〜2 |
+| 回帰の護り（先に入れた） | `e2e/golden.spec.js`: Math.random をシード付きに差し替え、固定入力で全 8 面 20 秒の軌跡（30 フレームごと 9 値）と 90・600 フレーム目＋タイトル／オプション／ポーズの画素ハッシュを `test/golden/stages.json` に固定。生成直後の再実行で一致を確認 | commit `533401f` |
+| 移設 | `tools/move_contexts.mjs`（git mv ＋ import 書き換え 49 ファイル・28 移動） | commit `a9b4ec2`、Vitest 122・Playwright 11 一致 |
+| 切り出し | `stage/render.js`（`drawWorld` / `drawGimmicks` / `drawWeather` / `drawBog` / `drawPitWalls` / `drawShore`）、`stage/collision.js`、`stage/viewport.js`（W/H/SCALE、循環回避）、`app/screens.js`（11 画面関数）、`app/options.js`（行定義・操作・文言・描画）、`platform/keymap.js`（既定割り当て。`settings.js` は再公開、`input.js` は keymap を読む向きに反転）。旧メソッドは委譲として残し外部 API（`world.draw` / `game.optionRowText` など）は不変。コメントは本文と一緒に移動 | world.js 395 → 202 行、game.js 422 → 229 行 |
+| 依存の検査 | `test/architecture.test.js` 4 件: 全ファイルが既知のコンテキストに属す／許可リスト外の import なし／境界をまたぐ狭い依存（gfx→stage は physics.js、ui→stage は projectiles.js、stage→platform は audio.js）だけ／グラフが空でない | Vitest 126 |
+
+検証: Vitest **126 件**、Playwright **11 件**（golden の軌跡・画素ハッシュはリファクタリング前と 1 ビットも違わない）、build → check_dist、デプロイ。
+残（`docs/architecture.md` §5）: `entities/*.draw` が `gfx/sprite.js` に直接依存、`World` のボス進行の切り出し。

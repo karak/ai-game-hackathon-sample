@@ -6,6 +6,7 @@
 - `docs/art-standard.md` — アート基準（数値・出典）。絵に関する判断はこれに照らす
 - `docs/gen-pipeline.md` — 素材生成パイプライン（Gemini → セル抽出 → manifest）
 - `HANDOFF.md` — セッション引き継ぎ（現在地・決定・残課題・手順の入口）
+- `docs/architecture.md` — コード構成（境界づけられたコンテキストと依存の向き）。ファイルを増やす／移すときはこれに従い `test/architecture.test.js` を通す
 - `docs/plan/README.md` — 現在地・直近ゴール・ロードマップ
 - `docs/retro/` — 過去の失敗と学び
 

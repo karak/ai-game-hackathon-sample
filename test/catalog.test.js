@@ -1,11 +1,11 @@
 import { test, expect } from 'vitest';
 import manifest from '../src/gfx/manifest.json';
 import { SPEC, BOSS_SPEC } from '../src/catalog/specs.js';
-import { DECO_MAP } from '../src/decomap.js';
+import { DECO_MAP } from '../src/stage/decomap.js';
 import { THEMES } from '../src/gfx/tiles.js';
 import { GROUP_JP } from '../src/catalog/pages/assets.js';
-import { STAGES } from '../src/levels/index.js';
-import { MAGIC, SUPER } from '../src/entities/magic.js';
+import { STAGES } from '../src/content/levels/index.js';
+import { MAGIC, SUPER } from '../src/stage/entities/magic.js';
 import { readFileSync } from 'node:fs';
 
 // カタログの掲載漏れ検査（DEBT-009）: manifest にある素材は必ずどこかの章の表に載る

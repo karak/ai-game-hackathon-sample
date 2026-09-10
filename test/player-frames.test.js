@@ -1,7 +1,7 @@
 // 主人公のコマ選択（frame()）: 走り撃ち専用コマ run*s は素材がある衣装だけで使い、無ければ走りコマに戻る（IMP-016）
 import { test, expect } from 'vitest';
-import { parseLevel } from '../src/level.js';
-import { Player } from '../src/entities/player.js';
+import { parseLevel } from '../src/stage/level.js';
+import { Player } from '../src/stage/entities/player.js';
 
 function playerWith(assets) {
   const rows = ['.'.repeat(32), '.'.repeat(32), '..P.............................', '#'.repeat(32)];

@@ -33,13 +33,14 @@
 | 死亡ログ | `localStorage lyrica_deaths`（600 件上限）。収集は `node tools/gather_deaths.mjs`（無敵なし・残機無限のボット）→ `docs/plan/logs/`。難易度は人のデータが出るまで動かさない | IMP-007 / IMP-017 |
 | 音 | シーケンサに `arp` / `echo` / `waves` / `once`＋`then`。ジングル 4（開始・クリア・死亡・ゲームオーバー）、最終ボス曲 `bossFinal`（`stage.bossSong`） | 05-systems 5.5 |
 | 性能 | update 0.03 ms・draw 0.16 ms 以下、rAF 20 ms 超 0 回。バッチ化・背景キャッシュは見送り。粒子上限 400 | 05-systems 5.6 |
-| 英語 UI | 日本語文字列をキーにした辞書 `src/i18n.js EN` と `t()`。物語本文は `story.js` に両言語（場面数・行数を揃える）。初回はブラウザ言語、以後は保存 `lang`。辞書漏れは `test/i18n.test.js` が t() の呼び出しを走査して検出 | IMP-008 |
+| 英語 UI | 日本語文字列をキーにした辞書 `src/shared/i18n.js EN` と `t()`。物語本文は `story.js` に両言語（場面数・行数を揃える）。初回はブラウザ言語、以後は保存 `lang`。辞書漏れは `test/i18n.test.js` が t() の呼び出しを走査して検出 | IMP-008 |
 | 素材の URL 解決 | `loader.js` はページ URL（`document.baseURI`）基準。build は `vite.config.js copySprites` が `assets/sprites` を dist にコピー。`import.meta.url` 基準に戻すと dist で全素材が消える | BUG-014 |
 | カットインは 1 枚のシートで作る | 4 枚を別リクエストで描かせると画風が別人になる。2×2 シートを 1 リクエストで描かせ `postprocess.py --grid` で切る。上端 12 セルは焼き込まれた題名なので落とす | Sprint L、ユーザー指摘 |
 | 挿絵級の画風は尊重物に合わせる（済: カットイン 4・ending 3/4/5。ゲーム内スプライトは保留） | `ending/scene1`・`scene6` が画風の尊重物（ユーザー指定）。挿絵級（カットイン・エンディング）は `_illust_style.txt`＋`style_refs`（尊重物 1 枚＋scene1 から切った立ち絵ベース `assets/gen/ref/lyrica-illust*.png`）を毎回添付して生成する。スプライト級の `_style.txt`（チビ）やスプライトを参照に渡すと絵師がスプライト側に寄る。`tools/style_check.py` で flat / 輪郭 / 色数を尊重物と並べて測る | IMP-022、art-standard §1.3・§2.6 |
 | 公開リポジトリ | https://github.com/karak/ai-game-hackathon-sample（public、`origin/main`）。不具合報告は Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose。`.env` は gitignore、鍵は含まれていないことを push 前に走査 | IMP-025 |
-| テスター計測は run 記録＋クリップボード | `src/runlog.js`（開始 1 回 = 1 run）。オプション「テスター報告を コピー」の JSON を `docs/plan/logs/testers/` に置いて `tools/tester_stats.mjs`。パッドはオプション「ゲームパッド」行で実機診断、経路は `e2e/gamepad.spec.js` の偽装パッド | IMP-023 / 024 |
+| テスター計測は run 記録＋クリップボード | `src/app/runlog.js`（開始 1 回 = 1 run）。オプション「テスター報告を コピー」の JSON を `docs/plan/logs/testers/` に置いて `tools/tester_stats.mjs`。パッドはオプション「ゲームパッド」行で実機診断、経路は `e2e/gamepad.spec.js` の偽装パッド | IMP-023 / 024 |
 | 沼・足場の見え方は章ごとの分岐で直す | 菓子の森だけ `bogStyle: 'syrup'`（糖蜜の水面・深部・穴の奥壁・岸の滴り、`=` は砂糖衣の帯）。他テーマに触れないことは `tools/hash_tiles.mjs` の画素ハッシュで示す | IMP-021、`hdworld.buildSyrupHD`、`world.drawPitWalls` |
+| コード構成は境界づけられたコンテキスト | `src/app`（進行）／`stage`（面のシミュレーション）／`content`（作品データ）／`gfx`／`ui`／`platform`／`shared`。依存の向きは `docs/architecture.md` §2、`test/architecture.test.js` が import を走査して検査。回帰の護りは `e2e/golden.spec.js`（全 8 面の軌跡と画素ハッシュ。振る舞いを変えたときだけ `GOLDEN_UPDATE=1` で更新） | Sprint P |
 | 衣装コマの割り当ては 2 パス | 共通コマ → 衣装別コマの順に代入する。1 パスだと manifest の読み込み完了順で共通コマが衣装別を上書きする（BUG-016） | `assets.js assignPlayerFrames`、`test/costume-frames.test.js` |
 | 溜めは 2 段階 | 0.9 秒 `CHARGE_T` で溜め魔法、1.8 秒 `SUPER_T` で強化魔法（`magic.js SUPER`）。強化魔法は新規生成素材なしで、既存スプライト＋粒子＋画面演出で作る | 05-systems 5.1、Sprint K |
 | 素材の軽量化 | フォントはゲーム用サブセット（`tools/subset_font.py`。文言を足したら作り直す。`test/font-subset.test.js` が漏れを検出）、スプライトはパレット PNG（`tools/optimize_pngs.py`、可逆検査つき）。`/assets/*` は 1 年 immutable なので PNG は `?v=<ビルド ID>` で破棄する | IMP-019、`docs/release/deploy.md` |
@@ -92,12 +93,12 @@ PY="/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.venv/
 
 | 領域 | ファイル |
 |------|---------|
-| ゲーム進行・画面 | `src/game.js`（状態機械、メニュー、クリア／ゲームオーバー／エンディング）、`src/main.js`（起動・ロード画面・ループ・縮小表示・言語の反映）、`src/i18n.js`（表示言語）、`src/story.js`（物語本文 両言語・ボス名） |
-| 世界・物理 | `src/world.js`、`src/physics.js`、`src/camera.js`、`src/level.js`、`src/levels/index.js`（8 面） |
-| キャラ | `src/entities/player.js`（コマ選択 `frame()`）、`enemies.js`、`bosses.js`、`gimmicks.js`、`magic.js`、`projectiles.js` |
+| ゲーム進行・画面（app） | `src/app/game.js`（状態機械・遷移・記録）、`src/app/screens.js`（各状態の画面描画）、`src/app/options.js`（オプション画面）、`src/main.js`（起動・ロード画面・ループ・縮小表示・言語の反映）、`src/shared/i18n.js`（表示言語）、`src/content/story.js`（物語本文 両言語・ボス名） |
+| 世界・物理（stage / content） | `src/stage/world.js`（面のルート集約）、`src/stage/render.js`（面の描画）、`src/stage/collision.js`（当たり判定）、`src/stage/physics.js`、`src/stage/camera.js`、`src/stage/level.js`、`src/content/levels/index.js`（8 面） |
+| キャラ | `src/stage/entities/player.js`（コマ選択 `frame()`）、`enemies.js`、`bosses.js`、`gimmicks.js`、`magic.js`、`projectiles.js` |
 | 描画・素材 | `src/gfx/assets.js`、`loader.js`、`hdworld.js`、`manifest.json`（235 エントリ、生成物） |
-| 音 | `src/audio.js`（`SONGS`、`CH_VOL`、`playJingle`） |
-| 保存・ログ | `src/settings.js`（`lyrica_save`）、`src/deathlog.js`（`lyrica_deaths`）、`src/balance.js` |
+| 音・入力（platform） | `src/platform/audio.js`（`SONGS`、`CH_VOL`、`playJingle`）、`src/platform/input.js`、`src/platform/keymap.js`（既定の割り当て） |
+| 保存・ログ | `src/app/settings.js`（`lyrica_save`）、`src/app/deathlog.js`（`lyrica_deaths`）、`src/app/runlog.js`（`lyrica_runs`）、`src/stage/balance.js` |
 | 生成 | `assets/gen/specs.json`（`part_sizes`、spec ごとの `use` / `frame_use` / `skip_out` / 後処理フラグ）、`assets/gen/prompts/*.txt`、`assets/gen/raw/`（原画は全保存） |
 | 資料 | `catalog.html` + `src/catalog/`（manifest 駆動。`test/catalog.test.js` が掲載漏れを検出） |
 | 証跡 | `test-results/shots/`（本日の撮影。git 管理外）、`docs/plan/logs/`（死亡ログ）、`docs/release/`（配信原稿・GIF） |

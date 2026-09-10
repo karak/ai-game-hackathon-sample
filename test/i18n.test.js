@@ -1,11 +1,11 @@
 import { test, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { t, setLang, getLang, detectLang, EN, LANGS, pick } from '../src/i18n.js';
-import { story, PROLOGUE, PROLOGUE_EN, ENDING_SCENES, ENDING_SCENES_EN, ENDING_TRUE, ENDING_TRUE_EN, CREDITS, CREDITS_EN, BOSS_NAMES } from '../src/story.js';
-import { STAGES } from '../src/levels/index.js';
-import { ACTION_LABEL, REBINDABLE, loadSettings, saveSettings, STORAGE_KEY } from '../src/settings.js';
-import { MAGIC, SUPER, magicName } from '../src/entities/magic.js';
+import { t, setLang, getLang, detectLang, EN, LANGS, pick } from '../src/shared/i18n.js';
+import { story, PROLOGUE, PROLOGUE_EN, ENDING_SCENES, ENDING_SCENES_EN, ENDING_TRUE, ENDING_TRUE_EN, CREDITS, CREDITS_EN, BOSS_NAMES } from '../src/content/story.js';
+import { STAGES } from '../src/content/levels/index.js';
+import { ACTION_LABEL, REBINDABLE, loadSettings, saveSettings, STORAGE_KEY } from '../src/app/settings.js';
+import { MAGIC, SUPER, magicName } from '../src/stage/entities/magic.js';
 
 const memStorage = (init = {}) => { const m = new Map(Object.entries(init)); return { getItem: k => m.has(k) ? m.get(k) : null, setItem: (k, v) => m.set(k, String(v)), m }; };
 const walk = dir => readdirSync(dir).flatMap(f => { const p = join(dir, f); return statSync(p).isDirectory() ? walk(p) : p.endsWith('.js') ? [p] : []; });

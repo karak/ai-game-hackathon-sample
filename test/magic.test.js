@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest';
-import { parseLevel } from '../src/level.js';
-import { Player } from '../src/entities/player.js';
-import { Enemy } from '../src/entities/enemies.js';
-import { castMagic, MAGIC, SUPER, CHARGE_T, SUPER_T, Meteor, ShadowClone, HeartBurst, HeartGarden, FirePillar, MirrorFrame, Shard, Cortege, CutIn, CUTIN_IN, CUTIN_HOLD, CUTIN_OUT } from '../src/entities/magic.js';
+import { parseLevel } from '../src/stage/level.js';
+import { Player } from '../src/stage/entities/player.js';
+import { Enemy } from '../src/stage/entities/enemies.js';
+import { castMagic, MAGIC, SUPER, CHARGE_T, SUPER_T, Meteor, ShadowClone, HeartBurst, HeartGarden, FirePillar, MirrorFrame, Shard, Cortege, CutIn, CUTIN_IN, CUTIN_HOLD, CUTIN_OUT } from '../src/stage/entities/magic.js';
 
 const STEP = 1 / 60;
 // 「その tick に存在した弾」を累積した w.seen（worldOf の tick が貯める）から種類で絞る。

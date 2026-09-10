@@ -75,7 +75,7 @@ Node 20 以上。`npm run e2e` は初回に `npx playwright install chromium` �
 - Vanilla JS（ES modules）+ Canvas 2D + Vite。内部解像度 **768×672**（世界座標 256×224 を 3 倍描画、SNES と同じ 16×14 タイル画面）
 - キャラ・敵・ボス・背景・地形・アイテムは **Gemini 2.5 Flash Image で生成したドット絵**を後処理（クロマキー→セル抽出→15 色量子化）した PNG（`assets/sprites/`、`docs/gen-pipeline.md`）
 - アート基準は `docs/art-standard.md`。`catalog.html` はデザイン資料（キャラクターシート / 敵・ボス / アイテム・弾 / タイル・装飾 / 背景レイヤー / ステージ構成 / UI）で、寸法・色数・フレーム時間・当たり判定・スクロール係数を絵と一緒に示す
-- 効果音・BGM は Web Audio API でリアルタイム合成（`src/audio.js`）。外部音源なし
+- 効果音・BGM は Web Audio API でリアルタイム合成（`src/platform/audio.js`）。外部音源なし
 - フォント：[DotGothic16](https://github.com/fontworks-fonts/DotGothic16)（SIL Open Font License 1.1、`assets/fonts/`）
 
 ### 素材の生成・更新

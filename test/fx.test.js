@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { Fx, irisRadius, HITSTOP_TICKS, BOSS_WHITEOUT_T, BOSS_SLOWMO_T, BOSS_SLOWMO_SCALE, IRIS_T, BOSS_INTRO_T } from '../src/fx.js';
+import { Fx, irisRadius, HITSTOP_TICKS, BOSS_WHITEOUT_T, BOSS_SLOWMO_T, BOSS_SLOWMO_SCALE, IRIS_T, BOSS_INTRO_T } from '../src/stage/fx.js';
 
 const STEP = 1 / 60;
 

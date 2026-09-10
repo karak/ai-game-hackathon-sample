@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
-import { TILE, TileMap, moveBody } from '../src/physics.js';
+import { TILE, TileMap, moveBody } from '../src/stage/physics.js';
 
 const rows = [
   '..........',

@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import { chooseContents } from '../src/entities/items.js';
-import { WEAPON_ORDER } from '../src/entities/projectiles.js';
+import { chooseContents } from '../src/stage/entities/items.js';
+import { WEAPON_ORDER } from '../src/stage/entities/projectiles.js';
 
 const world = (costume, weapon = 'star', boxCount = 0) => ({ player: { costume, weapon }, boxCount });
 

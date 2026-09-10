@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import { cameraTarget, cameraBounds, updateCamera, snapCamera, LOOK_AHEAD } from '../src/camera.js';
-import { TileMap } from '../src/physics.js';
+import { cameraTarget, cameraBounds, updateCamera, snapCamera, LOOK_AHEAD } from '../src/stage/camera.js';
+import { TileMap } from '../src/stage/physics.js';
 
 const player = (x, y, facing = 1) => ({ centerX: x, x: x - 6, y, h: 28, facing });
 

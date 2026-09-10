@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { loadDeathLog, saveDeathLog, pushDeath, summarizeDeaths, DEATH_KEY, DEATH_MAX } from '../src/deathlog.js';
+import { loadDeathLog, saveDeathLog, pushDeath, summarizeDeaths, DEATH_KEY, DEATH_MAX } from '../src/app/deathlog.js';
 
 const mem = () => { const m = new Map(); return { getItem: k => m.has(k) ? m.get(k) : null, setItem: (k, v) => m.set(k, String(v)) }; };
 

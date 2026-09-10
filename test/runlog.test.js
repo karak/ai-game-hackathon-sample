@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { loadRuns, saveRuns, newRun, pushRun, summarizeRuns, buildReport, RUN_KEY, RUN_MAX } from '../src/runlog.js';
+import { loadRuns, saveRuns, newRun, pushRun, summarizeRuns, buildReport, RUN_KEY, RUN_MAX } from '../src/app/runlog.js';
 
 const memStorage = (init = {}) => { const m = new Map(Object.entries(init)); return { getItem: k => m.has(k) ? m.get(k) : null, setItem: (k, v) => m.set(k, String(v)), m }; };
 
