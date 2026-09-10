@@ -19,7 +19,10 @@ export const THEMES = {
     grass: ['#ff8fc8', '#ff6fb8', '#ffb0dc'], grassFlower: ['#fdfbf7', '#f8e46e', '#7cff70'],
     dirt: ['#d8a878', '#c89060', '#b87848'], pebble: '#7a3a3a',
     plat: ['#6a3f1c', '#8a5a2c', '#4a2a10'], platMoss: '#ffd3e6',
-    bog: ['#2f6a20', '#3f8a28', '#5cb040'], bogGlow: '#7cff70', bogBubble: '#d0ff90',
+    bog: ['#245a1a', '#2f7a22', '#4aa034'], bogGlow: '#9cff70', bogBubble: '#ff8fc8',
+    // IMP-021: 毒沼を「平らな緑の板」にしない。糖蜜風の表面（太い揺らぎ・輪の泡・桃色の砂糖粒）と、地中帯の暗い苔色へ落ちる深部。
+    // bogStyle を持つテーマだけ hdworld.buildBogHD / world.drawBog が糖蜜描写になる（他テーマは 1 画素も変わらない。tools/hash_tiles.mjs で確認）
+    bogStyle: 'syrup', bogDeep: ['#183f14', '#1f5219', '#2a6a20'], bogSprinkle: ['#ff8fc8', '#fdfbf7', '#f8e46e'],
     skyTop: '#25305c', skyMid: '#4a5a9a', skyBot: '#9a8ac8', horizon: '#e0a8d8',
     moon: '#fff0a0', moonShade: '#f0c860', star: '#fdfbf7',
     far: '#3a3a72', mid: '#2c2c5c', near: '#1e1e44',

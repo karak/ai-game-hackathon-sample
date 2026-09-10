@@ -11,7 +11,7 @@ function canvas(w, h) { const c = document.createElement('canvas'); c.width = w;
 // bands: ストリップ高さに対する帯の [開始, 終了]（0..1）。生成物の実測: 地表(草) / 石壁 / 地中
 export const TILE_BANDS = {
   graveyard:   { surface: [0.00, 0.22], plat: [0.22, 0.40], fill: [0.52, 0.88] },
-  candyforest: { surface: [0.00, 0.19], plat: [0.32, 0.42], fill: [0.55, 0.95] },
+  candyforest: { surface: [0.00, 0.19], plat: [0.20, 0.33], fill: [0.55, 0.95] }, // plat は桃色の砂糖衣が滴る帯（0.20〜0.33）。旧 0.32〜0.42 は暗いチョコ礫の帯で、石の足場に見えた（IMP-021）
   castle:      { surface: [0.00, 0.20], plat: [0.50, 0.62], fill: [0.50, 1.00] },
   river:       { surface: [0.02, 0.09], plat: [0.28, 0.34], fill: [0.35, 0.98] }, // 実測（キー推定修正後 262×192）: 草 0.03〜0.08、泥と水溜まり 0.09〜0.27、草の線 0.28〜0.33、地中 0.34〜
   workshop:    { surface: [0.00, 0.19], plat: [0.05, 0.18], fill: [0.22, 0.96] },
@@ -55,6 +55,39 @@ export function buildBogHD(theme, seed = 7) {
     // 泡
     for (let i = 0; i < 5; i++) { const bx = Math.floor(rnd() * (T - 6)) + 3, by = Math.floor(rnd() * (T - 10)) + 6, r = 1 + Math.floor(rnd() * 2); g.fillStyle = theme.bogGlow; g.fillRect(bx - r, by, r * 2 + 1, 1); g.fillRect(bx, by - r, 1, r * 2 + 1); g.fillStyle = theme.bogBubble; g.fillRect(bx, by - r, 1, 1); }
     out.push(c);
+  }
+  if (theme.bogStyle === 'syrup') return buildSyrupHD(theme, seed);
+  return out;
+}
+
+// 糖蜜風の毒沼（IMP-021、第二章）。表面: 3 px の太い揺らぎ（光・明・中）と輪の泡、桃色の砂糖粒。深部: 地中帯へ落ちる暗い苔色。
+// 戻り値は [表面 f0, 表面 f1] に .deep = [深部 f0, 深部 f1] を付けたもの（drawBog が 2 段目以降に使う）
+function buildSyrupHD(theme, seed = 7) {
+  let s = seed >>> 0 || 1; const rnd = () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
+  const noise = (g, cols, blob) => { for (let y = 0; y < T; y += blob) for (let x = 0; x < T; x += blob) { const v = rnd(); g.fillStyle = cols[v < 0.62 ? 0 : v < 0.9 ? 1 : 2]; g.fillRect(x, y, blob, blob); } };
+  const ring = (g, bx, by, r, hi) => { g.fillStyle = theme.bogGlow; g.fillRect(bx - r, by - 1, r * 2 + 1, 1); g.fillRect(bx - r, by + 1, r * 2 + 1, 1); g.fillRect(bx - r - 1, by, 1, 1); g.fillRect(bx + r + 1, by, 1, 1); g.fillStyle = hi; g.fillRect(bx - 1, by - r - 1, 2, 1); };
+  const sprinkle = (g, n) => { for (let i = 0; i < n; i++) { const c = theme.bogSprinkle[Math.floor(rnd() * theme.bogSprinkle.length)]; g.fillStyle = c; g.fillRect(2 + Math.floor(rnd() * (T - 4)), 8 + Math.floor(rnd() * (T - 10)), 2, 1); } };
+  const out = [];
+  for (let f = 0; f < 2; f++) {
+    const c = canvas(T, T); const g = c.getContext('2d');
+    noise(g, theme.bog, 2);                                                      // 2 px の塊で粒を大きく（1 px の砂目は 3 倍表示で板に見える）
+    for (let y = T - 14; y < T; y++) { g.fillStyle = theme.bogDeep[y < T - 7 ? 2 : 1]; for (let x = 0; x < T; x += 2) if (rnd() < 0.5) g.fillRect(x, y, 2, 1); } // 下端は深部へ溶ける
+    for (let x = 0; x < T; x++) {                                                 // 太い表面: 光 1 px ＋ 明 1 px ＋ 中 1 px、振幅 2.5
+      const yy = 2 + Math.round(Math.sin((x + f * 7) / 4.5) * 2.5);
+      g.fillStyle = theme.bogGlow; g.fillRect(x, yy, 1, 1); g.fillStyle = theme.bog[2]; g.fillRect(x, yy + 1, 1, 1); g.fillStyle = theme.bog[1]; g.fillRect(x, yy + 2, 1, 1);
+      g.fillStyle = theme.bogDeep[0]; if (yy > 0) g.fillRect(x, yy - 1, 1, 1);  // 表面の上に細い暗線（メニスカス）
+    }
+    for (let i = 0; i < 4; i++) ring(g, 5 + Math.floor(rnd() * (T - 10)), 12 + Math.floor(rnd() * (T - 22)), 2 + (i + f) % 2, theme.bogBubble);
+    sprinkle(g, 6);
+    out.push(c);
+  }
+  out.deep = [];
+  for (let f = 0; f < 2; f++) {
+    const c = canvas(T, T); const g = c.getContext('2d');
+    noise(g, theme.bogDeep, 2);
+    for (let i = 0; i < 2; i++) ring(g, 6 + Math.floor(rnd() * (T - 12)), 6 + Math.floor(rnd() * (T - 12)), 2, theme.bogDeep[2]); // 深部の泡は暗く
+    sprinkle(g, 3);
+    out.deep.push(c);
   }
   return out;
 }

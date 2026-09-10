@@ -37,6 +37,7 @@
 | 素材の URL 解決 | `loader.js` はページ URL（`document.baseURI`）基準。build は `vite.config.js copySprites` が `assets/sprites` を dist にコピー。`import.meta.url` 基準に戻すと dist で全素材が消える | BUG-014 |
 | カットインは 1 枚のシートで作る | 4 枚を別リクエストで描かせると画風が別人になる。2×2 シートを 1 リクエストで描かせ `postprocess.py --grid` で切る。上端 12 セルは焼き込まれた題名なので落とす | Sprint L、ユーザー指摘 |
 | 挿絵級の画風は尊重物に合わせる（済: カットイン 4・ending 3/4/5。ゲーム内スプライトは保留） | `ending/scene1`・`scene6` が画風の尊重物（ユーザー指定）。挿絵級（カットイン・エンディング）は `_illust_style.txt`＋`style_refs`（尊重物 1 枚＋scene1 から切った立ち絵ベース `assets/gen/ref/lyrica-illust*.png`）を毎回添付して生成する。スプライト級の `_style.txt`（チビ）やスプライトを参照に渡すと絵師がスプライト側に寄る。`tools/style_check.py` で flat / 輪郭 / 色数を尊重物と並べて測る | IMP-022、art-standard §1.3・§2.6 |
+| 沼・足場の見え方は章ごとの分岐で直す | 菓子の森だけ `bogStyle: 'syrup'`（糖蜜の水面・深部・穴の奥壁・岸の滴り、`=` は砂糖衣の帯）。他テーマに触れないことは `tools/hash_tiles.mjs` の画素ハッシュで示す | IMP-021、`hdworld.buildSyrupHD`、`world.drawPitWalls` |
 | 衣装コマの割り当ては 2 パス | 共通コマ → 衣装別コマの順に代入する。1 パスだと manifest の読み込み完了順で共通コマが衣装別を上書きする（BUG-016） | `assets.js assignPlayerFrames`、`test/costume-frames.test.js` |
 | 溜めは 2 段階 | 0.9 秒 `CHARGE_T` で溜め魔法、1.8 秒 `SUPER_T` で強化魔法（`magic.js SUPER`）。強化魔法は新規生成素材なしで、既存スプライト＋粒子＋画面演出で作る | 05-systems 5.1、Sprint K |
 | 素材の軽量化 | フォントはゲーム用サブセット（`tools/subset_font.py`。文言を足したら作り直す。`test/font-subset.test.js` が漏れを検出）、スプライトはパレット PNG（`tools/optimize_pngs.py`、可逆検査つき）。`/assets/*` は 1 年 immutable なので PNG は `?v=<ビルド ID>` で破棄する | IMP-019、`docs/release/deploy.md` |
@@ -47,7 +48,7 @@
 
 **人手待ち（繰延決定済み）**: テスター 5 人の完走率（M5 出口）、IMP-017 死亡多発地点の検証（第三章 x512 棘、涙の川 x1280 沼、工房 x1088 プレス、遊園地 x2688 沼、菓子の森 x2304）、実機ゲームパッド。
 
-**次にやること（優先順）**: IMP-021（第二章の毒沼が平らな緑に見える／すり抜け足場 `=` が全テーマ共通の石の絵でテーマに合わない）、バグ報告先（GitHub Issues はリポジトリ公開後）、実機ゲームパッド、テスター計測。itch.io 掲載は任意（原稿 `docs/release/itch-page.md`）。第二章の再設計（IMP-020）と強化魔法は Sprint K・L で完了。
+**次にやること（優先順）**: バグ報告先（GitHub Issues はリポジトリ公開後）、実機ゲームパッド、テスター計測。itch.io 掲載は任意（原稿 `docs/release/itch-page.md`）。第二章の再設計（IMP-020）と強化魔法は Sprint K・L、挿絵級の画風統一（IMP-022）は Sprint M、毒沼と足場の見え方（IMP-021）は Sprint N で完了。
 
 **M6 の繰延**: 実機スマホ（Playwright の iPhone 13 エミュレーションのみ）、実機パッド。
 

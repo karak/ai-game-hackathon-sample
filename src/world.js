@@ -349,11 +349,47 @@ export class World {
   drawBog(g, cam) {
     const map = this.level.map; const f = Math.floor(this.t * 3) % 2;
     const tx0 = Math.floor(cam.x / TILE), tx1 = tx0 + W / TILE + 1;
+    const syrup = this.bogHD?.deep && THEMES[this.level.theme];   // 糖蜜描写（bogStyle: 'syrup' のテーマだけ。IMP-021）
+    if (syrup) this.drawPitWalls(g, cam, tx0, tx1);
     for (let ty = 0; ty < map.height; ty++) for (let tx = tx0; tx <= tx1; tx++) {
       if (map.at(tx, ty) !== '~') continue;
-      const top = map.at(tx, ty - 1) !== '~';
+      const top = map.at(tx, ty - 1) !== '~'; const x = tx * TILE - cam.x, y = ty * TILE - cam.y;
+      if (syrup) {
+        if (top) g.drawImage(this.bogHD[f], x, y + 6, TILE, TILE - 6); else g.drawImage(this.bogHD.deep[f], x, y, TILE, TILE);
+        if (top) this.drawShore(g, map, tx, ty, x, y + 6, syrup);
+        continue;
+      }
       if (this.bogHD) { const img = this.bogHD[f]; if (top) g.drawImage(img, tx * TILE - cam.x, ty * TILE - cam.y + 6, TILE, TILE - 6); else g.drawImage(img, 0, 24, 48, 24, tx * TILE - cam.x, ty * TILE - cam.y, TILE, TILE); }
       else g.drawImage(this.tiles[(top ? 'bogtop' : 'bog') + f], tx * TILE - cam.x, ty * TILE - cam.y);
     }
+  }
+  // 沼の穴の奥壁: 沼の上に空いた空気の列は背景の地平色（平らな桃色）が素通しで、穴が「板」に見えた。
+  // 隣の地面の面の高さから沼の水面までを、地中タイルを暗くして埋める（IMP-021。糖蜜テーマのみ）
+  drawPitWalls(g, cam, tx0, tx1) {
+    const map = this.level.map; const tiles = this.hdTiles; if (!tiles) return;
+    const surfaceRow = tx => { for (let ty = 0; ty < map.height; ty++) if (map.isSolid(tx, ty)) return ty; return map.height; };
+    for (let ty = 0; ty < map.height; ty++) for (let tx = tx0; tx <= tx1; tx++) {
+      if (map.at(tx, ty) !== '~' || map.at(tx, ty - 1) === '~') continue;   // 沼の水面タイルだけ
+      let L = tx; while (map.at(L - 1, ty) === '~') L--; let R = tx; while (map.at(R + 1, ty) === '~') R++;
+      const wallTop = Math.max(surfaceRow(L - 1), surfaceRow(R + 1));        // 両岸のうち低い方の面から下が穴
+      for (let wy = wallTop; wy < ty; wy++) {
+        if (map.isSolid(tx, wy) || map.at(tx, wy) === '~') continue;
+        const v = (tx * 7 + wy * 3) % tiles.cols; const x = tx * TILE - cam.x, y = wy * TILE - cam.y;
+        g.drawImage(tiles.fill[v], x, y, TILE, TILE); g.fillStyle = 'rgba(26,15,30,0.55)'; g.fillRect(x, y, TILE, TILE);
+      }
+      // 水面タイルは 6 px 下げて描くので、その上 6 px も奥壁で埋める（素通しだと地平色の桃色の帯が残る）。水面のすぐ上は沼の光を受けて少し明るい
+      const x = tx * TILE - cam.x, y = ty * TILE - cam.y; const v = (tx * 7 + ty * 3) % tiles.cols;
+      g.drawImage(tiles.fill[v], 0, 0, TILE * HD, 6 * HD, x, y, TILE, 6); g.fillStyle = 'rgba(26,15,30,0.55)'; g.fillRect(x, y, TILE, 6);
+      g.fillStyle = 'rgba(156,255,112,0.10)'; g.fillRect(x, y - 6, TILE, 12);
+    }
+  }
+  // 岸の滴り: 沼の水面タイルの左右が地面なら、地面の土色を 3 px 幅で沼の面へ垂らす（糖蜜が岸に絡む）
+  drawShore(g, map, tx, ty, x, y, th) {
+    const drip = (sx, dir) => {
+      g.fillStyle = th.dirt[2]; g.fillRect(sx, y - 1, 3, 4); g.fillStyle = th.dirt[0]; g.fillRect(sx + (dir > 0 ? 0 : 2), y + 3, 1, 3);
+      g.fillStyle = th.grass[0]; g.fillRect(sx + (dir > 0 ? 1 : 0), y - 2, 2, 1);
+    };
+    if (map.isSolid(tx - 1, ty)) drip(x, 1);
+    if (map.isSolid(tx + 1, ty)) drip(x + TILE - 3, -1);
   }
 }

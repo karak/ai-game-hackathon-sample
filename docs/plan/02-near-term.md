@@ -229,3 +229,16 @@
 
 検証: Vitest **119 件**通過（§2.6 の PENDING は空）、Playwright **9 件**通過、`npm run build` → `check_dist` ok、公開 URL 再デプロイ。
 未達: IMP-021、実機ゲームパッド、テスター計測。生成台帳 **232/250**。決定: ゲーム内スプライト（チビ）は統一対象から保留（ユーザー判断 2026-09-10）。輪郭帯の上限拡張（335 / 0.23）はユーザー承認。
+
+## Sprint N — 「第二章の毒沼と足場の見え方（IMP-021）」（2026-09-10、0 リクエスト）
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| 計測（変更前） | 沼の上の空気の列に背景の地平色が素通し（穴の空気域 flat3x 0.59・11 色）、沼は 1 px 砂目で明度 0.48（地面 0.32）、`=` は菓子の森の地形帯 0.32〜0.42（暗いチョコ礫）を切っていて石に見えた | `test-results/shots/cmp_stage2_36_before.png`、`cmp_stage2_12`（旧） |
+| 穴の奥壁 | `world.drawPitWalls`: 沼の両岸の低い方の面から水面まで、地中タイルを 55% 暗くして埋める。水面タイルは 6 px 下げて描くので、その上 6 px も埋める | `cmp_stage2_36.png`、`cmp_stage2_60.png` |
+| 糖蜜の水面・深部 | `hdworld.buildSyrupHD`: 2 px の粒、3 px の揺らぐ表面（光・明・中＋暗線）、輪の泡 4 個、桃色・白・黄の砂糖粒。2 段目以降は `bogDeep`（地中帯の苔色）。色を #245a1a/#2f7a22/#4aa034、泡を桃 #ff8fc8 に | 沼の明度 0.48 → 0.35、色数 5 → 11 |
+| 岸の滴り | `world.drawShore`: 水面タイルの左右が地面なら土色 3 px を垂らす | 同上 |
+| `=` の絵 | `TILE_BANDS.candyforest.plat` 0.32〜0.42 → **0.20〜0.33**（桃色の砂糖衣が滴る帯） | `cmp_stage2_12.png`、`cmp_stage2_60.png` |
+| 周辺への影響 | すべて `THEMES.candyforest.bogStyle = 'syrup'` で分岐。他 7 テーマの沼 2 コマ・`=`・地表タイルの画素ハッシュは変更前後で一致 | `tools/hash_tiles.mjs`（before/after の JSON 比較、8 テーマ中 candyforest の bog/plat だけ変化） |
+
+検証: Vitest 119 件、Playwright 9 件、build → check_dist、デプロイ。
