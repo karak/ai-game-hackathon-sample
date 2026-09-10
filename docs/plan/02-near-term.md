@@ -269,5 +269,7 @@
 | 切り出し | `stage/render.js`（`drawWorld` / `drawGimmicks` / `drawWeather` / `drawBog` / `drawPitWalls` / `drawShore`）、`stage/collision.js`、`stage/viewport.js`（W/H/SCALE、循環回避）、`app/screens.js`（11 画面関数）、`app/options.js`（行定義・操作・文言・描画）、`platform/keymap.js`（既定割り当て。`settings.js` は再公開、`input.js` は keymap を読む向きに反転）。旧メソッドは委譲として残し外部 API（`world.draw` / `game.optionRowText` など）は不変。コメントは本文と一緒に移動 | world.js 395 → 202 行、game.js 422 → 229 行 |
 | 依存の検査 | `test/architecture.test.js` 4 件: 全ファイルが既知のコンテキストに属す／許可リスト外の import なし／境界をまたぐ狭い依存（gfx→stage は physics.js、ui→stage は projectiles.js、stage→platform は audio.js）だけ／グラフが空でない | Vitest 126 |
 
-検証: Vitest **126 件**、Playwright **11 件**（golden の軌跡・画素ハッシュはリファクタリング前と 1 ビットも違わない）、build → check_dist、デプロイ。
-残（`docs/architecture.md` §5）: `entities/*.draw` が `gfx/sprite.js` に直接依存、`World` のボス進行の切り出し。
+| 後半: エンティティ描画の切り出し（ユーザー指示「残件を進めて」） | 先に護りを拡張（画廊: 全 17 種の敵・9 ボス・11 敵弾・アイテム・毒溜まり・自弾・魔法 16・カットイン 4 を 1 画面に出して 0 / 12 フレーム目を描く。生成直後の再実行で一致）。`entities/*` の `draw` 32 個＋`Player._drawBody`＋`flashImg` を `stage/entityRender.js` へ機械移設（`this` → `e`、`super.draw` → 親の関数）。`drawEntity(e, g, …)` がクラス → 関数の表を継承順に解決。`HD_SCALE` の正を `stage/viewport.js` に移し gfx/sprite.js は再公開。途中の抜け（`SUPER_COLOR` の export、`CHARGE_T` / `CUTIN_SCALE` / `W` / `H` の import、`_drawBody`）はすべて E2E が捕まえた | `test/architecture.test.js` 5 件目「entities は gfx/sprite.js を読まない」、golden 一致 |
+| 後半: ボス進行の切り出し | `startBoss` / `bossName` / `onBossDying` / `onBossDefeated` を `stage/bossflow.js` へ。World は委譲（bosses.js・game.js・E2E の呼び出しは不変）。既定引数の `this` 残りを E2E（autoplay）が捕まえて修正 | world.js 395 → **177 行** |
+
+検証: Vitest **127 件**、Playwright **11 件**（golden の軌跡・画素ハッシュ・画廊はリファクタリング前と 1 ビットも違わない）、build → check_dist、デプロイ。

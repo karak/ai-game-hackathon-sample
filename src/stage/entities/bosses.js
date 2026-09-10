@@ -1,7 +1,5 @@
 import { Enemy } from './enemies.js';
 import { rand, grand } from '../../shared/util.js';
-import { PAL } from '../../gfx/palette.js';
-import { blit } from '../../gfx/sprite.js';
 
 // ボス基底: HP バー、入場、死亡演出
 export class Boss extends Enemy {
@@ -30,10 +28,6 @@ export class Boss extends Enemy {
       return true;
     }
     return false;
-  }
-  draw(g, cam, assets) {
-    if (this.dying && Math.floor(this.dieT * 14) % 2) { this.flashT = 0.1; }
-    super.draw(g, cam, assets);
   }
 }
 
@@ -74,16 +68,6 @@ export class WeepingDoll extends Boss {
     const ar = this.world.arena; if (this.x < ar.x0 + 8) this.x = ar.x0 + 8; if (this.x + this.w > ar.x1 - 8) this.x = ar.x1 - 8 - this.w;
   }
   spriteName() { return this.state === 'cry' || this.state === 'throw' ? 'doll2' : 'doll1'; } // 2 コマ目（攻撃）は生成済みならそれを使う
-  draw(g, cam, assets) {
-    super.draw(g, cam, assets);
-    if (this.dying || this.state === 'enter') return;
-    // 目から流れる血/酸
-    const ex = Math.floor(this.x - cam.x), ey = Math.floor(this.y - cam.y);
-    g.fillStyle = this.hpRatio < 0.5 ? PAL.K : PAL.U;
-    const len = 6 + Math.floor(Math.sin(this.t * 6) * 2);
-    g.fillRect(ex + 6, ey + 12, 1, len); g.fillRect(ex + 17, ey + 12, 1, len + 1);
-    if (this.state === 'throw' && this.thrown) { g.fillStyle = PAL.K; g.fillRect(ex + (this.facing > 0 ? 24 : -2), ey + 22, 3, 3); }
-  }
 }
 
 // ---- はらわたテディ (Stage2) ----
@@ -129,13 +113,6 @@ export class GutsTeddy extends Boss {
     const a = this.world.arena; if (this.x < a.x0 + 4) this.x = a.x0 + 4; if (this.x + this.w > a.x1 - 4) this.x = a.x1 - 4 - this.w;
   }
   spriteName() { return this.state === 'belly' || this.state === 'jump' ? 'teddy2' : 'teddy1'; }
-  draw(g, cam, assets) {
-    if (this.state === 'belly' && !this.dying) {
-      const sx = Math.floor(this.x - cam.x), sy = Math.floor(this.y - cam.y);
-      g.fillStyle = PAL.K; g.fillRect(sx + 10, sy + 20, 14, 8); g.fillStyle = PAL.Z; g.fillRect(sx + 13, sy + 22, 8, 4);
-    }
-    super.draw(g, cam, assets);
-  }
 }
 
 // ---- 堕ちた魔法少女ノワール (Stage3) ----
@@ -196,16 +173,6 @@ export class Noir extends Boss {
   }
   hurt(dmg, shot) { if (this.state === 'teleport' || this.alpha < 0.8) return; super.hurt(dmg, shot); }
   spriteName() { return this.state === 'rain' || this.state === 'dash' ? 'noir2' : 'noir1'; }
-  draw(g, cam, assets) {
-    g.globalAlpha = this.alpha;
-    super.draw(g, cam, assets);
-    g.globalAlpha = 1;
-    if (!this.dying && this.alpha > 0.9) {
-      // 血の涙
-      const ex = Math.floor(this.x - cam.x), ey = Math.floor(this.y - cam.y);
-      g.fillStyle = PAL.K; g.fillRect(ex + (this.facing < 0 ? 4 : 10), ey + 8, 1, 5 + Math.floor(Math.sin(this.t * 5) * 2));
-    }
-  }
 }
 
 // ---- 涙の大蛇 (第三章): 川を渡る長い体。頭だけが弱点、胴体は触れると被弾 ----
@@ -268,7 +235,7 @@ export class TearSerpent extends Boss {
   spriteName() { return this.headOpen ? 'serpent_head2' : 'serpent_head1'; }
 }
 // 胴体・尾の 1 節。当たると被弾するが撃てない（hp なし）。World.enemies に登録される
-class SerpentPart {
+export class SerpentPart {
   constructor(head, isTail) { this.head = head; this.world = head.world; this.isTail = isTail; this.w = 18; this.h = 18; this.x = head.x; this.y = head.y; this.contact = false; this.dead = false; this.spawnX = -9999; this.facing = -1; }
   update() {}
   follow(head) {
@@ -281,12 +248,6 @@ class SerpentPart {
     if (spr?.hd) { this.w = Math.round(spr.w * 0.7); this.h = Math.round(spr.h * 0.7); }
     this.x = pos[0] - this.w / 2; this.y = pos[1] - this.h / 2;
     this.contact = head.state !== 'enter' && !head.dying && this.y + this.h < head.waterY + 6;
-  }
-  draw(g, cam, assets) {
-    const spr = assets.bosses?.[this.isTail ? 'serpent_tail' : 'serpent_body']; if (!spr) { g.fillStyle = '#5a94b4'; g.fillRect(Math.round(this.x - cam.x), Math.round(this.y - cam.y), this.w, this.h); return; }
-    g.save(); g.beginPath(); g.rect(0, 0, 9999, Math.floor(this.head.waterY + 4 - cam.y)); g.clip();
-    blit(g, spr, this.facing < 0, Math.round(this.x + this.w / 2 - spr.w / 2 - cam.x), Math.round(this.y + this.h / 2 - spr.h / 2 - cam.y));
-    g.restore();
   }
 }
 
@@ -361,10 +322,6 @@ export class Ringmaster extends Boss {
     if (a) { if (this.x < a.x0 + 8) { this.x = a.x0 + 8; } if (this.x + this.w > a.x1 - 8) { this.x = a.x1 - 8 - this.w; } }
   }
   spriteName() { return this.attackAnim > 0 ? 'ringmaster2' : 'ringmaster1'; }
-  draw(g, cam, assets) {
-    super.draw(g, cam, assets);
-    if (this.whipBox) { const b = this.whipBox; g.fillStyle = '#d9262b'; g.fillRect(Math.round(b.x - cam.x), Math.round(b.y + 4 - cam.y), b.w, 2); g.fillStyle = '#fdfbf7'; g.fillRect(Math.round((this.facing > 0 ? b.x + b.w - 6 : b.x) - cam.x), Math.round(b.y + 3 - cam.y), 6, 4); } // 鞭の軌跡
-  }
 }
 
 // ---- 鏡の女王 (第六章): 鏡の間を瞬間移動し、破片を扇状に撃つ。HP 50% 以下で鏡像（もう 1 体の判定なし分身）が同時に撃つ ----
@@ -402,10 +359,6 @@ export class MirrorQueen extends Boss {
     if (a) { if (this.x < a.x0 + 8) this.x = a.x0 + 8; if (this.x + this.w > a.x1 - 8) this.x = a.x1 - 8 - this.w; }
   }
   spriteName() { return this.attackAnim > 0 ? 'mirrorqueen2' : 'mirrorqueen1'; }
-  draw(g, cam, assets) {
-    g.save(); g.globalAlpha = Math.max(0, Math.min(1, this.alpha)); super.draw(g, cam, assets); g.restore();
-    if (this.mirrorX !== null) { const spr = assets.bosses[this.spriteName()]; if (spr) { g.save(); g.globalAlpha = 0.5; g.filter = 'saturate(0.2) brightness(1.3)'; blit(g, spr, this.facing > 0, Math.round(this.mirrorX - spr.w / 2 - cam.x), Math.round(this.y + this.h - spr.h - cam.y)); g.restore(); } }
-  }
 }
 
 // ---- 生まれ直すノワール (最終章 第 2 形態): 白いドレス。ノワールの行動に「光の星の環」を加え、常に激昂状態 ----

@@ -1,8 +1,7 @@
 import { PAL } from '../../gfx/palette.js';
 import { TILE } from '../physics.js';
 import { rand, pick } from '../../shared/util.js';
-import { HD_SCALE } from '../../gfx/sprite.js';
-const S = 1 / HD_SCALE; // 1 スクリーン px の世界単位
+import { HD_SCALE } from '../viewport.js';
 // 粒子の上限（05-systems 5.6、M6）。超えた分は古いものから捨てる（血痕は splat 済みなので見た目の損失は小さい）
 export const PARTICLE_MAX = 400;
 
@@ -60,14 +59,6 @@ export class Particles {
     }
   }
 
-  draw(g, cam) {
-    for (const p of this.list) {
-      if (p.twinkle && Math.floor(p.life * 20) % 2) continue;
-      g.fillStyle = p.color;
-      const sz = (p.size + 1) * S; // 粒子は 2〜4 スクリーン px
-      g.fillRect(Math.round((p.x - cam.x) / S) * S, Math.round((p.y - cam.y) / S) * S, sz, sz);
-    }
-  }
 }
 
 // 地面に残る血痕レイヤー（マップ全幅の canvas に描き込む）
@@ -87,10 +78,5 @@ export class Decals {
     if (size >= 2) g.fillRect(Math.floor(X - w / 5), Y - 6, Math.floor(w * 2 / 5), 2);
     for (let i = 0; i < 3; i++) g.fillRect(Math.floor(X + (Math.random() - 0.5) * w * 1.6), Y - 2 - Math.floor(Math.random() * 3) * 2, 2, 2); // 飛沫
     if (Math.random() < 0.3) g.fillRect(Math.floor(X + (Math.random() - 0.5) * 30), Y - 8 - Math.floor(Math.random() * 16), 2, 2);
-  }
-  draw(g, cam, W, H) {
-    const K = HD_SCALE; const sx = Math.max(0, Math.floor(cam.x * K)), sw = Math.min(W * K, this.canvas.width - sx);
-    if (sw <= 0) return;
-    g.drawImage(this.canvas, sx, 0, sw, H * K, (sx - Math.floor(cam.x * K)) / K, 0, sw / K, H);
   }
 }

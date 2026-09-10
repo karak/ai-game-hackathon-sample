@@ -11,15 +11,12 @@
 //  candle → 蝋の聖歌隊: 火柱 5 本（高さ 4 タイル、2.5 秒）。柱は触れた敵弾を蝋で包んで焼き落とす
 import { TILE, aabb } from '../physics.js';
 import { PlayerShot, Fire } from './projectiles.js';
-import { HD_SCALE } from '../../gfx/sprite.js';
-import { blit } from '../../gfx/sprite.js';
+import { HD_SCALE } from '../viewport.js';
 
-// 強化魔法の生成素材（assets/sprites/magicfx/*, cutin/*）。無ければ従来の弾スプライトで描く
-const mfx = A => A?.generated?.magicfx ?? {};
 const CUTIN = { star: 'stardust', knife: 'mirror', heart: 'heart', candle: 'wax' }; // 武器 → カットイン画
-const SUPER_COLOR = { star: '#cbaaf5', knife: '#d8e4ff', heart: '#ff8fc8', candle: '#ffd27f' };
+export const SUPER_COLOR = { star: '#cbaaf5', knife: '#d8e4ff', heart: '#ff8fc8', candle: '#ffd27f' };
 // スプライトを世界座標に 1:1（1 セル = 1 画面 px）で描く。spr は {r,w,h}
-const drawSpr = (g, spr, cx, cy, alpha = 1, angle = 0) => {
+export const drawSpr = (g, spr, cx, cy, alpha = 1, angle = 0) => {
   if (!spr) return;
   const w = spr.w ?? spr.r.width / HD_SCALE, h = spr.h ?? spr.r.height / HD_SCALE;
   g.save(); g.globalAlpha = alpha; g.translate(cx, cy); if (angle) g.rotate(angle);
@@ -94,7 +91,6 @@ export class MeteorCaster {
     }
     if (this.n >= M.count && (this.level < 2 || this.finaleDone)) this.dead = true;
   }
-  draw() {}
 }
 export class Meteor {
   // opts.burst: 着弾で半径この大きさの衝撃波を出す（星屑の葬列）。opts.big: 締めの巨大流星
@@ -112,15 +108,6 @@ export class Meteor {
     }
   }
   onHit() { this.world.particles.emit('sparkle', this.x + 4, this.y + 4, 4); }
-  draw(g, cam, sheet, A) {
-    // 強化魔法（burst 付き）は生成した彗星スプライトを 2 コマで、通常は従来の meteor/star を使う
-    const M = mfx(A), comet = this.burst ? (Math.floor(this.t * 12) % 2 ? M.comet2 : M.comet1) : null;
-    const spr = comet ?? sheet.meteor ?? sheet.star;
-    const dw = spr.hd ? spr.r.width / HD_SCALE : spr.r.width, dh = spr.hd ? spr.r.height / HD_SCALE : spr.r.height;
-    const k = this.big ? 1.6 : 1; // 締めの巨大流星だけ大きく描く（整数倍でないため彗星のみ、輪郭のにじみは許容）
-    g.save(); g.translate(Math.floor(this.x + this.w / 2 - cam.x), Math.floor(this.y + this.h / 2 - cam.y)); g.rotate(Math.atan2(this.vy, this.vx) + Math.PI / 2);
-    g.drawImage(spr.r, -dw * k / 2, -dh * k / 2, dw * k, dh * k); g.restore();
-  }
 }
 
 // ---- 影の分身: 主人公の前後に浮かび、ナイフを連射する ----
@@ -145,15 +132,6 @@ export class ShadowClone {
     }
     if (this.t >= this.duration) this.dead = true;
   }
-  draw(g, cam, A) {
-    const p = this.player, sheet = A.player[p.costume] ?? A.player.dress, spr = sheet[p.frame()] ?? sheet.idle; if (!spr) return;
-    // 周回中は撃つ向き（外向き）に反転して「鏡像」に見せる。通常の分身は主人公と同じ向き
-    const flip = this.orbit ? Math.cos(this.theta) < 0 : p.facing < 0;
-    g.save(); g.globalAlpha = this.orbit ? 0.55 + 0.25 * Math.sin(this.t * 14 + this.angle) : 0.45 + 0.15 * Math.sin(this.t * 10);
-    blit(g, spr, flip, Math.floor(this.x + p.w / 2 - spr.w / 2 - cam.x), Math.floor(this.y + p.h - spr.h - cam.y));
-    g.restore();
-
-  }
 }
 
 // ---- 大爆発: 拡がる輪。範囲内の敵に一度だけダメージ ----
@@ -174,26 +152,6 @@ export class HeartBurst {
     }
     for (const b of this.world.boxes) if (!b.dead && Math.hypot(b.x + b.w / 2 - this.cx, b.y + b.h / 2 - this.cy) <= r) b.hurt();
     if (this.t >= this.life) this.dead = true;
-  }
-  draw(g, cam, A) {
-    const r = this.radius, a = 1 - this.t / this.life;
-    const M = mfx(A);
-    if (this.art === 'starburst' && M.starburst1) { // 星屑の葬列の着弾
-      const s = Math.floor(this.t * 14) % 2 ? M.starburst2 : M.starburst1;
-      drawSpr(g, s, this.cx - cam.x, this.cy - cam.y, Math.max(0, a), 0);
-      return;
-    }
-    if (this.art === 'petals' && M.petal1) { // 心臓の花園の破裂: 花びらが外向きに散る
-      const petals = [M.petal1, M.petal2, M.petal3, M.petal4].filter(Boolean);
-      for (let i = 0; i < 8; i++) {
-        const th = (i / 8) * Math.PI * 2 + this.t * 2, d = r * (0.6 + 0.4 * Math.sin(i * 1.7));
-        drawSpr(g, petals[i % petals.length], this.cx - cam.x + Math.cos(th) * d, this.cy - cam.y + Math.sin(th) * d * 0.7, Math.max(0, a), th);
-      }
-      return;
-    }
-    const spr = A.shots.burst;
-    if (spr) { const s = (r * 2) / (spr.r.width / HD_SCALE); g.save(); g.globalAlpha = Math.max(0, a); g.translate(this.cx - cam.x, this.cy - cam.y); g.scale(s, s); g.drawImage(spr.r, -spr.r.width / HD_SCALE / 2, -spr.r.height / HD_SCALE / 2, spr.r.width / HD_SCALE, spr.r.height / HD_SCALE); g.restore(); return; }
-    g.save(); g.globalAlpha = Math.max(0, a); g.strokeStyle = this.color; g.lineWidth = 3; g.beginPath(); g.arc(this.cx - cam.x, this.cy - cam.y, r, 0, Math.PI * 2); g.stroke(); g.restore();
   }
 }
 
@@ -216,20 +174,6 @@ export class HeartGarden {
     }
     if (this.n >= this.seeds.length) this.dead = true;
   }
-  // 咲いている間の花。生成素材（magicfx/flower1 蕾 → flower2 開花）があればそれを、無ければハートの弾を置く
-  draw(g, cam, A) {
-    const M = mfx(A), S = SUPER.heart;
-    for (const s of this.seeds) {
-      if (s.burst || this.t < s.plantAt) continue;
-      const age = this.t - s.plantAt, k = Math.min(1, age / 0.25);
-      const bloom = age > S.delay * 0.6; // 破裂の直前に開く
-      const spr = (bloom ? M.flower2 : M.flower1) ?? A.shots?.heart;
-      if (!spr) continue;
-      const dw = spr.hd ? spr.r.width / HD_SCALE : spr.r.width, dh = spr.hd ? spr.r.height / HD_SCALE : spr.r.height;
-      g.save(); g.globalAlpha = 0.75 + 0.25 * Math.sin(this.t * 18); // 脈打つ
-      g.drawImage(spr.r, s.x - dw / 2 - cam.x, s.y - dh * k - cam.y, dw, dh * k); g.restore();
-    }
-  }
 }
 
 // ---- 火柱: 背の高い炎（fires に入り、既存の炎 vs 敵 判定を使う） ----
@@ -248,34 +192,6 @@ export class FirePillar extends Fire {
       s.dead = true; this.world.particles.emit('fire', s.x + s.w / 2, s.y + s.h / 2, 6); this.world.particles.emit('dust', s.x + s.w / 2, s.y + s.h / 2, 3);
     }
   }
-  draw(g, cam, sheet, A) {
-    const bottom = this.y + this.h - cam.y, x = Math.floor(this.x + this.w / 2 - cam.x);
-    const M = mfx(A);
-    if (this.wax && M.waxpillar1) { // 蝋の聖歌隊: 蝋柱の中央帯を縦に繰り返して this.h まで伸ばす（拡大縮小しない）
-      const wp = Math.floor(this.t * 10) % 2 ? M.waxpillar2 : M.waxpillar1;
-      const S = 1 / HD_SCALE, sw = wp.r.width, sh = wp.r.height, w = sw * S;
-      const k = Math.min(1, this.t / 0.2), target = this.h * k;
-      const topH = sh * 0.5 * S, baseH = sh * 0.18 * S; // 上 = 炎、下 = 溶けた根元
-      g.save(); g.globalAlpha = this.t > this.life - 0.4 ? Math.max(0, (this.life - this.t) / 0.4) : 1;
-      let y = bottom - baseH;
-      g.drawImage(wp.r, 0, sh * 0.82, sw, sh * 0.18, x - w / 2, y, w, baseH);        // 根元
-      const bandH = sh * 0.22 * S, fill = Math.max(0, target - topH - baseH);
-      for (let d = 0; d < fill; d += bandH) {                                          // 蝋の胴を繰り返す
-        const hh = Math.min(bandH, fill - d);
-        g.drawImage(wp.r, 0, sh * 0.55, sw, sh * 0.22 * (hh / bandH), x - w / 2, y - d - hh, w, hh);
-      }
-      y -= fill;
-      g.drawImage(wp.r, 0, 0, sw, sh * 0.5, x - w / 2, y - topH, w, topH);            // 炎と上部
-      // 根元で歌う蝋の聖歌隊（2 体、コマ違い）
-      const choir = Math.floor(this.t * 6) % 2 ? M.choir2 : M.choir1;
-      if (choir) { drawSpr(g, choir, x - w * 0.9, bottom - (choir.h ?? 0) / 2 - 2, 0.9); drawSpr(g, choir, x + w * 0.9, bottom - (choir.h ?? 0) / 2 - 2, 0.9); }
-      g.restore(); return;
-    }
-    const spr = sheet.pillar;
-    if (spr) { const dw = spr.r.width / HD_SCALE, dh = spr.r.height / HD_SCALE; const k = Math.min(1, this.t / 0.2); g.save(); g.globalAlpha = this.t > this.life - 0.3 ? (this.life - this.t) / 0.3 : 1; g.drawImage(spr.r, x - dw / 2, bottom - dh * k, dw, dh * k); g.restore(); return; }
-    const f = Math.floor(this.t * 12) % 2 ? sheet.fire1 : sheet.fire2; const dw = f.r.width / HD_SCALE, dh = f.r.height / HD_SCALE;
-    for (let yy = bottom; yy > this.y - cam.y; yy -= dh * 0.8) g.drawImage(f.r, x - dw / 2, yy - dh, dw, dh);
-  }
 }
 
 // ---- 鏡の枠（knife の強化魔法）: 鏡像が出てくる鏡。0.25 秒で割れて破片が飛ぶ ----
@@ -289,13 +205,6 @@ export class MirrorFrame {
     }
     if (this.t > 0.75) this.dead = true;
   }
-  draw(g, cam, A) {
-    if (this.t < 0) return;
-    const M = mfx(A), spr = this.broke ? M.mirror2 : M.mirror1; if (!spr) return;
-    const a = this.t > 0.5 ? Math.max(0, (0.75 - this.t) / 0.25) : 1;
-    const h = spr.h ?? spr.r.height / HD_SCALE;
-    drawSpr(g, spr, this.cx - cam.x, this.groundY - h / 2 - cam.y, a);
-  }
 }
 
 // ---- 星屑の葬列（star の強化魔法）: 小さな幽霊 3 体が星の棺を担いで画面を渡る ----
@@ -305,13 +214,6 @@ export class Cortege {
     this.t += dt; this.x += this.dir * 46 * dt; this.y += Math.sin(this.t * 3) * 6 * dt;
     if (Math.random() < 0.5) this.world.particles.emit('sparkle', this.x, this.y + 10, 1);
     if (this.t > 3.2) this.dead = true;
-  }
-  draw(g, cam, A) {
-    const M = mfx(A), spr = Math.floor(this.t * 5) % 2 ? M.cortege2 : M.cortege1; if (!spr) return;
-    const a = this.t < 0.3 ? this.t / 0.3 : this.t > 2.8 ? (3.2 - this.t) / 0.4 : 1;
-    g.save(); g.globalAlpha = Math.max(0, a);
-    blit(g, spr, this.dir > 0, Math.floor(this.x - spr.w / 2 - cam.x), Math.floor(this.y - spr.h / 2 - cam.y));
-    g.restore();
   }
 }
 
@@ -328,21 +230,6 @@ export class CutIn {
     return Math.max(0, 1 - (this.t - CUTIN_IN - CUTIN_HOLD) / CUTIN_OUT);
   }
   update(dt) { this.t += dt; if (this.t > CUTIN_IN + CUTIN_HOLD + CUTIN_OUT) this.dead = true; }
-  draw(g, A, W, H) {
-    const spr = A?.generated?.cutin?.[this.name]; if (!spr) return;
-    // 4 枚を 1 リクエストで描かせたため 1 枚は 92x130 セル前後（v2 = 尊重物 scene1 の画風に揃えた版は 125〜129x112〜117。IMP-022）。整数 2 倍で表示する（1 セル = 2 画面 px。art-standard §2.1 の整数倍表示）
-    const w = (spr.w ?? spr.r.width / HD_SCALE) * CUTIN_SCALE, h = (spr.h ?? spr.r.height / HD_SCALE) * CUTIN_SCALE;
-    // 地表の演出（火柱・花園・鏡像）を隠さないよう、帯は画面の上寄り 28% に置く（HUD 26 単位より下）
-    const k = this.slide, x = Math.round(-w + (W * 0.52 + w) * k - w * 0.02), y = Math.round(H * 0.28);
-    g.save();
-    // 斜めの帯（下地）。絵の左右に伸びて画面を横断する
-    g.globalAlpha = 0.7 * k; g.fillStyle = '#150a22';
-    g.beginPath(); g.moveTo(0, y - 6); g.lineTo(W, y - 14); g.lineTo(W, y + h + 6); g.lineTo(0, y + h + 14); g.closePath(); g.fill();
-    g.globalAlpha = k; g.drawImage(spr.r, x, y, w, h);
-    // 枠線（武器色）
-    g.globalAlpha = k; g.strokeStyle = SUPER_COLOR[this.kind]; g.lineWidth = 1; g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
-    g.restore();
-  }
 }
 
 // ---- 鏡の破片: 割れた鏡から飛び散り、回りながら落ちて消える（knife の強化魔法の演出） ----
@@ -354,9 +241,4 @@ export class Shard {
     this.spin = (i % 2 ? -1 : 1) * (3 + i);
   }
   update(dt) { this.t += dt; this.vy += 320 * dt; this.x += this.vx * dt; this.y += this.vy * dt; if (this.t > 0.7) this.dead = true; }
-  draw(g, cam, A) {
-    const M = mfx(A), shards = [M.shard1, M.shard2, M.shard3, M.shard4].filter(Boolean);
-    if (!shards.length) return;
-    drawSpr(g, shards[this.i % shards.length], this.x - cam.x, this.y - cam.y, Math.max(0, 1 - this.t / 0.7), this.t * this.spin);
-  }
 }

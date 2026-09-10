@@ -4,7 +4,6 @@ import { renderMapLayer } from '../gfx/tiles.js';
 import { Particles, Decals } from './entities/particles.js';
 import { Player } from './entities/player.js';
 import { createEnemy } from './entities/enemies.js';
-import { createBoss } from './entities/bosses.js';
 import { TreasureBox, FloatingItem } from './entities/items.js';
 import { EnemyShot, WEAPONS } from './entities/projectiles.js';
 import { SONGS } from '../platform/audio.js';
@@ -18,8 +17,8 @@ import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine, SyrupDr
 import { resolveDecoMap } from './decomap.js';
 import { updateCamera, snapCamera } from './camera.js';
 import { collide } from './collision.js';
+import { startBoss, bossName, onBossDying, onBossDefeated } from './bossflow.js';
 import { drawWorld } from './render.js';
-import { BOSS_NAMES } from '../content/story.js';
 import { t } from '../shared/i18n.js';
 
 export { W, H, SCALE } from './viewport.js'; // 旧来の import 元（camera.js・app・catalog）のために再公開
@@ -114,14 +113,6 @@ export class World {
     this.time = Math.max(this.time, 60);
     this.audio.playBgm(SONGS[this.level.theme]);
   }
-  onBossDying() { this.cutscene = true; this.audio.stopBgm(); this.fx.bossDefeat(); }
-  onBossDefeated() {
-    if (this.bossIdx + 1 < this.level.bosses.length) { // 連戦: 次のボスへ（部屋を開放して先へ進ませる）
-      this.bossIdx++; this.boss = null; this.arena = null; this.bossState = 'none'; this.cutscene = false; this.enemies = this.enemies.filter(e => !e.isBoss && !e.head);
-      this.player.invT = Math.max(this.player.invT, 1.5); this.time = Math.max(this.time, 90); this.toast(t('先へ進め')); this.audio.playBgm(SONGS[this.level.theme]); return;
-    }
-    this.cleared = true; this.cutscene = true; this.player.vx = 0; this.game.stageClear();
-  }
 
   update(dt, input) {
     dt = this.fx.tick(dt); if (dt <= 0) return; // ヒットストップ中は世界を止める。スロー中は dt が縮む
@@ -171,32 +162,15 @@ export class World {
     for (const t of this.toasts) t.t += dt; this.toasts = this.toasts.filter(t => t.t < 2.4);
   }
 
+  // ボス戦の進行は stage/bossflow.js へ切り出した。ここは委譲だけ（bosses.js・game.js・E2E が呼ぶ）
+  startBoss() { startBoss(this); }
+  bossName(kind) { return bossName(this, kind); }
+  onBossDying() { onBossDying(this); }
+  onBossDefeated() { onBossDefeated(this); }
   // 当たり判定と描画は別モジュールへ切り出した（stage/collision.js・stage/render.js）。ここは委譲だけ
   collide() { collide(this); }
   draw(g) { drawWorld(this, g); }
 
-  startBoss() {
-    const trig = this.level.bossTriggers[this.bossIdx]; const map = this.level.map; const kind = this.level.bosses[this.bossIdx] ?? this.level.boss;
-    const x0 = this.level.vertical ? 0 : Math.max(0, Math.min(trig.x - 24, map.pixelWidth - W)); const x1 = Math.min(map.pixelWidth, x0 + W);
-    this.arena = { x0, x1 }; this.bossState = 'fight'; this.audio.sfx('boss'); this.shake(3);
-    if (map.pixelHeight > H) { const y1 = Math.min(map.pixelHeight, Math.max(H, trig.y + 2 * TILE)); this.arena.y0 = y1 - H; this.arena.y1 = y1; } // 縦マップ: トリガー行を下端近くに含む 1 画面
-    // 地面高さを探す
-    const tx = Math.floor((x1 - 40) / TILE); let gy = map.pixelHeight;
-    const startTy = Math.max(0, Math.floor((this.player.y + this.player.h) / TILE) - 1);
-    for (let ty = startTy; ty < map.height; ty++) if (map.isSolid(tx, ty)) { gy = ty * TILE; break; }
-    if (kind === 'serpent') { // 大蛇は川に棲む: 部屋の中央列で最初の '~' の上端を水面にする
-      const cx = Math.floor((x0 + x1) / 2 / TILE);
-      for (let ty = 0; ty < map.height; ty++) if (map.at(cx, ty) === '~') { gy = ty * TILE; break; }
-    }
-    this.boss = createBoss(this, kind, x1 - 48, gy);
-    if (this.level.bossHpMul !== 1) { this.boss.hpMax = Math.round(this.boss.hpMax * this.level.bossHpMul); this.boss.hp = this.boss.hpMax; } // 連戦強化
-    if (this.boss.parts) this.enemies.push(...this.boss.parts); // 胴体（接触判定のみ）
-    this.enemies = this.enemies.filter(e => !(e.spawnX >= x0 - 200)); // 周辺の雑魚は消す
-    this.enemies.push(this.boss);
-    this.audio.playBgm(SONGS[this.level.bossSong ?? 'boss']); // 最終章は bossFinal
-    this.fx.bossIntro(this.bossName());
-  }
-  bossName(kind = this.level.bosses[this.bossIdx] ?? this.level.boss) { const n = BOSS_NAMES[kind]; return n ? t(n) : 'BOSS'; }
 
 
 }

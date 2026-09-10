@@ -1,7 +1,6 @@
 import { TILE, moveBody } from '../physics.js';
 import { PlayerShot, WEAPONS } from './projectiles.js';
-import { blit } from '../../gfx/sprite.js';
-import { castMagic, MAGIC, magicName, CHARGE_T, SUPER_T } from './magic.js';
+import { castMagic, magicName, CHARGE_T, SUPER_T } from './magic.js';
 import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConveyor, ladderAt, ladderBelow, LADDER_SPEED, trampolineAt, TRAMPOLINE_V } from './gimmicks.js';
 import { t } from '../../shared/i18n.js';
 
@@ -212,52 +211,5 @@ export class Player {
     }
     if (this.attackT > 0) return 'attack';
     return 'idle';
-  }
-
-  draw(g, cam, assets) {
-    if (this.state === 'dead') return;
-    if (this.state === 'dying' && this.deathReason === 'bog') {
-      // 沼に沈む
-      const sink = Math.min(24, this.deathT * 30);
-      g.save(); g.beginPath(); g.rect(0, 0, 999, Math.floor(this.y + this.h - cam.y - 2)); g.clip();
-      this._drawBody(g, cam, assets, sink); g.restore(); return;
-    }
-    if (this.state === 'dying') {
-      if (this.deathT > 1.0 && Math.floor(this.deathT * 16) % 2) return; // 消えかけの点滅
-    } else if (this.invT > 0 && Math.floor(this.invT * 18) % 2) return; // 無敵点滅
-    this._drawBody(g, cam, assets, 0);
-  }
-
-  _drawBody(g, cam, assets, dy) {
-    const fr = this.frame();
-    const sheet = assets.player[this.costume];
-    let spr = sheet[fr] ?? sheet.idle; if (!spr) return;
-    if (this.state === 'dying' && this.deathReason !== 'bog' && this.costume !== 'plain' && assets.player.nohat?.[fr]) spr = assets.player.nohat[fr]; // 帽子が飛ぶ間は帽子なし原画
-    // スプライト箱の底辺中央を当たり判定の底辺中央に合わせる
-    const px = Math.floor(this.centerX - spr.w / 2 - cam.x), py = Math.floor(this.y + this.h - spr.h - cam.y + dy);
-    blit(g, spr, this.facing < 0, px, py);
-    // 帽子は各コマの原画に描き込まれている（生成時に帽子ありで描かせ、脱落したコマだけ tools/derive_variants.py が合成）。
-    // 実行時の重ね描きは二重になって浮くので行わない。死亡時のみ帽子なし原画に差し替えて帽子を飛ばす
-    const hat = assets.hat; const hatDy = assets.hatTopOffset !== undefined ? -assets.hatTopOffset : -(hat.h - (hat.brim ?? 2)); // 帽子上端 = 髪上端 − hatTopOffset（元デザインの実測 3）。生成前の旧式: つばが髪に少しかかる
-    if (this.state === 'dying' && this.deathReason !== 'bog' && this.costume !== 'plain') {
-      // 帽子が飛ぶ
-      const t = this.deathT; const hx = this.centerX - hat.w / 2 - cam.x + t * 20 * -this.facing, hy = py + (spr.headY ?? 0) + hatDy - (60 * t - 90 * t * t);
-      blit(g, hat, this.facing < 0, hx, Math.min(hy, py + spr.h * 0.5));
-    }
-    if (this.broomT > 0) blit(g, assets.broom, this.facing < 0, this.centerX - assets.broom.w / 2 - cam.x, this.y + this.h - 4 - cam.y);
-    if (this.chargeT > CHARGE_T && Math.floor(this.chargeT * 20) % 2) blit(g, assets.shots.charge, false, this.centerX + (this.facing > 0 ? 12 : -22) - cam.x, this.y + 8 - cam.y);
-    if (this.chargeT >= SUPER_T) { // 強化魔法が出る合図: 生成した光輪（magicfx/aura、2 コマで回る）。無ければ円で描く
-      const aura = assets.generated?.magicfx, spr = aura && (Math.floor(this.chargeT * 8) % 2 ? aura.aura2 : aura.aura1);
-      const cx = this.centerX - cam.x, cy = this.y + this.h / 2 - cam.y;
-      if (spr) {
-        const w = spr.w ?? spr.r.width / 3, h = spr.h ?? spr.r.height / 3;
-        g.save(); g.globalAlpha = 0.9; g.drawImage(spr.r, cx - w / 2, cy - h / 2, w, h); g.restore();
-      } else {
-        const r = 18 + Math.sin(this.chargeT * 14) * 3;
-        g.save(); g.globalAlpha = 0.75; g.strokeStyle = '#ffe860'; g.lineWidth = 2;
-        g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke();
-        g.globalAlpha = 0.4; g.strokeStyle = '#ff8fc8'; g.beginPath(); g.arc(cx, cy, r + 4, 0, Math.PI * 2); g.stroke(); g.restore();
-      }
-    }
   }
 }

@@ -6,6 +6,7 @@ import { drawBackground } from '../gfx/background.js';
 import { drawBackgroundHD } from '../gfx/hdworld.js';
 import { THEMES } from '../gfx/tiles.js';
 import { HD_SCALE as HD } from '../gfx/sprite.js';
+import { drawEntity } from './entityRender.js';
 
 export function drawWorld(world, g) {
   const cam = { x: Math.floor(world.cam.x), y: Math.floor(world.cam.y) };
@@ -17,26 +18,26 @@ export function drawWorld(world, g) {
   else for (const c of world.chunks) { const sx = c.x - cam.x; if (sx > W || sx + c.canvas.width < 0) continue; g.drawImage(c.canvas, sx, -cam.y); }
   // 毒沼アニメ（'~' タイル）
   drawBog(world, g, cam);
-  world.decals.draw(g, cam, W, H);
+  drawEntity(world.decals, g, cam, W, H);
   drawGimmicks(world, g, cam);
   const A = world.assets;
-  for (const b of world.boxes) b.draw(g, cam, A.items);
-  for (const q of world.pools) q.draw(g, cam, A.shots);
-  for (const i of world.items) i.draw(g, cam, A.pickups);
-  for (const e of world.enemies) e.draw(g, cam, A);
-  world.player.draw(g, cam, A);
-  for (const f of world.fires) f.draw(g, cam, A.shots, A);   // 第 4 引数: 強化魔法の生成素材（magicfx）を引くため
-  for (const s of world.shots) s.draw(g, cam, A.shots, A);
-  for (const s of world.enemyShots) s.draw(g, cam, A.shots);
-  for (const e of world.effects) e.draw(g, cam, A);
-  world.particles.draw(g, cam);
+  for (const b of world.boxes) drawEntity(b, g, cam, A.items);
+  for (const q of world.pools) drawEntity(q, g, cam, A.shots);
+  for (const i of world.items) drawEntity(i, g, cam, A.pickups);
+  for (const e of world.enemies) drawEntity(e, g, cam, A);
+  drawEntity(world.player, g, cam, A);
+  for (const f of world.fires) drawEntity(f, g, cam, A.shots, A);   // 第 4 引数: 強化魔法の生成素材（magicfx）を引くため
+  for (const s of world.shots) drawEntity(s, g, cam, A.shots, A);
+  for (const s of world.enemyShots) drawEntity(s, g, cam, A.shots);
+  for (const e of world.effects) drawEntity(e, g, cam, A);
+  drawEntity(world.particles, g, cam);
   drawWeather(world, g, cam);
   // 毒の画面効果（変身解除中にうっすら）
   if (world.player.costume === 'plain' && world.player.alive) { g.fillStyle = 'rgba(180,92,245,0.06)'; g.fillRect(0, 0, W, H); }
   // 撃破フラッシュ / ボス撃破の白飛び
   const fa = world.fx.flashAlpha; if (fa > 0) { g.globalAlpha = fa; g.fillStyle = world.fx.flashColor; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }
   // 画面固定の演出（カットイン）は最後に、カメラを無視して描く
-  for (const e of world.screenFx) e.draw(g, world.assets, W, H);
+  for (const e of world.screenFx) drawEntity(e, g, world.assets, W, H);
 }
 
 // 動く足場・崩れる足場・はしご（足場画像はテーマの足場タイルを流用。はしごは暫定の幾何描画: 第四章の地形生成で置換予定）

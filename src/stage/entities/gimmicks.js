@@ -1,7 +1,7 @@
 // 地形ギミック（docs/plan/05-systems.md 5.2）: 動く足場 M/V、浮島 @、崩れる足場 !、はしご L、水流 > <、風 } {
 import { TILE, overlapsSolid } from '../physics.js';
 import { EnemyShot } from './projectiles.js';
-import { HD_SCALE } from '../../gfx/sprite.js';
+import { HD_SCALE } from '../viewport.js';
 
 export const FLOW_SPEED = 40;          // 水流・風で加わる速度（世界単位/s）
 export const CRUMBLE_SHAKE_T = 0.6;    // 乗ってから落ちるまで

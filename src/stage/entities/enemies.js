@@ -1,14 +1,9 @@
 import { TILE, moveBody } from '../physics.js';
 import { EnemyShot } from './projectiles.js';
-import { tint, blit } from '../../gfx/sprite.js';
 import { rand, grand } from '../../shared/util.js';
 import { SAFE_ZONE_X } from '../balance.js';
 
 let nextId = 1;
-const flashCache = new Map();
-export function flashImg(img) {
-  let f = flashCache.get(img); if (!f) { f = tint(img, '#fdfbf7'); flashCache.set(img, f); } return f;
-}
 
 // 敵の基底クラス。見た目はファンシー、死に様はえげつない。
 export class Enemy {
@@ -61,15 +56,6 @@ export class Enemy {
   }
   update(dt) { this.t += dt; this.flashT = Math.max(0, this.flashT - dt); }
   spriteName() { return null; }
-  draw(g, cam, assets) {
-    const name = this.spriteName(); if (!name) return;
-    const spr = assets.enemies[name] ?? assets.bosses[name] ?? (this.baseSprite && (assets.enemies[this.baseSprite] ?? assets.bosses[this.baseSprite])); if (!spr) return;
-    // HD スプライトは寸法がコマごとに違いうる（doll1/doll2 等）ので、底辺中央を当たり判定の底辺中央に合わせる
-    const ox = spr.hd ? (spr.w - this.w) / 2 : this.facing < 0 ? (spr.w - this.w - this.spriteOff[0]) : this.spriteOff[0];
-    const oy = spr.hd ? spr.h - this.h : this.spriteOff[1];
-    const fs = this.flashT > 0 ? { ...spr, r: flashImg(spr.r), l: flashImg(spr.l) } : spr;
-    blit(g, fs, this.facing < 0, this.x - ox - cam.x, this.y - oy - cam.y);
-  }
 }
 
 // ---- ゾンビうさぎ: 地面から湧いて歩いてくる ----
@@ -91,22 +77,11 @@ export class ZombieRabbit extends Enemy {
     if (grand() < 0.02) this.world.decals.splat(this.cx, this.y + this.h, '#d9262b', 1);
   }
   spriteName() { return this.rise > 0 ? 'zombieRise' : (Math.floor(this.t * 5) % 2 ? 'zombie1' : 'zombie2'); }
-  draw(g, cam, assets) {
-    if (this.rise > 0) {
-      // 地面から迫り上がる（下をクリップ）
-      const groundY = this.y + this.h; const up = Math.min(this.h + 2, (0.7 - this.rise) / 0.7 * (this.h + 2));
-      g.save(); g.beginPath(); g.rect(0, 0, 9999, Math.floor(groundY - cam.y)); g.clip();
-      const spr = assets.enemies.zombie1;
-      blit(g, spr, this.facing < 0, this.x - this.spriteOff[0] - cam.x, groundY - up - cam.y); g.restore(); return;
-    }
-    super.draw(g, cam, assets);
-  }
 }
 
 // ゾンビの湧きポイント（プレイヤー接近で周囲に湧く）
 export class ZombieSpawner {
   constructor(world, x) { this.world = world; this.x = x; this.timer = 0.5; this.dead = false; this.contact = false; }
-  draw() {}
   update(dt) {
     const p = this.world.player; if (!p.alive || this.world.boss) return;
     if (Math.abs(p.centerX - this.x) > 150) return;
@@ -288,11 +263,6 @@ export class MermaidDoll extends Enemy {
   }
   hurt(dmg, shot) { if (this.state === 'wait' && shot && shot.y + shot.h > this.waterY) return; super.hurt(dmg, shot); } // 水面下は撃てない
   spriteName() { return this.state === 'lunge' ? 'mermaid2' : 'mermaid1'; }
-  draw(g, cam, assets) {
-    // 水面より下は描かない（潜っている表現）
-    g.save(); g.beginPath(); g.rect(0, 0, 9999, Math.floor(this.waterY - cam.y)); g.clip();
-    super.draw(g, cam, assets); g.restore();
-  }
 }
 
 // ---- 傘の妖精 (第三章): 主人公の上空を漂い、血の雨滴を落とす ----
@@ -424,15 +394,6 @@ export class MirrorLyrica extends Enemy {
     this.contact = !far;
   }
   spriteName() { return null; }
-  draw(g, cam, assets) {
-    const sheet = assets.player[this.hist[0]?.costume ?? 'dress'] ?? assets.player.dress; const spr = sheet[this.frame] ?? sheet.idle; if (!spr) return;
-    g.save(); g.globalAlpha = 0.75; g.filter = 'saturate(0.2) brightness(1.15)';
-    if (this.flashT > 0) g.filter = 'brightness(3)';
-    blit(g, spr, this.mirrorFacing < 0, Math.floor(this.x + this.w / 2 - spr.w / 2 - cam.x), Math.floor(this.y + this.h - spr.h - cam.y));
-    g.restore();
-    // 鏡の軸（薄い光の線）
-    g.fillStyle = 'rgba(232,232,244,0.25)'; g.fillRect(Math.round(this.axis - cam.x), 0, 1, 224);
-  }
 }
 
 // ---- ガーゴイル人形 (第六章): 止まり木で待ち、主人公が下を通ると急降下して戻る ----

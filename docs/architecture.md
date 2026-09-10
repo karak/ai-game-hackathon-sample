@@ -8,7 +8,7 @@ DDD の「境界づけられたコンテキスト」で `src/` を切り分け�
 | コンテキスト | ディレクトリ | 責務・語彙 | 主な集約／サービス |
 |---|---|---|---|
 | **進行**（Session） | `src/app/` | 1 回の遊び（run）の状態機械: タイトル → プロローグ → 面 → クリア → エンディング／ゲームオーバー。スコア・残機・章の進行・周回・コンティニュー、設定とセーブ、死亡ログ・run 記録（テスター計測）、デモ（放置再生） | `Game`（状態機械）、`screens.js`（各状態の画面描画）、`options.js`（オプション画面の行と操作）、`settings.js`、`runlog.js`、`deathlog.js`、`demo.js` |
-| **ステージ**（Stage） | `src/stage/` | 1 面のシミュレーション: タイルマップと物理、主人公・敵・ボス・弾・アイテム・ギミック・魔法、当たり判定、カメラ、演出のタイミング（ヒットストップ・スロー）、難易度定数 | `World`（面のルート集約）、`collision.js`（当たり判定）、`render.js`（面の描画アダプタ）、`physics.js`、`level.js`（記号 → マップと配置）、`camera.js`、`balance.js`、`fx.js`、`decomap.js`、`entities/*` |
+| **ステージ**（Stage） | `src/stage/` | 1 面のシミュレーション: タイルマップと物理、主人公・敵・ボス・弾・アイテム・ギミック・魔法、当たり判定、カメラ、演出のタイミング（ヒットストップ・スロー）、難易度定数 | `World`（面のルート集約。状態と更新だけ）、`bossflow.js`（ボス戦の進行）、`collision.js`（当たり判定）、`render.js`（面の描画アダプタ）、`entityRender.js`（エンティティの描画。クラス → 関数の表を継承をたどって解決する `drawEntity`）、`viewport.js`（W/H/SCALE/HD_SCALE）、`physics.js`、`level.js`（記号 → マップと配置）、`camera.js`、`balance.js`、`fx.js`、`decomap.js`、`entities/*`（状態と更新。描画基盤を読まない） |
 | **コンテンツ**（Content） | `src/content/` | 作品データ: 8 章の地形文字列と章題、物語本文（両言語）、ボス名、デモ入力ログ。コードは持たず、ステージ・進行が読む | `levels/index.js`、`levels/stitch.js`、`story.js`、`demos.js` |
 | **描画基盤**（Graphics） | `src/gfx/` | 生成素材の読み込みと切り出し、パレット、HD スプライトの blit、地形帯からのタイル合成、背景層、フォールバックの文字列ドット絵 | `assets.js`、`loader.js`、`sprite.js`、`palette.js`、`tiles.js`、`hdworld.js`、`background.js`、`sprites/*` |
 | **UI 部品**（UI） | `src/ui/` | 窓・文字・ミニフォント・HUD の描画部品（256×224 の論理座標で配置、実測幅で折り返し） | `window.js`、`text.js`、`minifont.js`、`hud.js`、`layout.js` |
@@ -21,12 +21,12 @@ DDD の「境界づけられたコンテキスト」で `src/` を切り分け�
 
 ```
 main ──▶ app ──▶ stage ──▶ content
-  │       │        │  └───▶ gfx（sprite/palette は entities から、tiles/hdworld/background は render.js から）
+  │       │        │  └───▶ gfx（render.js / entityRender.js から。entities/* は palette.js の色データだけ）
   │       │        └──────▶ platform/audio（曲名 SONGS。音は World が game.audio 経由で鳴らす）
   │       ├──────▶ content, gfx, ui, platform
   │       └──────▶ shared
   ├─────▶ platform ──▶ shared（keymap は自前。設定は keymap を読む）
-  ├─────▶ gfx ──▶ shared, stage/physics（TILE 定数のみ）
+  ├─────▶ gfx ──▶ shared, stage/physics・stage/viewport（TILE / HD_SCALE の定数のみ）
   └─────▶ ui ──▶ gfx, stage/entities/projectiles（WEAPONS の表示）, shared
 content ──▶ shared のみ
 shared ──▶ なし
@@ -49,7 +49,13 @@ catalog ──▶ なんでも
 - 単体 `npm test`（122 件）と E2E 10 件は移設後も同じ数だけ通ること。
 - `test/architecture.test.js`: 依存の向き。
 
-## 5. 今後
+## 5. 後半で済ませたこと（2026-09-11）
 
-- `entities/*` の `draw` メソッドは領域オブジェクトが描画基盤（`gfx/sprite.js`）に直接依存している。描画を `stage/render.js` 側へ寄せる（Renderer が entity の種類ごとに描く）のは次段。
-- `World` はまだ「ボスの進行」「トースト」「揺れ」も持つ。ボス戦の進行は `stage/bossflow.js` に切れる。
+- `entities/*` の `draw` メソッド 32 個（＋ `Player._drawBody`、`flashImg`）を `stage/entityRender.js` へ移した。`drawEntity(e, g, …)` がクラス → 関数の表を継承順にたどって解決する（`super.draw` は親クラスの関数呼び出しに置換）。`HD_SCALE` の正を `stage/viewport.js` に移し（`gfx/sprite.js` は再公開）、entities が読む gfx は `palette.js` の色データだけになった（`test/architecture.test.js` 5 件目）。
+- `World` からボス戦の進行（`startBoss` / `bossName` / `onBossDying` / `onBossDefeated`）を `stage/bossflow.js` へ。world.js は 177 行。
+- 護りの拡張: `e2e/golden.spec.js` に「画廊」（全 17 種の敵・9 体のボス・11 種の敵弾・アイテム・毒溜まり・自弾 8・魔法エフェクト 16・カットイン 4 を 1 画面に出して 0 / 12 フレーム目を描く）を足し、通常プレイの 20 秒に出ない種の描画も画素ハッシュで固定した。
+
+## 6. 今後
+
+- `World` はまだトースト・揺れ・湧きを持つ。必要になれば `stage/spawn.js` に切れる。
+- `entities/*` は `PAL`（色）と `HD_SCALE`（寸法）を読む。色は演出の語彙なので許容している。

@@ -94,8 +94,8 @@ PY="/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.venv/
 | 領域 | ファイル |
 |------|---------|
 | ゲーム進行・画面（app） | `src/app/game.js`（状態機械・遷移・記録）、`src/app/screens.js`（各状態の画面描画）、`src/app/options.js`（オプション画面）、`src/main.js`（起動・ロード画面・ループ・縮小表示・言語の反映）、`src/shared/i18n.js`（表示言語）、`src/content/story.js`（物語本文 両言語・ボス名） |
-| 世界・物理（stage / content） | `src/stage/world.js`（面のルート集約）、`src/stage/render.js`（面の描画）、`src/stage/collision.js`（当たり判定）、`src/stage/physics.js`、`src/stage/camera.js`、`src/stage/level.js`、`src/content/levels/index.js`（8 面） |
-| キャラ | `src/stage/entities/player.js`（コマ選択 `frame()`）、`enemies.js`、`bosses.js`、`gimmicks.js`、`magic.js`、`projectiles.js` |
+| 世界・物理（stage / content） | `src/stage/world.js`（面のルート集約）、`src/stage/render.js`（面の描画）、`src/stage/entityRender.js`（エンティティの描画 `drawEntity`）、`src/stage/collision.js`（当たり判定）、`src/stage/bossflow.js`（ボス戦の進行）、`src/stage/physics.js`、`src/stage/camera.js`、`src/stage/level.js`、`src/content/levels/index.js`（8 面） |
+| キャラ（状態と更新。描画は entityRender.js） | `src/stage/entities/player.js`（コマ選択 `frame()`）、`enemies.js`、`bosses.js`、`gimmicks.js`、`magic.js`、`projectiles.js` |
 | 描画・素材 | `src/gfx/assets.js`、`loader.js`、`hdworld.js`、`manifest.json`（235 エントリ、生成物） |
 | 音・入力（platform） | `src/platform/audio.js`（`SONGS`、`CH_VOL`、`playJingle`）、`src/platform/input.js`、`src/platform/keymap.js`（既定の割り当て） |
 | 保存・ログ | `src/app/settings.js`（`lyrica_save`）、`src/app/deathlog.js`（`lyrica_deaths`）、`src/app/runlog.js`（`lyrica_runs`）、`src/stage/balance.js` |

@@ -18,7 +18,7 @@ const ALLOWED = {
   catalog: ['catalog', 'app', 'stage', 'content', 'gfx', 'ui', 'platform', 'shared'],
 };
 // コンテキスト境界をまたぐ import のうち、ファイル単位で限定するもの
-const NARROW = { 'gfx→stage': ['stage/physics.js'], 'ui→stage': ['stage/entities/projectiles.js'], 'stage→platform': ['platform/audio.js'] };
+const NARROW = { 'gfx→stage': ['stage/physics.js', 'stage/viewport.js'], 'ui→stage': ['stage/entities/projectiles.js'], 'stage→platform': ['platform/audio.js'] };
 
 function walk(dir, out = []) { for (const f of readdirSync(dir)) { const p = join(dir, f); if (statSync(p).isDirectory()) walk(p, out); else if (p.endsWith('.js')) out.push(p); } return out; }
 const files = walk(SRC);
@@ -55,4 +55,9 @@ test('the map has at least the expected contexts and the graph is non-trivial', 
   const ctx = new Set(edges.map(e => e.from));
   for (const c of ['main', 'app', 'stage', 'content', 'gfx', 'ui', 'platform']) expect(ctx.has(c), c).toBe(true);
   expect(edges.length).toBeGreaterThan(80);
+});
+
+test('domain entities (stage/entities/*) do not draw: no import of gfx/sprite.js; palette colors as data are allowed', () => {
+  const bad = edges.filter(e => e.file.startsWith('stage/entities/') && e.to === 'gfx' && e.target !== 'gfx/palette.js').map(e => `${e.file} → ${e.target}`);
+  expect(bad, '描画は stage/entityRender.js（drawEntity）へ。docs/architecture.md §5').toEqual([]);
 });

@@ -39,7 +39,8 @@ export function makeSprite(rows, remap = null, scale = 1, opts = {}) {
 }
 
 // スプライト描画。hd（生成 PNG、1 画面画素 = 0.5 世界単位）は世界座標系(2x スケール)で半分サイズに描く。
-export const HD_SCALE = 3; // 生成 PNG の 1 画素 = 1/HD_SCALE 世界単位（world.js の SCALE と一致させる）
+export { HD_SCALE } from '../stage/viewport.js'; // 正は stage/viewport.js（SCALE と同じ値）。従来の import 元のために再公開
+import { HD_SCALE } from '../stage/viewport.js';
 export function blit(g, spr, facingLeft, x, y) {
   const img = facingLeft ? spr.l : spr.r;
   if (spr.hd) {
