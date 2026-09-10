@@ -112,7 +112,7 @@ docs/            art-standard / gen-pipeline / plan（計画・バックログ�
 
 ## 不具合の報告・テスター計測
 
-- 不具合は GitHub Issues の「不具合報告」テンプレート（`.github/ISSUE_TEMPLATE/bug_report.yml`）へ。リポジトリ公開後に URL をここに書く。
+- 不具合は GitHub Issues の「不具合報告」テンプレートへ: https://github.com/karak/ai-game-hackathon-sample/issues/new/choose （リポジトリ: https://github.com/karak/ai-game-hackathon-sample）
 - ゲーム内 **オプション → テスター報告を コピー** で、ビルド ID・ブラウザ・パッド名・各プレイの到達章／死亡数／プレイ秒・死亡地点集計の JSON がクリップボードに入る（個人情報なし）。Issue の「テスター報告」欄に貼る。
 - テスターの手引きは `docs/release/tester-guide.md`、集計は `node tools/tester_stats.mjs`（`docs/plan/logs/testers/*.json`）。
 - ゲームパッドは **オプション → ゲームパッド** の行に接続中のパッド名と押しているボタン名が出る（実機確認用）。

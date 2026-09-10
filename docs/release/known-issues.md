@@ -2,6 +2,8 @@
 
 配信ページに載せる「既知の問題」の正。ID は `docs/plan/08-backlog.md` と同じ。修正したら両方から消す。
 
+不具合報告: https://github.com/karak/ai-game-hackathon-sample/issues/new/choose （オプション「テスター報告を コピー」の JSON を添える）
+
 ## プレイに影響するもの
 
 | ID | 内容 | 回避 |

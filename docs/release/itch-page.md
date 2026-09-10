@@ -12,7 +12,7 @@
 6. Metadata: Genre Platformer、Tags `pixel-art` `2d` `action` `retro` `ghouls-n-ghosts` `magical-girl` `dark-fantasy` `japanese` `english`、Made with Vite / Gemini、Average session A few minutes、Inputs Keyboard / Gamepad / Touchscreen、Languages Japanese / English、Accessibility: Configurable controls
 7. スクリーンショット: `test-results/shots/`（英語タイトル `en_title.png`、オプション `en_options.png`、章題 `en_intro.png`、スマホ `mobile_title.png`）と `docs/plan/logs/`（各章の実機撮影）。トレーラーは `docs/release/trailer.gif`
 8. Content warning: 血・臓物の表現あり（ドット絵）。年齢制限の欄は「Not rated」だが説明文に明記する
-9. 公開後: URL を `README.md` と `docs/plan/03-roadmap.md` M7 に書く。バグ報告先は GitHub Issues（`docs/release/known-issues.md`）
+9. 公開後: URL を `README.md` と `docs/plan/03-roadmap.md` M7 に書く。バグ報告先は GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（`docs/release/known-issues.md`）
 
 ## タイトル
 
