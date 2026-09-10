@@ -1,9 +1,9 @@
 import { TILE, moveBody } from '../physics.js';
 import { PlayerShot, WEAPONS } from './projectiles.js';
-import { blit } from '../gfx/sprite.js';
+import { blit } from '../../gfx/sprite.js';
 import { castMagic, MAGIC, magicName, CHARGE_T, SUPER_T } from './magic.js';
 import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConveyor, ladderAt, ladderBelow, LADDER_SPEED, trampolineAt, TRAMPOLINE_V } from './gimmicks.js';
-import { t } from '../i18n.js';
+import { t } from '../../shared/i18n.js';
 
 const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196; // 単発ジャンプ 42 世界px(2.6タイル)
 const STAND_H = 28, CROUCH_H = 18; // 当たり判定（世界単位）。スプライトは生成 PNG のサイズに従う（docs/art-standard.md §2.1）

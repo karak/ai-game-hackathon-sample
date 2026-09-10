@@ -1,7 +1,7 @@
 import { Enemy } from './enemies.js';
-import { rand, grand } from '../util.js';
-import { PAL } from '../gfx/palette.js';
-import { blit } from '../gfx/sprite.js';
+import { rand, grand } from '../../shared/util.js';
+import { PAL } from '../../gfx/palette.js';
+import { blit } from '../../gfx/sprite.js';
 
 // ボス基底: HP バー、入場、死亡演出
 export class Boss extends Enemy {

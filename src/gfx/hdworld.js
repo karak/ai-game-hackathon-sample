@@ -1,7 +1,7 @@
 // 生成済み背景レイヤー / 地形タイル（HD: 1 世界単位 = HD_SCALE 画素）の描画。
 // タイルストリップ（tiles/<theme>.png）を 48px 角に切り、上段 = 地表、下段 = 地中として使う。
 import { HD_SCALE } from './sprite.js';
-import { TILE } from '../physics.js';
+import { TILE } from '../stage/physics.js';
 
 const T = TILE * HD_SCALE; // 48
 

@@ -1,7 +1,7 @@
 import { TILE, moveBody } from '../physics.js';
 import { EnemyShot } from './projectiles.js';
-import { tint, blit } from '../gfx/sprite.js';
-import { rand, grand } from '../util.js';
+import { tint, blit } from '../../gfx/sprite.js';
+import { rand, grand } from '../../shared/util.js';
 import { SAFE_ZONE_X } from '../balance.js';
 
 let nextId = 1;

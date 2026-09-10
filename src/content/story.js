@@ -1,6 +1,6 @@
 // プロローグ・エンディングのテキスト。表示側で実測幅により折り返す。
 // 英語版（IMP-008）は同じ場面数・同じ順で _EN に置き、story() で現在の言語のものを返す
-import { pick } from './i18n.js';
+import { pick } from '../shared/i18n.js';
 export const PROLOGUE = [
   'むかしむかし、おとぎの国は',
   'ひとりの魔法少女に',

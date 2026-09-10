@@ -2,8 +2,8 @@
 import { h1, h2, note, table, canvas } from '../sheet.js';
 import { drawWindow, text, mini, textBox, LAYOUT, UI_PX, FONT_PX } from '../../ui/index.js';
 import { drawHud } from '../../ui/hud.js';
-import { World } from '../../world.js';
-import { STAGES } from '../../levels/index.js';
+import { World } from '../../stage/world.js';
+import { STAGES } from '../../content/levels/index.js';
 
 export async function render(main, A) {
   main.appendChild(h1('UI'));

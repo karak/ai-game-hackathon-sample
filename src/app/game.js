@@ -1,20 +1,20 @@
-import { World, W, H } from './world.js';
-import { STAGES } from './levels/index.js';
-import { drawWindow, text, mini, drawHud, textBox, wrap, LAYOUT, MINI_W, rowHeight } from './ui/index.js';
+import { World, W, H } from '../stage/world.js';
+import { STAGES } from '../content/levels/index.js';
+import { drawWindow, text, mini, drawHud, textBox, wrap, LAYOUT, MINI_W, rowHeight } from '../ui/index.js';
 const miniX = str => Math.round(128 - str.length * MINI_W / 2); // ミニフォントの中央揃え x
-import { SONGS } from './audio.js';
-import { drawBackground } from './gfx/background.js';
-import { blit } from './gfx/sprite.js';
-import { drawBackgroundHD } from './gfx/hdworld.js';
-import { story } from './story.js';
-import { t, setLang, LANGS, LANG_LABEL } from './i18n.js';
-import { irisRadius, IRIS_T, BOSS_INTRO_T } from './fx.js';
+import { SONGS } from '../platform/audio.js';
+import { drawBackground } from '../gfx/background.js';
+import { blit } from '../gfx/sprite.js';
+import { drawBackgroundHD } from '../gfx/hdworld.js';
+import { story } from '../content/story.js';
+import { t, setLang, LANGS, LANG_LABEL } from '../shared/i18n.js';
+import { irisRadius, IRIS_T, BOSS_INTRO_T } from '../stage/fx.js';
 import { DemoRecorder, DemoInput, DEMO_MAX_T, DEMO_IDLE_T } from './demo.js';
-import { DEMOS } from './demos.js';
-import { hashSeed } from './util.js';
+import { DEMOS } from '../content/demos.js';
+import { hashSeed } from '../shared/util.js';
 import { loadDeathLog, saveDeathLog, pushDeath, summarizeDeaths } from './deathlog.js';
 import { loadRuns, saveRuns, newRun, pushRun, buildReport } from './runlog.js';
-import { BUILD_ID } from './gfx/loader.js';
+import { BUILD_ID } from '../gfx/loader.js';
 import { defaultSettings, saveSettings, volumeGain, bind, codesFor, keyName, keyNameMini, padName, REBINDABLE, ACTION_LABEL, VOLUME_MAX, DEFAULT_KEYS, DEFAULT_PAD } from './settings.js';
 
 // オプション画面の行。kind: volume / mute / key(action) / reset / back

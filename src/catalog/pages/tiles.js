@@ -2,8 +2,8 @@
 import { h1, h2, h3, note, table, canvas, drawRaw, rawSize, state } from '../sheet.js';
 import { sliceTileStrip, renderMapLayerHD, TILE_BANDS, buildBogHD, buildSpikeHD } from '../../gfx/hdworld.js';
 import { THEMES } from '../../gfx/tiles.js';
-import { TileMap } from '../../physics.js';
-import { DECO_MAP } from '../../decomap.js';
+import { TileMap } from '../../stage/physics.js';
+import { DECO_MAP } from '../../stage/decomap.js';
 
 const SAMPLE = ['..........', '..===.....', '..........', '###....###', '###~~^^###', '###~~^^###'];
 

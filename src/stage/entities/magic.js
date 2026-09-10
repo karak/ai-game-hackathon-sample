@@ -11,8 +11,8 @@
 //  candle → 蝋の聖歌隊: 火柱 5 本（高さ 4 タイル、2.5 秒）。柱は触れた敵弾を蝋で包んで焼き落とす
 import { TILE, aabb } from '../physics.js';
 import { PlayerShot, Fire } from './projectiles.js';
-import { HD_SCALE } from '../gfx/sprite.js';
-import { blit } from '../gfx/sprite.js';
+import { HD_SCALE } from '../../gfx/sprite.js';
+import { blit } from '../../gfx/sprite.js';
 
 // 強化魔法の生成素材（assets/sprites/magicfx/*, cutin/*）。無ければ従来の弾スプライトで描く
 const mfx = A => A?.generated?.magicfx ?? {};

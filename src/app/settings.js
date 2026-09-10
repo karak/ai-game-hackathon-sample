@@ -1,5 +1,5 @@
 // 設定とセーブ（localStorage）。純粋関数群。ストレージは注入可能（テスト用）
-import { LANGS, detectLang } from './i18n.js';
+import { LANGS, detectLang } from '../shared/i18n.js';
 export const STORAGE_KEY = 'lyrica_save';
 export const LEGACY_HI_KEY = 'lyrica_hi';
 export const ACTIONS = ['left', 'right', 'up', 'down', 'shoot', 'jump', 'start', 'pause', 'mute'];

@@ -1,25 +1,25 @@
 import { TILE, aabb } from './physics.js';
 import { parseLevel } from './level.js';
-import { renderMapLayer } from './gfx/tiles.js';
-import { drawBackground } from './gfx/background.js';
+import { renderMapLayer } from '../gfx/tiles.js';
+import { drawBackground } from '../gfx/background.js';
 import { Particles, Decals } from './entities/particles.js';
 import { Player } from './entities/player.js';
 import { createEnemy } from './entities/enemies.js';
 import { createBoss } from './entities/bosses.js';
 import { TreasureBox, FloatingItem } from './entities/items.js';
 import { EnemyShot, WEAPONS } from './entities/projectiles.js';
-import { SONGS } from './audio.js';
-import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBogHD, buildSpikeHD } from './gfx/hdworld.js';
-import { THEMES } from './gfx/tiles.js';
+import { SONGS } from '../platform/audio.js';
+import { sliceTileStrip, renderMapLayerHD, drawBackgroundHD, TILE_BANDS, buildBogHD, buildSpikeHD } from '../gfx/hdworld.js';
+import { THEMES } from '../gfx/tiles.js';
 import { SAFE_SHOT_T, LOOP2 } from './balance.js';
 import { Fx } from './fx.js';
-import { seedGame, hashSeed } from './util.js';
-import { HD_SCALE as HD } from './gfx/sprite.js';
+import { seedGame, hashSeed } from '../shared/util.js';
+import { HD_SCALE as HD } from '../gfx/sprite.js';
 import { MovingPlatform, CrumbleTile, PLATFORM, makeWheel, PressMachine, SyrupDripper, isTrampoline } from './entities/gimmicks.js';
 import { resolveDecoMap } from './decomap.js';
 import { updateCamera, snapCamera } from './camera.js';
-import { BOSS_NAMES } from './story.js';
-import { t } from './i18n.js';
+import { BOSS_NAMES } from '../content/story.js';
+import { t } from '../shared/i18n.js';
 
 export const W = 256, H = 224; // 論理座標（世界単位）。実キャンバスは SCALE 倍
 export const SCALE = 3; // 内部解像度 768x672（docs/art-standard.md §2.1）。HD スプライトは 1 画面画素 = 1/3 世界単位

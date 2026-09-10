@@ -1,9 +1,9 @@
 // ステージ構成: 俯瞰マップ（記号付き）、セグメント構成表、難易度曲線
 import { h1, h2, h3, note, table, canvas, el } from '../sheet.js';
-import { STAGES } from '../../levels/index.js';
-import { parseLevel, MARKERS } from '../../level.js';
-import { World } from '../../world.js';
-import { loadDeathLog, summarizeDeaths } from '../../deathlog.js';
+import { STAGES } from '../../content/levels/index.js';
+import { parseLevel, MARKERS } from '../../stage/level.js';
+import { World } from '../../stage/world.js';
+import { loadDeathLog, summarizeDeaths } from '../../app/deathlog.js';
 
 const COLORS = { solid: '#6c6c80', oneway: '#c8a060', hazard: '#b45cf5', spike: '#d9262b', player: '#7cff70', checkpoint: '#ffe860', boss: '#ff6a6a', goal: '#ffffff', treasure: '#ff8fc8', enemy: '#ff9040', deco: '#3a3a52' };
 const ENEMY_JP = { zombie: 'ゾンビ湧き', mushroom: 'キノコ妖精', unicorn: 'ユニコーン', cake: 'ケーキ', angel: '天使骸骨', bear: 'テディ', eye: '目玉', heartitem: 'ポーション', treasure: '宝箱' };

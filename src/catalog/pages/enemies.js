@@ -1,9 +1,9 @@
 // 敵・ボスシート: フレーム、当たり判定（実クラスから取得）、行動仕様、弾、演出、スコア
 import { h1, h2, h3, note, table, frameStrip, paletteStrip, rawSize } from '../sheet.js';
-import { createEnemy, ZombieRabbit } from '../../entities/enemies.js';
-import { createBoss } from '../../entities/bosses.js';
+import { createEnemy, ZombieRabbit } from '../../stage/entities/enemies.js';
+import { createBoss } from '../../stage/entities/bosses.js';
 import { SPEC, BOSS_SPEC } from '../specs.js';
-import { TileMap } from '../../physics.js';
+import { TileMap } from '../../stage/physics.js';
 
 // 行動仕様（コードの状態機械を要約。数値は enemies.js / bosses.js の定数）
 

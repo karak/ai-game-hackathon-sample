@@ -1,5 +1,5 @@
 import { THEMES } from './tiles.js';
-import { rng } from '../util.js';
+import { rng } from '../shared/util.js';
 
 function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 

@@ -1,5 +1,5 @@
 // キーボード・ゲームパッド・タッチ入力。pressed = 今フレーム押された、held = 押し続け
-import { DEFAULT_KEYS, DEFAULT_PAD } from './settings.js';
+import { DEFAULT_KEYS, DEFAULT_PAD } from '../app/settings.js';
 
 // 互換用: 既定のキーマップ
 export const MAP = DEFAULT_KEYS;

@@ -1,8 +1,8 @@
 import { PAL } from './palette.js';
 import { makeSprite } from './sprite.js';
 import { DECO } from './sprites/index.js';
-import { rng } from '../util.js';
-import { TILE } from '../physics.js';
+import { rng } from '../shared/util.js';
+import { TILE } from '../stage/physics.js';
 
 // テーマごとの配色
 export const THEMES = {

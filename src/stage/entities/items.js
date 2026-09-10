@@ -1,8 +1,8 @@
-import { grand } from '../util.js';
+import { grand } from '../../shared/util.js';
 import { TILE, moveBody } from '../physics.js';
 import { WEAPON_ORDER } from './projectiles.js';
-import { blit } from '../gfx/sprite.js';
-import { t } from '../i18n.js';
+import { blit } from '../../gfx/sprite.js';
+import { t } from '../../shared/i18n.js';
 
 // 宝箱（プレゼント箱）: 撃つと開いてアイテムが飛び出す
 export class TreasureBox {

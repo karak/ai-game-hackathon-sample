@@ -1,10 +1,10 @@
 import { buildAssets } from './gfx/assets.js';
-import { Audio, SONGS } from './audio.js';
-import { Input } from './input.js';
-import { Game } from './game.js';
-import { W, H, SCALE } from './world.js';
-import { loadSettings } from './settings.js';
-import { setLang } from './i18n.js';
+import { Audio, SONGS } from './platform/audio.js';
+import { Input } from './platform/input.js';
+import { Game } from './app/game.js';
+import { W, H, SCALE } from './stage/world.js';
+import { loadSettings } from './app/settings.js';
+import { setLang } from './shared/i18n.js';
 
 async function boot() {
   const canvas = document.getElementById('game');

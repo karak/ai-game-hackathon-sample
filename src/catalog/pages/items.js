@@ -1,8 +1,8 @@
 // アイテム・弾シート: 寸法、武器パラメータ、敵弾の物理
 import { h1, h2, h3, note, table, frameStrip, paletteStrip } from '../sheet.js';
-import { MAGIC, SUPER, CHARGE_T, SUPER_T } from '../../entities/magic.js';
-import { CUTIN_IN, CUTIN_HOLD, CUTIN_OUT } from '../../entities/magic.js';
-import { WEAPONS, ENEMY_SHOTS } from '../../entities/projectiles.js';
+import { MAGIC, SUPER, CHARGE_T, SUPER_T } from '../../stage/entities/magic.js';
+import { CUTIN_IN, CUTIN_HOLD, CUTIN_OUT } from '../../stage/entities/magic.js';
+import { WEAPONS, ENEMY_SHOTS } from '../../stage/entities/projectiles.js';
 
 export async function render(main, A) {
   main.appendChild(h1('アイテム・弾'));

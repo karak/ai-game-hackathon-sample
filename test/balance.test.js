@@ -1,10 +1,10 @@
 import { test, expect, vi, afterEach } from 'vitest';
-import { parseLevel } from '../src/level.js';
-import { STAGES } from '../src/levels/index.js';
-import { SAFE_ZONE_X, SAFE_SHOT_T, minTimeLimit, PLAYER_SPEED } from '../src/balance.js';
-import { ZombieSpawner, Enemy } from '../src/entities/enemies.js';
-import { TILE } from '../src/physics.js';
-import { EnemyShot, ENEMY_SHOTS, SHOT_HIT_RATIO } from '../src/entities/projectiles.js';
+import { parseLevel } from '../src/stage/level.js';
+import { STAGES } from '../src/content/levels/index.js';
+import { SAFE_ZONE_X, SAFE_SHOT_T, minTimeLimit, PLAYER_SPEED } from '../src/stage/balance.js';
+import { ZombieSpawner, Enemy } from '../src/stage/entities/enemies.js';
+import { TILE } from '../src/stage/physics.js';
+import { EnemyShot, ENEMY_SHOTS, SHOT_HIT_RATIO } from '../src/stage/entities/projectiles.js';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -16,7 +16,7 @@ const fakeWorld = (level, playerX) => ({
 });
 
 test('PLAYER_SPEED matches player.js', async () => {
-  const src = await import('node:fs').then(fs => fs.readFileSync(new URL('../src/entities/player.js', import.meta.url), 'utf8'));
+  const src = await import('node:fs').then(fs => fs.readFileSync(new URL('../src/stage/entities/player.js', import.meta.url), 'utf8'));
   expect(src).toMatch(new RegExp(`const SPEED = ${PLAYER_SPEED}\\b`));
 });
 

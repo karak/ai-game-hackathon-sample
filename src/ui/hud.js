@@ -2,7 +2,7 @@ import { LAYOUT } from './layout.js';
 import { drawWindow } from './window.js';
 import { text, textBox } from './text.js';
 import { mini } from './minifont.js';
-import { WEAPONS } from '../entities/projectiles.js';
+import { WEAPONS } from '../stage/entities/projectiles.js';
 import { blit } from '../gfx/sprite.js';
 
 export function fmtTime(t) { t = Math.max(0, Math.ceil(t)); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; }

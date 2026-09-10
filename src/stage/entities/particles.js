@@ -1,7 +1,7 @@
-import { PAL } from '../gfx/palette.js';
+import { PAL } from '../../gfx/palette.js';
 import { TILE } from '../physics.js';
-import { rand, pick } from '../util.js';
-import { HD_SCALE } from '../gfx/sprite.js';
+import { rand, pick } from '../../shared/util.js';
+import { HD_SCALE } from '../../gfx/sprite.js';
 const S = 1 / HD_SCALE; // 1 スクリーン px の世界単位
 // 粒子の上限（05-systems 5.6、M6）。超えた分は古いものから捨てる（血痕は splat 済みなので見た目の損失は小さい）
 export const PARTICLE_MAX = 400;

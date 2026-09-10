@@ -1,7 +1,7 @@
-import { grand } from '../util.js';
+import { grand } from '../../shared/util.js';
 import { TILE, aabb } from '../physics.js';
-import { PAL } from '../gfx/palette.js';
-import { HD_SCALE } from '../gfx/sprite.js';
+import { PAL } from '../../gfx/palette.js';
+import { HD_SCALE } from '../../gfx/sprite.js';
 
 // スプライトの描画サイズ（世界単位）。生成 PNG は 1/HD_SCALE
 const dims = spr => spr.hd ? [spr.r.width / HD_SCALE, spr.r.height / HD_SCALE] : [spr.r.width, spr.r.height];
