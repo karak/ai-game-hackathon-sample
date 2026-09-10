@@ -1930,7 +1930,12 @@
    "kind": "bg",
    "colors": 32,
    "nokey": true,
-   "trim_border": true
+   "trim_border": true,
+   "style": "_illust_style.txt",
+   "style_refs": [
+    "assets/sprites/ending/scene1.png",
+    "assets/gen/ref/lyrica-illust-sq.png"
+   ]
   },
   "ending-4": {
    "box": [
@@ -1946,7 +1951,12 @@
    "kind": "bg",
    "colors": 32,
    "nokey": true,
-   "trim_border": true
+   "trim_border": true,
+   "style": "_illust_style.txt",
+   "style_refs": [
+    "assets/sprites/ending/scene1.png",
+    "assets/gen/ref/lyrica-illust.png"
+   ]
   },
   "ending-5": {
    "box": [
@@ -1962,7 +1972,13 @@
    "kind": "bg",
    "colors": 32,
    "nokey": true,
-   "trim_border": true
+   "trim_border": true,
+   "style": "_illust_style.txt",
+   "style_refs": [
+    "assets/sprites/ending/scene1.png",
+    "assets/gen/ref/lyrica-illust.png"
+   ],
+   "outline_val_max": 0.23
   },
   "ending-6": {
    "box": [

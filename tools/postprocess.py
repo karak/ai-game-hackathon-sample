@@ -308,6 +308,30 @@ def trim_thin_bottom(im, frac=0.12):
     return im.crop((0, 0, im.width, y)) if y < im.height else im
 
 
+def clamp_outline(im, val_max):
+    """最暗色（輪郭に使われる色）の HSV 明度が val_max を超えていたら、色相を保って val_max まで暗くする。
+    明るい場面（夜明けの空など）で絵師が輪郭まで明るく描いたときに、尊重物の輪郭帯（art-standard §2.6、val ≤ 0.23）へ寄せる。
+    置換は 1 色のみで画素比 2〜3%（ending scene5 v3: #412547 val 0.28 → val 0.23）。"""
+    import colorsys
+    px = im.load(); cols = {}
+    for y in range(im.height):
+        for x in range(im.width):
+            c = px[x, y]
+            if c[3]: cols[c[:3]] = cols.get(c[:3], 0) + 1
+    if not cols: return im
+    darkest = min(cols, key=lambda c: 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2])
+    h, s, v = colorsys.rgb_to_hsv(*(k / 255 for k in darkest))
+    if v <= val_max: return im
+    r, g, b = colorsys.hsv_to_rgb(h, s, val_max); new = (int(r * 255), int(g * 255), int(b * 255))
+    out = im.copy(); po = out.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            c = po[x, y]
+            if c[3] and c[:3] == darkest: po[x, y] = (*new, 255)
+    print(f'  clamped outline #{darkest[0]:02x}{darkest[1]:02x}{darkest[2]:02x} (val {v:.2f}) -> #{new[0]:02x}{new[1]:02x}{new[2]:02x} (val {val_max})')
+    return out
+
+
 def crop_alpha(im):
     bb = im.split()[3].getbbox(); return im.crop(bb) if bb else im
 
@@ -327,6 +351,7 @@ def main():
     ap.add_argument('--grid', help='RxC の格子に並んだ不透明パネルを、緑の隙間で切って個別に処理する（1 リクエストで 4 枚のカットインを同じ画風で描かせる用）')
     ap.add_argument('--crop-top', type=int, default=0, help='各パネルの上端をこのセル数だけ切る（モデルが焼き込んだ題名の帯を落とす。実測 11〜12 セル）')
     ap.add_argument('--crop-bottom', type=int, default=0, help='各パネルの下端をこのセル数だけ切る（題名の帯が下に来た版用）')
+    ap.add_argument('--outline-val-max', type=float, default=0, help='量子化後、最暗色の HSV 明度がこの値を超えていたら暗くする（挿絵級の輪郭帯 0.23）')
     ap.add_argument('--trim-thin-bottom', action='store_true', help='下端の細い滴などを落として接地面を広い部分にする（血溜まり）')
     a = ap.parse_args()
     bw, bh = (int(v) for v in a.logical.split('x'))
@@ -339,6 +364,7 @@ def main():
     if a.keep_bottom: logical = logical.crop((0, int(logical.height * (1 - a.keep_bottom)), logical.width, logical.height))
     if not a.nokey and not a.keep_bottom: logical = strip_shadow(logical)
     logical = quantize_shared(logical, a.colors, a.palette)
+    if a.outline_val_max: logical = clamp_outline(logical, a.outline_val_max)  # 挿絵級の輪郭帯（明るい場面で輪郭まで明るく描かれたとき）
     meta = {'source': a.src, 'pitch': [px, py], 'max_box': [bw, bh]}
     def info(img):
         return {'w': img.width, 'h': img.height, 'fits': img.width <= bw and img.height <= bh, 'colors': len([c for c in img.getcolors(99999) if c[1][3] > 0])}
@@ -413,6 +439,7 @@ def grid_main(a, bw, bh):
         if a.crop_top and logical.height > a.crop_top * 2: logical = logical.crop((0, a.crop_top, logical.width, logical.height))  # 焼き込まれた題名の帯（実測 11〜12 セル）を落とす。名前はゲーム側のテロップで出す
         if a.crop_bottom and logical.height > a.crop_bottom * 2: logical = logical.crop((0, 0, logical.width, logical.height - a.crop_bottom))  # 同じ帯が下端に来る版（v2）用
         logical = quantize_shared(logical, a.colors, a.palette)
+        if a.outline_val_max: logical = clamp_outline(logical, a.outline_val_max)
         dst = Path(a.dst) / f'{name}.png'
         logical.save(dst)
         info = {'name': name, 'w': logical.width, 'h': logical.height, 'fits': logical.width <= bw and logical.height <= bh,

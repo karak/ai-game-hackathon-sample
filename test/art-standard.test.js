@@ -72,9 +72,9 @@ test('§2.5 background layers: each theme has sky + far A/B + mid; far variants 
 // §2.6 挿絵級（カットイン・エンディング）は尊重物 ending/scene1・scene6 と同じ物差し（tools/style_check.py が manifest に書き足す flat / dither / outline）で比べる。
 // 帯: 色数 28〜32、flat ≤ 0.28（尊重物 0.16 / 0.20）、dither ≥ 0.07、輪郭は暗紫〜暗い葡萄色（hue 255〜335、明度 ≤ 0.23。尊重物 276/286・0.19/0.14。
 // 上限は尊重物と同じ手順で描いた cutin v2 の暖色パネル（薔薇の空・蝋燭の光）が 315〜328・0.23 に出たことから置いた。tools/style_check.py と同値）。
-// PENDING は 2026-09-10 計測で帯の外にある既存絵（IMP-022 の修正対象。scene3/4/5 は flat 0.30〜0.38）。直したら外す。ここに無い挿絵級が帯を外れたら失敗する
+// PENDING は帯の外にある既存絵（IMP-022 の修正対象）。2026-09-10 に cutin 4 枚・scene3/4/5 を再生成して空になった。新しい挿絵級が帯を外れたら失敗する
 test('§2.6 illustration-class images match the canon (ending/scene1, scene6) on colors, grain and outline', () => {
-  const PENDING = new Set(['ending/scene3', 'ending/scene4', 'ending/scene5']);
+  const PENDING = new Set([]);
   const illust = entries.filter(([k]) => k.startsWith('cutin/') || k.startsWith('ending/'));
   expect(illust.length).toBeGreaterThanOrEqual(10);
   for (const [k, v] of illust) {

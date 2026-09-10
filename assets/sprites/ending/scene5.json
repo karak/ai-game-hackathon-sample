@@ -1,5 +1,5 @@
 {
- "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/ending-5-v1.png",
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/ending-5-v3.png",
  "pitch": [
   4.0,
   4.0
@@ -9,7 +9,7 @@
   260
  ],
  "w": 265,
- "h": 271,
+ "h": 264,
  "fits": false,
  "colors": 32
 }

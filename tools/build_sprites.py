@@ -38,6 +38,7 @@ def build(name, sp):
     if sp.get('grid'): pal_arg += ['--grid', sp['grid']]    # 格子に並んだ複数パネルを 1 枚から切り出す（カットイン 4 枚）
     if sp.get('crop_top'): pal_arg += ['--crop-top', str(sp['crop_top'])]  # パネル上端の題名帯を落とす
     if sp.get('crop_bottom'): pal_arg += ['--crop-bottom', str(sp['crop_bottom'])]  # 題名帯が下端に来た版
+    if sp.get('outline_val_max'): pal_arg += ['--outline-val-max', str(sp['outline_val_max'])]  # 挿絵級: 最暗色を輪郭帯（val ≤ 0.23）へ寄せる（IMP-022）
     if sp.get('kind') in ('bg', 'tiles'): pal_arg += ['--nosplit']
     if sp.get('keep_bottom'): pal_arg += ['--keep-bottom', str(sp['keep_bottom'])]
     if sp['frames'] == 1:

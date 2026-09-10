@@ -224,5 +224,8 @@
 | 後処理の修正 2 件 | 格子の隙間判定を any() から「不透明 5% 未満の行・列」に（モデルが隙間の緑をパレットに寄せて #71a85f で描き、キーから漏れた画素で隙間が見つからなかった）。`trim_border` に行の色数条件 `uniq_max`（粒子で満ちた薔薇の空は std が小さく、額縁と誤認して heart の上 24 行が落ちた） | `tools/postprocess.py grid_main / trim_border` |
 | 輪郭の帯 | 尊重物 2 枚（hue 276/286・val 0.19/0.14）から置いた上限 320/0.22 を、同じ手順の v2 暖色パネルが 315〜328 / 0.23 に出たため **335 / 0.23** に広げた（要否はユーザー判断） | `tools/style_check.py`、`test/art-standard.test.js` §2.6 |
 
-検証: Vitest **119 件**通過（§2.6 を追加）、Playwright `e2e/magic.spec.js` 通過（4 武器のカットイン表示・エラー 0）。
-未達: ending scene3/4/5 の再生成（3 リクエスト、PENDING）、IMP-021、実機ゲームパッド、テスター計測。生成台帳 **226/250**。未決: ゲーム内スプライト（チビ）を統一対象に含めるか（約 200 リクエストで予算外。挿絵級だけ揃える前提で進めた）。
+| ending scene3/4/5 の再生成（ユーザー承認 2026-09-10「再生成してよい」） | 尊重物 scene1＋立ち絵ベース（桃）添付。台帳 **227〜232**（6 リクエスト）。scene4 は 1 回で 256×256。scene3 は 2 回とも縦長 704×1472（縦長の立ち絵ベースに出力形が引かれた）→ 契約に「正方形 1:1」を追記し、3 回目は参照を正方形切り抜き `lyrica-illust-sq.png` に変えて 262×258。scene5 は夜明けの明るい場面で最暗色 val 0.28 → プロンプトで上空を夜に寄せ（1 回）、残りは `outline_val_max: 0.23`（`postprocess.py clamp_outline`、最暗 1 色・画素比 2.4% のみ）で帯へ | flat 0.30〜0.38 → **0.16 / 0.16 / 0.20**、輪郭 hue 273〜289・val 0.16〜0.23。`test-results/shots/ending_v2_vs_v1.png`、`ending_scene1..6.png`（`tools/shot_ending.mjs`、6 場面とも黒帯 0・エラー 0） |
+| 周辺への影響 | `style_check.annotate_manifest` は `cutin/` `ending/` だけに書く（bg/tiles の遠景・中景には触れない。manifest の bg エントリに `flat` なし）。輪郭帯の拡張はこの 2 グループの検査にだけ効く | `src/gfx/manifest.json` の差分は cutin 4・ending 6 のみ |
+
+検証: Vitest **119 件**通過（§2.6 の PENDING は空）、Playwright **9 件**通過、`npm run build` → `check_dist` ok、公開 URL 再デプロイ。
+未達: IMP-021、実機ゲームパッド、テスター計測。生成台帳 **232/250**。決定: ゲーム内スプライト（チビ）は統一対象から保留（ユーザー判断 2026-09-10）。輪郭帯の上限拡張（335 / 0.23）はユーザー承認。

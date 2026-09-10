@@ -1,5 +1,5 @@
 {
- "requests": 226,
+ "requests": 232,
  "entries": [
   {
    "name": "player-base",
@@ -1768,6 +1768,54 @@
    "secs": 17.6,
    "text": "",
    "ts": 1788973798.660701
+  },
+  {
+   "name": "ending-3",
+   "v": 2,
+   "ok": true,
+   "secs": 13.0,
+   "text": "",
+   "ts": 1788998833.4169118
+  },
+  {
+   "name": "ending-4",
+   "v": 2,
+   "ok": true,
+   "secs": 11.4,
+   "text": "",
+   "ts": 1788998845.065863
+  },
+  {
+   "name": "ending-5",
+   "v": 2,
+   "ok": true,
+   "secs": 14.8,
+   "text": "",
+   "ts": 1788998860.163758
+  },
+  {
+   "name": "ending-3",
+   "v": 3,
+   "ok": true,
+   "secs": 13.4,
+   "text": "",
+   "ts": 1788998942.999224
+  },
+  {
+   "name": "ending-5",
+   "v": 3,
+   "ok": true,
+   "secs": 14.6,
+   "text": "",
+   "ts": 1788998957.896021
+  },
+  {
+   "name": "ending-3",
+   "v": 4,
+   "ok": true,
+   "secs": 16.6,
+   "text": "",
+   "ts": 1788999013.004836
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。"

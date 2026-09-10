@@ -8,5 +8,18 @@ STYLE (strict — this is the ILLUSTRATION class, not the in-game sprite class):
 - Outlines are 1 cell, very dark plum (#220d30 / #1e0a24), never pure black. Shading uses 3-4 steps per material with muted, slightly desaturated colors; deep indigo, plum, dusty rose, cream and antique gold dominate.
 - Soft night lighting with a single warm or cold key light; the mood is quiet and melancholic, never a bright cheerful sticker look.
 - CHARACTER PROPORTIONS: the SECOND attached image is the canonical character taken from the same illustration. Her figure is slender, about 4.3 heads tall without the hat (hat tip to boot sole 156 cells, head 32 cells in the reference); eyes are small almond shapes about 4 cells tall drawn in profile or three-quarter view, the face is calm and pretty, NOT chibi, NOT big-eyed, NOT 2.5 heads tall. Keep her hair color, hat, dress design and colors exactly as in that image.
-- OUTPUT FORMAT: one SQUARE 1024x1024 image (1:1). Never output a portrait or tall image, even though the attached character reference is tall — the character reference only defines her design and proportions, not the picture format.
 - No text, no letters, no logo, no signature, no border frame.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 260 cells wide x 260 cells tall (= 2080 x 2080 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 221 cells of the 260-cell height).
+- Exactly ONE sprite, horizontally centered on the canvas.
+- Vertically centered on the canvas.
+
+A FULL-SCREEN ILLUSTRATION for the ending of a 16-bit SNES-era Japanese RPG (1995 Square style): one scene filling the ENTIRE canvas edge to edge (NO green background), landscape composition centered vertically so the middle 7/8 of the height holds the important content (the top and bottom 1/16 will be cropped). Painterly pixel art exactly like image 1 (the same illustrator): 28-32 colors, fine 1-cell grain over every surface, very dark plum outlines, 3-4 shade steps, checker dithering for gradients. No text, no letters, no logo. SCENE 5: Lyrica — the girl in image 2, drawn with exactly her design and slender proportions (about 4.3 heads tall without the hat, small almond eyes): chin-length pale pink hair, a wide-brimmed dark plum witch hat with a pale ribbon, a mauve-pink puff-sleeve dress with a plum bodice, white socks and dark boots flying on her broom high over a candy forest at sunrise, tiny far below: giant lollipop trees, a pink castle in the distance, birds; her hat held on with one hand, dress fluttering. Wide, hopeful.
+
+
+REFERENCES: image 1 is a finished illustration by this game's illustrator — reproduce its style exactly (grain, dither, outline color, palette, proportions). Image 2 is the canonical character cut from that illustration — keep her design, colors and body proportions identical.
+
+[refs] /Users/yasushi/projects/poc-square/assets/sprites/ending/scene1.png, /Users/yasushi/projects/poc-square/assets/gen/ref/lyrica-illust.png
