@@ -28,7 +28,7 @@ test('golden: trajectories and canvas hashes of all stages and menu screens are 
 
   const got = await page.evaluate(async ({ FRAMES, SAMPLE, SHOT_AT }) => {
     const g = window.__game, STEP = 1 / 60;
-    const { STAGES } = await import('/src/levels/index.js');
+    const { STAGES } = await import('/src/content/levels/index.js');
     const canvas = document.getElementById('game'), ctx = canvas.getContext('2d');
     const hash = () => { const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data; let h = 2166136261; for (let i = 0; i < d.length; i += 4) { h ^= d[i] ^ (d[i + 1] << 8) ^ (d[i + 2] << 16); h = Math.imul(h, 16777619) >>> 0; } return h.toString(16); };
     const drawNow = () => { ctx.setTransform(3, 0, 0, 3, 0, 0); ctx.imageSmoothingEnabled = false; g.draw(ctx); };
@@ -57,7 +57,31 @@ test('golden: trajectories and canvas hashes of all stages and menu screens are 
     g.setState('options'); g.optIdx = 2; g.stateT = 0; drawNow(); screens.options = hash();
     g.startGame(0); g.stageIndex = 0; g.startStage(); g.setState('play'); g.irisT = 99; g.paused = true; g.pauseIdx = 1; for (let i = 0; i < 3; i++) { g.update(STEP); g.input.endFrame(); } drawNow(); screens.pause = hash();
     g.paused = false; g.world = null; g.setState('title');
-    return { stages, screens, canvas: [canvas.width, canvas.height] };
+    // 画廊: 全種の敵・ボス・弾・アイテム・魔法エフェクト・カットインを 1 画面に出して描く（描画コードの切り出しで、通常プレイの 20 秒に出ない種も護る）
+    const gallery = {};
+    {
+      const [{ createEnemy }, { createBoss }, { TreasureBox, Item, FloatingItem }, { EnemyShot, PoisonPool, PlayerShot, WEAPON_ORDER, ENEMY_SHOTS }, { castMagic }] = await Promise.all([
+        import('/src/stage/entities/enemies.js'), import('/src/stage/entities/bosses.js'), import('/src/stage/entities/items.js'), import('/src/stage/entities/projectiles.js'), import('/src/stage/entities/magic.js')]);
+      window.__seedRandom(4242);
+      g.input.held.clear(); g.startGame(0); g.stageIndex = 0; g.startStage(); g.setState('play'); g.irisT = 99;
+      const w = g.world, p = w.player; p.invT = 1e9; p.die = () => {}; p.setCostume('gold');
+      const cx = Math.floor(w.cam.x); w.arena = { x0: cx, x1: cx + 256 }; // ボスの update は部屋（arena）を前提にする
+      ['zombie', 'mushroom', 'unicorn', 'cake', 'angel', 'bear', 'eye', 'mermaid', 'umbrella', 'dollpart', 'needles', 'balloon', 'clown', 'mirror', 'gargoyle', 'cocoon', 'syruparm']
+        .forEach((type, i) => { const e = createEnemy(w, { type, x: cx + 8 + i * 14, y: 40 + (i % 3) * 30 }); if (e) w.enemies.push(e); });
+      ['doll', 'teddy', 'noir', 'serpent', 'machine', 'ringmaster', 'mirrorqueen', 'noirw', 'sugarqueen'].forEach((k, i) => { const b = createBoss(w, k, cx + 20 + i * 26, 176); if (b) { b.state = 'fight'; w.enemies.push(b); if (b.parts) w.enemies.push(...b.parts); } });
+      ['dress', 'golddress', 'oneup', 'candy'].forEach((k, i) => { w.items.push(new Item(w, k, cx + 30 + i * 20, 120)); w.items.push(new FloatingItem(w, k, cx + 30 + i * 20, 100)); });
+      w.boxes.push(new TreasureBox(w, cx + 200, 160));
+      Object.keys(ENEMY_SHOTS).forEach((k, i) => w.enemyShots.push(new EnemyShot(w, k, cx + 10 + i * 20, 130, 0, 0)));
+      w.pools.push(new PoisonPool(w, cx + 40, 176, 'poison'), new PoisonPool(w, cx + 90, 176, 'acid'));
+      WEAPON_ORDER.forEach((k, i) => { w.shots.push(new PlayerShot(w, k, cx + 20 + i * 30, 90, 1, false), new PlayerShot(w, k, cx + 20 + i * 30, 80, 1, true)); });
+      for (const k of WEAPON_ORDER) { p.weapon = k; castMagic(w, p, 2); castMagic(w, p, 1); }
+      drawNow(); gallery.f0 = hash();
+      for (let i = 0; i < 12; i++) { g.update(STEP); g.input.endFrame(); }
+      drawNow(); gallery.f12 = hash();
+      gallery.counts = { enemies: w.enemies.length, shots: w.shots.length, enemyShots: w.enemyShots.length, effects: w.effects.length, screenFx: w.screenFx.length, fires: w.fires.length, items: w.items.length };
+      g.world = null; g.setState('title');
+    }
+    return { stages, screens, gallery, canvas: [canvas.width, canvas.height] };
   }, { FRAMES, SAMPLE, SHOT_AT });
   expect(errors).toEqual([]);
 
@@ -77,4 +101,5 @@ test('golden: trajectories and canvas hashes of all stages and menu screens are 
     expect(a.shots, `${b.name}: canvas hash at frames ${SHOT_AT}`).toEqual(b.shots);
   }
   expect(got.screens, 'title / options / pause canvas hashes').toEqual(want.screens);
+  expect(got.gallery, 'gallery: every enemy / boss / shot / item / magic effect / cut-in drawn at once (frame 0 and 12)').toEqual(want.gallery);
 });
