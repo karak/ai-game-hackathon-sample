@@ -58,6 +58,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
   };
   // 回避候補の評価用: k フレーム後の全ての敵弾・突進敵の箱が (x,y,w,h) と重なるか（跳ねる弾は高さ固定で横だけ進める）
   const shotHook = (k, x, y, h) => {
+    if (k > Math.max(v.predict, 36)) return false; // 先の弾は次の判断に任せる（遠い将来まで見ると全候補が「当たる」になり、動けなくなる）。突進敵は遅れて届くので最低 36
     const t = k * STEP;
     for (const s of w.enemyShots) {
       if (s.dead) continue;
@@ -82,7 +83,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
       if (s.dead) continue;
       const grav = s.def?.gravity ?? 0;
       if (s.def?.bounce) { // 地面を跳ねる弾（蛆）: 放物線では追えないので、向かってくるものは低い弾として扱い跳び越える
-        const dx = p.centerX - (s.x + s.w / 2); if (Math.sign(dx) === Math.sign(s.vx) && Math.abs(dx) / Math.max(1, Math.abs(s.vx)) * 60 <= v.predict) { const k = Math.abs(dx) / Math.max(1, Math.abs(s.vx)) * 60; if (!hit || k < hit.k) hit = { k, cy: p.y + p.h - 2, bottom: p.y + p.h, grav: 1 }; }
+        const dx = p.centerX - (s.x + s.w / 2); if (Math.sign(dx) === Math.sign(s.vx) && Math.abs(dx) / Math.max(1, Math.abs(s.vx)) * 60 <= v.predict) { const k = Math.abs(dx) / Math.max(1, Math.abs(s.vx)) * 60; if (!hit || k < hit.k) hit = { k, cy: p.y + p.h - 2, bottom: p.y + p.h, grav: 1, bounce: true }; }
         continue;
       }
       for (let k = 1; k <= v.predict; k += 2) {
@@ -139,6 +140,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
   // （SPEED 66・GRAV 560・落下上限 320・JUMP_V -218・DJUMP_V -196・TRAMPOLINE_V -330）。壁は横移動を止めるだけ、天井は無視
   let curDir = 1; // 今フレームの進行方向（sim の既定）
   let simPath = null; // simdump 用
+  const poolAt = (x, y, h) => (w.pools ?? []).some(q => !q.dead && overlap(q.x, q.y, q.w, q.h, x, y, p.w, h)); // 毒溜まり（妖精の毒が地面に残る）は沼と同じ扱い
   const sim = (jumpNow, dbl, hold, d = curDir, dblHold = hold, opts = {}) => { // dblHold: 二段ジャンプの瞬間に進行方向を押しているか（離すと真下へ落ちる）。opts.hook(k,x,y,h) が true を返すと 'hit'、opts.crouch で伏せた箱
     let x = p.x, y = p.y, vy = p.vy, jumps = p.jumps, onG = p.onGround; let h = p.h; const w0 = p.w;
     if (opts.crouch && onG && !p.crouch) { y += 10; h = 18; } else if (!opts.crouch && p.crouch) { y -= 10; h = 28; }
@@ -156,12 +158,12 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
     let kk = 0;
     for (let k = 0; k < 180; k++) {
       kk = k; if (simPath) simPath.push(`${Math.round(x * 10) / 10},${Math.round(y * 10) / 10},${Math.round(vy)}${onG ? 'G' : ''}`);
-      if (opts.hook && opts.hook(k, x, y, h)) return { r: 'hit', x };
+      if (opts.hook && opts.hook(k, x, y, h)) return { r: 'hit', x, k };
       if (onG) { // 歩き: 支えが無くなったら落下へ。歩いている間に沼・棘へ入れば死
         let nx = x + vx / 60;
         if (vx !== 0) { const etx = Math.floor((vx > 0 ? nx + w0 - 0.001 : nx) / 16); if (map.isSolid(etx, Math.floor(y / 16)) || map.isSolid(etx, Math.floor((y + h - 0.001) / 16))) return { r: 'safe', x }; } // 壁で止まる = 落ちない
         x = nx;
-        const cx = Math.floor((x + w0 / 2) / 16); if (map.isHazard(cx, Math.floor((y + h - 1) / 16)) || map.isHazard(cx, Math.floor(y / 16))) return { r: 'death', x };
+        const cx = Math.floor((x + w0 / 2) / 16); if (map.isHazard(cx, Math.floor((y + h - 1) / 16)) || map.isHazard(cx, Math.floor(y / 16)) || poolAt(x, y, h)) return { r: 'death', x };
         if (supported()) { if (vx === 0 && k >= (opts.hook ? 60 : 0)) return { r: 'safe', x }; continue; } // 止まっている候補は弾を見る間（60 フレーム）だけ進める
         onG = false; vy = 0; jumps = 0; // 縁から落ちた（ジャンプ権なし）
       }
@@ -181,7 +183,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
       }
       y = ny;
       const cx = Math.floor((x + w0 / 2) / 16), fy = Math.floor((y + h - 1) / 16), hy = Math.floor(y / 16);
-      if (map.isHazard(cx, fy) || map.isHazard(cx, hy) || y > map.pixelHeight + 8) return { r: 'death', x };
+      if (map.isHazard(cx, fy) || map.isHazard(cx, hy) || y > map.pixelHeight + 8 || poolAt(x, y, h)) return { r: 'death', x };
     }
     return { r: 'none', x };
   };
@@ -263,7 +265,10 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
         if (behind && behind.gap < 36 && !behind.passable && !(behind.e.isBoss || behind.e.hp >= 20) && behindF < 45) { behindF++; if (p.facing !== -dir && p.onGround) { dir = -dir; curDir = dir; move = true; } else move = false; shoot = frames % 6 === 0; }
         else if (!behind) behindF = 0;
         if (pr && !fall) { if (pr.gap < 0) { underPress = true; move = true; } else if (pr.gap < 24) move = false; } // プレスの下に居るなら止まらず走り抜ける。手前なら安全時間を待つ
-        if (shot && p.onGround && !underPress) {
+        if (shot && shot.bounce && p.onGround && !underPress) {
+          // 跳ねる弾（蛆）: 近づいたら跳び越える（前へ跳んで安全ならそのまま、だめならその場で跳ぶ）。遠ければそのまま
+          if (shot.k <= 14) { if (move && (safe(true, null, true) || safe(true, 'apex', true))) { jump = true; move = true; } else { jump = true; move = false; } }
+        } else if (shot && p.onGround && !underPress) {
           // 回避: 候補行動（走り続ける／伏せる／下がる／跳ぶ／跳んで止まる／止まる）ごとに自分の箱を進め、全ての弾・突進敵の予測位置と重ならず着地も安全なものを最初に採る
           const blocked = !move; // 敵待ちなどで止まっているときは、前へ走る・前へ跳ぶ候補を使わない
           const cands = [{ n: 'run', hold: true, d: dir, only: !blocked }, { n: 'crouch', crouch: true }, { n: 'back', hold: true, d: -dir, only: gapWidth(-dir) === 0 }, { n: 'jump', j: true, hold: true, d: dir, only: !blocked }, { n: 'jumpStop', j: true, hold: false, d: dir }, { n: 'stop', hold: false, d: dir }];
@@ -319,6 +324,11 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
         else if (dir === 1 && ++movingF >= v.stuck && frames % v.stuck === 0) { if (p.x - lastX < 6 && p.onGround && (safe(true, null, true) || safe(true, 'apex', true) || safe(true, 'apex', true, dir, false))) jump = true; lastX = p.x; } // 進みが止まったら（安全に着地できるなら）跳ぶ
         if (v.trace && v.simdump >= 0 && frames === Math.round(v.simdump * 60)) {
           for (const [label, a] of [['continue', [false, null, move]], ['jump', [true, null, true]], ['jump+apex', [true, 'apex', true]], ['jump+apex nohold', [true, 'apex', true, curDir, false]], ['dbl now', [false, 'now', true]], ['dbl apex', [false, 'apex', true]]]) { simPath = []; const r = sim(...a); trace.push(`  SIM ${label}: ${r.r} x=${Math.round(r.x)} path=${simPath.slice(0, 40).join(' ')}`); simPath = null; }
+          if (shot) { // 回避候補ごとの結果と、弾の予測位置
+            const res = [['run', [true, null, true, dir, true, { hook: shotHook }]], ['crouch', [false, null, false, dir, false, { hook: shotHook, crouch: true }]], ['back', [false, null, true, -dir, true, { hook: shotHook }]], ['jump', [true, null, true, dir, true, { hook: shotHook }]], ['jumpStop', [true, null, false, dir, false, { hook: shotHook }]], ['stop', [false, null, false, dir, false, { hook: shotHook }]]].map(([n, a]) => { const r = sim(...a); return `${n}=${r.r}${r.k !== undefined ? '@' + r.k : ''}`; });
+            const shots = w.enemyShots.filter(q => !q.dead).map(q => `${q.kind}(${Math.round(q.x)},${Math.round(q.y)} v${Math.round(q.vx)},${Math.round(q.vy)})`).join(' ');
+            trace.push(`  DODGE shot k=${shot.k} cy-y=${Math.round(shot.cy - p.y)} : ${res.join(' ')} | shots: ${shots} | p=(${Math.round(p.x)},${Math.round(p.y)})`);
+          }
         }
         if (v.trace && frames % v.tstep === 0 && frames >= v.tfrom * 60 && frames <= v.tto * 60) {
           const ne = w.enemies.filter(e => !e.dead && e.contact !== undefined).map(e => ({ e, d: e.x - p.x })).filter(o => o.d > -40 && o.d < 120).sort((a, b) => Math.abs(a.d) - Math.abs(b.d))[0];
