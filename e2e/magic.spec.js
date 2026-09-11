@@ -13,7 +13,7 @@ test('super magic: each weapon casts its L2 spell in game, with effects on scree
   for (const weapon of ['star', 'knife', 'heart', 'candle']) {
     const r = await page.evaluate(async weapon => {
       const g = window.__game, STEP = 1 / 60;
-      const { SUPER_T } = await import('/src/entities/magic.js');
+      const { SUPER_T } = await import('/src/stage/entities/magic.js');
       const tick = (n, held = []) => { for (let i = 0; i < n; i++) { g.input.held.clear(); for (const a of held) g.input.held.add(a); g.update(STEP); g.input.endFrame(); } };
       g.input.held.clear(); g.startGame(0); g.stageIndex = 0; g.startStage(); g.setState('play'); g.irisT = 99;
       const w = g.world, p = w.player;

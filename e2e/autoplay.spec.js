@@ -15,7 +15,7 @@ test('bot clears every stage (invincible, death stubbed) without runtime errors'
   const errors = await boot(page);
   const results = await page.evaluate(async () => {
     const g = window.__game, STEP = 1 / 60, out = [];
-    const { STAGES } = await import('/src/levels/index.js');
+    const { STAGES } = await import('/src/content/levels/index.js');
     for (let si = 0; si < STAGES.length; si++) {
       g.input.held.clear();
       g.startGame(0); g.stageIndex = si; g.startStage(); g.setState('play'); g.irisT = 99;

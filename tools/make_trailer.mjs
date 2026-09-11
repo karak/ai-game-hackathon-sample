@@ -52,7 +52,7 @@ try {
   await page.evaluate(() => { const g = window.__game; g.input.held.clear(); g.setState('title'); g.menuIdx = 0; });
   for (let k = 0; k < frames; k++) save(await grab(per, false));
   // 各章: 序盤を走る → 中盤（ボス直前 1/4 手前）へ飛ばして走る
-  const { STAGES } = await import('../src/levels/index.js');
+  const { STAGES } = await import('../src/content/levels/index.js');
   for (let si = 0; si < STAGES.length; si++) {
     await page.evaluate(si => { const g = window.__game; g.input.held.clear(); g.startGame(0); g.stageIndex = si; g.startStage(); g.setState('play'); g.irisT = 99; g.__f = 0; g.__lx = 0; const p = g.world.player; p.invT = 0; p.die = () => {}; p.hit = () => {}; g.world.time = 240; }, si);
     for (let k = 0; k < frames; k++) save(await grab(per, true));

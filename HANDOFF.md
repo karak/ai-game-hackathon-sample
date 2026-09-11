@@ -1,15 +1,17 @@
-# HANDOFF — 引き継ぎ（2026-09-10 01:45 JST 時点）
+# HANDOFF — 引き継ぎ（2026-09-11 09:40 JST 時点）
 
 次のセッション（人でも Claude でも）が、このリポジトリの現在地・決定事項・残課題・作業手順を 10 分で把握するための文書。詳細は `docs/plan/` が正で、ここは入口。
 
 ## 1. 現在地
 
-- リポジトリ: `/Users/yasushi/projects/poc-square`、HEAD は Sprint I・J のコミット（`git log -2`）、作業ツリー clean
-- 検証: `npm test` Vitest 118 件通過、`npm run e2e` Playwright 9 件通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 235 読込を確認
-- 生成予算: Gemini 台帳 `tools/gen_ledger.json` **225 / 250**（当初 200 ＋ 強化魔法に 50 追加。残 25）。逐次実行、並列禁止
-- **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）
+- リポジトリ: `/Users/yasushi/projects/poc-square`、**公開リポジトリ https://github.com/karak/ai-game-hackathon-sample**（`origin/main`、public）。HEAD は Sprint P（コンテキスト整理）のコミット（`git log -3`）、作業ツリー clean
+- 検証: `npm test` Vitest **127 件**通過（architecture 5 件を含む）、`npm run e2e` Playwright **11 件**通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・**golden**〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 282 読込を確認
+- 生成予算: Gemini 台帳 `tools/gen_ledger.json` **232 / 250**（当初 200 ＋ 強化魔法に 50 追加。残 18）。逐次実行、並列禁止
+- **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）。最終デプロイ Version `0fa29898`（2026-09-11、Sprint P 後半と同内容）
+- コード構成: `docs/architecture.md`（境界づけられたコンテキスト app / stage / content / gfx / ui / platform / shared）。ファイルを増やす・移すときは `test/architecture.test.js` を通す。振る舞いを変える変更をしたら `GOLDEN_UPDATE=1 npx playwright test e2e/golden.spec.js` で黄金を更新し、差分の理由を commit に書く
+- 不具合報告: GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（テンプレートあり）。テスター計測はオプション「テスター報告を コピー」→ `docs/release/tester-guide.md` → `tools/tester_stats.mjs`
 - マイルストーン: M0〜M4 済、M5 は実装分済（テスター計測は人手のため繰延）、M6 済（実機確認のみ繰延）、M7 公開済（バグ報告先と初回ロード短縮 IMP-019 が残）。表は `docs/plan/03-roadmap.md`
-- 本日のスプリント: E ビジュアル残課題一掃 → F 死亡ログ・コンティニュー・2 周目・ポーズ → G 音 → H 計測・ロード画面 → I 英語 UI・粒子上限・ロード計測・スマホ → J リリース準備・Cloudflare 公開 → K 強化魔法・初回ロード短縮・生成環境の自立（`docs/plan/02-near-term.md` 末尾）
+- スプリント履歴: E → F → G → H → I → J（公開）→ K（強化魔法）→ L（第二章再設計・カットイン）→ M（挿絵級の画風統一 IMP-022）→ N（毒沼と足場 IMP-021）→ O（テスター計測・パッド診断・Issue テンプレート）→ P（DDD コンテキスト整理とリファクタリング。DEBT-004 / DEBT-011）（`docs/plan/02-near-term.md` 末尾）
 
 ## 2. 最初に読むもの（順番）
 
@@ -55,7 +57,9 @@
 
 **M6 の繰延**: 実機スマホ（Playwright の iPhone 13 エミュレーションのみ）、実機パッド。
 
-**技術的負債 P2**: DEBT-004 `world.js` 分割、DEBT-008 生成スクリプトが外部 venv/.env 依存（`requirements.txt` と `.env.example` を置く）、DEBT-003 旧文字列ドット絵の残存、BUG-008 城の中景 1 種、IMP-013 本来の強制スクロール。
+**技術的負債 P2**: DEBT-003 旧文字列ドット絵の残存、BUG-008 城の中景 1 種（2 リクエスト）、IMP-013 本来の強制スクロール。DEBT-004（world.js 分割）と DEBT-008（生成環境）と DEBT-011（コンテキスト整理）は済。`World` に残るトースト・揺れ・湧きの分離は必要になったときに（`docs/architecture.md` §6）。
+
+**環境メモ（2026-09-11）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
 
 **P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現、IMP-015 デモ未収録（第四章以降）、BUG-006 私服の色分け、BUG-007 hurt2 の用途、DEBT-007 `box` 命名。
 

@@ -14,7 +14,7 @@ const page = await browser.newPage({ viewport: { width: 900, height: 760 } });
 const errors = []; page.on('pageerror', e => errors.push(String(e)));
 await page.goto(`${URL}/index.html`); await page.waitForFunction(() => !!window.__game, null, { timeout: 30_000 });
 const result = await page.evaluate(async ({ RUNS, SECS }) => {
-  const g = window.__game, STEP = 1 / 60; const { STAGES } = await import('/src/levels/index.js');
+  const g = window.__game, STEP = 1 / 60; const { STAGES } = await import('/src/content/levels/index.js');
   const out = []; const startLen = g.deathLog.length;
   for (let run = 0; run < RUNS; run++) for (let si = 0; si < STAGES.length; si++) {
     g.input.held.clear(); g.startGame(0); g.stageIndex = si; g.startStage(); g.setState('play'); g.irisT = 99;
@@ -48,7 +48,7 @@ const result = await page.evaluate(async ({ RUNS, SECS }) => {
   return { runs: out, log: g.deathLog.slice(startLen) };
 }, { RUNS, SECS });
 await browser.close();
-const { summarizeDeaths } = await import('../src/deathlog.js');
+const { summarizeDeaths } = await import('../src/app/deathlog.js');
 const date = new Date().toISOString().slice(0, 10);
 mkdirSync('docs/plan/logs', { recursive: true });
 writeFileSync(`docs/plan/logs/deaths-${date}.json`, JSON.stringify({ date, runs: RUNS, secsPerStage: SECS, bot: 'gather_deaths.mjs (mortal, infinite lives)', results: result.runs, deaths: result.log }, null, 1));
