@@ -1,17 +1,17 @@
-# HANDOFF — 引き継ぎ（2026-09-11 09:40 JST 時点）
+# HANDOFF — 引き継ぎ（2026-09-11 10:30 JST 時点）
 
 次のセッション（人でも Claude でも）が、このリポジトリの現在地・決定事項・残課題・作業手順を 10 分で把握するための文書。詳細は `docs/plan/` が正で、ここは入口。
 
 ## 1. 現在地
 
-- リポジトリ: `/Users/yasushi/projects/poc-square`、**公開リポジトリ https://github.com/karak/ai-game-hackathon-sample**（`origin/main`、public）。HEAD は Sprint P（コンテキスト整理）のコミット（`git log -3`）、作業ツリー clean
-- 検証: `npm test` Vitest **127 件**通過（architecture 5 件を含む）、`npm run e2e` Playwright **11 件**通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・**golden**〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 282 読込を確認
+- リポジトリ: `/Users/yasushi/projects/poc-square`、**公開リポジトリ https://github.com/karak/ai-game-hackathon-sample**（`origin/main`、public）。HEAD は Sprint Q（デモ全面収録・hurt2・box 定義）のコミット（`git log -3`）、作業ツリー clean
+- 検証: `npm test` Vitest **129 件**通過（architecture 5 件を含む）、`npm run e2e` Playwright **11 件**通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・**golden**〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 282 読込を確認
 - 生成予算: Gemini 台帳 `tools/gen_ledger.json` **232 / 250**（当初 200 ＋ 強化魔法に 50 追加。残 18）。逐次実行、並列禁止
-- **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）。最終デプロイ Version `0fa29898`（2026-09-11、Sprint P 後半と同内容）
+- **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）。最終デプロイ Version `0fa29898`（2026-09-11、Sprint P 後半と同内容。**Sprint Q は未デプロイ**: `npm run deploy` で反映）
 - コード構成: `docs/architecture.md`（境界づけられたコンテキスト app / stage / content / gfx / ui / platform / shared）。ファイルを増やす・移すときは `test/architecture.test.js` を通す。振る舞いを変える変更をしたら `GOLDEN_UPDATE=1 npx playwright test e2e/golden.spec.js` で黄金を更新し、差分の理由を commit に書く
 - 不具合報告: GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（テンプレートあり）。テスター計測はオプション「テスター報告を コピー」→ `docs/release/tester-guide.md` → `tools/tester_stats.mjs`
 - マイルストーン: M0〜M4 済、M5 は実装分済（テスター計測は人手のため繰延）、M6 済（実機確認のみ繰延）、M7 公開済（バグ報告先と初回ロード短縮 IMP-019 が残）。表は `docs/plan/03-roadmap.md`
-- スプリント履歴: E → F → G → H → I → J（公開）→ K（強化魔法）→ L（第二章再設計・カットイン）→ M（挿絵級の画風統一 IMP-022）→ N（毒沼と足場 IMP-021）→ O（テスター計測・パッド診断・Issue テンプレート）→ P（DDD コンテキスト整理とリファクタリング。DEBT-004 / DEBT-011）（`docs/plan/02-near-term.md` 末尾）
+- スプリント履歴: E → F → G → H → I → J（公開）→ K（強化魔法）→ L（第二章再設計・カットイン）→ M（挿絵級の画風統一 IMP-022）→ N（毒沼と足場 IMP-021）→ O（テスター計測・パッド診断・Issue テンプレート）→ P（DDD コンテキスト整理とリファクタリング。DEBT-004 / DEBT-011）→ Q（人手のいらない残課題: デモ全面収録 IMP-015・hurt2 BUG-007・`box` 定義 DEBT-007）（`docs/plan/02-near-term.md` 末尾）
 
 ## 2. 最初に読むもの（順番）
 
@@ -43,6 +43,9 @@
 | テスター計測は run 記録＋クリップボード | `src/app/runlog.js`（開始 1 回 = 1 run）。オプション「テスター報告を コピー」の JSON を `docs/plan/logs/testers/` に置いて `tools/tester_stats.mjs`。パッドはオプション「ゲームパッド」行で実機診断、経路は `e2e/gamepad.spec.js` の偽装パッド | IMP-023 / 024 |
 | 沼・足場の見え方は章ごとの分岐で直す | 菓子の森だけ `bogStyle: 'syrup'`（糖蜜の水面・深部・穴の奥壁・岸の滴り、`=` は砂糖衣の帯）。他テーマに触れないことは `tools/hash_tiles.mjs` の画素ハッシュで示す | IMP-021、`hdworld.buildSyrupHD`、`world.drawPitWalls` |
 | コード構成は境界づけられたコンテキスト | `src/app`（進行）／`stage`（面のシミュレーション）／`content`（作品データ）／`gfx`／`ui`／`platform`／`shared`。依存の向きは `docs/architecture.md` §2、`test/architecture.test.js` が import を走査して検査。回帰の護りは `e2e/golden.spec.js`（全 8 面の軌跡と画素ハッシュ。振る舞いを変えたときだけ `GOLDEN_UPDATE=1` で更新） | Sprint P |
+| デモは面名で照合し、ボットで全面収録 | `assets/demo/<面名>.json`（8 面）。`startDemo` は `findDemo` で記録時の面名と照合（章の並び替えで位置がずれない）、`loop = 0`。収録は `node tools/record_demos.mjs`（無敵なし・残機 2 のボット 16 変種、再生と同じ条件。収録後にページを読み直し再生軌跡の一致を検査する）。JSON を書くと Vite が再読込するので書き出しは全面の収録後 | IMP-015、Sprint Q |
+| hurt2 は被弾直後の白飛び | 被弾から 0.1 秒（`HURT_FLASH_T`）は hurt2、以後 0.25 秒は hurt。衣装に hurt2 が無ければ hurt | BUG-007 |
+| `box` は論理箱で改名しない | prompt の Logical box・後処理 `--logical`・manifest `fits` が同じ値を共有する（上限かつ目標）。`docs/gen-pipeline.md` §1 | DEBT-007 |
 | 衣装コマの割り当ては 2 パス | 共通コマ → 衣装別コマの順に代入する。1 パスだと manifest の読み込み完了順で共通コマが衣装別を上書きする（BUG-016） | `assets.js assignPlayerFrames`、`test/costume-frames.test.js` |
 | 溜めは 2 段階 | 0.9 秒 `CHARGE_T` で溜め魔法、1.8 秒 `SUPER_T` で強化魔法（`magic.js SUPER`）。強化魔法は新規生成素材なしで、既存スプライト＋粒子＋画面演出で作る | 05-systems 5.1、Sprint K |
 | 素材の軽量化 | フォントはゲーム用サブセット（`tools/subset_font.py`。文言を足したら作り直す。`test/font-subset.test.js` が漏れを検出）、スプライトはパレット PNG（`tools/optimize_pngs.py`、可逆検査つき）。`/assets/*` は 1 年 immutable なので PNG は `?v=<ビルド ID>` で破棄する | IMP-019、`docs/release/deploy.md` |
@@ -57,11 +60,13 @@
 
 **M6 の繰延**: 実機スマホ（Playwright の iPhone 13 エミュレーションのみ）、実機パッド。
 
-**技術的負債 P2**: DEBT-003 旧文字列ドット絵の残存、BUG-008 城の中景 1 種（2 リクエスト）、IMP-013 本来の強制スクロール。DEBT-004（world.js 分割）と DEBT-008（生成環境）と DEBT-011（コンテキスト整理）は済。`World` に残るトースト・揺れ・湧きの分離は必要になったときに（`docs/architecture.md` §6）。
+**技術的負債 P2**: DEBT-003 旧文字列ドット絵の残存（`src/gfx/sprites/*` 1261 行。`assets.js` の敵・ボス・弾・アイテム・主人公シートと `tiles.js` の装飾のフォールバックとして今も参照される。生成素材が全部ある現状では実行時に描かれないが、削除は「読込失敗時に何を出すか」の判断を伴う）、BUG-008 城の中景 1 種（2 リクエスト）、IMP-013 本来の強制スクロール。DEBT-004（world.js 分割）と DEBT-008（生成環境）と DEBT-011（コンテキスト整理）は済。`World` に残るトースト・揺れ・湧きの分離は必要になったときに（`docs/architecture.md` §6）。
 
-**環境メモ（2026-09-11）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
+**環境メモ（2026-09-11 10:00、ディスク）**: 作業中にディスクが満杯（228 GB 中 186 GB 使用、空き 118 MB）になり Bash の出力ファイルさえ書けなくなった。`uv cache prune`（未使用 3.3 GiB を削除、再取得可）で空き 1.5 GB にして続行。ほかは触っていない。大きいもの: `~/Library/Application Support/MobileSync` 17 GB、`Claude` 9.9 GB、`Notion` 6.6 GB、`~/.colima` 7.0 GB、`~/.npm` 3.1 GB（`_npx` 2.1 GB）、`~/Library/Caches/puccinialin` 2.0 GB（Rust ツールチェーンのキャッシュ）、`ms-playwright` 1.1 GB（E2E に必要）、`~/.claude/projects.bak-20260621-2201` 482 MB。**ユーザー判断で整理が要る**（e2e・build が書き込み失敗で落ちる）。
 
-**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現、IMP-015 デモ未収録（第四章以降）、BUG-006 私服の色分け、BUG-007 hurt2 の用途、DEBT-007 `box` 命名。
+**環境メモ（2026-09-11、GitHub MCP）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
+
+**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは第二・三・五章で 3 死（28〜51 秒で終了）— 人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
 
 **ビジュアル保留**: hurt のつば幅 1.45x（傾いた帽子）、fall_nohat 髪幅 1.39x、走り撃ち通過コマの杖。
 
@@ -71,8 +76,9 @@
 # 開発
 npx vite --port 5173 --host 127.0.0.1     # http://127.0.0.1:5173/index.html, /catalog.html
 npm test                                   # Vitest
-npm run e2e                                # Playwright 8 件（5174 を自動起動、headless）。証跡は test-results/shots/（outputDir は test-results/pw に分離）
-npm run build && node tools/check_dist.mjs # dist を vite preview（4174）で起こし素材 235 の読込を確認
+npm run e2e                                # Playwright 11 件（5174 を自動起動、headless）。証跡は test-results/shots/（outputDir は test-results/pw に分離）
+npm run build && node tools/check_dist.mjs # dist を vite preview（4174）で起こし素材 282 の読込を確認
+node tools/record_demos.mjs [--stages stage2] # デモ入力ログをボットで収録し再生一致を検査（5173 が起きていること。IMP-015）
 npm run deploy                             # Cloudflare へ本番デプロイ（wrangler login 済みが前提）。deploy:preview はプレビュー URL のみ
 node tools/check_dist.mjs https://magical-lyrica.karak97.workers.dev   # 公開 URL の検証（bootMs・素材・エラー）
 node tools/shot_stages.mjs --stages 1,2 --at 0.35,0.7  # 章の同じ位置を撮って比べる（アートの判断材料）
@@ -97,7 +103,7 @@ PY="/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.venv/
 
 | 領域 | ファイル |
 |------|---------|
-| ゲーム進行・画面（app） | `src/app/game.js`（状態機械・遷移・記録）、`src/app/screens.js`（各状態の画面描画）、`src/app/options.js`（オプション画面）、`src/main.js`（起動・ロード画面・ループ・縮小表示・言語の反映）、`src/shared/i18n.js`（表示言語）、`src/content/story.js`（物語本文 両言語・ボス名） |
+| ゲーム進行・画面（app） | `src/app/game.js`（状態機械・遷移・記録）、`src/app/demo.js`（デモの記録・再生・`findDemo`）、`src/content/demos.js`＋`assets/demo/<面名>.json`（8 面の入力ログ）、`src/app/screens.js`（各状態の画面描画）、`src/app/options.js`（オプション画面）、`src/main.js`（起動・ロード画面・ループ・縮小表示・言語の反映）、`src/shared/i18n.js`（表示言語）、`src/content/story.js`（物語本文 両言語・ボス名） |
 | 世界・物理（stage / content） | `src/stage/world.js`（面のルート集約）、`src/stage/render.js`（面の描画）、`src/stage/entityRender.js`（エンティティの描画 `drawEntity`）、`src/stage/collision.js`（当たり判定）、`src/stage/bossflow.js`（ボス戦の進行）、`src/stage/physics.js`、`src/stage/camera.js`、`src/stage/level.js`、`src/content/levels/index.js`（8 面） |
 | キャラ（状態と更新。描画は entityRender.js） | `src/stage/entities/player.js`（コマ選択 `frame()`）、`enemies.js`、`bosses.js`、`gimmicks.js`、`magic.js`、`projectiles.js` |
 | 描画・素材 | `src/gfx/assets.js`、`loader.js`、`hdworld.js`、`manifest.json`（235 エントリ、生成物） |

@@ -29,3 +29,14 @@ test('run-shoot alternates the two contact frames with the run phase (runT) so t
   const seen = [0, 0.1, 0.2, 0.3].map(t => { p.runT = t; return p.frame(); });
   expect(seen).toEqual(['run1s', 'run1s', 'run3s', 'run3s']);
 });
+
+test('hurt shows the white-flash frame hurt2 for the first 0.1 s, then the hurt pose; sheets without hurt2 stay on hurt (BUG-007)', () => {
+  const p = playerWith({ player: { dress: { hurt2: {} } } });
+  p.hit({ x: p.x + 20, w: 4 });
+  expect(p.costume).toBe('plain'); // 変身解除で私服へ。素材は dress にしか無い設定なので hurt へ落ちる
+  expect(p.frame()).toBe('hurt');
+  p.costume = 'dress'; p.hurtT = 0.35; expect(p.frame()).toBe('hurt2');
+  p.hurtT = 0.26; expect(p.frame()).toBe('hurt2');
+  p.hurtT = 0.24; expect(p.frame()).toBe('hurt');
+  p.hurtT = 0.1; expect(p.frame()).toBe('hurt');
+});

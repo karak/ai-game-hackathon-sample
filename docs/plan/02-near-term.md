@@ -273,3 +273,17 @@
 | 後半: ボス進行の切り出し | `startBoss` / `bossName` / `onBossDying` / `onBossDefeated` を `stage/bossflow.js` へ。World は委譲（bosses.js・game.js・E2E の呼び出しは不変）。既定引数の `this` 残りを E2E（autoplay）が捕まえて修正 | world.js 395 → **177 行** |
 
 検証: Vitest **127 件**、Playwright **11 件**（golden の軌跡・画素ハッシュ・画廊はリファクタリング前と 1 ビットも違わない）、build → check_dist、デプロイ。
+
+## Sprint Q — 「人手のいらない残課題: デモ全面収録・hurt2・box の定義」（2026-09-11、0 リクエスト）
+
+ユーザー指示「人手のいらない作業を進めて」。生成予算を使う項目（BUG-008・IMP-018）と表現の変更（IMP-009）・設計判断（IMP-013）は触らない。
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| IMP-015 デモ全面収録 | `tools/record_demos.mjs`: 無敵なし・残機 2 のボット 16 変種を各面 60 秒走らせ「ゲームオーバーにならない → 死亡が少ない → 進んだ距離」で採用、`assets/demo/<面名>.json`（8 面）。収録後にページを読み直し `startDemo` の再生軌跡が収録と一致することを検査。`demos.js` は 8 面を面名で import、`startDemo` は `findDemo` で面名照合、`loop = 0` で 1 周目規則に固定 | 収録結果: stage1 60 s/1 死、stage2 43.8 s/3 死、stage3 35.1 s/3 死、river 60 s/2 死、workshop 51.2 s/3 死、park 60 s/2 死、tower 60 s/2 死、stars 60 s/0 死。8 面とも再生一致。`test/demo.test.js` 5 件目、`test-results/shots/demo_<面名>.png` |
+| BUG-007 hurt2 | 被弾直後 0.1 秒は白飛びコマ hurt2、以後は hurt | `test/player-frames.test.js` 4 件目、`test-results/shots/hurt2_frame.png`（私服・白飛び）。golden 一致（ハッシュを取る 90・600 フレーム目に被弾が重ならない） |
+| DEBT-007 `box` | 改名せず定義を明文化（論理箱 = prompt・後処理・QA が共有） | `docs/gen-pipeline.md` §1、スキル SKILL.md |
+| 環境 | 作業中にディスク残 118 MB で書き込み不能になった。`uv cache prune`（3.3 GiB）で 1.5 GB を確保。ほかは触っていない（下記 HANDOFF 環境メモ） | `df -h` |
+
+検証: Vitest **129 件**、Playwright **11 件**（golden 一致）、build → check_dist 282 読込。デプロイは未実施（ユーザー判断）。
+

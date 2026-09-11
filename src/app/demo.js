@@ -20,6 +20,13 @@ export function encodeRLE(masks) {
 }
 export function decodeRLE(rle) { const out = []; for (const [m, n] of rle) for (let i = 0; i < n; i++) out.push(m); return out; }
 
+// 面名で入力ログを選ぶ。デモは章の並び替え（IMP-014）で index がずれるので、配列の位置ではなく記録時の面名で照合する。
+// frames が 0 のものは未収録として扱い null を返す
+export function findDemo(demos, stageName) {
+  const d = demos.find(d => d && d.stage === stageName);
+  return d && d.frames ? d : null;
+}
+
 export class DemoRecorder {
   constructor(stageName, seed) { this.stage = stageName; this.seed = seed; this.masks = []; }
   record(input) { this.masks.push(maskOf(input)); }

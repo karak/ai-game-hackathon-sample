@@ -23,7 +23,7 @@ description: Use when producing pixel-art game sprites, tiles or backgrounds wit
 1. **密度を実測してから解像度を決める（1 リクエスト）**
    主人公を **2 フレーム横並び**で生成し、`scripts/postprocess.py` でセル数を測る。実測: 2 フレーム構図で 1 体 ≈ 45×100 セル、単体だと ≈ 70×108（キャンバスを埋める）。
    その高さが画面高の 14〜16% になる内部解像度を選ぶ（例: 100 セル → 768×672）。**決める前に必ず 4 倍ズーム画像でセル幅を目視確認する**（周期推定は 2 倍・1/2 に誤爆する）。
-2. **仕様表（`specs.json`）を先に書く**: 素材ごとに `box`（最大セル数、検査用）、`frames`（1〜2、小物は 4）、`anchor`、`out`（出力名）、`ref`（参照 raw）、`palette`（共有パレット）。テンプレートは `scripts/specs.example.json`。
+2. **仕様表（`specs.json`）を先に書く**: 素材ごとに `box`（論理箱 `[W, H]` セル。prompt の Logical box・後処理の `--logical`・manifest `fits` の QA が共有する上限かつ目標）、`frames`（1〜2、小物は 4）、`anchor`、`out`（出力名）、`ref`（参照 raw）、`palette`（共有パレット）。テンプレートは `scripts/specs.example.json`。
 3. **生成**: `python3 scripts/gemini_gen.py <spec>`。プロンプト = `style-contract.txt`（画風・背景 #00FF00・色数）＋ SIZE ブロック（自動）＋ 主題ファイル。台帳 `gen_ledger.json` に全リクエストを記録し予算を守る。**逐次実行**（並列は台帳が競合）。
 4. **後処理**: `postprocess.py` — クロマキー → 列/行の色変化投影でセル境界検出 → 中央値ピッチの規則格子を境界へスナップ → 各セルの最頻色を 1 画素 → 落ち影除去 → 15 色量子化 → 連結成分でフレーム分割（期待数に足りなければ占有最小列で割る）。**`resize` は使わない**。
 5. **一括構築**: `build_sprites.py` が raw → `assets/sprites/<group>/<name>.png` + `.json`（w,h,colors,fits）→ `manifest.json`。

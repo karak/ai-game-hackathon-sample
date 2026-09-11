@@ -12,7 +12,7 @@ ID は種別＋連番。優先: P1（次スプリント）/ P2（次マイルス
 | BUG-004 | キノコ妖精 2 コマ目が 1 コマ目と形が大きく違い瞬きが荒い | カタログ敵シート | 済 | 再生成 v2（羽の上下・腕・体高 3 セル差を明記）。83×94 / 84×113、15 色。commit 0d46a4e |
 | BUG-005 | 城の「空」が一枚絵（アーチ窓）で遠景と密度が合わない | 3 面 | 済 | 奥壁として再生成（台帳 81）、2 px/セル横タイル（`world.js SKY_PX`） |
 | BUG-006 | 私服の袖口・襟の色分けが単純（規則置換の限界） | カタログ主人公シート | P3 | 手修正 or 置換規則の細分化 |
-| BUG-007 | hurt2（白飛び）コマが未使用 | — | P3 | 被弾点滅に使う or 削除 |
+| BUG-007 | hurt2（白飛び）コマが未使用 | — | 済（2026-09-11、Sprint Q） | 被弾直後 0.1 秒（`HURT_FLASH_T`）は hurt2、以後 0.25 秒は hurt（`player.js frame()`、衣装に hurt2 が無ければ hurt）。`test/player-frames.test.js`、`test-results/shots/hurt2_frame.png`。golden の画素ハッシュ（90・600 フレーム目）は不変 |
 | BUG-008 | 中景 B/C が主中景と高さが違う場合に連結から除外されるため、城は 1 種のみ | 3 面 | P2 | 城用に壁面 2 種を生成 |
 | BUG-014 | `npm run build` の dist に生成素材 PNG が 1 枚も入らず、preview で全素材がフォールバック表示になる（`loader.js` が `import.meta.url` 基準で `../../assets/…` を解決し、dist/assets/main-*.js からはサイトの外を指す） | `npm run build && npm run preview` | 済 | ページ URL（`document.baseURI`）基準に変更、`vite.config.js copySprites` が `assets/sprites` を dist にコピー。`tools/check_dist.mjs` で 235 読込を確認（Sprint J） |
 | BUG-015 | スマホ縦（幅 390）でキャンバスが 768 px のまま横にはみ出す（`fit()` の最小倍率が 1） | iPhone 13 エミュレーション | 済 | 整数倍で入らないときは幅に合わせて縮小。`e2e/mobile.spec.js`（Sprint I） |
@@ -27,7 +27,7 @@ ID は種別＋連番。優先: P1（次スプリント）/ P2（次マイルス
 | DEBT-004 | `world.js` が描画・当たり判定・ボス管理を抱えて肥大 | 済（Sprint P、2026-09-11） | `stage/render.js`（描画 6 関数）/ `stage/collision.js` に分割。world.js 395 → 202 行。ボス進行は残（`docs/architecture.md` §5） |
 | DEBT-005 | 背景の密度が層ごとに違う（空 3・遠 2・中 1） | 済（遠景 1 倍化、A/B 連結。空 3 は残存: 城 2） | 遠景 A/B 生成（台帳 75〜82） |
 | DEBT-006 | HUD のミニフォントが手描き 3×5 | 済（DotGothic16 16px） | 8px 英数フォントに置換 |
-| DEBT-007 | `specs.json` の `box` が検査専用で意味が曖昧 | P3 | `max` に改名、`docs/gen-pipeline.md` 更新 |
+| DEBT-007 | `specs.json` の `box` が検査専用で意味が曖昧 | 済（2026-09-11、Sprint Q） | 改名せず定義を明文化。`box` は prompt の Logical box（`gemini_gen.py`）・後処理 `--logical`（`build_sprites.py`）・manifest `fits` の QA の 3 箇所が共有する「論理箱」で検査専用ではないため `max` は不適。`docs/gen-pipeline.md` §1 に行を追加、スキル SKILL.md の説明を修正 |
 | DEBT-008 | 生成スクリプトが参照プロジェクトの `.venv` と `.env` に依存 | 済（Sprint K） | 本リポに `requirements.txt`（fonttools/pillow/numpy/google-genai）と `.env.example` を置き、`python3 -m venv .venv` で完結。`gemini_gen.py` は 環境変数 → 本リポ `.env` → 参照プロジェクト `.env` の順に探す |
 
 ## 改善（IMP）
@@ -48,7 +48,7 @@ ID は種別＋連番。優先: P1（次スプリント）/ P2（次マイルス
 | IMP-012 | 遊園地の中景 A に暗い地面板（キー残り）が残る。STRICT KEY を強めて再生成、または後処理で下端の暗帯を落とす | 済（中景 6 枚は BUG-011 で再生成。2026-09-09 に全 41 層の下 6 行を機械計測: 不透明率 0.85 超は遠景 12 枚と castle_mid・workshop_mid で、目視ではいずれも地平線の地面帯か壁面で板ではない。tower_far/far2・workshop_far の床帯 8〜10 行は残置） |
 | IMP-013 | 第六章の強制スクロール区間は「走る車 `R` に乗る」代替。本来の強制スクロール（カメラ固定速度・画面外で死亡）は縦スクロール実装と合わせて設計 | P2 |
 | IMP-014 | 章の並び替え: 城を第三章へ戻し新ボス「砂糖の女王」を置く、ノワールを最終章（第八章）へ | 済（commit 予定） |
-| IMP-015 | デモ入力ログが 4 面分のみ（第四・五章は未収録） | P3 |
+| IMP-015 | デモ入力ログが 4 面分のみ（第四・五章は未収録） | 済（2026-09-11、Sprint Q）: `tools/record_demos.mjs` が無敵なし・残機 2 のボット（16 変種）で全 8 面を収録し、`assets/demo/<面名>.json` に書く。再生と同じ条件（面の seed・lives 2・loop 0）で録り、ページ再読込後に `startDemo` の軌跡（60 フレームごと）が収録と一致することを検査（8 面一致）。あわせて `startDemo` が配列位置ではなく面名で照合（`findDemo`。IMP-014 の並び替えで stage3.json が涙の川、stage4.json が城の記録になっていた）。ボットの限界: 第二・三・五章は 3 死で 28〜51 秒（IMP-017 の多発地点と同じ） |
 | DEBT-009 | デザインカタログが歯抜け: 第三〜五章の敵・ボス（人魚・傘・人形・針・風船・ピエロ、大蛇・機械・観覧車の主）、ギミック小物（はしご・浮島・板・プレス・ベルト・歯車・車・ゴンドラ・軸）、溜め魔法演出、敵弾 cknife、新テーマの装飾が章に無い／固定リストで欠落。**全素材を manifest から機械的に列挙して網羅する**（ユーザー指示 2026-09-09） | 済（commit 予定: サイズ比較・ボス欄・装飾表・ギミック小物を manifest/DECO_MAP 駆動に、「全素材」章を追加、`test/catalog.test.js` 4 件で掲載漏れを検出） | 各章を manifest 駆動にし、掲載漏れをテストで検出 |
 | DEBT-010 | ゾンビうさぎの湧きコマ（`zombieRise`）が旧手描きドット絵のまま（炎は生成に置換済み）。生成 1 リクエストで置換 | 済（台帳 134、57×63 セル） | `enemy-zombie-rise` spec を追加 |
 | IMP-016 | 走りながら撃つ専用コマを走りモーションと同じ 4 コマ分用意する（現在は走行中の射撃で足を止めないため上半身の射撃ポーズが出ない）。生成 2 リクエスト（2 コマ×2）＋帽子合成 | 済（2 コマ運用に縮小。帽子なし `player-runshoot-a/b` v2 の接地コマ run1s/run3s（103×104 / 99×105、杖込み）を採用し帽子は合成。通過コマ（2・4）は v1/v2 とも杖が描かれず不採用。帽子あり生成 2 枚は idle 比 1.14〜1.24x で不採用（`skip`）。台帳 181〜186。`player.js frame()` は射撃中 12 tick ずつ run1s/run3s を交互、`test/player-frames.test.js`） |

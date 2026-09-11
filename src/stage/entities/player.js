@@ -5,6 +5,7 @@ import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConv
 import { t } from '../../shared/i18n.js';
 
 const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196; // 単発ジャンプ 42 世界px(2.6タイル)
+const HURT_T = 0.35, HURT_FLASH_T = 0.1; // 被弾でのけぞる時間と、その先頭で白飛びコマ hurt2 を出す時間（BUG-007）
 const STAND_H = 28, CROUCH_H = 18; // 当たり判定（世界単位）。スプライトは生成 PNG のサイズに従う（docs/art-standard.md §2.1）
 
 // 主人公リリカ。超魔界村式: 空中制御なし・二段ジャンプで軌道修正・被弾で変身解除。
@@ -166,7 +167,7 @@ export class Player {
     w.particles.emit('sparkle', this.centerX, this.y + 10, 16);
     w.particles.emit('stuffing', this.centerX, this.y + 12, 6);
     this.costume = 'plain'; this.chargeT = 0;
-    this.invT = 1.8; this.hurtT = 0.35;
+    this.invT = 1.8; this.hurtT = HURT_T;
     this.vx = (source && source.x + (source.w ?? 0) / 2 > this.centerX ? -1 : 1) * 50; this.vy = -120; this.onGround = false;
     w.audio.sfx('undress'); w.shake(4); w.fx?.hitStop();
     w.toast(t('変身が解けた…！'));
@@ -199,7 +200,7 @@ export class Player {
     if (this.chargeT >= SUPER_T && this.onGround && sheet?.cast1) return 'cast1';
     if (this.climbing) return ['jump', 'fall'][Math.floor(this.runT * 6) % 2]; // 専用コマなし: 上昇／下降コマを交互に
     if (this.crouch) return 'crouch';
-    if (this.hurtT > 0) return 'hurt';
+    if (this.hurtT > 0) return this.hurtT > HURT_T - HURT_FLASH_T && sheet?.hurt2 ? 'hurt2' : 'hurt'; // 被弾直後は白飛びコマ（BUG-007）、以後は被弾ポーズ
     if (!this.onGround) return this.attackT > 0 ? 'attack' : (this.vy < 0 ? 'jump' : 'fall');
     // 走りながら撃っても足は止めない（超魔界村準拠）。連射すると attack コマに固定されて滑走に見えるため、立ち撃ちのみ attack
     if (this.vx !== 0) {

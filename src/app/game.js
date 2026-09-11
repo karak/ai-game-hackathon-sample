@@ -6,7 +6,7 @@ import { SONGS } from '../platform/audio.js';
 import { story } from '../content/story.js';
 import { t, setLang } from '../shared/i18n.js';
 import { IRIS_T } from '../stage/fx.js';
-import { DemoRecorder, DemoInput, DEMO_MAX_T, DEMO_IDLE_T } from './demo.js';
+import { DemoRecorder, DemoInput, DEMO_MAX_T, DEMO_IDLE_T, findDemo } from './demo.js';
 import { DEMOS } from '../content/demos.js';
 import { hashSeed } from '../shared/util.js';
 import { loadDeathLog, saveDeathLog, pushDeath, summarizeDeaths } from './deathlog.js';
@@ -184,13 +184,15 @@ export class Game {
 
   // ---- デモ（アトラクト）モード ----
   // 入力ログの記録: window.__game.startRecording() → プレイ → stopRecording() が JSON を返す（assets/demo/stageN.json に保存）
+  // 2026-09-11 から保存名は面名（assets/demo/<面名>.json）。全面をボットで録るなら node tools/record_demos.mjs（IMP-015）
   startRecording() { const st = STAGES[this.stageIndex]; this.recorder = new DemoRecorder(st.name, st.seed ?? hashSeed(st.name)); return this.recorder; }
   stopRecording() { const r = this.recorder; this.recorder = null; return r ? r.toJSON() : null; }
   // 未収録（frames 0）を飛ばして i 番目以降のデモを開始。無ければ false
+  // ログは配列の位置ではなく面名で照合する（findDemo。章の並び替えで位置がずれていた）
   startDemo(i = 0) {
-    for (let k = i; k < DEMOS.length && k < STAGES.length; k++) {
-      const d = DEMOS[k]; if (!d || !d.frames) continue;
-      this.demoIdx = k; this.score = 0; this.lives = 2; this.stageIndex = k;
+    for (let k = i; k < STAGES.length; k++) {
+      const d = findDemo(DEMOS, STAGES[k].name); if (!d) continue;
+      this.demoIdx = k; this.score = 0; this.lives = 2; this.stageIndex = k; this.loop = 0; // デモは 1 周目の規則で再生（収録条件と同じ）
       this.world = new World(this, { ...STAGES[k], seed: d.seed });
       this.demo = { input: new DemoInput(d), t: 0 }; this.irisT = 99;
       this.audio.playBgm(SONGS[this.world.level.theme]); this.setState('demo'); return true;

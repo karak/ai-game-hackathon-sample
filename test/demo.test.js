@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { encodeRLE, decodeRLE, maskOf, DemoRecorder, DemoInput, DEMO_ACTIONS } from '../src/app/demo.js';
+import { encodeRLE, decodeRLE, maskOf, DemoRecorder, DemoInput, DEMO_ACTIONS, findDemo } from '../src/app/demo.js';
 import { seedGame, grand, rand, hashSeed } from '../src/shared/util.js';
 import { parseLevel } from '../src/stage/level.js';
 import { MushroomFairy, ZombieSpawner } from '../src/stage/entities/enemies.js';
@@ -48,4 +48,12 @@ test('same seed + same ticks → identical enemy behaviour (spawner positions, f
     return JSON.stringify(log) + JSON.stringify(w.enemies.map(e => Math.round(e.x)));
   };
   expect(run()).toBe(run());
+});
+
+test('findDemo picks the log by stage name (not array position) and treats frames 0 as unrecorded', () => {
+  const demos = [{ stage: 'stage2', frames: 10, rle: [[0, 10]] }, { stage: 'stage1', frames: 0, rle: [] }, null, { stage: 'stage-river', frames: 3, rle: [[1, 3]] }];
+  expect(findDemo(demos, 'stage2')).toBe(demos[0]);
+  expect(findDemo(demos, 'stage-river')).toBe(demos[3]);
+  expect(findDemo(demos, 'stage1')).toBeNull();
+  expect(findDemo(demos, 'stage-tower')).toBeNull();
 });
