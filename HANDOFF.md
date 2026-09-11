@@ -6,7 +6,7 @@
 
 - リポジトリ: `/Users/yasushi/projects/poc-square`、**公開リポジトリ https://github.com/karak/ai-game-hackathon-sample**（`origin/main`、public）。HEAD は Sprint Q（デモ全面収録・敵回避ボットの調整・hurt2・box 定義）のコミット（`git log -5`）、`origin/main` へ push 済み、作業ツリー clean
 - 検証: `npm test` Vitest **129 件**通過（architecture 5 件を含む）、`npm run e2e` Playwright **11 件**通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・**golden**〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 282 読込を確認
-- 生成予算: Gemini 台帳 `tools/gen_ledger.json` **232 / 250**（当初 200 ＋ 強化魔法に 50 追加。残 18）。逐次実行、並列禁止
+- 生成予算: Gemini 台帳 `tools/gen_ledger.json` **232 / 280**（当初 200 ＋ 強化魔法に 50 ＋ 2026-09-12 に 30 追加。残 48。台帳の `budget` 欄が正）。逐次実行、並列禁止。使い先の候補: IMP-026 人魚縦長（1〜2）、IMP-018 2 周目挿絵（1）、BUG-008 城の中景（2）
 - **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）。最終デプロイ Version `2e0f11db`（2026-09-12 00:50、第二章の繭移動を含む。公開 URL で 282 読込・bootMs 599）。その前 `a2fb1446`（2026-09-11 13:40、Sprint Q〔デモ全面収録＋敵回避ボット・hurt2・box 定義〕＋ BUG-018/019〔涙の川・第二章の沼 5 タイル化、人魚クリップ〕を含む。公開 URL で `check_dist` 282 読込・bootMs 563 を確認）
 - コード構成: `docs/architecture.md`（境界づけられたコンテキスト app / stage / content / gfx / ui / platform / shared）。ファイルを増やす・移すときは `test/architecture.test.js` を通す。振る舞いを変える変更をしたら `GOLDEN_UPDATE=1 npx playwright test e2e/golden.spec.js` で黄金を更新し、差分の理由を commit に書く
 - 不具合報告: GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（テンプレートあり）。テスター計測はオプション「テスター報告を コピー」→ `docs/release/tester-guide.md` → `tools/tester_stats.mjs`
