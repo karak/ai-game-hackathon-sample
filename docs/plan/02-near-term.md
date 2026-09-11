@@ -291,3 +291,7 @@
 
 検証: Vitest **129 件**、Playwright **11 件**（golden 一致）、build → check_dist 282 読込。デプロイは未実施（ユーザー判断）。
 
+## Sprint R（次）— 「観測性: 実ユーザー＆ボットの E2E プレイテスト」（計画 2026-09-12、0 リクエスト）
+
+ユーザー指示「次の sprint に実ユーザーおよび bot による e2e プレイテストのための observability を積む。スコープは console（Chrome DevTools）/ wrangler のログ。OTel や外部ツールは導入しないが、導入可能な形（構造化ログ・error code・session-id / request-id・context）にする」。計画は **[09-observability.md](09-observability.md)**（IMP-027）。作業 R1〜R7、合計 2.75 日。出口条件: 人 1 セッションとボット 1 本の `wrangler tail` NDJSON を `docs/plan/logs/tail/` に置き、`tools/log_stats.mjs` の表をここに貼る。
+

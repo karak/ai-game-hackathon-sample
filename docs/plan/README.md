@@ -13,6 +13,7 @@
 | [06-asset-pipeline.md](06-asset-pipeline.md) | 素材制作計画（生成手順・命名・予算配分・QA） | 随時 |
 | [07-risks.md](07-risks.md) | リスクと対策 | マイルストーンごと |
 | [08-backlog.md](08-backlog.md) | 不具合・技術的負債・改善の一覧（ID 付き） | 随時 |
+| [09-observability.md](09-observability.md) | 観測性（構造化ログ・エラーコード・session/request-id・Worker `/api/log`・wrangler tail）— Sprint R 計画 | スプリントごと |
 
 ## 運用ルール
 

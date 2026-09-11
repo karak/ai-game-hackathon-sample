@@ -11,7 +11,7 @@
 - コード構成: `docs/architecture.md`（境界づけられたコンテキスト app / stage / content / gfx / ui / platform / shared）。ファイルを増やす・移すときは `test/architecture.test.js` を通す。振る舞いを変える変更をしたら `GOLDEN_UPDATE=1 npx playwright test e2e/golden.spec.js` で黄金を更新し、差分の理由を commit に書く
 - 不具合報告: GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（テンプレートあり）。テスター計測はオプション「テスター報告を コピー」→ `docs/release/tester-guide.md` → `tools/tester_stats.mjs`
 - マイルストーン: M0〜M4 済、M5 は実装分済（テスター計測は人手のため繰延）、M6 済（実機確認のみ繰延）、M7 公開済（バグ報告先と初回ロード短縮 IMP-019 が残）。表は `docs/plan/03-roadmap.md`
-- スプリント履歴: E → F → G → H → I → J（公開）→ K（強化魔法）→ L（第二章再設計・カットイン）→ M（挿絵級の画風統一 IMP-022）→ N（毒沼と足場 IMP-021）→ O（テスター計測・パッド診断・Issue テンプレート）→ P（DDD コンテキスト整理とリファクタリング。DEBT-004 / DEBT-011）→ Q（人手のいらない残課題: デモ全面収録 IMP-015・hurt2 BUG-007・`box` 定義 DEBT-007）（`docs/plan/02-near-term.md` 末尾）
+- スプリント履歴: E → F → G → H → I → J（公開）→ K（強化魔法）→ L（第二章再設計・カットイン）→ M（挿絵級の画風統一 IMP-022）→ N（毒沼と足場 IMP-021）→ O（テスター計測・パッド診断・Issue テンプレート）→ P（DDD コンテキスト整理とリファクタリング。DEBT-004 / DEBT-011）→ Q（人手のいらない残課題: デモ全面収録 IMP-015・hurt2 BUG-007・`box` 定義 DEBT-007、敵回避ボット、沼 5 タイル化 BUG-018・人魚クリップ BUG-019）→ **R（次、計画済み）: 観測性 IMP-027（`docs/plan/09-observability.md`）**（`docs/plan/02-near-term.md` 末尾）
 
 ## 2. 最初に読むもの（順番）
 
