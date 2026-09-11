@@ -66,7 +66,7 @@
 
 **環境メモ（2026-09-11、GitHub MCP）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
 
-**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは敵回避と放物線先読み入り（総死亡 16 → 11、全面 60 秒）。残る死因は敵弾の至近弾・ボス接触・遊園地の観覧車先の沼。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
+**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは敵回避（候補行動 × 弾の予測のシミュレーション）と放物線先読み入り（総死亡 16 → 6、全面 60 秒。塔だけ素朴なボットが選ばれ 2 死）。残る死因は妖精の毒の至近弾・針の群れの突進・ピエロのナイフ・塔の蛆弾。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
 
 **ビジュアル保留**: hurt のつば幅 1.45x（傾いた帽子）、fall_nohat 髪幅 1.39x、走り撃ち通過コマの杖。
 
