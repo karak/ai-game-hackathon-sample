@@ -43,7 +43,7 @@
 | テスター計測は run 記録＋クリップボード | `src/app/runlog.js`（開始 1 回 = 1 run）。オプション「テスター報告を コピー」の JSON を `docs/plan/logs/testers/` に置いて `tools/tester_stats.mjs`。パッドはオプション「ゲームパッド」行で実機診断、経路は `e2e/gamepad.spec.js` の偽装パッド | IMP-023 / 024 |
 | 沼・足場の見え方は章ごとの分岐で直す | 菓子の森だけ `bogStyle: 'syrup'`（糖蜜の水面・深部・穴の奥壁・岸の滴り、`=` は砂糖衣の帯）。他テーマに触れないことは `tools/hash_tiles.mjs` の画素ハッシュで示す | IMP-021、`hdworld.buildSyrupHD`、`world.drawPitWalls` |
 | コード構成は境界づけられたコンテキスト | `src/app`（進行）／`stage`（面のシミュレーション）／`content`（作品データ）／`gfx`／`ui`／`platform`／`shared`。依存の向きは `docs/architecture.md` §2、`test/architecture.test.js` が import を走査して検査。回帰の護りは `e2e/golden.spec.js`（全 8 面の軌跡と画素ハッシュ。振る舞いを変えたときだけ `GOLDEN_UPDATE=1` で更新） | Sprint P |
-| デモは面名で照合し、ボットで全面収録 | `assets/demo/<面名>.json`（8 面）。`startDemo` は `findDemo` で記録時の面名と照合（章の並び替えで位置がずれない）、`loop = 0`。収録は `node tools/record_demos.mjs`（無敵なし・残機 2 のボット 16 変種、再生と同じ条件。収録後にページを読み直し再生軌跡の一致を検査する）。JSON を書くと Vite が再読込するので書き出しは全面の収録後 | IMP-015、Sprint Q |
+| デモは面名で照合し、ボットで全面収録 | `assets/demo/<面名>.json`（8 面）。`startDemo` は `findDemo` で記録時の面名と照合（章の並び替えで位置がずれない）、`loop = 0`。収録は `node tools/record_demos.mjs`（無敵なし・残機 2 のボット。敵・敵弾・落下物・プレスの先読みと放物線シミュレーションで安全な跳び方だけ実行、素朴な変種も含めて面ごとにスコアで採用。再生と同じ条件で録り、ページを読み直して再生軌跡の一致を検査する）。JSON を書くと Vite が再読込するので書き出しは全面の収録後。調整は `--trace <面> --step 6 --from 秒 --to 秒 --simdump 秒` | IMP-015、Sprint Q |
 | hurt2 は被弾直後の白飛び | 被弾から 0.1 秒（`HURT_FLASH_T`）は hurt2、以後 0.25 秒は hurt。衣装に hurt2 が無ければ hurt | BUG-007 |
 | `box` は論理箱で改名しない | prompt の Logical box・後処理 `--logical`・manifest `fits` が同じ値を共有する（上限かつ目標）。`docs/gen-pipeline.md` §1 | DEBT-007 |
 | 衣装コマの割り当ては 2 パス | 共通コマ → 衣装別コマの順に代入する。1 パスだと manifest の読み込み完了順で共通コマが衣装別を上書きする（BUG-016） | `assets.js assignPlayerFrames`、`test/costume-frames.test.js` |
@@ -66,7 +66,7 @@
 
 **環境メモ（2026-09-11、GitHub MCP）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
 
-**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは第二・三・五章で 3 死（28〜51 秒で終了）— 人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
+**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは敵回避と放物線先読み入り（総死亡 16 → 11、全面 60 秒）。残る死因は敵弾の至近弾・ボス接触・遊園地の観覧車先の沼。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
 
 **ビジュアル保留**: hurt のつば幅 1.45x（傾いた帽子）、fall_nohat 髪幅 1.39x、走り撃ち通過コマの杖。
 
