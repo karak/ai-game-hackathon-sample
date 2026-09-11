@@ -62,7 +62,7 @@
 
 **技術的負債 P2**: DEBT-003 旧文字列ドット絵の残存（`src/gfx/sprites/*` 1261 行。`assets.js` の敵・ボス・弾・アイテム・主人公シートと `tiles.js` の装飾のフォールバックとして今も参照される。生成素材が全部ある現状では実行時に描かれないが、削除は「読込失敗時に何を出すか」の判断を伴う）、BUG-008 城の中景 1 種（2 リクエスト）、IMP-013 本来の強制スクロール。DEBT-004（world.js 分割）と DEBT-008（生成環境）と DEBT-011（コンテキスト整理）は済。`World` に残るトースト・揺れ・湧きの分離は必要になったときに（`docs/architecture.md` §6）。
 
-**環境メモ（2026-09-11 10:00、ディスク）**: 作業中にディスクが満杯（228 GB 中 186 GB 使用、空き 118 MB）になり Bash の出力ファイルさえ書けなくなった。`uv cache prune`（未使用 3.3 GiB を削除、再取得可）で空き 1.5 GB にして続行。ほかは触っていない。大きいもの: `~/Library/Application Support/MobileSync` 17 GB、`Claude` 9.9 GB、`Notion` 6.6 GB、`~/.colima` 7.0 GB、`~/.npm` 3.1 GB（`_npx` 2.1 GB）、`~/Library/Caches/puccinialin` 2.0 GB（Rust ツールチェーンのキャッシュ）、`ms-playwright` 1.1 GB（E2E に必要）、`~/.claude/projects.bak-20260621-2201` 482 MB。**ユーザー判断で整理が要る**（e2e・build が書き込み失敗で落ちる）。
+**環境メモ（2026-09-11 10:00、ディスク）**: 作業中にディスクが満杯（228 GB 中 186 GB 使用、空き 118 MB）になり Bash の出力ファイルさえ書けなくなった。`uv cache prune`（未使用 3.3 GiB を削除、再取得可）で空き 1.5 GB にして続行。ほかは触っていない。大きいもの: `~/Library/Application Support/MobileSync` 17 GB、`Claude` 9.9 GB、`Notion` 6.6 GB、`~/.colima` 7.0 GB、`~/.npm` 3.1 GB（`_npx` 2.1 GB）、`~/Library/Caches/puccinialin` 2.0 GB（Rust ツールチェーンのキャッシュ）、`ms-playwright` 1.1 GB（E2E に必要）、`~/.claude/projects.bak-20260621-2201` 482 MB。10:07 にユーザー指示で `~/Library/Application Support/Claude/vm_bundles`（Cowork の VM イメージ 8.5 GB）と同 `Cache`（808 MB）を削除し、空き **12 GB**。残りの大物（MobileSync・Notion・colima・npm）は未整理。
 
 **環境メモ（2026-09-11、GitHub MCP）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
 
