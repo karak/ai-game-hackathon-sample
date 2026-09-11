@@ -46,6 +46,8 @@
 | デモは面名で照合し、ボットで全面収録 | `assets/demo/<面名>.json`（8 面）。`startDemo` は `findDemo` で記録時の面名と照合（章の並び替えで位置がずれない）、`loop = 0`。収録は `node tools/record_demos.mjs`（無敵なし・残機 2 のボット。敵・敵弾・落下物・プレスの先読みと放物線シミュレーションで安全な跳び方だけ実行、素朴な変種も含めて面ごとにスコアで採用。再生と同じ条件で録り、ページを読み直して再生軌跡の一致を検査する）。JSON を書くと Vite が再読込するので書き出しは全面の収録後。調整は `--trace <面> --step 6 --from 秒 --to 秒 --simdump 秒` | IMP-015、Sprint Q |
 | hurt2 は被弾直後の白飛び | 被弾から 0.1 秒（`HURT_FLASH_T`）は hurt2、以後 0.25 秒は hurt。衣装に hurt2 が無ければ hurt | BUG-007 |
 | `box` は論理箱で改名しない | prompt の Logical box・後処理 `--logical`・manifest `fits` が同じ値を共有する（上限かつ目標）。`docs/gen-pipeline.md` §1 | DEBT-007 |
+| 地面からの隙間は最大 5 タイル | 主人公物理（SPEED 66・JUMP −218・二段 −196）では縁から 6 タイル（96 px）は渡れない（最大到達 96 px、着地に >96 が要る）。レベル編集後は `tools/check_gaps.mjs` を通す。トランポリン・助走・踏み石経路も検査する | BUG-018 |
+| 人魚は水の絵の位置でクリップ | `drawBog` は水面タイルの 6 px 下から描くので、人魚のクリップも `waterY + 6`。縦長スプライトへの差し替えは IMP-026（予算要） | BUG-019 |
 | 衣装コマの割り当ては 2 パス | 共通コマ → 衣装別コマの順に代入する。1 パスだと manifest の読み込み完了順で共通コマが衣装別を上書きする（BUG-016） | `assets.js assignPlayerFrames`、`test/costume-frames.test.js` |
 | 溜めは 2 段階 | 0.9 秒 `CHARGE_T` で溜め魔法、1.8 秒 `SUPER_T` で強化魔法（`magic.js SUPER`）。強化魔法は新規生成素材なしで、既存スプライト＋粒子＋画面演出で作る | 05-systems 5.1、Sprint K |
 | 素材の軽量化 | フォントはゲーム用サブセット（`tools/subset_font.py`。文言を足したら作り直す。`test/font-subset.test.js` が漏れを検出）、スプライトはパレット PNG（`tools/optimize_pngs.py`、可逆検査つき）。`/assets/*` は 1 年 immutable なので PNG は `?v=<ビルド ID>` で破棄する | IMP-019、`docs/release/deploy.md` |
@@ -66,7 +68,7 @@
 
 **環境メモ（2026-09-11、GitHub MCP）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
 
-**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは敵回避（候補行動 × 弾の予測のシミュレーション）と放物線先読み入り（総死亡 16 → 6、全面 60 秒。塔だけ素朴なボットが選ばれ 2 死）。残る死因は妖精の毒の至近弾・針の群れの突進・ピエロのナイフ・塔の蛆弾。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
+**P3**: IMP-026 人魚スプライトの縦長化（1〜2 リクエスト、攻撃範囲維持）、IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは敵回避（候補行動 × 弾の予測のシミュレーション）と放物線先読み入り（総死亡 16 → 6、全面 60 秒。塔だけ素朴なボットが選ばれ 2 死）。残る死因は妖精の毒の至近弾・針の群れの突進・ピエロのナイフ・塔の蛆弾。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
 
 **ビジュアル保留**: hurt のつば幅 1.45x（傾いた帽子）、fall_nohat 髪幅 1.39x、走り撃ち通過コマの杖。
 
@@ -79,6 +81,7 @@ npm test                                   # Vitest
 npm run e2e                                # Playwright 11 件（5174 を自動起動、headless）。証跡は test-results/shots/（outputDir は test-results/pw に分離）
 npm run build && node tools/check_dist.mjs # dist を vite preview（4174）で起こし素材 282 の読込を確認
 node tools/record_demos.mjs [--stages stage2] # デモ入力ログをボットで収録し再生一致を検査（5173 が起きていること。IMP-015）
+node tools/check_gaps.mjs [--stages stage-river] # 横スクロール面の「縁から渡れない隙間」を本物の物理で総当たり検査（レベル編集後に必ず。終了コード 1 = 渡れない縁あり）
 npm run deploy                             # Cloudflare へ本番デプロイ（wrangler login 済みが前提）。deploy:preview はプレビュー URL のみ
 node tools/check_dist.mjs https://magical-lyrica.karak97.workers.dev   # 公開 URL の検証（bootMs・素材・エラー）
 node tools/shot_stages.mjs --stages 1,2 --at 0.35,0.7  # 章の同じ位置を撮って比べる（アートの判断材料）

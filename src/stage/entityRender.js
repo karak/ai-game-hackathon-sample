@@ -51,7 +51,9 @@ function drawZombieSpawner(e) {}
 
 function drawMermaidDoll(e, g, cam, assets) {
   // 水面より下は描かない（潜っている表現）
-  g.save(); g.beginPath(); g.rect(0, 0, 9999, Math.floor(e.waterY - cam.y)); g.clip();
+  // 水の絵は drawBog が水面タイルの 6 px 下から描く（top 行は y+6）ので、クリップもそこに合わせる。waterY で切ると
+  // スプライトの切れた縁が水面の 6 px 上に浮いて見えた（2026-09-11 ユーザー報告）
+  g.save(); g.beginPath(); g.rect(0, 0, 9999, Math.floor(e.waterY + 6 - cam.y)); g.clip();
   drawEnemy(e, g, cam, assets); g.restore();
 }
 
