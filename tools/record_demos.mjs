@@ -159,6 +159,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
     for (let k = 0; k < 180; k++) {
       kk = k; if (simPath) simPath.push(`${Math.round(x * 10) / 10},${Math.round(y * 10) / 10},${Math.round(vy)}${onG ? 'G' : ''}`);
       if (opts.hook && opts.hook(k, x, y, h)) return { r: 'hit', x, k };
+      if (onG && opts.jumpAt === k) { vy = -218; jumps = 1; onG = false; vx = hold ? d * 66 : 0; } // 待ってから跳ぶ候補（k フレーム目で跳ぶ）
       if (onG) { // 歩き: 支えが無くなったら落下へ。歩いている間に沼・棘へ入れば死
         let nx = x + vx / 60;
         if (vx !== 0) { const etx = Math.floor((vx > 0 ? nx + w0 - 0.001 : nx) / 16); if (map.isSolid(etx, Math.floor(y / 16)) || map.isSolid(etx, Math.floor((y + h - 0.001) / 16))) return { r: 'safe', x }; } // 壁で止まる = 落ちない
@@ -271,16 +272,17 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
         } else if (shot && p.onGround && !underPress) {
           // 回避: 候補行動（走り続ける／伏せる／下がる／跳ぶ／跳んで止まる／止まる）ごとに自分の箱を進め、全ての弾・突進敵の予測位置と重ならず着地も安全なものを最初に採る
           const blocked = !move; // 敵待ちなどで止まっているときは、前へ走る・前へ跳ぶ候補を使わない
-          const cands = [{ n: 'run', hold: true, d: dir, only: !blocked }, { n: 'crouch', crouch: true }, { n: 'back', hold: true, d: -dir, only: gapWidth(-dir) === 0 }, { n: 'jump', j: true, hold: true, d: dir, only: !blocked }, { n: 'jumpStop', j: true, hold: false, d: dir }, { n: 'stop', hold: false, d: dir }];
+          const cands = [{ n: 'run', hold: true, d: dir, only: !blocked }, { n: 'crouch', crouch: true }, { n: 'back', hold: true, d: -dir, only: gapWidth(-dir) === 0 }, { n: 'jump', j: true, hold: true, d: dir, only: !blocked }, { n: 'jumpStop', j: true, hold: false, d: dir }, { n: 'stop', hold: false, d: dir },
+            { n: 'waitJump', hold: false, d: dir, jumpAt: 6 }, { n: 'waitJump', hold: false, d: dir, jumpAt: 12 }, { n: 'waitJump', hold: false, d: dir, jumpAt: 18 }]; // 今は止まり、数フレーム後に跳ぶ（次のフレームで再評価され、跳ぶ時機が来れば jumpStop が選ばれる）
           let pick = null;
-          for (const c of cands) { if (c.only === false) continue; const r = sim(!!c.j, null, !!c.hold, c.d ?? dir, !!c.hold, { hook: shotHook, crouch: !!c.crouch }); if (r.r === 'safe') { pick = c; break; } }
+          for (const c of cands) { if (c.only === false) continue; const r = sim(!!c.j, null, !!c.hold, c.d ?? dir, !!c.hold, { hook: shotHook, crouch: !!c.crouch, jumpAt: c.jumpAt }); if (r.r === 'safe') { pick = c; break; } }
           if (pick) {
             if (pick.n === 'run') { move = true; }
             else if (pick.n === 'crouch') { move = false; crouch = true; shoot = frames % 6 === 0; }
             else if (pick.n === 'back') { dir = -dir; curDir = dir; move = true; }
             else if (pick.n === 'jump') { jump = true; move = true; }
             else if (pick.n === 'jumpStop') { jump = true; move = false; }
-            else move = false;
+            else move = false; // stop / waitJump: 止まる（waitJump は次フレーム以降に跳ぶ判断が出る）
           } else if ((shot.grav || shot.dash) && !blocked) move = true; // 全部だめ: 落下弾・突進は走り抜ける（敵待ちで止まっているときは動かない）、直進弾は元の判断のまま
         }
         const ridingMover = p.platform && (p.platform.axis === 'x' || p.platform.axis === 'rail' || p.platform.axis === 'circle'); // 横に運んでくれる足場
@@ -325,7 +327,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
         if (v.trace && v.simdump >= 0 && frames === Math.round(v.simdump * 60)) {
           for (const [label, a] of [['continue', [false, null, move]], ['jump', [true, null, true]], ['jump+apex', [true, 'apex', true]], ['jump+apex nohold', [true, 'apex', true, curDir, false]], ['dbl now', [false, 'now', true]], ['dbl apex', [false, 'apex', true]]]) { simPath = []; const r = sim(...a); trace.push(`  SIM ${label}: ${r.r} x=${Math.round(r.x)} path=${simPath.slice(0, 40).join(' ')}`); simPath = null; }
           if (shot) { // 回避候補ごとの結果と、弾の予測位置
-            const res = [['run', [true, null, true, dir, true, { hook: shotHook }]], ['crouch', [false, null, false, dir, false, { hook: shotHook, crouch: true }]], ['back', [false, null, true, -dir, true, { hook: shotHook }]], ['jump', [true, null, true, dir, true, { hook: shotHook }]], ['jumpStop', [true, null, false, dir, false, { hook: shotHook }]], ['stop', [false, null, false, dir, false, { hook: shotHook }]]].map(([n, a]) => { const r = sim(...a); return `${n}=${r.r}${r.k !== undefined ? '@' + r.k : ''}`; });
+            const res = [['run', [true, null, true, dir, true, { hook: shotHook }]], ['crouch', [false, null, false, dir, false, { hook: shotHook, crouch: true }]], ['back', [false, null, true, -dir, true, { hook: shotHook }]], ['jump', [true, null, true, dir, true, { hook: shotHook }]], ['jumpStop', [true, null, false, dir, false, { hook: shotHook }]], ['stop', [false, null, false, dir, false, { hook: shotHook }]], ['wait6', [false, null, false, dir, false, { hook: shotHook, jumpAt: 6 }]], ['wait12', [false, null, false, dir, false, { hook: shotHook, jumpAt: 12 }]], ['wait18', [false, null, false, dir, false, { hook: shotHook, jumpAt: 18 }]]].map(([n, a]) => { const r = sim(...a); return `${n}=${r.r}${r.k !== undefined ? '@' + r.k : ''}`; });
             const shots = w.enemyShots.filter(q => !q.dead).map(q => `${q.kind}(${Math.round(q.x)},${Math.round(q.y)} v${Math.round(q.vx)},${Math.round(q.vy)})`).join(' ');
             trace.push(`  DODGE shot k=${shot.k} cy-y=${Math.round(shot.cy - p.y)} : ${res.join(' ')} | shots: ${shots} | p=(${Math.round(p.x)},${Math.round(p.y)})`);
           }
