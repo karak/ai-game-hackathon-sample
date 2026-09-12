@@ -51,6 +51,8 @@
 | 構造化ログの核は shared、ブラウザ依存は platform | `src/shared/log.js`（LogEvent・通番・上限・リングバッファ）はどこからでも `log.emit(code, msg, attr)` できる。console／fetch(keepalive)／onerror／sessionStorage は `src/platform/telemetry.js`。stage・gfx → platform は依存の向きで禁止のため（`09-observability.md` §6） | IMP-027 |
 | ログ送信は本番だけ既定 ON | dev サーバーには `/api/log` が無い（404 が console error になり E2E が落ちる）。dev で送信を試すときは `?telemetry=1`、本番で止めるときは `?telemetry=0` かオプション「ログそうしん」OFF。Playwright は `page.route('**/api/log')` で握る | IMP-027 |
 | ログコードは登録制で、未使用も落とす | `src/shared/logcodes.js` に無いコードは `log.emit` が throw。`test/logcodes.test.js` が src/worker/e2e/tools を走査し、未登録と未使用の両方を落とす | IMP-027 |
+| デモボットは「止まって撃つ」前に敵の方を向く | 向きは動いた瞬間にしか変わらないので、下がった直後は後ろ向きに撃ち続けて「撃っても減らない」になっていた。1 フレームだけ進行方向へ寄る（`turning`）。敵弾は EnemyShot と同じ物理で軌道を先読みする（`shotPath`） | IMP-015 |
+| 風船の亡霊に専用規則は置かない | 跳ばない／待って撃つ／下がる、のどれも死亡を増やした（1 → 3）。一般規則のままが最も遠くまで進む（遊園地 3780・0 死） | IMP-015 |
 | 人魚は当たり判定を固定し、絵だけ縦長 | 待機コマを頭〜尾まで描いた 62×66 に差し替えたが、当たり判定は v1 由来の 8×15（`MERMAID_W/H`）、頭頂の位置は `MERMAID_HEAD_ABOVE`（8 セル）で不変。伸びた分は水面下に α0.3 で透かす。スプライト寸法から当たり判定を出す `fitSprite` はこの敵には使わない | IMP-026 |
 | 衣装コマの割り当ては 2 パス | 共通コマ → 衣装別コマの順に代入する。1 パスだと manifest の読み込み完了順で共通コマが衣装別を上書きする（BUG-016） | `assets.js assignPlayerFrames`、`test/costume-frames.test.js` |
 | 溜めは 2 段階 | 0.9 秒 `CHARGE_T` で溜め魔法、1.8 秒 `SUPER_T` で強化魔法（`magic.js SUPER`）。強化魔法は新規生成素材なしで、既存スプライト＋粒子＋画面演出で作る | 05-systems 5.1、Sprint K |
@@ -74,7 +76,7 @@
 
 **環境メモ（2026-09-11、GitHub MCP）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
 
-**P3**: IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。IMP-018（scene7）・IMP-026・BUG-008 は 2026-09-12 に済（台帳 233〜236）。デモのボットは敵回避（候補行動 × 弾の予測のシミュレーション）と放物線先読み入り（総死亡 16 → 6、全面 60 秒。塔だけ素朴なボットが選ばれ 2 死）。残る死因は妖精の毒の至近弾・針の群れの突進・ピエロのナイフ・塔の蛆弾。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
+**P3**: IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。IMP-018（scene7）・IMP-026・BUG-008 は 2026-09-12 に済（台帳 233〜236）。デモのボットは敵回避（候補行動 × 弾の予測のシミュレーション）と放物線先読み入り（総死亡 16 → 6 → **3**〔2026-09-12 の死因追跡。第一章 1・塔 2〕、全面 60 秒。塔だけ素朴なボットが選ばれ 2 死）。残る死因は第一章の妖精の毒（x=2362）と塔の蛆・鏡像（素朴なボット）。追跡の手順: `--trace <面> --step 3600` で死亡フレーム → `--step 3 --from 秒 --to 秒 --simdump 秒`（DODGE 行に候補ごとの結果と弾・速い敵の座標、mv=向き/理由 j=跳ぶ理由 br=敵待ちの枝 my=自弾）。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
 
 **ビジュアル保留**: hurt のつば幅 1.45x（傾いた帽子）、fall_nohat 髪幅 1.39x、走り撃ち通過コマの杖。
 

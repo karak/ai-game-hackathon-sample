@@ -57,24 +57,51 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
     }
     return best ? { e: best, gap: bestGap } : null;
   };
-  // 回避候補の評価用: k フレーム後の全ての敵弾・突進敵の箱が (x,y,w,h) と重なるか（跳ねる弾は高さ固定で横だけ進める）
+  // (x, y) の下にある最初の床の上端（8 タイル以内。無ければ null）
+  const groundBelow = (x, y) => { const tx = Math.floor(x / 16); for (let ty = Math.floor(y / 16); ty < Math.min(map.height, Math.floor(y / 16) + 8); ty++) if (map.isSolid(tx, ty) || map.isOneWay(tx, ty)) return ty * 16; return null; };
+  // 敵弾の軌道（k = 0..60 フレームの [x, y]。地面に当たって消えた後は null）。EnemyShot.update と同じ: 重力、床（solid / 上向きの片道床）で消える、
+  // bounce が残っていれば vy を 0.5 倍で反射し vx を 0.7 倍（蛆）。1 フレームに 1 回だけ計算して全候補で使い回す（2026-09-12。以前は跳ねる弾を「床の上の箱」で近似し、
+  // 高く跳ねる蛆や空中からの見え方が合わなかった）
+  let shotPaths = null;
+  const shotPath = s => {
+    if (!shotPaths) shotPaths = new Map();
+    let path = shotPaths.get(s); if (path) return path;
+    path = []; let x = s.x, y = s.y, vx = s.vx, vy = s.vy, bounces = s.bounces ?? 0; const grav = s.def?.gravity ?? 0, homing = !!s.def?.homing;
+    for (let k = 0; k <= 60; k++) {
+      path.push([x, y]);
+      if (homing) { path.pop(); path.push(null); continue; } // 追尾弾は先読みしない（incoming の直線近似に任せる）
+      vy += grav / 60; x += vx / 60; y += vy / 60;
+      const cx = Math.floor((x + s.w / 2) / 16), cy = Math.floor((y + s.h) / 16);
+      if (map.isSolid(cx, cy) || (map.isOneWay(cx, cy) && vy > 0 && ((y + s.h) % 16) < 5)) {
+        if (bounces > 0 && vy > 0) { bounces--; vy = -Math.abs(vy) * 0.5; y = cy * 16 - s.h; vx *= 0.7; }
+        else { while (path.length <= 60) path.push(null); break; }
+      }
+    }
+    shotPaths.set(s, path); return path;
+  };
+  // 回避候補の評価用: k フレーム後の全ての敵弾・突進敵の箱が (x,y,w,h) と重なるか
   const shotHook = (k, x, y, h) => {
-    if (k > Math.max(v.predict, 36)) return false; // 先の弾は次の判断に任せる（遠い将来まで見ると全候補が「当たる」になり、動けなくなる）。突進敵は遅れて届くので最低 36
+    if (k > Math.max(v.predict, 48)) return false; // 先の弾は次の判断に任せる（遠い将来まで見ると全候補が「当たる」になり、動けなくなる）。突進敵は遅れて届くので最低 36 → 48（下がって跳ぶ候補が 40 フレーム前後を要する。2026-09-12）
     const t = k * STEP;
     for (const s of w.enemyShots) {
       if (s.dead) continue;
-      const grav = s.def?.bounce ? 0 : (s.def?.gravity ?? 0), sx = s.x + s.vx * t;
-      if (s.def?.bounce) { // 跳ねる弾: 直近 6 フレームは今の高さから足元までの帯、それ以降は床すれすれの箱（跳び越えの判断ができる）
-        const floor = p.y + p.h, top = k <= 6 ? Math.min(s.y, floor - 14) : floor - 8;
-        if (overlap(sx - 1, top, s.w + 2, floor - top, x, y, p.w, h)) return true; continue;
-      }
-      const sy = s.y + s.vy * t + 0.5 * grav * t * t;
+      const pos = shotPath(s)[k];
+      const [sx, sy] = pos ?? (s.def?.homing ? [s.x + s.vx * t, s.y + s.vy * t] : [null, null]); if (sx === null) continue; // 消えた弾
       if (overlap(sx - 1, sy - 1, s.w + 2, s.h + 2, x, y, p.w, h)) return true;
     }
     for (const e of w.enemies) {
-      if (e.dead || !e.contact || Math.hypot(e.vx, e.vy) < 120) continue;
-      if (overlap(e.x + e.vx * t - 1, e.y + e.vy * t - 1, e.w + 2, e.h + 2, x, y, p.w, h)) return true;
+      if (e.dead || !e.contact || !fastEnemy(e)) continue;
+      const eg = e.gravity ? 520 : 0; // 重力のある敵（跳ねる熊）は放物線で当てる（Enemy.update の 520 px/s²。2026-09-12）
+      if (overlap(e.x + e.vx * t - 1, e.y + e.vy * t + 0.5 * eg * t * t - 1, e.w + 2, e.h + 2, x, y, p.w, h)) return true;
     }
+    return false;
+  };
+  // 「速い敵」= 弾のように予測する敵: 速度 120 以上、または重力で跳んでいる最中（熊は頂点で遅くなるが落ちてくる）
+  const fastEnemy = e => e.state !== 'drop' && (Math.hypot(e.vx, e.vy) >= 120 || (e.gravity && e.onGround === false && Math.abs(e.vx) > 5)); // 落ちてくる繭（drop）は falling() が逃げる
+  // 跳び越えの判定用: k フレーム後に接触する敵（ボス以外。速いものは shotHook が見る）の箱が (x,y,w,h) と重なるか。低い敵を「近いから跳ぶ」前に、跳んだ軌道が敵に触れないかを見る
+  const enemyHook = (k, x, y, h) => {
+    if (k > 60) return false; const t = k * STEP;
+    for (const e of w.enemies) { if (e.dead || !e.contact || e.isBoss || e.hp >= 20 || fastEnemy(e)) continue; const m = 3 + Math.abs(e.vx) * t * 0.6; if (overlap(e.x + e.vx * t - m, e.y + e.vy * t - 3, e.w + 2 * m, e.h + 6, x, y, p.w, h)) return true; } // 余白は時間とともに広げる（這う繭は速度が脈打つ 18±8 で、今の vx から外れる。第二章 x=1567）
     return false;
   };
   // 敵弾の先読み: 今の速度（＋重力）で predict フレーム以内に主人公の箱へ入るか。入るなら着弾高さを返す
@@ -82,21 +109,19 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
     let hit = null;
     for (const s of w.enemyShots) {
       if (s.dead) continue;
-      const grav = s.def?.gravity ?? 0;
-      if (s.def?.bounce) { // 地面を跳ねる弾（蛆）: 放物線では追えないので、向かってくるものは低い弾として扱い跳び越える
-        const dx = p.centerX - (s.x + s.w / 2); if (Math.sign(dx) === Math.sign(s.vx) && Math.abs(dx) / Math.max(1, Math.abs(s.vx)) * 60 <= v.predict) { const k = Math.abs(dx) / Math.max(1, Math.abs(s.vx)) * 60; if (!hit || k < hit.k) hit = { k, cy: p.y + p.h - 2, bottom: p.y + p.h, grav: 1, bounce: true }; }
-        continue;
-      }
+      const grav = s.def?.gravity ?? 0, path = shotPath(s);
       for (let k = 1; k <= v.predict; k += 2) {
-        const t = k * STEP, sx = s.x + s.vx * t, sy = s.y + s.vy * t + 0.5 * grav * t * t;
-        if (overlap(sx, sy, s.w, s.h, p.x - 1, p.y - 1, p.w + 2, p.h + 2)) { if (!hit || k < hit.k) hit = { k, cy: sy + s.h / 2, bottom: sy + s.h, grav }; break; }
+        const pos = path[k]; if (!pos) { if (s.def?.homing) { const t = k * STEP; if (overlap(s.x + s.vx * t, s.y + s.vy * t, s.w, s.h, p.x - 1, p.y - 1, p.w + 2, p.h + 2)) { if (!hit || k < hit.k) hit = { k, cy: s.y + s.vy * t + s.h / 2, bottom: s.y + s.vy * t + s.h, grav }; break; } continue; } break; }
+        const [sx, sy] = pos;
+        if (overlap(sx, sy, s.w, s.h, p.x - 1, p.y - 1, p.w + 2, p.h + 2)) { if (!hit || k < hit.k) hit = { k, cy: sy + s.h / 2, bottom: sy + s.h, grav, bounce: !!s.def?.bounce }; break; }
       }
     }
     // 突進する敵（針の群れなど）も弾と同じに扱う: 速いものだけ
     for (const e of w.enemies) {
-      if (e.dead || !e.contact || Math.hypot(e.vx, e.vy) < 120) continue;
+      if (e.dead || !e.contact || !fastEnemy(e)) continue;
+      const eg = e.gravity ? 520 : 0;
       for (let k = 1; k <= v.predict; k += 2) {
-        const t = k * STEP, ex = e.x + e.vx * t, ey = e.y + e.vy * t;
+        const t = k * STEP, ex = e.x + e.vx * t, ey = e.y + e.vy * t + 0.5 * eg * t * t;
         if (overlap(ex, ey, e.w, e.h, p.x - 1, p.y - 1, p.w + 2, p.h + 2)) { if (!hit || k < hit.k) hit = { k, cy: ey + e.h / 2, bottom: ey + e.h, grav: 0, dash: true }; break; }
       }
     }
@@ -126,12 +151,23 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
     return null;
   };
   // プレス機: 進行方向 48 px 以内のものについて、下を通り切るまでの安全時間があるか
+  // 足元の帯（ベルトコンベア ')' 右 / '(' 左、30 px/s）を含めた、x0〜x1 を dir へ歩くときの最小の実効速度（工房のプレスの下はベルトが逆向きで 36 px/s しか出ず、3 秒周期に間に合わなかった。2026-09-12）
+  const effSpeed = (x0, x1, dir) => {
+    const fy = Math.floor((p.y + p.h + 0.5) / 16); let sp = 66;
+    for (let tx = Math.floor(Math.min(x0, x1) / 16); tx <= Math.floor(Math.max(x0, x1) / 16); tx++) { const c = map.at(tx, fy); const belt = c === ')' ? 1 : c === '(' ? -1 : 0; if (belt) sp = Math.min(sp, 66 + 30 * belt * dir); }
+    return sp;
+  };
   const pressAhead = dir => {
     for (const q of w.presses ?? []) {
       const gap = dir > 0 ? q.x - (p.x + p.w) : p.x - (q.x + q.w);
       if (gap < -(q.w + p.w) || gap > 48) continue;
-      if (gap < 0) return { q, gap }; // すでに真下（走り抜ける）
-      const tm = q.t % 3.0, safeLeft = q.crushing ? 0 : 3.0 - tm, need = (q.w + p.w + 10) / 66 + 0.1; // 3.0 秒周期: 落下 0.15 → 下 0.5 → 上昇 0.6 → 待機
+      const tm = q.t % 3.0, safeLeft = q.crushing ? 0 : 3.0 - tm; // 3.0 秒周期: 落下 0.15 → 下 0.5 → 上昇 0.6 → 待機
+      if (gap < 0) { // すでに真下: 出口までの距離と残り時間を見て、間に合わなければ近い側へ抜ける（戻る）
+        const fwd = dir > 0 ? (q.x + q.w) - p.x + 2 : (p.x + p.w) - q.x + 2, back = dir > 0 ? (p.x + p.w) - q.x + 2 : (q.x + q.w) - p.x + 2;
+        const retreat = safeLeft < fwd / effSpeed(p.x, dir > 0 ? q.x + q.w : q.x, dir) + 0.05 && back < fwd;
+        return { q, gap, retreat };
+      }
+      const need = (gap + q.w + p.w + 10) / effSpeed(p.x, dir > 0 ? q.x + q.w : q.x, dir) + 0.1;
       if (safeLeft < need) return { q, gap };
     }
     return null;
@@ -200,7 +236,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
     }
     return best;
   };
-  const platformAhead = dir => (w.platforms ?? []).some(pl => !pl.dead && (dir > 0 ? pl.x - p.x : p.x - pl.x) > -pl.w && (dir > 0 ? pl.x - p.x : p.x - pl.x) < 160);
+  const platformAhead = dir => (w.platforms ?? []).some(pl => !pl.dead && (pl.axis === 'x' || pl.axis === 'rail' || pl.axis === 'circle') && (dir > 0 ? pl.x - p.x : p.x - pl.x) > -pl.w && (dir > 0 ? pl.x - p.x : p.x - pl.x) < 160); // 横に動く足場だけを「来るのを待つ」対象にする（縦に揺れる浮島は x が変わらず、待つと縁で永久に止まる。涙の川 x=1200、2026-09-12）
   // 接触する敵（同じ高さの帯）で最も近いもの。沈んでいるシロップの腕は contact=false だが、間もなく立ち上がるので含める
   const blockerAt = dir => {
     let best = null, bestGap = Infinity;
@@ -220,7 +256,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
   };
   g.startRecording();
   while (g.state === 'play' && frames < 60 * SECS) {
-    g.input.held.clear();
+    g.input.held.clear(); shotPaths = null;
     if (p.state === 'normal' && v.simple) {
       // 素朴なボット（比較用・保険）: 右へ走る、足元の先が立てなければ跳ぶ、落下に入ったら二段ジャンプ、進みが止まったら跳ぶ、定期的に撃つ。縦面ははしごへ
       if (w.level.vertical) {
@@ -244,45 +280,51 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
       if (p.x > farX + 24) { farX = p.x; retreats = 0; holdF = 0; } // 前に進めたら引き返し回数を忘れる
       if (p.onGround) plan = null;
       const enemyAhead = w.enemies.some(e => !e.dead && e.hp !== undefined && e.state !== 'enter' && (e.x - p.x) * (dir || 1) > -8 && Math.abs(e.x - p.x) < 128 && e.y < p.y + p.h + 8 && e.y + e.h > p.y - 24);
-      let move = dir !== 0, jump = false, shoot = frames % (enemyAhead ? Math.min(v.shoot, 6) : v.shoot) === 0, crouch = false, underPress = false; // 敵が前に居るときは連射
+      let jr = '-', dr = '-', br = '-'; let move = dir !== 0, jump = false, shoot = frames % (enemyAhead ? Math.min(v.shoot, 6) : v.shoot) === 0, crouch = false, underPress = false, turning = false; // 敵が前に居るときは連射。turning = 後ろの敵へ振り向く 1 フレーム（この間は地上の跳ぶ判断をしない）
+      let b = null, shot = null, fall = null, pr = null; // トレースがはしご中も読めるよう外に置く
       if (p.climbing) held('up');
       else if (climbTo) held('up');
       else {
         // 逃げる対象は着地するまで固定（毎フレーム判定し直すと範囲の境で左右に振れて動けない）
         if (fleeFrom && (fleeFrom.dead || (fleeFrom.state !== 'drop' && fleeFrom.vy < 60) || fleeFrom.y + fleeFrom.h > p.y || Math.abs(fleeFrom.x - p.x) > 60)) fleeFrom = null;
-        const b = blockerAt(dir), shot = incoming(), fall = fleeFrom ?? falling(), pr = pressAhead(dir); if (fall) fleeFrom = fall;
+        b = blockerAt(dir); shot = incoming(); fall = fleeFrom ?? falling(); pr = pressAhead(dir); if (fall) fleeFrom = fall;
+        // 風船の亡霊（BalloonGhost）専用の規則は置かない（2026-09-12 に「跳ばない／止まって撃つ／下がる」を試したが、穴の上を漂う亡霊の下で待つ・下がる動きが
+        // 雨と接触の死亡を 1 → 3 に増やした。一般規則〔敵待ち・回避候補・跳び越え〕のままが最も遠くまで進む: 遊園地 progress 2641 / 1 死）
         if (fall) { const fd = fall.x + fall.w / 2 >= p.centerX ? -1 : 1; if (gapWidth(fd) === 0) { move = true; dir = fd; curDir = fd; } else move = false; waitF = 0; } // 落下物の反対へ（そちらが穴なら止まる）
-        else if (b && (b.e.isBoss || b.e.hp >= 20)) { shoot = frames % 6 === 0; waitF = 0; }                    // ボスは塞ぐ相手として扱わず、撃ちながら素朴に進む（跳び越えられず、待つと接触される）
+        else if (b && (b.e.isBoss || b.e.hp >= 20)) { br = 'boss'; shoot = frames % 6 === 0; waitF = 0; }                    // ボスは塞ぐ相手として扱わず、撃ちながら素朴に進む（跳び越えられず、待つと接触される）
         else if (b) {
           const standHit = b.e.y < p.y + 15 && b.e.y + b.e.h > p.y + 9, crouchHit = b.e.y < p.y + 19 && b.e.y + b.e.h > p.y + 13; // 立ち撃ち y+12 / しゃがみ撃ち y+16 が当たる高さか
           const low = b.e.y >= p.y + p.h - 22; // 上端が足元から 22 px 以内の低い敵だけ跳び越えられる（頭の高さに浮く敵は跳ぶと当たる）
-          if (b.isArm) { if (b.passable) { waitF = 0; } else { move = false; shoot = frames % 8 === 0; } }          // 腕: 沈んだら通る、立っていれば撃つ
-          else if (low && b.gap < v.jumpAt) { if (p.onGround) jump = true; waitF = 0; }                          // 低くて近い: 跳び越える
-          else if (!low && b.gap < 28) { if (gapWidth(-dir) === 0) { dir = -dir; curDir = dir; move = true; } else move = false; shoot = frames % 6 === 0; } // 高い敵が迫る: 下がって距離を取る（撃ち続ける）
-          else if (!standHit && !crouchHit) { if (!low) move = false; waitF = 0; }                                // 撃っても当たらない高さ: 低い敵なら進む、高い敵なら止まって様子を見る
-          else if (waitF < v.wait || !low) { move = false; shoot = frames % Math.min(v.shoot, 12) === 0; waitF++; crouch = !standHit; } // 止まって撃つ（立ち撃ちで当たらなければしゃがみ撃ち）。高い敵は待ち切る
-          else if (p.onGround) jump = true;                                                                      // 待ちすぎ（低い敵）: 跳んで抜ける
+          if (b.isArm) { br = 'arm'; if (b.passable) { waitF = 0; } else { move = false; shoot = frames % 8 === 0; } }          // 腕: 沈んだら通る、立っていれば撃つ
+          else if (low && b.gap < v.jumpAt && (waitF >= v.wait || b.gap < 12 || !(standHit || crouchHit))) { // 低くて近い: 跳び越える（撃って当たる高さなら待ち時間内は撃ち続ける。塔のはしご上で腐ったケーキを跳び越えて先の蛆に落ちた）。ただし跳んだ軌道が敵の箱に触れる（幅のある敵の手前で跳ぶと上昇中に当たる。第一章の妖精 x=1383）なら止まって撃つ
+            br = 'over'; if (p.onGround) { if (sim(true, null, true, dir, true, { hook: enemyHook }).r === 'safe') jump = true, jr = '1'; else if (b.gap < 12 && gapWidth(-dir) === 0) { dir = -dir, dr = '7'; curDir = dir; move = true; waitF++; } else { move = false; shoot = frames % 6 === 0; crouch = !standHit && crouchHit; waitF++; } } // 跳べないほど近い（12 px 未満）なら下がって間を取る（第二章の這う繭は撃っても減らず、隣で立ち止まって接触死した x=409）
+            waitF = 0; }
+          else if (!low && b.gap < 28) { br = 'high'; if (gapWidth(-dir) === 0) { dir = -dir, dr = '2'; curDir = dir; move = true; } else move = false; shoot = frames % 6 === 0; } // 高い敵が迫る: 下がって距離を取る（撃ち続ける）
+          else if (!standHit && !crouchHit) { br = 'nohit'; if (!low) move = false; waitF = 0; }                                // 撃っても当たらない高さ: 低い敵なら進む、高い敵なら止まって様子を見る
+          else if (waitF < v.wait || !low) { br = 'wait'; move = false; shoot = frames % Math.min(v.shoot, 12) === 0; waitF++; crouch = !standHit; } // 止まって撃つ（立ち撃ちで当たらなければしゃがみ撃ち）。高い敵は待ち切る
+          else if (p.onGround) { if (sim(true, null, true, dir, true, { hook: enemyHook }).r === 'safe') jump = true, jr = '2'; else if (gapWidth(-dir) === 0) { dir = -dir, dr = '6'; curDir = dir; move = true; } else move = false; } // 待ちすぎ（低い敵）: 跳んで抜ける。軌道が敵に触れる（這う繭が近い）なら下がって間を取る（第二章 x=1567）
         } else waitF = 0;
         const behind = !fall && !b && dir !== 0 ? blockerAt(-dir) : null; // 後ろから迫る敵: 振り向いて撃つ（向きは動いた瞬間に変わるので 1 フレームだけ寄る）
-        if (behind && behind.gap < 36 && !behind.passable && !(behind.e.isBoss || behind.e.hp >= 20) && behindF < 45) { behindF++; if (p.facing !== -dir && p.onGround) { dir = -dir; curDir = dir; move = true; } else move = false; shoot = frames % 6 === 0; }
+        if (behind && behind.gap < 36 && !behind.passable && !(behind.e.isBoss || behind.e.hp >= 20) && behindF < 45 && behind.e.onGround !== false && Math.hypot(behind.e.vx, behind.e.vy) < 60) { behindF++; if (p.facing !== -dir && p.onGround) { dir = -dir, dr = '3'; curDir = dir; move = true; turning = true; } else move = false; shoot = frames % 6 === 0; } // turning: この 1 フレームは「歩いた先が死なら跳ぶ」を止める（敵の毒溜まりへ向かって後ろ跳びした。第一章 x=1406、2026-09-12）
         else if (!behind) behindF = 0;
-        if (pr && !fall) { if (pr.gap < 0) { underPress = true; move = true; } else if (pr.gap < 24) move = false; } // プレスの下に居るなら止まらず走り抜ける。手前なら安全時間を待つ
-        if (shot && shot.bounce && p.onGround && !underPress) {
+        if (pr && !fall) { if (pr.gap < 0) { underPress = true; move = true; if (pr.retreat) { dir = -dir, dr = '4'; curDir = dir; } } else if (pr.gap < 24) move = false; } // プレスの下に居るなら止まらず走り抜ける（間に合わなければ近い側へ戻る）。手前なら安全時間を待つ
+        if (shot && shot.bounce && p.onGround && !underPress && move && !fall) {
           // 跳ねる弾（蛆）: 近づいたら跳び越える（前へ跳んで安全ならそのまま、だめならその場で跳ぶ）。遠ければそのまま
-          if (shot.k <= 14) { if (move && (safe(true, null, true) || safe(true, 'apex', true))) { jump = true; move = true; } else { jump = true; move = false; } }
-        } else if (shot && p.onGround && !underPress) {
+          if (shot.k <= 14) { if (move && (safe(true, null, true) || safe(true, 'apex', true))) { jump = true, jr = '3'; move = true; } else { jump = true, jr = '4'; move = false; } }
+        } else if (shot && p.onGround && !underPress && !fall) { // 落下物から逃げている間は回避候補で上書きしない。跳ねる弾も、止まっているとき（塞がれている）はこちら: その場跳びで弾の上に降りていた
           // 回避: 候補行動（走り続ける／伏せる／下がる／跳ぶ／跳んで止まる／止まる）ごとに自分の箱を進め、全ての弾・突進敵の予測位置と重ならず着地も安全なものを最初に採る
           const blocked = !move; // 敵待ちなどで止まっているときは、前へ走る・前へ跳ぶ候補を使わない
           const cands = [{ n: 'run', hold: true, d: dir, only: !blocked }, { n: 'crouch', crouch: true }, { n: 'back', hold: true, d: -dir, only: gapWidth(-dir) === 0 }, { n: 'jump', j: true, hold: true, d: dir, only: !blocked }, { n: 'jumpStop', j: true, hold: false, d: dir }, { n: 'stop', hold: false, d: dir },
-            { n: 'waitJump', hold: false, d: dir, jumpAt: 6 }, { n: 'waitJump', hold: false, d: dir, jumpAt: 12 }, { n: 'waitJump', hold: false, d: dir, jumpAt: 18 }]; // 今は止まり、数フレーム後に跳ぶ（次のフレームで再評価され、跳ぶ時機が来れば jumpStop が選ばれる）
+            { n: 'waitJump', hold: false, d: dir, jumpAt: 6 }, { n: 'waitJump', hold: false, d: dir, jumpAt: 12 }, { n: 'waitJump', hold: false, d: dir, jumpAt: 18 }, // 今は止まり、数フレーム後に跳ぶ（次のフレームで再評価され、跳ぶ時機が来れば jumpStop が選ばれる）
+            ...[6, 12, 18, 24, 30, 36].map(k => ({ n: 'backJump', hold: true, d: -dir, jumpAt: k, only: gapWidth(-dir) === 0 }))]; // 下がりながら k フレーム後に跳ぶ（上下 2 本のナイフ: 上の弾は下がるほど頭上を抜け、下の弾を跳び越える。遊園地 x=1035、2026-09-12）
           let pick = null;
           for (const c of cands) { if (c.only === false) continue; const r = sim(!!c.j, null, !!c.hold, c.d ?? dir, !!c.hold, { hook: shotHook, crouch: !!c.crouch, jumpAt: c.jumpAt }); if (r.r === 'safe') { pick = c; break; } }
           if (pick) {
             if (pick.n === 'run') { move = true; }
             else if (pick.n === 'crouch') { move = false; crouch = true; shoot = frames % 6 === 0; }
-            else if (pick.n === 'back') { dir = -dir; curDir = dir; move = true; }
-            else if (pick.n === 'jump') { jump = true; move = true; }
-            else if (pick.n === 'jumpStop') { jump = true; move = false; }
+            else if (pick.n === 'back' || pick.n === 'backJump') { dir = -dir, dr = '5'; curDir = dir; move = true; } // backJump は下がる（跳ぶ時機は次フレーム以降の再評価で jump が選ばれる）
+            else if (pick.n === 'jump') { jump = true, jr = '5'; move = true; }
+            else if (pick.n === 'jumpStop') { jump = true, jr = '6'; move = false; }
             else move = false; // stop / waitJump: 止まる（waitJump は次フレーム以降に跳ぶ判断が出る）
           } else if ((shot.grav || shot.dash) && !blocked) move = true; // 全部だめ: 落下弾・突進は走り抜ける（敵待ちで止まっているときは動かない）、直進弾は元の判断のまま
         }
@@ -291,53 +333,57 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
         if (move && !b && !fall && !shot && dir !== 0 && (wallAhead || backoffF > 0)) {
           // 壁に接して跳ぶと横速度 0 の垂直ジャンプになる。少し下がりながら、前へ跳んで乗れる位置を毎フレーム探す
           const fwd = backoffF > 0 ? backDir : dir, bj = bestJump(fwd);
-          if (bj) { jump = true; plan = bj.dbl ? { hold: bj.dblHold } : null; backoffF = 0; dir = fwd; curDir = fwd; }
-          else if (backoffF < 45) { if (backoffF === 0) backDir = dir; backoffF++; dir = -backDir; curDir = backDir; move = true; }
-          else { jump = true; backoffF = 0; dir = backDir; curDir = backDir; } // 見つからなければ跳ぶ（垂直でも段差なら乗れる）
+          if (bj) { jump = true, jr = '7'; plan = bj.dbl ? { hold: bj.dblHold } : null; backoffF = 0; dir = fwd; curDir = fwd; }
+          else if (backoffF < 45 && !blockerAt(-(backoffF > 0 ? backDir : dir))) { if (backoffF === 0) backDir = dir; backoffF++; dir = -backDir; curDir = backDir; move = true; } // 後ろに敵が居るときは下がらない（跳ねる熊へ下がって当たった。第一章 x=2343）
+          else { jump = true, jr = '8'; backoffF = 0; dir = backDir; curDir = backDir; } // 見つからなければ跳ぶ（垂直でも段差なら乗れる）
         }
         if (!p.onGround && dir !== 0) {
           // 空中: このまま落ちて安全ならそのまま。危なければ「二段ジャンプ（今）」→「二段は頂点で（待つ）」→「止まる」→「止まって二段」の順。全部だめなら落下に入ったら二段
           // 空中は横速度を変えられないので、選べるのは二段ジャンプの時機と、その瞬間の向き（押す＝進行方向へ 66、離す＝真下へ）だけ
           if (plan && p.jumps === 1) {
-            if (p.vy > 0) { if (safe(false, 'now', true, dir, plan.hold)) { jump = true; move = plan.hold; plan = null; } else plan = null; } // 計画どおり頂点で二段（この瞬間だけ向きを離すことがある。先読みが崩れていれば捨てて一般則へ）
+            if (p.vy > 0) { if (safe(false, 'now', true, dir, plan.hold)) { jump = true, jr = '9'; move = plan.hold; plan = null; } else plan = null; } // 計画どおり頂点で二段（この瞬間だけ向きを離すことがある。先読みが崩れていれば捨てて一般則へ）
           }
           if (!plan && !safe(false, null, move) && p.jumps === 1) {
-            if (safe(false, 'now', true)) { jump = true; move = true; }
+            if (safe(false, 'now', true)) { jump = true, jr = '10'; move = true; }
             else if (safe(false, 'apex', true)) {}                       // 頂点で前へ二段（待つ）
-            else if (safe(false, 'now', false)) { jump = true; move = false; retreats++; } // 今、真下へ（引き返す）
+            else if (safe(false, 'now', false)) { jump = true, jr = '11'; move = false; retreats++; } // 今、真下へ（引き返す）
             else if (safe(false, 'apex', false)) {}                      // 頂点で真下へ（待つ）
-            else if (p.vy > 0) jump = true;
+            else if (p.vy > 0) jump = true, jr = '12';
           }
         } else if (move && p.onGround && ridingMover && gapWidth(dir) > 0) {                                     // 運ばれている間: 安全に降りられる跳び方が見つかった瞬間に跳ぶ。無ければ乗ったまま待つ
-          const bj = bestJump(dir); if (bj) { jump = true; plan = bj.dbl ? { hold: bj.dblHold } : null; } else move = false;
+          const bj = bestJump(dir); if (bj) { jump = true, jr = '13'; plan = bj.dbl ? { hold: bj.dblHold } : null; } else move = false;
         }
-        else if (move && p.onGround && backoffF === 0 && !wallAhead) {
+        else if (move && p.onGround && backoffF === 0 && !wallAhead && !turning) {
           // 地上: 歩き続けた先読みが死（穴・沼・棘）なら、単発で届くなら跳ぶ、二段で届くなら跳ぶ（空中で二段を判断）。
           // どれも届かなければ縁まで歩いて再判断し、縁では最善（跳んで二段）
           const wk = sim(false, null, true).r;
           if (wk === 'death') {
             const bj = bestJump(dir);
-            if (bj) { jump = true; plan = bj.dbl ? { hold: bj.dblHold } : null; } // 二段が要る計画なら空中で頂点に実行する
+            if (bj) { jump = true, jr = '14'; plan = bj.dbl ? { hold: bj.dblHold } : null; } // 二段が要る計画なら空中で頂点に実行する
             else if (platformAhead(dir)) move = false;                    // 動く足場が来るのを待つ
             else if (retreats >= 2 && holdF < 90) { move = false; holdF++; } // 引き返しが続いたら少し待って状況（敵・足場）が変わるのを見る
-            else if (unsafeAhead(dir, 6)) { jump = true; holdF = 0; }
+            else if (unsafeAhead(dir, 6)) { jump = true, jr = '15'; holdF = 0; }
           }
         }
         if (!move) { lastX = p.x; movingF = 0; }                                                                 // 待ちは「詰まり」に数えない
-        else if (dir === 1 && ++movingF >= v.stuck && frames % v.stuck === 0) { if (p.x - lastX < 6 && p.onGround && (safe(true, null, true) || safe(true, 'apex', true) || safe(true, 'apex', true, dir, false))) jump = true; lastX = p.x; } // 進みが止まったら（安全に着地できるなら）跳ぶ
+        else if (dir === 1 && ++movingF >= v.stuck && frames % v.stuck === 0) { if (p.x - lastX < 6 && p.onGround && (safe(true, null, true) || safe(true, 'apex', true) || safe(true, 'apex', true, dir, false))) jump = true, jr = '16'; lastX = p.x; } // 進みが止まったら（安全に着地できるなら）跳ぶ
         if (v.trace && v.simdump >= 0 && frames === Math.round(v.simdump * 60)) {
           for (const [label, a] of [['continue', [false, null, move]], ['jump', [true, null, true]], ['jump+apex', [true, 'apex', true]], ['jump+apex nohold', [true, 'apex', true, curDir, false]], ['dbl now', [false, 'now', true]], ['dbl apex', [false, 'apex', true]]]) { simPath = []; const r = sim(...a); trace.push(`  SIM ${label}: ${r.r} x=${Math.round(r.x)} path=${simPath.slice(0, 40).join(' ')}`); simPath = null; }
           if (shot) { // 回避候補ごとの結果と、弾の予測位置
             const res = [['run', [true, null, true, dir, true, { hook: shotHook }]], ['crouch', [false, null, false, dir, false, { hook: shotHook, crouch: true }]], ['back', [false, null, true, -dir, true, { hook: shotHook }]], ['jump', [true, null, true, dir, true, { hook: shotHook }]], ['jumpStop', [true, null, false, dir, false, { hook: shotHook }]], ['stop', [false, null, false, dir, false, { hook: shotHook }]], ['wait6', [false, null, false, dir, false, { hook: shotHook, jumpAt: 6 }]], ['wait12', [false, null, false, dir, false, { hook: shotHook, jumpAt: 12 }]], ['wait18', [false, null, false, dir, false, { hook: shotHook, jumpAt: 18 }]]].map(([n, a]) => { const r = sim(...a); return `${n}=${r.r}${r.k !== undefined ? '@' + r.k : ''}`; });
             const shots = w.enemyShots.filter(q => !q.dead).map(q => `${q.kind}(${Math.round(q.x)},${Math.round(q.y)} v${Math.round(q.vx)},${Math.round(q.vy)})`).join(' ');
-            trace.push(`  DODGE shot k=${shot.k} cy-y=${Math.round(shot.cy - p.y)} : ${res.join(' ')} | shots: ${shots} | p=(${Math.round(p.x)},${Math.round(p.y)})`);
+            const fast = w.enemies.filter(e => !e.dead && e.contact && Math.hypot(e.vx, e.vy) >= 120).map(e => `${e.constructor.name}(${Math.round(e.x)},${Math.round(e.y)} ${e.w}x${e.h} v${Math.round(e.vx)},${Math.round(e.vy)})`).join(' ');
+            trace.push(`  DODGE shot k=${shot.k} cy-y=${Math.round(shot.cy - p.y)} : ${res.join(' ')} | shots: ${shots} | fast: ${fast} | p=(${Math.round(p.x)},${Math.round(p.y)})`);
           }
         }
-        if (v.trace && frames % v.tstep === 0 && frames >= v.tfrom * 60 && frames <= v.tto * 60) {
-          const ne = w.enemies.filter(e => !e.dead && e.contact !== undefined).map(e => ({ e, d: e.x - p.x })).filter(o => o.d > -40 && o.d < 120).sort((a, b) => Math.abs(a.d) - Math.abs(b.d))[0];
-          trace.push(`${(frames / 60).toFixed(2)}s x=${Math.round(p.x)} y=${Math.round(p.y)} v=${Math.round(p.vx)},${Math.round(p.vy)} jn=${p.jumps} g=${p.onGround ? 1 : 0} pf=${p.platform ? 1 : 0} mv=${move ? dir : 0} j=${jump ? 1 : 0} cr=${crouch ? 1 : 0} held=[${[...g.input.held].join(',')}] gw=${gapWidth(dir)} air(n/now/apex)=${sim(false, null, move).r[0]}${sim(false, 'now', move).r[0]}${sim(false, 'apex', move).r[0]} sim(w/j/jd/jdn)=${sim(false, null, true).r[0]}${sim(true, null, true).r[0]}${sim(true, 'apex', true).r[0]}${sim(true, 'apex', true, curDir, false).r[0]} bj=${(() => { const q = bestJump(curDir); return q ? `${q.dbl ?? 'single'}${q.dbl ? (q.dblHold ? '+' : '-') : ''}@${Math.round(q.x)}` : '-'; })()} b=${b ? `${b.e.constructor.name}/${Math.round(b.gap)}${b.isArm ? (b.passable ? '/pass' : '/wait') : ''}` : '-'} sh=${shot ? Math.round(shot.cy - p.y) : '-'} fall=${fall ? 1 : 0} pr=${pr ? Math.round(pr.gap) : '-'} w=${waitF} near=${ne ? `${ne.e.constructor.name}(${ne.e.state ?? ''},vy${Math.round(ne.e.vy)})@${Math.round(ne.d)}` : '-'}`);
-        }
       }
+      if (v.trace && frames % v.tstep === 0 && frames >= v.tfrom * 60 && frames <= v.tto * 60) {
+        const ne = w.enemies.filter(e => !e.dead && e.contact !== undefined).map(e => ({ e, d: e.x - p.x })).filter(o => o.d > -40 && o.d < 120).sort((a, b) => Math.abs(a.d) - Math.abs(b.d))[0];
+        trace.push(`${(frames / 60).toFixed(2)}s x=${Math.round(p.x)} y=${Math.round(p.y)} v=${Math.round(p.vx)},${Math.round(p.vy)} jn=${p.jumps} g=${p.onGround ? 1 : 0} pf=${p.platform ? 1 : 0} mv=${move ? dir : 0}${dr !== '-' ? '/' + dr : ''} j=${jump ? jr : 0} cr=${crouch ? 1 : 0} s=${shoot ? 1 : 0} br=${br} co=${p.costume[0]}/${p.weapon} at=${p.attackT.toFixed(2)} my=[${w.shots.filter(q => !q.dead).map(q => `${q.kind ?? q.weapon ?? '?'}(${Math.round(q.x)},${Math.round(q.y)} ${q.w}x${q.h} v${Math.round(q.vx)},${Math.round(q.vy)})`).join(' ')}] cl=${p.climbing ? 1 : 0}${climbTo ? 't' : ''} held=[${[...g.input.held].join(',')}] gw=${gapWidth(dir)} air(n/now/apex)=${sim(false, null, move).r[0]}${sim(false, 'now', move).r[0]}${sim(false, 'apex', move).r[0]} sim(w/j/jd/jdn)=${sim(false, null, true).r[0]}${sim(true, null, true).r[0]}${sim(true, 'apex', true).r[0]}${sim(true, 'apex', true, curDir, false).r[0]} bj=${(() => { const q = bestJump(curDir); return q ? `${q.dbl ?? 'single'}${q.dbl ? (q.dblHold ? '+' : '-') : ''}@${Math.round(q.x)}` : '-'; })()} b=${b ? `${b.e.constructor.name}/${Math.round(b.gap)}${b.isArm ? (b.passable ? '/pass' : '/wait') : ''}[y${Math.round(b.e.y - p.y)}..${Math.round(b.e.y + b.e.h - p.y)} hp${b.e.hp}]` : '-'} sh=${shot ? Math.round(shot.cy - p.y) : '-'} fall=${fall ? 1 : 0} pr=${pr ? Math.round(pr.gap) : '-'} w=${waitF} near=${ne ? `${ne.e.constructor.name}(${ne.e.state ?? ''},vy${Math.round(ne.e.vy)})@${Math.round(ne.d)}` : '-'}`);
+      }
+      // 止まって撃つのに敵と反対を向いていたら（下がった直後・後ろを向いた直後）、1 フレームだけ進行方向へ寄って向きを変える。向きは動いた瞬間にしか変わらず、
+      // 後ろ向きに撃ち続けて「撃っても減らない」状態になっていた（第二章の這う繭 x=726、塔のはしご上のケーキ。2026-09-12）
+      if (!move && shoot && p.onGround && dir !== 0 && p.facing !== dir && !underPress && !crouch) { move = true; turning = true; shoot = false; }
       if (underPress) { jump = false; crouch = false; move = true; } // プレスの真下では跳ばない・伏せない（ブロックは床まで降りる）
       if (crouch) held('down');
       if (move && dir !== 0) held(dir > 0 ? 'right' : 'left');

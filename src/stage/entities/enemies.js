@@ -333,7 +333,7 @@ export class NeedleSwarm extends Enemy {
         break;
       case 'dash':
         this.x += this.vx * dt; this.y += this.vy * dt;
-        if (this.stateT > 0.55 || this.world.level.map.isSolid(Math.floor(this.cx / TILE), Math.floor(this.cy / TILE))) { this.state = 'drift'; this.stateT = 0; this.vx = this.vy = 0; if (this.y > this.homeY + 40) this.y = this.homeY + 40; }
+        if (this.stateT > 0.55 || this.world.level.map.isSolid(Math.floor(this.cx / TILE), Math.floor(this.cy / TILE))) { this.state = 'drift'; this.stateT = 0; this.vx = this.vy = 0; } // 突進の終わりに y を homeY+40 へ瞬間移動していたが、主人公の真上に現れて接触死になった（工房 x=1965、デモ収録で検出 2026-09-12）。高さは drift が 30 px/s で戻す
         break;
     }
     if (this.y < 8) this.y = 8;
