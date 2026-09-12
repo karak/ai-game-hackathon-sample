@@ -37,7 +37,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
   const g = window.__game, STEP = 1 / 60;
   g.input.held.clear(); g.startGame(0); g.stageIndex = si; g.startStage(); g.setState('play'); g.irisT = 99;
   const w = g.world, p = w.player, map = w.level.map; let frames = 0, lastX = p.x, best = w.level.vertical ? p.y : p.x, waitF = 0;
-  const traj = [], deathsAt = g.deathLog.length, hits = [], trace = []; let wasHurt = false, fleeFrom = null, retreats = 0, holdF = 0, farX = p.x, movingF = 0, backoffF = 0, backDir = 1, plan = null, behindF = 0;
+  const traj = [], deathsAt = g.deathLog.length, hits = [], trace = []; let pickups = 0, lastCostume = p.costume; const skipBoxes = new Set(); let boxWait = 0; let wasHurt = false, fleeFrom = null, retreats = 0, holdF = 0, farX = p.x, movingF = 0, backoffF = 0, backDir = 1, plan = null, behindF = 0;
   const held = a => g.input.held.add(a), press = a => g.input.pressed.add(a);
   const ladderX = () => { const fy = Math.floor((p.y + p.h - 1) / 16); let best = null; for (const ty of [fy, fy - 1]) for (let tx = 0; tx < map.width; tx++) if (map.at(tx, ty) === 'L') { const x = tx * 16 + 8; if (best === null || Math.abs(x - p.centerX) < Math.abs(best - p.centerX)) best = x; } return best; }; // 最も近いはしご（左端を選ぶと崖から歩き降りていた。塔 x=74、2026-09-12）
   const overlap = (ax, ay, aw, ah, bx, by, bw, bh) => ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
@@ -103,7 +103,8 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
     if (k > 60) return false; const t = k * STEP;
     for (const e of w.enemies) {
       if (e.dead || !e.contact || e.isBoss || e.hp >= 20 || fastEnemy(e)) continue;
-      const m = 3 + Math.abs(e.vx) * t * 0.6, eg = e.gravity && (e.onGround === false || e.vy > 0) ? 520 : 0;
+      const m = 4 + Math.abs(e.vx) * t * 1.2, eg = e.gravity && (e.onGround === false || e.vy > 0) ? 520 : 0;
+      if (e.state === 'hang' && e.crawlT !== undefined) { if (k >= 6 && overlap(e.x - 26, e.y, e.w + 52, e.h + 70, x, y, p.w, h)) return true; continue; } // 吊り下がる繭: 真下（±26）を通ると落ちてくるので、その柱（下 70 px）を跳ぶ経路に含めない。歩いて通り抜けるのは可（第二章 x=1598、2026-09-12）
       if (e.hopT !== undefined && e.onGround && e.hopT < 0.6 + t) { const f = e.facing || 1; if (overlap(Math.min(e.x, e.x + f * 46) - m, e.y - 36, e.w + 46 + 2 * m, e.h + 40, x, y, p.w, h)) return true; continue; } // 跳ぶ直前の熊: 跳躍の弧（前 46・上 36）を箱にする（第一章 x=2409、2026-09-12）
       if (overlap(e.x + e.vx * t - m, e.y + e.vy * t + 0.5 * eg * t * t - 3, e.w + 2 * m, e.h + 6, x, y, p.w, h)) return true;
     } // 空中の重力持ち（崖から落ちてくるケーキ）は放物線で当てる（塔 x=59、2026-09-12） // 余白は時間とともに広げる（這う繭は速度が脈打つ 18±8 で、今の vx から外れる。第二章 x=1567）
@@ -205,10 +206,10 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
       if (onG && opts.jumpAt === k) { vy = -218; jumps = 1; onG = false; vx = hold ? d * 66 : 0; } // 待ってから跳ぶ候補（k フレーム目で跳ぶ）
       if (onG) { // 歩き: 支えが無くなったら落下へ。歩いている間に沼・棘へ入れば死
         let nx = x + vx / 60;
-        if (vx !== 0) { const etx = Math.floor((vx > 0 ? nx + w0 - 0.001 : nx) / 16); if (map.isSolid(etx, Math.floor(y / 16)) || map.isSolid(etx, Math.floor((y + h - 0.001) / 16))) return { r: 'safe', x }; } // 壁で止まる = 落ちない
+        if (vx !== 0) { const etx = Math.floor((vx > 0 ? nx + w0 - 0.001 : nx) / 16); if (map.isSolid(etx, Math.floor(y / 16)) || map.isSolid(etx, Math.floor((y + h - 0.001) / 16))) return { r: 'safe', x, y }; } // 壁で止まる = 落ちない
         x = nx;
         const cx = Math.floor((x + w0 / 2) / 16); if (map.isHazard(cx, Math.floor((y + h - 1) / 16)) || map.isHazard(cx, Math.floor(y / 16)) || poolAt(x, y, h)) return { r: 'death', x };
-        if (supported()) { if (vx === 0 && k >= (opts.hook ? 60 : 0)) return { r: 'safe', x }; continue; } // 止まっている候補は弾を見る間（60 フレーム）だけ進める
+        if (supported()) { if (vx === 0 && k >= (opts.hook ? 60 : 0)) return { r: 'safe', x, y }; continue; } // 止まっている候補は弾を見る間（60 フレーム）だけ進める
         onG = false; vy = 0; jumps = 0; // 縁から落ちた（ジャンプ権なし）
       }
       if (pendingDbl && !onG && vy > 0 && jumps === 1) { vy = -196; jumps = 2; pendingDbl = false; vx = dblHold ? d * 66 : 0; dblHold = hold; } // 2 度目以降（トランポリン後）は進行方向へ
@@ -222,8 +223,8 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
         let landed = false, tramp = false;
         if (prevBottom <= fty * 16 + 0.01) for (let tx = tx0; tx <= tx1; tx++) if (map.isSolid(tx, fty) || map.isOneWay(tx, fty)) { landed = true; if (map.at(tx, fty) === 'W') tramp = true; }
         const standing = yTop => { const cx = Math.floor((x + w0 / 2) / 16); if (w.level.vertical && yTop > p.y + 40) return 'death'; return map.isHazard(cx, Math.floor((yTop + h - 1) / 16)) || map.isHazard(cx, Math.floor(yTop / 16)) ? 'death' : 'safe'; }; // 着地しても胴体が沼・棘の中なら死。縦面では 40 px より下へ降りる着地も避ける（進みを失い、下の敵の上に落ちる。塔 x=74、2026-09-12）
-        if (landed) { ny = fty * 16 - h; if (tramp) { vy = -330; jumps = 1; onG = false; pendingDbl = !!dbl; dblHold = hold; } else return { r: standing(ny), x }; } // トランポリンで跳ね返ると二段ジャンプ権が戻る（本物と同じ）
-        for (const pl of w.platforms ?? []) { if (pl.dead) continue; const [px, py] = plAt(pl, k + 1); if (prevBottom <= py + 0.01 && ny + h >= py && x + w0 > px && x < px + pl.w) return { r: standing(py - h), x }; }
+        if (landed) { ny = fty * 16 - h; if (tramp) { vy = -330; jumps = 1; onG = false; pendingDbl = !!dbl; dblHold = hold; } else return { r: standing(ny), x, y: ny }; } // トランポリンで跳ね返ると二段ジャンプ権が戻る（本物と同じ）
+        for (const pl of w.platforms ?? []) { if (pl.dead) continue; const [px, py] = plAt(pl, k + 1); if (prevBottom <= py + 0.01 && ny + h >= py && x + w0 > px && x < px + pl.w) return { r: standing(py - h), x, y: py - h }; }
       }
       y = ny;
       const cx = Math.floor((x + w0 / 2) / 16), fy = Math.floor((y + h - 1) / 16), hy = Math.floor(y / 16);
@@ -283,10 +284,38 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
       let dir = 1, climbTo = false;
       if (w.level.vertical) { if (p.climbing) dir = 0; else { const lx = ladderX(); if (lx !== null) { const dx = lx - p.centerX; if (Math.abs(dx) < 3) { climbTo = true; dir = 0; } else dir = dx > 0 ? 1 : -1; } } }
       curDir = dir || 1;
+      // ドレス優先（ユーザー指示 2026-09-12）: 落ちている dress / golddress が 220 px 以内・同じ高さ帯に在れば、後ろでもそこへ向かう（進みは少し落ちてよい）。
+      // 宝箱（T）を開けると出る（私服なら dress、ドレスで 3 個目ごとに golddress）。宝箱は 120 px 以内なら連射で開ける
+      const wantKind = k => k === 'golddress' ? p.costume !== 'gold' : k === 'dress' ? p.costume === 'plain' : false;
+      const dressItem = v.noDress ? null : w.items.filter(it => !it.dead && wantKind(it.kind) && Math.abs(it.x + it.w / 2 - p.centerX) < 220 && it.y + it.h > p.y - 40 && it.y < p.y + p.h + 24).sort((a, b) => Math.abs(a.x - p.centerX) - Math.abs(b.x - p.centerX))[0] ?? null;
+      const needBox = p.costume === 'plain' || (p.costume === 'dress' && ((w.boxCount ?? 0) % 3) === 2); // 開ける価値がある箱: 私服なら dress、ドレスで次が 3 個目なら golddress（それ以外は武器が変わって狙いが狂う）
+      const boxAhead = !v.noDress && needBox && (w.boxes ?? []).some(bx => !bx.dead && (bx.x - p.centerX) * (dir || 1) > -8 && Math.abs(bx.x + bx.w / 2 - p.centerX) < 120 && bx.y + bx.h > p.y && bx.y < p.y + p.h + 8);
+      if (dressItem && !w.level.vertical) { const dx = dressItem.x + dressItem.w / 2 - p.centerX; if (Math.abs(dx) > 5) { dir = dx > 0 ? 1 : -1; curDir = dir; } }
+      // 宝箱は足場の上に置かれている（第二章の 2 個目は地面より 48 px 上）。開ける価値があり 140 px 以内・90 px 以内の高さなら、その足場へ跳び乗ってから撃つ。
+      // 真下に着いても乗れる跳び方が見つからなければ 90 フレームで諦める（skipBoxes）
+      const boxTarget = !v.noDress && needBox && !dressItem && !w.level.vertical ? ((w.boxes ?? []).filter(bx => !bx.dead && !skipBoxes.has(bx) && Math.abs(bx.x + bx.w / 2 - p.centerX) < 140 && bx.y + bx.h <= p.y + p.h + 4 && bx.y + bx.h >= p.y + p.h - 90).sort((a, b) => Math.abs(a.x - p.centerX) - Math.abs(b.x - p.centerX))[0] ?? null) : null;
+      let boxAct = null; // 'shoot' | 'climb' | 'walk'
+      if (boxTarget) {
+        const bdx = boxTarget.x + boxTarget.w / 2 - p.centerX, level = Math.abs((p.y + p.h) - (boxTarget.y + boxTarget.h)) < 4;
+        if (level) { boxAct = 'shoot'; if (Math.abs(bdx) > 4) { dir = bdx > 0 ? 1 : -1; curDir = dir; } }
+        else { dir = bdx > 0 ? 1 : -1; curDir = dir; boxAct = 'walk';
+          if (p.onGround) {
+            const top = boxTarget.y + boxTarget.h - p.h; let best = null; // 足場に立ったときの上端
+            for (const [dbl, dblHold] of [[null, true], ['apex', true], ['apex', false]]) { const r = sim(true, dbl, true, dir, dblHold, { hook: anyHook }); if (r.r === 'safe' && r.y !== undefined && Math.abs(r.y - top) < 4 && Math.abs(r.x + p.w / 2 - (boxTarget.x + boxTarget.w / 2)) < 64 && (!best || Math.abs(r.x - boxTarget.x) < Math.abs(best.x - boxTarget.x))) best = { x: r.x, dbl, dblHold }; }
+            if (best) boxAct = { climb: best };
+            else if (Math.abs(bdx) < 10) { boxWait++; if (boxWait > 90) { skipBoxes.add(boxTarget); boxWait = 0; boxAct = null; } else boxAct = 'wait'; }
+          }
+        }
+      } else boxWait = 0;
       if (p.x > farX + 24) { farX = p.x; retreats = 0; holdF = 0; } // 前に進めたら引き返し回数を忘れる
       if (p.onGround) plan = null;
       const enemyAhead = w.enemies.some(e => !e.dead && e.hp !== undefined && e.state !== 'enter' && (e.x - p.x) * (dir || 1) > -8 && Math.abs(e.x - p.x) < 128 && e.y < p.y + p.h + 8 && e.y + e.h > p.y - 24);
-      let jr = '-', dr = '-', br = '-'; let move = dir !== 0, jump = false, shoot = frames % (enemyAhead ? Math.min(v.shoot, 6) : v.shoot) === 0, crouch = false, underPress = false, turning = false; // 敵が前に居るときは連射。turning = 後ろの敵へ振り向く 1 フレーム（この間は地上の跳ぶ判断をしない）
+      const spitSoon = w.enemies.some(e => !e.dead && e.spitT !== undefined && Math.abs(e.x - p.x) < 150 && e.spitT < 0.4); // 腐ったケーキが間もなく蛆を吐く（塔 x=59: 跳んだ途中で浴びた。跳び越えも待つ。2026-09-12）
+      let jr = '-', dr = '-', br = '-'; let move = dir !== 0, jump = false, shoot = frames % (enemyAhead || boxAhead ? Math.min(v.shoot, 6) : v.shoot) === 0, crouch = false, underPress = false, turning = false;
+      if (dressItem && dir !== 0 && gapWidth(dir) > 0 && Math.abs(dressItem.x - p.centerX) > 8) { dir = 1; curDir = 1; } // 取りに行く先が穴・沼なら諦めて右へ（沼の上に落ちた品）
+      if (boxAct === 'shoot') { turning = true; move = Math.abs(boxTarget.x + boxTarget.w / 2 - p.centerX) > 100; shoot = frames % 6 === 0; } // 同じ高さ: 止まって撃つ（100 px 以内。向きは下の 1 フレーム寄りで合う）
+      else if (boxAct && boxAct.climb) { turning = true; if (p.onGround) { jump = true, jr = 'B'; plan = boxAct.climb.dbl ? { hold: boxAct.climb.dblHold } : null; } }
+      else if (boxAct === 'wait') { move = false; turning = true; } // 敵が前に居るときは連射。turning = 後ろの敵へ振り向く 1 フレーム（この間は地上の跳ぶ判断をしない）
       let b = null, shot = null, fall = null, pr = null; // トレースがはしご中も読めるよう外に置く
       if (p.climbing) held('up');
       else if (climbTo) held('up');
@@ -310,7 +339,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
           const low = b.e.y >= p.y + p.h - 22; // 上端が足元から 22 px 以内の低い敵だけ跳び越えられる（頭の高さに浮く敵は跳ぶと当たる）
           if (b.isArm) { br = 'arm'; if (b.passable) { waitF = 0; } else { move = false; shoot = frames % 8 === 0; } }          // 腕: 沈んだら通る、立っていれば撃つ
           else if (low && b.gap < v.jumpAt && (waitF >= v.wait || b.gap < 12 || !(standHit || crouchHit))) { // 低くて近い: 跳び越える（撃って当たる高さなら待ち時間内は撃ち続ける。塔のはしご上で腐ったケーキを跳び越えて先の蛆に落ちた）。ただし跳んだ軌道が敵の箱に触れる（幅のある敵の手前で跳ぶと上昇中に当たる。第一章の妖精 x=1383）なら止まって撃つ
-            br = 'over'; if (p.onGround) { if (sim(true, null, true, dir, true, { hook: enemyHook }).r === 'safe') jump = true, jr = '1'; else if (b.gap < 12 && gapWidth(-dir) === 0) { dir = -dir, dr = '7'; curDir = dir; move = true; waitF++; } else { move = false; shoot = frames % 6 === 0; crouch = !standHit && crouchHit; waitF++; } } // 跳べないほど近い（12 px 未満）なら下がって間を取る（第二章の這う繭は撃っても減らず、隣で立ち止まって接触死した x=409）
+            br = 'over'; if (p.onGround) { if (!spitSoon && sim(true, null, true, dir, true, { hook: enemyHook }).r === 'safe') jump = true, jr = '1'; else if (b.gap < 12 && gapWidth(-dir) === 0) { dir = -dir, dr = '7'; curDir = dir; move = true; waitF++; } else { move = false; shoot = frames % 6 === 0; crouch = !standHit && crouchHit; waitF++; } } // 跳べないほど近い（12 px 未満）なら下がって間を取る（第二章の這う繭は撃っても減らず、隣で立ち止まって接触死した x=409）
             waitF = 0; }
           else if (!low && b.gap < 28) { br = 'high'; if (gapWidth(-dir) === 0) { dir = -dir, dr = '2'; curDir = dir; move = true; } else move = false; shoot = frames % 6 === 0; } // 高い敵が迫る: 下がって距離を取る（撃ち続ける）
           else if (!standHit && !crouchHit) { br = 'nohit'; if (!low) move = false; waitF = 0; }                                // 撃っても当たらない高さ: 低い敵なら進む、高い敵なら止まって様子を見る
@@ -374,7 +403,6 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
           // 地上: 歩き続けた先読みが死（穴・沼・棘）なら、単発で届くなら跳ぶ、二段で届くなら跳ぶ（空中で二段を判断）。
           // どれも届かなければ縁まで歩いて再判断し、縁では最善（跳んで二段）
           const wk = sim(false, null, true).r;
-          const spitSoon = w.enemies.some(e => !e.dead && e.spitT !== undefined && Math.abs(e.x - p.x) < 150 && e.spitT < 0.4); // 腐ったケーキが間もなく蛆を吐く（塔 x=59: 跳んだ途中で浴びた。2026-09-12）
           if (wk === 'death' && spitSoon && !unsafeAhead(dir, 4)) move = false;
           else if (wk === 'death') {
             const bj = bestJump(dir);
@@ -398,7 +426,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
       }
       if (v.trace && frames % v.tstep === 0 && frames >= v.tfrom * 60 && frames <= v.tto * 60) {
         const ne = w.enemies.filter(e => !e.dead && e.contact !== undefined).map(e => ({ e, d: e.x - p.x })).filter(o => o.d > -40 && o.d < 120).sort((a, b) => Math.abs(a.d) - Math.abs(b.d))[0];
-        trace.push(`${(frames / 60).toFixed(2)}s x=${Math.round(p.x)} y=${Math.round(p.y)} v=${Math.round(p.vx)},${Math.round(p.vy)} jn=${p.jumps} g=${p.onGround ? 1 : 0} pf=${p.platform ? 1 : 0} mv=${move ? dir : 0}${dr !== '-' ? '/' + dr : ''} j=${jump ? jr : 0} cr=${crouch ? 1 : 0} s=${shoot ? 1 : 0} br=${br} co=${p.costume[0]}/${p.weapon} at=${p.attackT.toFixed(2)} my=[${w.shots.filter(q => !q.dead).map(q => `${q.kind ?? q.weapon ?? '?'}(${Math.round(q.x)},${Math.round(q.y)} ${q.w}x${q.h} v${Math.round(q.vx)},${Math.round(q.vy)})`).join(' ')}] cl=${p.climbing ? 1 : 0}${climbTo ? 't' : ''} held=[${[...g.input.held].join(',')}] gw=${gapWidth(dir)} air(n/now/apex)=${sim(false, null, move).r[0]}${sim(false, 'now', move).r[0]}${sim(false, 'apex', move).r[0]} sim(w/j/jd/jdn)=${sim(false, null, true).r[0]}${sim(true, null, true).r[0]}${sim(true, 'apex', true).r[0]}${sim(true, 'apex', true, curDir, false).r[0]} bj=${(() => { const q = bestJump(curDir); return q ? `${q.dbl ?? 'single'}${q.dbl ? (q.dblHold ? '+' : '-') : ''}@${Math.round(q.x)}` : '-'; })()} b=${b ? `${b.e.constructor.name}/${Math.round(b.gap)}${b.isArm ? (b.passable ? '/pass' : '/wait') : ''}[y${Math.round(b.e.y - p.y)}..${Math.round(b.e.y + b.e.h - p.y)} hp${b.e.hp}]` : '-'} sh=${shot ? Math.round(shot.cy - p.y) : '-'} fall=${fall ? 1 : 0} pr=${pr ? Math.round(pr.gap) : '-'} w=${waitF} near=${ne ? `${ne.e.constructor.name}(${ne.e.state ?? ''},vy${Math.round(ne.e.vy)}${ne.e.spitT !== undefined ? ',spit' + ne.e.spitT.toFixed(2) : ''}${ne.e.hopT !== undefined ? ',hop' + ne.e.hopT.toFixed(2) : ''})@${Math.round(ne.d)},${Math.round(ne.e.y - p.y)}` : '-'}`);
+        trace.push(`${(frames / 60).toFixed(2)}s x=${Math.round(p.x)} y=${Math.round(p.y)} v=${Math.round(p.vx)},${Math.round(p.vy)} jn=${p.jumps} g=${p.onGround ? 1 : 0} pf=${p.platform ? 1 : 0} mv=${move ? dir : 0}${dr !== '-' ? '/' + dr : ''} j=${jump ? jr : 0} cr=${crouch ? 1 : 0} s=${shoot ? 1 : 0} br=${br} co=${p.costume[0]}/${p.weapon} at=${p.attackT.toFixed(2)} my=[${w.shots.filter(q => !q.dead).map(q => `${q.kind ?? q.weapon ?? '?'}(${Math.round(q.x)},${Math.round(q.y)} ${q.w}x${q.h} v${Math.round(q.vx)},${Math.round(q.vy)})`).join(' ')}] cl=${p.climbing ? 1 : 0}${climbTo ? 't' : ''} held=[${[...g.input.held].join(',')}] gw=${gapWidth(dir)} air(n/now/apex)=${sim(false, null, move).r[0]}${sim(false, 'now', move).r[0]}${sim(false, 'apex', move).r[0]} sim(w/j/jd/jdn)=${sim(false, null, true).r[0]}${sim(true, null, true).r[0]}${sim(true, 'apex', true).r[0]}${sim(true, 'apex', true, curDir, false).r[0]} bj=${(() => { const q = bestJump(curDir); return q ? `${q.dbl ?? 'single'}${q.dbl ? (q.dblHold ? '+' : '-') : ''}@${Math.round(q.x)}` : '-'; })()} b=${b ? `${b.e.constructor.name}/${Math.round(b.gap)}${b.isArm ? (b.passable ? '/pass' : '/wait') : ''}[y${Math.round(b.e.y - p.y)}..${Math.round(b.e.y + b.e.h - p.y)} hp${b.e.hp}]` : '-'} sh=${shot ? Math.round(shot.cy - p.y) : '-'} it=${dressItem ? `${dressItem.kind}@${Math.round(dressItem.x - p.x)}` : '-'}${boxAhead ? ' box' : ''} fall=${fall ? 1 : 0} pr=${pr ? Math.round(pr.gap) : '-'} w=${waitF} near=${ne ? `${ne.e.constructor.name}(${ne.e.state ?? ''},vy${Math.round(ne.e.vy)}${ne.e.spitT !== undefined ? ',spit' + ne.e.spitT.toFixed(2) : ''}${ne.e.hopT !== undefined ? ',hop' + ne.e.hopT.toFixed(2) : ''})@${Math.round(ne.d)},${Math.round(ne.e.y - p.y)}` : '-'}`);
       }
       // 止まって撃つのに敵と反対を向いていたら（下がった直後・後ろを向いた直後）、1 フレームだけ進行方向へ寄って向きを変える。向きは動いた瞬間にしか変わらず、
       // 後ろ向きに撃ち続けて「撃っても減らない」状態になっていた（第二章の這う繭 x=726、塔のはしご上のケーキ。2026-09-12）
@@ -414,6 +442,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
     g.update(STEP); g.input.endFrame(); frames++;
     // 診断: 被弾（変身解除）の瞬間に、いちばん近い敵と敵弾を記録する（ボット改善の材料。再生には影響しない）
     if (v.trace && p.state === 'dying' && p.deathT < STEP * 1.5) trace.push(`  DIED ${p.deathReason} at x=${Math.round(p.x)} y=${Math.round(p.y)} frame=${frames}`);
+    if (p.state !== 'normal') lastCostume = null; else if (p.costume !== lastCostume) { if ((lastCostume === 'plain' && p.costume !== 'plain') || (lastCostume === 'dress' && p.costume === 'gold')) pickups++; lastCostume = p.costume; } // 復活で dress に戻るのは数えない // ドレス／フルブルームの取得
     const hurt = p.hurtT > 0; if (hurt && !wasHurt) {
       const near = arr => arr.filter(o => !o.dead).map(o => ({ o, d: Math.hypot(o.x + o.w / 2 - p.centerX, o.y + o.h / 2 - (p.y + p.h / 2)) })).sort((a, b) => a.d - b.d)[0];
       const e = near(w.enemies), sh = near(w.enemyShots);
@@ -423,12 +452,12 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
   const json = g.stopRecording(); g.input.held.clear();
   const progress = w.level.vertical ? (map.height * 16 - best) : best;
   const reasons = g.deathLog.slice(deathsAt).map(d => `${d.r}@${Math.round(d.x)}`);
-  return { json, traj, frames, deaths: w.deaths, reasons, hits, trace, endState: g.state, progress: Math.round(progress) };
+  return { json, traj, frames, deaths: w.deaths, reasons, hits, trace, endState: g.state, progress: Math.round(progress), pickups };
 };
 
 if (TRACE) {
   const si = names.indexOf(TRACE); const r = await page.evaluate(runOne, { si, v: { ...VARIANTS[0], ...JSON.parse(arg('--bot', '{}')), trace: true, tstep: TSTEP, tfrom: TFROM, tto: TTO, simdump: SIMDUMP }, SECS, SAMPLE });
-  console.log(r.trace.join('\n')); console.log(`end=${r.endState} deaths=${r.deaths} [${r.reasons.join(' ')}] hits=[${r.hits.join(' ')}] progress=${r.progress}`);
+  console.log(r.trace.join('\n')); console.log(`end=${r.endState} deaths=${r.deaths} [${r.reasons.join(' ')}] hits=[${r.hits.join(' ')}] progress=${r.progress} dresses=${r.pickups}`);
   await browser.close(); process.exit(0);
 }
 mkdirSync('assets/demo', { recursive: true });
@@ -443,7 +472,7 @@ for (const name of targets) {
   runs.sort((a, b) => score(b) - score(a));
   const b = runs[0];
   picked[name] = b;
-  console.log(`${name}: ${b.frames} frames (${(b.frames / 60).toFixed(1)}s), end=${b.endState}, deaths=${b.deaths} [${b.reasons.join(' ')}] hits=[${b.hits.join(' ')}], progress=${b.progress}, bot=${JSON.stringify(b.v)}\n  variants(score deaths/progress): ${runs.map(r => `${score(r)}:${r.deaths}d/${r.progress}${r.v.simple ? 's' : ''}`).join(' ')}`);
+  console.log(`${name}: ${b.frames} frames (${(b.frames / 60).toFixed(1)}s), end=${b.endState}, deaths=${b.deaths} [${b.reasons.join(' ')}] hits=[${b.hits.join(' ')}], progress=${b.progress}, dresses=${b.pickups}, bot=${JSON.stringify(b.v)}\n  variants(score deaths/progress): ${runs.map(r => `${score(r)}:${r.deaths}d/${r.progress}${r.v.simple ? 's' : ''}`).join(' ')}`);
 }
 
 // 書き出しは全面の収録が終わってから（JSON を書くと Vite が HMR でページを読み直し、収録中の実行コンテキストが壊れる）

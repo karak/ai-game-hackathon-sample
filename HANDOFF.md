@@ -51,6 +51,7 @@
 | 構造化ログの核は shared、ブラウザ依存は platform | `src/shared/log.js`（LogEvent・通番・上限・リングバッファ）はどこからでも `log.emit(code, msg, attr)` できる。console／fetch(keepalive)／onerror／sessionStorage は `src/platform/telemetry.js`。stage・gfx → platform は依存の向きで禁止のため（`09-observability.md` §6） | IMP-027 |
 | ログ送信は本番だけ既定 ON | dev サーバーには `/api/log` が無い（404 が console error になり E2E が落ちる）。dev で送信を試すときは `?telemetry=1`、本番で止めるときは `?telemetry=0` かオプション「ログそうしん」OFF。Playwright は `page.route('**/api/log')` で握る | IMP-027 |
 | ログコードは登録制で、未使用も落とす | `src/shared/logcodes.js` に無いコードは `log.emit` が throw。`test/logcodes.test.js` が src/worker/e2e/tools を走査し、未登録と未使用の両方を落とす | IMP-027 |
+| デモボットはドレスを優先して取る | 落ちている dress / golddress へは後ろでも向かい、価値のある宝箱（私服→dress、3 個目→golddress）は足場へ跳び乗って撃つ。進みは多少落ちてよい（ユーザー指示 2026-09-13）。価値の無い箱は開けない（武器が変わる） | IMP-015 |
 | デモの採用基準は死亡 1 回 = 400 | 進んだ距離 − 400 × 死亡 − 400 × ゲームオーバー。以前の 250 では塔で「1 死 1800」が「0 死 1445」に勝った。放置デモで死ぬ方が進みの短さより目立つ | IMP-015 |
 | 敵は足場の縁で止まる（ケーキ） | 主人公へ寄る敵が崖から落ちて下の主人公に蛆を降らせていた。縁の先が床でなければ歩かない | BUG-021 |
 | デモボットは「止まって撃つ」前に敵の方を向く | 向きは動いた瞬間にしか変わらないので、下がった直後は後ろ向きに撃ち続けて「撃っても減らない」になっていた。1 フレームだけ進行方向へ寄る（`turning`）。敵弾は EnemyShot と同じ物理で軌道を先読みする（`shotPath`） | IMP-015 |
