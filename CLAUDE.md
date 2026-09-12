@@ -5,7 +5,9 @@
 ## 最初に読むもの
 - `docs/art-standard.md` — アート基準（数値・出典）。絵に関する判断はこれに照らす
 - `docs/gen-pipeline.md` — 素材生成パイプライン（Gemini → セル抽出 → manifest）
-- `HANDOFF.md` — セッション引き継ぎ（現在地・決定・残課題・手順の入口）
+- `HANDOFF.md` — セッション引き継ぎ。**セッションごとに変わる内容だけ**（現在地・今回の変更・次にやること）。恒常的な内容は書かない
+- `docs/dev-guide.md` — 変わらない手順・主要ファイル・注意点・環境メモ
+- `docs/adr/README.md` — 決定の記録（ADR）。後から変えると影響が大きい決定は 1 決定 1 ファイルでここに起こす。形式は README が規定し `test/adr.test.js` が検査する
 - `docs/architecture.md` — コード構成（境界づけられたコンテキストと依存の向き）。ファイルを増やす／移すときはこれに従い `test/architecture.test.js` を通す
 - `docs/plan/README.md` — 現在地・直近ゴール・ロードマップ
 - `docs/retro/` — 過去の失敗と学び
