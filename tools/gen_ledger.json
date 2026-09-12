@@ -1,5 +1,5 @@
 {
- "requests": 233,
+ "requests": 236,
  "entries": [
   {
    "name": "player-base",
@@ -1824,6 +1824,30 @@
    "secs": 16.7,
    "text": "",
    "ts": 1789181912.373355
+  },
+  {
+   "name": "ending-7",
+   "v": 1,
+   "ok": true,
+   "secs": 14.2,
+   "text": "",
+   "ts": 1789182358.380579
+  },
+  {
+   "name": "bg-castle-mid2",
+   "v": 2,
+   "ok": true,
+   "secs": 14.7,
+   "text": "",
+   "ts": 1789182402.938336
+  },
+  {
+   "name": "bg-castle-mid3",
+   "v": 2,
+   "ok": true,
+   "secs": 16.6,
+   "text": "",
+   "ts": 1789182419.907052
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。",

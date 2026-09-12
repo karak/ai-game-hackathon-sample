@@ -805,7 +805,9 @@
     "bg/castle_mid2"
    ],
    "kind": "bg",
-   "colors": 32
+   "colors": 32,
+   "ref": "bg-castle-mid",
+   "_note": "BUG-008（2026-09-12）: v1 は小物の列（高さ 127）で、壁面の主中景（164）と噛み合わず（mid3 は高さ 50% 未満で連結から除外）。v2 は主中景 v1 raw を参照し、同じ壁面の帯として配置 B を描く"
   },
   "bg-castle-mid3": {
    "box": [
@@ -819,7 +821,9 @@
     "bg/castle_mid3"
    ],
    "kind": "bg",
-   "colors": 32
+   "colors": 32,
+   "ref": "bg-castle-mid",
+   "_note": "BUG-008（2026-09-12）: v1 は小物の列（高さ 74）で、壁面の主中景（164）と噛み合わず（mid3 は高さ 50% 未満で連結から除外）。v2 は主中景 v1 raw を参照し、同じ壁面の帯として配置 C を描く"
   },
   "shots-enemy-a": {
    "box": [
@@ -2407,6 +2411,29 @@
     "assets/gen/ref/lyrica-illust-gold.png"
    ],
    "crop_bottom": 12
+  },
+  "ending-7": {
+   "box": [
+    260,
+    260
+   ],
+   "frames": 1,
+   "anchor": "center",
+   "subject": "ending-7.txt",
+   "out": [
+    "ending/scene7"
+   ],
+   "kind": "bg",
+   "colors": 32,
+   "nokey": true,
+   "trim_border": true,
+   "style": "_illust_style.txt",
+   "style_refs": [
+    "assets/sprites/ending/scene1.png",
+    "assets/gen/ref/lyrica-illust.png"
+   ],
+   "outline_val_max": 0.23,
+   "_note": "IMP-018（2026-09-12）: 2 周目「真の結末」の専用挿絵。ending-5 と同じ物差し（_illust_style、尊重物 scene1 ＋ 立ち絵 lyrica-illust）。game.js endingScenes は scene7 が無ければ scene5 を流用"
   }
  }
 }

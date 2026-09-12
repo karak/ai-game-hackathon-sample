@@ -75,17 +75,17 @@
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 127,
+  "h": 162,
   "src": "assets/sprites/bg/castle_mid2.png",
-  "w": 278
+  "w": 268
  },
  "bg/castle_mid3": {
   "anchor": "center",
   "colors": 32,
   "fits": true,
-  "h": 74,
+  "h": 169,
   "src": "assets/sprites/bg/castle_mid3.png",
-  "w": 269
+  "w": 263
  },
  "bg/castle_sky": {
   "anchor": "center",
@@ -950,6 +950,18 @@
   "outline_val": 0.14,
   "src": "assets/sprites/ending/scene6.png",
   "w": 259
+ },
+ "ending/scene7": {
+  "anchor": "center",
+  "colors": 32,
+  "dither": 0.13,
+  "fits": true,
+  "flat": 0.21,
+  "h": 256,
+  "outline_hue": 302,
+  "outline_val": 0.23,
+  "src": "assets/sprites/ending/scene7.png",
+  "w": 256
  },
  "enemies/angel1": {
   "anchor": "bottom",

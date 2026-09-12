@@ -6,7 +6,7 @@
 
 - リポジトリ: `/Users/yasushi/projects/poc-square`、**公開リポジトリ https://github.com/karak/ai-game-hackathon-sample**（`origin/main`、public）。HEAD は Sprint Q（デモ全面収録・敵回避ボットの調整・hurt2・box 定義）のコミット（`git log -5`）、`origin/main` へ push 済み、作業ツリー clean
 - 検証: `npm test` Vitest **129 件**通過（architecture 5 件を含む）、`npm run e2e` Playwright **11 件**通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・**golden**〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 282 読込を確認
-- 生成予算: Gemini 台帳 `tools/gen_ledger.json` **233 / 280**（当初 200 ＋ 強化魔法に 50 ＋ 2026-09-12 に 30 追加。残 47。台帳の `budget` 欄と `gemini_gen.py` の `BUDGET` が正）。逐次実行、並列禁止。使い先の候補: IMP-018 2 周目挿絵（1）、BUG-008 城の中景（2）。IMP-026 人魚縦長は 1 リクエストで済
+- 生成予算: Gemini 台帳 `tools/gen_ledger.json` **236 / 280**（当初 200 ＋ 強化魔法に 50 ＋ 2026-09-12 に 30 追加。残 44。台帳の `budget` 欄と `gemini_gen.py` の `BUDGET` が正）。逐次実行、並列禁止。追加分 30 の使い先だった IMP-026 人魚縦長（1）・IMP-018 2 周目挿絵（1）・BUG-008 城の中景 B/C（2）は 2026-09-12 に済（計 4）。残 44 は予備（生成が要る新規項目はユーザー判断）
 - **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）。最終デプロイ Version `2e0f11db`（2026-09-12 00:50、第二章の繭移動を含む。公開 URL で 282 読込・bootMs 599）。その前 `a2fb1446`（2026-09-11 13:40、Sprint Q〔デモ全面収録＋敵回避ボット・hurt2・box 定義〕＋ BUG-018/019〔涙の川・第二章の沼 5 タイル化、人魚クリップ〕を含む。公開 URL で `check_dist` 282 読込・bootMs 563 を確認）
 - コード構成: `docs/architecture.md`（境界づけられたコンテキスト app / stage / content / gfx / ui / platform / shared）。ファイルを増やす・移すときは `test/architecture.test.js` を通す。振る舞いを変える変更をしたら `GOLDEN_UPDATE=1 npx playwright test e2e/golden.spec.js` で黄金を更新し、差分の理由を commit に書く
 - 不具合報告: GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（テンプレートあり）。テスター計測はオプション「テスター報告を コピー」→ `docs/release/tester-guide.md` → `tools/tester_stats.mjs`
@@ -63,13 +63,13 @@
 
 **M6 の繰延**: 実機スマホ（Playwright の iPhone 13 エミュレーションのみ）、実機パッド。
 
-**技術的負債 P2**: DEBT-003 旧文字列ドット絵の残存（`src/gfx/sprites/*` 1261 行。`assets.js` の敵・ボス・弾・アイテム・主人公シートと `tiles.js` の装飾のフォールバックとして今も参照される。生成素材が全部ある現状では実行時に描かれないが、削除は「読込失敗時に何を出すか」の判断を伴う）、BUG-008 城の中景 1 種（2 リクエスト）、IMP-013 本来の強制スクロール。DEBT-004（world.js 分割）と DEBT-008（生成環境）と DEBT-011（コンテキスト整理）は済。`World` に残るトースト・揺れ・湧きの分離は必要になったときに（`docs/architecture.md` §6）。
+**技術的負債 P2**: DEBT-003 旧文字列ドット絵の残存（`src/gfx/sprites/*` 1261 行。`assets.js` の敵・ボス・弾・アイテム・主人公シートと `tiles.js` の装飾のフォールバックとして今も参照される。生成素材が全部ある現状では実行時に描かれないが、削除は「読込失敗時に何を出すか」の判断を伴う）、IMP-013 本来の強制スクロール。BUG-008 城の中景（壁面 B/C を 2 リクエストで生成、3 種連結）は 2026-09-12 に済。DEBT-004（world.js 分割）と DEBT-008（生成環境）と DEBT-011（コンテキスト整理）は済。`World` に残るトースト・揺れ・湧きの分離は必要になったときに（`docs/architecture.md` §6）。
 
 **環境メモ（2026-09-11 10:00、ディスク）**: 作業中にディスクが満杯（228 GB 中 186 GB 使用、空き 118 MB）になり Bash の出力ファイルさえ書けなくなった。`uv cache prune`（未使用 3.3 GiB を削除、再取得可）で空き 1.5 GB にして続行。ほかは触っていない。大きいもの: `~/Library/Application Support/MobileSync` 17 GB、`Claude` 9.9 GB、`Notion` 6.6 GB、`~/.colima` 7.0 GB、`~/.npm` 3.1 GB（`_npx` 2.1 GB）、`~/Library/Caches/puccinialin` 2.0 GB（Rust ツールチェーンのキャッシュ）、`ms-playwright` 1.1 GB（E2E に必要）、`~/.claude/projects.bak-20260621-2201` 482 MB。10:07 にユーザー指示で `~/Library/Application Support/Claude/vm_bundles`（Cowork の VM イメージ 8.5 GB）と同 `Cache`（808 MB）を削除し、空き **12 GB**。残りの大物（MobileSync・Notion・colima・npm）は未整理。
 
 **環境メモ（2026-09-11、GitHub MCP）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
 
-**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは敵回避（候補行動 × 弾の予測のシミュレーション）と放物線先読み入り（総死亡 16 → 6、全面 60 秒。塔だけ素朴なボットが選ばれ 2 死）。残る死因は妖精の毒の至近弾・針の群れの突進・ピエロのナイフ・塔の蛆弾。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
+**P3**: IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。IMP-018（scene7）・IMP-026・BUG-008 は 2026-09-12 に済（台帳 233〜236）。デモのボットは敵回避（候補行動 × 弾の予測のシミュレーション）と放物線先読み入り（総死亡 16 → 6、全面 60 秒。塔だけ素朴なボットが選ばれ 2 死）。残る死因は妖精の毒の至近弾・針の群れの突進・ピエロのナイフ・塔の蛆弾。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
 
 **ビジュアル保留**: hurt のつば幅 1.45x（傾いた帽子）、fall_nohat 髪幅 1.39x、走り撃ち通過コマの杖。
 
