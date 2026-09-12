@@ -163,6 +163,9 @@ export class RottenCake extends Enemy {
     this.facePlayer();
     const d = this.distX();
     if (this.onGround) this.vx = Math.abs(d) > 30 && Math.abs(d) < 200 ? this.facing * 18 : 0;
+    // 足場の縁で止まる: 進む先の足元が床でなければ歩かない。鏡の塔（縦面）では上の足場のケーキが主人公の x へ寄って崖から落ち、落下しながら蛆を吐いて
+    // 下の主人公に降り注いでいた（デモ収録ボットの死因追跡で検出 2026-09-12、BUG-021）
+    if (this.onGround && this.vx !== 0) { const map = this.world.level.map, tx = Math.floor((this.cx + Math.sign(this.vx) * (this.w / 2 + 2)) / TILE), ty = Math.floor((this.y + this.h + 1) / TILE); if (!map.isSolid(tx, ty) && !map.isOneWay(tx, ty)) this.vx = 0; }
     if (Math.abs(d) < 150) {
       this.spitT -= dt;
       if (this.spitT <= 0) { this.spitT = 2.6; for (let i = 0; i < 3; i++) this.shoot('maggot', this.facing * (40 + i * 25), -90 - i * 15, this.facing * 4, -2); this.world.audio.sfx('squish'); }

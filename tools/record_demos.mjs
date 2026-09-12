@@ -39,7 +39,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
   const w = g.world, p = w.player, map = w.level.map; let frames = 0, lastX = p.x, best = w.level.vertical ? p.y : p.x, waitF = 0;
   const traj = [], deathsAt = g.deathLog.length, hits = [], trace = []; let wasHurt = false, fleeFrom = null, retreats = 0, holdF = 0, farX = p.x, movingF = 0, backoffF = 0, backDir = 1, plan = null, behindF = 0;
   const held = a => g.input.held.add(a), press = a => g.input.pressed.add(a);
-  const ladderX = () => { const fy = Math.floor((p.y + p.h - 1) / 16); for (const ty of [fy, fy - 1]) for (let tx = 0; tx < map.width; tx++) if (map.at(tx, ty) === 'L') return tx * 16 + 8; return null; };
+  const ladderX = () => { const fy = Math.floor((p.y + p.h - 1) / 16); let best = null; for (const ty of [fy, fy - 1]) for (let tx = 0; tx < map.width; tx++) if (map.at(tx, ty) === 'L') { const x = tx * 16 + 8; if (best === null || Math.abs(x - p.centerX) < Math.abs(best - p.centerX)) best = x; } return best; }; // 最も近いはしご（左端を選ぶと崖から歩き降りていた。塔 x=74、2026-09-12）
   const overlap = (ax, ay, aw, ah, bx, by, bw, bh) => ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
   // 足元の先が「立てない」（穴・沼・棘）か。fty = 足の下の行、fy = 足のある行（棘は地表行を置き換える）
   const unsafeAhead = (dir, dist) => {
@@ -101,9 +101,15 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
   // 跳び越えの判定用: k フレーム後に接触する敵（ボス以外。速いものは shotHook が見る）の箱が (x,y,w,h) と重なるか。低い敵を「近いから跳ぶ」前に、跳んだ軌道が敵に触れないかを見る
   const enemyHook = (k, x, y, h) => {
     if (k > 60) return false; const t = k * STEP;
-    for (const e of w.enemies) { if (e.dead || !e.contact || e.isBoss || e.hp >= 20 || fastEnemy(e)) continue; const m = 3 + Math.abs(e.vx) * t * 0.6; if (overlap(e.x + e.vx * t - m, e.y + e.vy * t - 3, e.w + 2 * m, e.h + 6, x, y, p.w, h)) return true; } // 余白は時間とともに広げる（這う繭は速度が脈打つ 18±8 で、今の vx から外れる。第二章 x=1567）
+    for (const e of w.enemies) {
+      if (e.dead || !e.contact || e.isBoss || e.hp >= 20 || fastEnemy(e)) continue;
+      const m = 3 + Math.abs(e.vx) * t * 0.6, eg = e.gravity && (e.onGround === false || e.vy > 0) ? 520 : 0;
+      if (e.hopT !== undefined && e.onGround && e.hopT < 0.6 + t) { const f = e.facing || 1; if (overlap(Math.min(e.x, e.x + f * 46) - m, e.y - 36, e.w + 46 + 2 * m, e.h + 40, x, y, p.w, h)) return true; continue; } // 跳ぶ直前の熊: 跳躍の弧（前 46・上 36）を箱にする（第一章 x=2409、2026-09-12）
+      if (overlap(e.x + e.vx * t - m, e.y + e.vy * t + 0.5 * eg * t * t - 3, e.w + 2 * m, e.h + 6, x, y, p.w, h)) return true;
+    } // 空中の重力持ち（崖から落ちてくるケーキ）は放物線で当てる（塔 x=59、2026-09-12） // 余白は時間とともに広げる（這う繭は速度が脈打つ 18±8 で、今の vx から外れる。第二章 x=1567）
     return false;
   };
+  const anyHook = (k, x, y, h) => shotHook(k, x, y, h) || enemyHook(k, x, y, h); // 跳ぶ先に敵・弾のどちらも無いか（bestJump と空中の二段ジャンプの第一候補）
   // 敵弾の先読み: 今の速度（＋重力）で predict フレーム以内に主人公の箱へ入るか。入るなら着弾高さを返す
   const incoming = () => {
     let hit = null;
@@ -145,7 +151,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
   const falling = () => {
     for (const e of w.enemies) {
       if (e.dead || !e.contact || e.y + e.h > p.y) continue;
-      const dropping = e.state === 'drop' || (e.vy >= 60 && Math.abs(e.vx) < 40 && (p.y - (e.y + e.h)) / e.vy < 1.0); // ほぼ真下に、1 秒以内に届く
+      const dropping = e.state === 'drop' || e.state === 'swoop' || (e.gravity !== false && e.vy >= 60 && Math.abs(e.vx) < 40 && (p.y - (e.y + e.h)) / e.vy < 1.0); // ほぼ真下に、1 秒以内に届く。速度は重力のある敵だけ信じる（ガーゴイルは急降下後も vy が残る。塔 x=55、2026-09-12）
       if (dropping && e.x + e.w > p.x - 14 && e.x < p.x + p.w + 14) return e;
     }
     return null;
@@ -215,7 +221,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
         const fty = Math.floor((ny + h) / 16), tx0 = Math.floor(x / 16), tx1 = Math.floor((x + w0 - 0.001) / 16);
         let landed = false, tramp = false;
         if (prevBottom <= fty * 16 + 0.01) for (let tx = tx0; tx <= tx1; tx++) if (map.isSolid(tx, fty) || map.isOneWay(tx, fty)) { landed = true; if (map.at(tx, fty) === 'W') tramp = true; }
-        const standing = yTop => { const cx = Math.floor((x + w0 / 2) / 16); return map.isHazard(cx, Math.floor((yTop + h - 1) / 16)) || map.isHazard(cx, Math.floor(yTop / 16)) ? 'death' : 'safe'; }; // 着地しても胴体が沼・棘の中なら死
+        const standing = yTop => { const cx = Math.floor((x + w0 / 2) / 16); if (w.level.vertical && yTop > p.y + 40) return 'death'; return map.isHazard(cx, Math.floor((yTop + h - 1) / 16)) || map.isHazard(cx, Math.floor(yTop / 16)) ? 'death' : 'safe'; }; // 着地しても胴体が沼・棘の中なら死。縦面では 40 px より下へ降りる着地も避ける（進みを失い、下の敵の上に落ちる。塔 x=74、2026-09-12）
         if (landed) { ny = fty * 16 - h; if (tramp) { vy = -330; jumps = 1; onG = false; pendingDbl = !!dbl; dblHold = hold; } else return { r: standing(ny), x }; } // トランポリンで跳ね返ると二段ジャンプ権が戻る（本物と同じ）
         for (const pl of w.platforms ?? []) { if (pl.dead) continue; const [px, py] = plAt(pl, k + 1); if (prevBottom <= py + 0.01 && ny + h >= py && x + w0 > px && x < px + pl.w) return { r: standing(py - h), x }; }
       }
@@ -228,13 +234,13 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
   const safe = (...a) => sim(...a).r === 'safe';
   const good = (jumpNow, dbl, hold, d = curDir, dblHold = hold) => { const r = sim(jumpNow, dbl, hold, d, dblHold); return r.r === 'safe' && (r.x - p.x) * d >= 24; }; // 安全で、かつ進行方向に 1.5 タイル以上進む着地（その場で跳ねるだけの選択を除く）
   // 地上からの跳び方 3 通り（単発／頂点で前へ二段／頂点で真下へ二段）を先読みし、安全で最も遠くへ進むものを返す（無ければ null）
-  const bestJump = fwd => {
+  const bestJump = (fwd, hook = anyHook) => {
     let best = null;
     for (const [dbl, dblHold] of [[null, true], ['apex', true], ['apex', false]]) {
-      const r = sim(true, dbl, true, fwd, dblHold);
+      const r = sim(true, dbl, true, fwd, dblHold, hook ? { hook } : {});
       if (r.r === 'safe' && (r.x - p.x) * fwd >= 24 && (!best || (r.x - p.x) * fwd > (best.x - p.x) * fwd)) best = { x: r.x, dbl, dblHold };
     }
-    return best;
+    return best ?? (hook ? bestJump(fwd, null) : null); // 敵・弾を避ける跳び方が無ければ地形だけで選ぶ（従来。塔 x=59 で落ちてくるケーキへ跳んだ、2026-09-12）
   };
   const platformAhead = dir => (w.platforms ?? []).some(pl => !pl.dead && (pl.axis === 'x' || pl.axis === 'rail' || pl.axis === 'circle') && (dir > 0 ? pl.x - p.x : p.x - pl.x) > -pl.w && (dir > 0 ? pl.x - p.x : p.x - pl.x) < 160); // 横に動く足場だけを「来るのを待つ」対象にする（縦に揺れる浮島は x が変わらず、待つと縁で永久に止まる。涙の川 x=1200、2026-09-12）
   // 接触する敵（同じ高さの帯）で最も近いもの。沈んでいるシロップの腕は contact=false だが、間もなく立ち上がるので含める
@@ -286,11 +292,18 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
       else if (climbTo) held('up');
       else {
         // 逃げる対象は着地するまで固定（毎フレーム判定し直すと範囲の境で左右に振れて動けない）
-        if (fleeFrom && (fleeFrom.dead || (fleeFrom.state !== 'drop' && fleeFrom.vy < 60) || fleeFrom.y + fleeFrom.h > p.y || Math.abs(fleeFrom.x - p.x) > 60)) fleeFrom = null;
+        if (fleeFrom && (fleeFrom.dead || (fleeFrom.state !== 'drop' && fleeFrom.state !== 'swoop' && (fleeFrom.gravity === false || fleeFrom.vy < 60)) || fleeFrom.y + fleeFrom.h > p.y || Math.abs(fleeFrom.x - p.x) > 60)) fleeFrom = null;
         b = blockerAt(dir); shot = incoming(); fall = fleeFrom ?? falling(); pr = pressAhead(dir); if (fall) fleeFrom = fall;
         // 風船の亡霊（BalloonGhost）専用の規則は置かない（2026-09-12 に「跳ばない／止まって撃つ／下がる」を試したが、穴の上を漂う亡霊の下で待つ・下がる動きが
         // 雨と接触の死亡を 1 → 3 に増やした。一般規則〔敵待ち・回避候補・跳び越え〕のままが最も遠くまで進む: 遊園地 progress 2641 / 1 死）
-        if (fall) { const fd = fall.x + fall.w / 2 >= p.centerX ? -1 : 1; if (gapWidth(fd) === 0) { move = true; dir = fd; curDir = fd; } else move = false; waitF = 0; } // 落下物の反対へ（そちらが穴なら止まる）
+        // 鏡像（MirrorLyrica: 軸 axis で反転した 1 秒前の主人公。触れると死、hp 4）: 軸へ近づくほど向かって来るので、軸の 150 px 手前で止まり、撃って倒してから進む。
+        // 40 px より近ければ下がる（鏡像は 2 倍離れる）。跳ばない（跳ぶと鏡像も跳んで来る。塔 x=78 / 123、2026-09-12）
+        const clone = w.enemies.find(e => !e.dead && e.axis !== undefined && Math.abs(p.centerX - e.axis) < 150 && (e.axis - p.centerX) * dir > 0);
+        if (clone && !fall) {
+          turning = true; waitF = 0; const ad = Math.abs(p.centerX - clone.axis);
+          if (p.onGround) { if (ad < 40 && gapWidth(-dir) === 0) { dir = -dir, dr = 'm'; curDir = dir; move = true; shoot = false; } else { move = false; shoot = frames % 6 === 0; } }
+        }
+        else if (fall) { const fd = fall.x + fall.w / 2 >= p.centerX ? -1 : 1; const bl = blockerAt(fd); if (gapWidth(fd) === 0 && !(bl && bl.gap < 30)) { move = true; dir = fd; curDir = fd; } else move = false; waitF = 0; } // 落下物の反対へ（そちらが穴か、30 px 以内に敵が居るなら止まる）
         else if (b && (b.e.isBoss || b.e.hp >= 20)) { br = 'boss'; shoot = frames % 6 === 0; waitF = 0; }                    // ボスは塞ぐ相手として扱わず、撃ちながら素朴に進む（跳び越えられず、待つと接触される）
         else if (b) {
           const standHit = b.e.y < p.y + 15 && b.e.y + b.e.h > p.y + 9, crouchHit = b.e.y < p.y + 19 && b.e.y + b.e.h > p.y + 13; // 立ち撃ち y+12 / しゃがみ撃ち y+16 が当たる高さか
@@ -317,8 +330,9 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
           const cands = [{ n: 'run', hold: true, d: dir, only: !blocked }, { n: 'crouch', crouch: true }, { n: 'back', hold: true, d: -dir, only: gapWidth(-dir) === 0 }, { n: 'jump', j: true, hold: true, d: dir, only: !blocked }, { n: 'jumpStop', j: true, hold: false, d: dir }, { n: 'stop', hold: false, d: dir },
             { n: 'waitJump', hold: false, d: dir, jumpAt: 6 }, { n: 'waitJump', hold: false, d: dir, jumpAt: 12 }, { n: 'waitJump', hold: false, d: dir, jumpAt: 18 }, // 今は止まり、数フレーム後に跳ぶ（次のフレームで再評価され、跳ぶ時機が来れば jumpStop が選ばれる）
             ...[6, 12, 18, 24, 30, 36].map(k => ({ n: 'backJump', hold: true, d: -dir, jumpAt: k, only: gapWidth(-dir) === 0 }))]; // 下がりながら k フレーム後に跳ぶ（上下 2 本のナイフ: 上の弾は下がるほど頭上を抜け、下の弾を跳び越える。遊園地 x=1035、2026-09-12）
-          let pick = null;
-          for (const c of cands) { if (c.only === false) continue; const r = sim(!!c.j, null, !!c.hold, c.d ?? dir, !!c.hold, { hook: shotHook, crouch: !!c.crouch, jumpAt: c.jumpAt }); if (r.r === 'safe') { pick = c; break; } }
+          let pick = null, latest = null; // latest: 全部だめなときの最終手段 = 当たるのが最も遅い候補（時間を稼いで次のフレームで再評価。第一章 x=2356 の袋小路、2026-09-12）
+          for (const c of cands) { if (c.only === false) continue; const r = sim(!!c.j, null, !!c.hold, c.d ?? dir, !!c.hold, { hook: shotHook, crouch: !!c.crouch, jumpAt: c.jumpAt }); if (r.r === 'safe') { pick = c; break; } if (r.r === 'hit' && (!latest || r.k > latest.k)) latest = { c, k: r.k }; }
+          if (!pick && latest && latest.k > 3) pick = latest.c;
           if (pick) {
             if (pick.n === 'run') { move = true; }
             else if (pick.n === 'crouch') { move = false; crouch = true; shoot = frames % 6 === 0; }
@@ -344,7 +358,10 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
             if (p.vy > 0) { if (safe(false, 'now', true, dir, plan.hold)) { jump = true, jr = '9'; move = plan.hold; plan = null; } else plan = null; } // 計画どおり頂点で二段（この瞬間だけ向きを離すことがある。先読みが崩れていれば捨てて一般則へ）
           }
           if (!plan && !safe(false, null, move) && p.jumps === 1) {
-            if (safe(false, 'now', true)) { jump = true, jr = '10'; move = true; }
+            const hs = (...a) => sim(...a, curDir, true, { hook: anyHook }).r === 'safe'; // 敵・弾も避ける版（第一章 x=2409: 二段で跳んだ先で熊が跳ね上がった。2026-09-12）
+            if (hs(false, 'now', true)) { jump = true, jr = '10h'; move = true; }
+            else if (hs(false, 'apex', true)) {}
+            else if (safe(false, 'now', true)) { jump = true, jr = '10'; move = true; }
             else if (safe(false, 'apex', true)) {}                       // 頂点で前へ二段（待つ）
             else if (safe(false, 'now', false)) { jump = true, jr = '11'; move = false; retreats++; } // 今、真下へ（引き返す）
             else if (safe(false, 'apex', false)) {}                      // 頂点で真下へ（待つ）
@@ -357,7 +374,9 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
           // 地上: 歩き続けた先読みが死（穴・沼・棘）なら、単発で届くなら跳ぶ、二段で届くなら跳ぶ（空中で二段を判断）。
           // どれも届かなければ縁まで歩いて再判断し、縁では最善（跳んで二段）
           const wk = sim(false, null, true).r;
-          if (wk === 'death') {
+          const spitSoon = w.enemies.some(e => !e.dead && e.spitT !== undefined && Math.abs(e.x - p.x) < 150 && e.spitT < 0.4); // 腐ったケーキが間もなく蛆を吐く（塔 x=59: 跳んだ途中で浴びた。2026-09-12）
+          if (wk === 'death' && spitSoon && !unsafeAhead(dir, 4)) move = false;
+          else if (wk === 'death') {
             const bj = bestJump(dir);
             if (bj) { jump = true, jr = '14'; plan = bj.dbl ? { hold: bj.dblHold } : null; } // 二段が要る計画なら空中で頂点に実行する
             else if (platformAhead(dir)) move = false;                    // 動く足場が来るのを待つ
@@ -379,7 +398,7 @@ const runOne = ({ si, v, SECS, SAMPLE }) => {
       }
       if (v.trace && frames % v.tstep === 0 && frames >= v.tfrom * 60 && frames <= v.tto * 60) {
         const ne = w.enemies.filter(e => !e.dead && e.contact !== undefined).map(e => ({ e, d: e.x - p.x })).filter(o => o.d > -40 && o.d < 120).sort((a, b) => Math.abs(a.d) - Math.abs(b.d))[0];
-        trace.push(`${(frames / 60).toFixed(2)}s x=${Math.round(p.x)} y=${Math.round(p.y)} v=${Math.round(p.vx)},${Math.round(p.vy)} jn=${p.jumps} g=${p.onGround ? 1 : 0} pf=${p.platform ? 1 : 0} mv=${move ? dir : 0}${dr !== '-' ? '/' + dr : ''} j=${jump ? jr : 0} cr=${crouch ? 1 : 0} s=${shoot ? 1 : 0} br=${br} co=${p.costume[0]}/${p.weapon} at=${p.attackT.toFixed(2)} my=[${w.shots.filter(q => !q.dead).map(q => `${q.kind ?? q.weapon ?? '?'}(${Math.round(q.x)},${Math.round(q.y)} ${q.w}x${q.h} v${Math.round(q.vx)},${Math.round(q.vy)})`).join(' ')}] cl=${p.climbing ? 1 : 0}${climbTo ? 't' : ''} held=[${[...g.input.held].join(',')}] gw=${gapWidth(dir)} air(n/now/apex)=${sim(false, null, move).r[0]}${sim(false, 'now', move).r[0]}${sim(false, 'apex', move).r[0]} sim(w/j/jd/jdn)=${sim(false, null, true).r[0]}${sim(true, null, true).r[0]}${sim(true, 'apex', true).r[0]}${sim(true, 'apex', true, curDir, false).r[0]} bj=${(() => { const q = bestJump(curDir); return q ? `${q.dbl ?? 'single'}${q.dbl ? (q.dblHold ? '+' : '-') : ''}@${Math.round(q.x)}` : '-'; })()} b=${b ? `${b.e.constructor.name}/${Math.round(b.gap)}${b.isArm ? (b.passable ? '/pass' : '/wait') : ''}[y${Math.round(b.e.y - p.y)}..${Math.round(b.e.y + b.e.h - p.y)} hp${b.e.hp}]` : '-'} sh=${shot ? Math.round(shot.cy - p.y) : '-'} fall=${fall ? 1 : 0} pr=${pr ? Math.round(pr.gap) : '-'} w=${waitF} near=${ne ? `${ne.e.constructor.name}(${ne.e.state ?? ''},vy${Math.round(ne.e.vy)})@${Math.round(ne.d)}` : '-'}`);
+        trace.push(`${(frames / 60).toFixed(2)}s x=${Math.round(p.x)} y=${Math.round(p.y)} v=${Math.round(p.vx)},${Math.round(p.vy)} jn=${p.jumps} g=${p.onGround ? 1 : 0} pf=${p.platform ? 1 : 0} mv=${move ? dir : 0}${dr !== '-' ? '/' + dr : ''} j=${jump ? jr : 0} cr=${crouch ? 1 : 0} s=${shoot ? 1 : 0} br=${br} co=${p.costume[0]}/${p.weapon} at=${p.attackT.toFixed(2)} my=[${w.shots.filter(q => !q.dead).map(q => `${q.kind ?? q.weapon ?? '?'}(${Math.round(q.x)},${Math.round(q.y)} ${q.w}x${q.h} v${Math.round(q.vx)},${Math.round(q.vy)})`).join(' ')}] cl=${p.climbing ? 1 : 0}${climbTo ? 't' : ''} held=[${[...g.input.held].join(',')}] gw=${gapWidth(dir)} air(n/now/apex)=${sim(false, null, move).r[0]}${sim(false, 'now', move).r[0]}${sim(false, 'apex', move).r[0]} sim(w/j/jd/jdn)=${sim(false, null, true).r[0]}${sim(true, null, true).r[0]}${sim(true, 'apex', true).r[0]}${sim(true, 'apex', true, curDir, false).r[0]} bj=${(() => { const q = bestJump(curDir); return q ? `${q.dbl ?? 'single'}${q.dbl ? (q.dblHold ? '+' : '-') : ''}@${Math.round(q.x)}` : '-'; })()} b=${b ? `${b.e.constructor.name}/${Math.round(b.gap)}${b.isArm ? (b.passable ? '/pass' : '/wait') : ''}[y${Math.round(b.e.y - p.y)}..${Math.round(b.e.y + b.e.h - p.y)} hp${b.e.hp}]` : '-'} sh=${shot ? Math.round(shot.cy - p.y) : '-'} fall=${fall ? 1 : 0} pr=${pr ? Math.round(pr.gap) : '-'} w=${waitF} near=${ne ? `${ne.e.constructor.name}(${ne.e.state ?? ''},vy${Math.round(ne.e.vy)}${ne.e.spitT !== undefined ? ',spit' + ne.e.spitT.toFixed(2) : ''}${ne.e.hopT !== undefined ? ',hop' + ne.e.hopT.toFixed(2) : ''})@${Math.round(ne.d)},${Math.round(ne.e.y - p.y)}` : '-'}`);
       }
       // 止まって撃つのに敵と反対を向いていたら（下がった直後・後ろを向いた直後）、1 フレームだけ進行方向へ寄って向きを変える。向きは動いた瞬間にしか変わらず、
       // 後ろ向きに撃ち続けて「撃っても減らない」状態になっていた（第二章の這う繭 x=726、塔のはしご上のケーキ。2026-09-12）
@@ -418,8 +437,9 @@ for (const name of targets) {
   const si = names.indexOf(name);
   const runs = [];
   for (const v of VARIANTS) { const r = await page.evaluate(runOne, { si, v, SECS, SAMPLE }); runs.push({ v, ...r }); }
-  // 採用基準: 進んだ距離 − 死亡 1 回あたり 250 − ゲームオーバーなら 400（デモが途中で終わる）。死なずに止まっているだけの変種を採らない
-  const score = r => r.progress - 250 * r.deaths - (r.endState === 'gameover' ? 400 : 0);
+  // 採用基準: 進んだ距離 − 死亡 1 回あたり 400 − ゲームオーバーなら 400（デモが途中で終わる）。死なずに止まっているだけの変種を採らない。
+  // 死亡の重みは 250 → 400（2026-09-12: 塔で「1 死で 1800」の素朴なボットが「0 死で 1445」の賢いボットに勝っていた。放置デモで死ぬ方が進みが短いより目立つ）
+  const score = r => r.progress - 400 * r.deaths - (r.endState === 'gameover' ? 400 : 0);
   runs.sort((a, b) => score(b) - score(a));
   const b = runs[0];
   picked[name] = b;
