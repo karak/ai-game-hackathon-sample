@@ -69,8 +69,10 @@ function drawMermaidDoll(e, g, cam, assets) {
 }
 
 function drawMirrorLyrica(e, g, cam, assets) {
+  // 倒された後の不在中は軸の線だけ。復活の 1.5 秒前から軸の位置に薄く現れる（gone は enemies.js MirrorLyrica、MIRROR_RESPAWN_T で復活）
+  if (e.gone > 1.5) { g.fillStyle = 'rgba(232,232,244,0.25)'; g.fillRect(Math.round(e.axis - cam.x), 0, 1, 224); return; }
   const sheet = assets.player[e.hist[0]?.costume ?? 'dress'] ?? assets.player.dress; const spr = sheet[e.frame] ?? sheet.idle; if (!spr) return;
-  g.save(); g.globalAlpha = 0.75; g.filter = 'saturate(0.2) brightness(1.15)';
+  g.save(); g.globalAlpha = e.gone > 0 ? 0.75 * (1 - e.gone / 1.5) : 0.75; g.filter = 'saturate(0.2) brightness(1.15)';
   if (e.flashT > 0) g.filter = 'brightness(3)';
   blit(g, spr, e.mirrorFacing < 0, Math.floor(e.x + e.w / 2 - spr.w / 2 - cam.x), Math.floor(e.y + e.h - spr.h - cam.y));
   g.restore();

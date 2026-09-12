@@ -1,7 +1,7 @@
 import { TILE, moveBody } from '../physics.js';
 import { EnemyShot } from './projectiles.js';
 import { rand, grand } from '../../shared/util.js';
-import { SAFE_ZONE_X } from '../balance.js';
+import { SAFE_ZONE_X, MIRROR_RESPAWN_T } from '../balance.js';
 import { HD_SCALE } from '../viewport.js';
 
 let nextId = 1;
@@ -389,17 +389,23 @@ export class ClownSkeleton extends Enemy {
 // ---- 鏡像リリカ (第六章): 鏡の軸 x=axis を挟んで、主人公の 1 秒前の位置・コマを左右反転して再生する。触れると被弾。撃てる（HP 4） ----
 export class MirrorLyrica extends Enemy {
   constructor(world, axisX, y) {
-    super(world, axisX, y, 12, 28); this.axis = axisX; this.hp = 4; this.score = 500; this.gravity = false; this.gore = 'blood'; this.contact = true;
+    super(world, axisX, y, 12, 28); this.axis = axisX; this.homeY = y; this.hp = 4; this.score = 500; this.gravity = false; this.gore = 'blood'; this.contact = true; // homeY: 自分の階（この高さ ±48 に主人公が居るときだけ鏡になる）
     this.hist = []; this.delay = 60; this.frame = 'idle'; this.mirrorFacing = 1;
+    this.gone = 0; // 倒された後の不在時間（秒）。0 より大きい間は姿も当たりも無く、MIRROR_RESPAWN_T で軸に復活する（ユーザー指示 2026-09-13）
   }
+  // 倒しても消えない: 演出と得点は通常どおり出し、dead を戻して MIRROR_RESPAWN_T 秒の不在にする（world.enemies から外れないので、同じ軸に復活する）
+  die() { super.die(); this.dead = false; this.gone = MIRROR_RESPAWN_T; this.contact = false; this.hist = []; }
+  hurt(dmg, shot) { if (this.gone > 0) return; super.hurt(dmg, shot); }
   update(dt) {
     super.update(dt); const p = this.player;
+    if (this.gone > 0) { this.gone -= dt; this.contact = false; if (this.gone <= 0) { this.gone = 0; this.hp = 4; this.hist = []; this.world.particles.emit('sparkle', this.axis, p.y + 10, 12); this.world.audio.sfx('dress'); } return; } // 復活: 軸の位置で 1 秒ぶんの履歴を貯め直す
     this.hist.push({ x: p.centerX, y: p.y, h: p.h, frame: p.frame(), facing: p.facing, costume: p.costume });
     if (this.hist.length > this.delay) this.hist.shift();
     const s = this.hist[0];
-    // 鏡像: x は軸で反転、y はそのまま。主人公が軸から 200 以上離れると軸の位置で待つ
-    const mx = 2 * this.axis - s.x; const far = Math.abs(p.centerX - this.axis) > 200;
-    this.x = (far ? this.axis : mx) - this.w / 2; this.y = s.y + (s.h - this.h); this.h = 28; this.frame = far ? 'idle' : s.frame; this.mirrorFacing = -s.facing;
+    // 鏡像: x は軸で反転、y はそのまま。主人公が軸から 200 以上離れる、または別の階（自分の homeY から 48 以上離れた高さ）に居るときは自分の階の軸の位置で待つ
+    // （鏡の塔は 3 体が同じ軸 x を共有していて、以前は全員が主人公の階へ集まって重なった。2026-09-13）
+    const mx = 2 * this.axis - s.x; const far = Math.abs(p.centerX - this.axis) > 200 || Math.abs((p.y + p.h) - (this.homeY + 28)) > 48;
+    this.x = (far ? this.axis : mx) - this.w / 2; this.y = far ? this.homeY : s.y + (s.h - this.h); this.h = 28; this.frame = far ? 'idle' : s.frame; this.mirrorFacing = -s.facing;
     this.contact = !far;
   }
   spriteName() { return null; }

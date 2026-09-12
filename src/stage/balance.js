@@ -7,3 +7,4 @@ export const BOSS_FIGHT_T = 90;     // 制限時間の見積もりに使うボ�
 export const minTimeLimit = bossX => Math.ceil(bossX / PLAYER_SPEED) * 3 + BOSS_FIGHT_T;
 // 2 周目（真の結末ルート、05-systems 5.1）: 敵弾の速さ 1.5 倍、ゾンビ湧き間隔 0.8 倍
 export const LOOP2 = Object.freeze({ shotSpeed: 1.5, spawnGap: 0.8 });
+export const MIRROR_RESPAWN_T = 22; // 鏡像リリカを倒してから復活するまでの秒数（ユーザー指示 2026-09-13「20 秒ちょっと」）
