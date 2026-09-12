@@ -41,6 +41,19 @@
    "block_width": 130,
    "block_height": 100,
    "chain_height": 20
+  },
+  "mermaid": {
+   "_doc": "人魚人形（IMP-026、2026-09-12）。v1 実測: mermaid1 42x53（頭 40・胴の途中で切れている）、mermaid2 78x77（跳躍、尾あり）。頭 40 は v1 と同じ、胴 20 は主人公と同じ、腰 10・尾 36 で待機コマの全高 ≈ 100 にし、水面（上から 47 行）より下に腰と尾が続くようにする",
+   "total_height": 100,
+   "head_height": 40,
+   "hair_width": 40,
+   "eye_height": 8,
+   "eye_from_hair_top": 18,
+   "torso_height": 20,
+   "shoulder_width": 26,
+   "hips_height": 10,
+   "tail_length": 36,
+   "tail_fin_width": 24
   }
  },
  "sprites": {
@@ -1083,7 +1096,10 @@
    "out": [
     "enemies/mermaid1",
     "enemies/mermaid2"
-   ]
+   ],
+   "ref": "enemy-mermaid",
+   "parts": "mermaid",
+   "_note": "IMP-026: v2 は待機コマを頭〜腰〜尾まで描く（v1 は胴の途中で切れ、水面の 6 px 上に切れ目が見えた）。ref は自作の v1 raw（配色・顔の同一性）"
   },
   "enemy-umbrella": {
    "box": [

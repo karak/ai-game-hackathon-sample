@@ -5,7 +5,7 @@ import { PAL } from '../gfx/palette.js';
 import { HD_SCALE, blit, tint } from '../gfx/sprite.js';
 import { t } from '../shared/i18n.js';
 import { Boss, GutsTeddy, MirrorQueen, Noir, Ringmaster, SerpentPart, WeepingDoll } from './entities/bosses.js';
-import { Enemy, MermaidDoll, MirrorLyrica, ZombieRabbit, ZombieSpawner } from './entities/enemies.js';
+import { Enemy, MERMAID_HEAD_ABOVE, MermaidDoll, MirrorLyrica, ZombieRabbit, ZombieSpawner } from './entities/enemies.js';
 import { FloatingItem, Item, TreasureBox } from './entities/items.js';
 import { CHARGE_T, CUTIN_SCALE, Cortege, CutIn, FirePillar, HeartBurst, HeartGarden, Meteor, MeteorCaster, MirrorFrame, SUPER, SUPER_COLOR, SUPER_T, ShadowClone, Shard, drawSpr } from './entities/magic.js';
 import { Decals, Particles } from './entities/particles.js';
@@ -53,8 +53,19 @@ function drawMermaidDoll(e, g, cam, assets) {
   // 水面より下は描かない（潜っている表現）
   // 水の絵は drawBog が水面タイルの 6 px 下から描く（top 行は y+6）ので、クリップもそこに合わせる。waterY で切ると
   // スプライトの切れた縁が水面の 6 px 上に浮いて見えた（2026-09-11 ユーザー報告）
-  g.save(); g.beginPath(); g.rect(0, 0, 9999, Math.floor(e.waterY + 6 - cam.y)); g.clip();
-  drawEnemy(e, g, cam, assets); g.restore();
+  // IMP-026（2026-09-12）: 待機コマ mermaid1 は頭〜腰〜尾まで描いた縦長版（62x66）。当たり判定は 8x15 に固定したので（enemies.js MERMAID_W/H）、
+  // 待機中は「頭頂 = 当たり判定の上端 − MERMAID_HEAD_ABOVE」で上寄せに置き、伸びた分は水面下へ沈める。跳躍コマ（mermaid2）は従来どおり底辺合わせ（drawEnemy）
+  const surface = Math.floor(e.waterY + 6 - cam.y);
+  const draw = () => {
+    if (e.state !== 'lunge') {
+      const spr = assets.enemies.mermaid1;
+      if (spr?.hd) { const fs = e.flashT > 0 ? { ...spr, r: flashImg(spr.r), l: flashImg(spr.l) } : spr; blit(g, fs, e.facing < 0, e.x + e.w / 2 - spr.w / 2 - cam.x, e.y - MERMAID_HEAD_ABOVE - cam.y); return; }
+    }
+    drawEnemy(e, g, cam, assets);
+  };
+  g.save(); g.beginPath(); g.rect(0, 0, 9999, surface); g.clip(); draw(); g.restore();
+  // 水面下の体は水を透かして薄く見せる（腰・尾が水中に続いている表現。当たり判定には影響しない）
+  g.save(); g.beginPath(); g.rect(0, surface, 9999, 9999); g.clip(); g.globalAlpha = 0.3; draw(); g.restore();
 }
 
 function drawMirrorLyrica(e, g, cam, assets) {

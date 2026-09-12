@@ -1,5 +1,5 @@
 {
- "requests": 232,
+ "requests": 233,
  "entries": [
   {
    "name": "player-base",
@@ -1816,6 +1816,14 @@
    "secs": 16.6,
    "text": "",
    "ts": 1788999013.004836
+  },
+  {
+   "name": "enemy-mermaid",
+   "v": 2,
+   "ok": true,
+   "secs": 16.7,
+   "text": "",
+   "ts": 1789181912.373355
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。",

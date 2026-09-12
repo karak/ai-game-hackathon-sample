@@ -2,6 +2,7 @@ import { TILE, moveBody } from '../physics.js';
 import { EnemyShot } from './projectiles.js';
 import { rand, grand } from '../../shared/util.js';
 import { SAFE_ZONE_X } from '../balance.js';
+import { HD_SCALE } from '../viewport.js';
 
 let nextId = 1;
 
@@ -236,10 +237,15 @@ export class EyeTurret extends Enemy {
 }
 
 // ---- 人魚人形 (第三章): 水面下で待ち、主人公が近づくと跳ね上がって噛みつく ----
+export const MERMAID_W = 8, MERMAID_H = 15;       // 当たり判定（世界単位）。v1 スプライト 42x53 に fitSprite(0.6, 0.85) を当てた値を固定（IMP-026）
+export const MERMAID_HEAD_ABOVE = 8 / HD_SCALE;  // 待機コマの頭頂が当たり判定の上端より上に出る量（v1: 53 - 45 = 8 セル）。縦長版でも頭の位置を変えないための基準
 export class MermaidDoll extends Enemy {
   constructor(world, x, y) {
     super(world, x, y - 6, 14, 20); this.spriteOff = [3, 2];
-    this.hp = 3; this.score = 300; this.gravity = false; this.gore = 'bone'; this.fitSprite('mermaid1', 0.6, 0.85);
+    this.hp = 3; this.score = 300; this.gravity = false; this.gore = 'bone';
+    // IMP-026（2026-09-12）: スプライトを頭〜尾まで描く縦長版（mermaid1 42x53 → 62x66）にしたので、fitSprite で寸法を出すと当たり判定と跳躍の
+    // 発生範囲が変わってしまう。v1 のとき fitSprite('mermaid1', 0.6, 0.85) が返していた 8x15（世界単位）に固定して攻撃範囲を維持する（描画は drawMermaidDoll）
+    if (this.world.assets?.enemies?.mermaid1?.hd) { const bottom = this.y + this.h; this.baseSprite = 'mermaid1'; this.w = MERMAID_W; this.h = MERMAID_H; this.y = bottom - this.h; }
     // マーカーの真下で最初に見つかる '~' の上端を水面にする
     const map = world.level.map, tx = Math.floor((x + 7) / TILE); let ty = Math.floor(y / TILE);
     while (ty < map.height && map.at(tx, ty) !== '~') ty++;

@@ -6,7 +6,7 @@
 
 - リポジトリ: `/Users/yasushi/projects/poc-square`、**公開リポジトリ https://github.com/karak/ai-game-hackathon-sample**（`origin/main`、public）。HEAD は Sprint Q（デモ全面収録・敵回避ボットの調整・hurt2・box 定義）のコミット（`git log -5`）、`origin/main` へ push 済み、作業ツリー clean
 - 検証: `npm test` Vitest **129 件**通過（architecture 5 件を含む）、`npm run e2e` Playwright **11 件**通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・**golden**〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 282 読込を確認
-- 生成予算: Gemini 台帳 `tools/gen_ledger.json` **232 / 280**（当初 200 ＋ 強化魔法に 50 ＋ 2026-09-12 に 30 追加。残 48。台帳の `budget` 欄が正）。逐次実行、並列禁止。使い先の候補: IMP-026 人魚縦長（1〜2）、IMP-018 2 周目挿絵（1）、BUG-008 城の中景（2）
+- 生成予算: Gemini 台帳 `tools/gen_ledger.json` **233 / 280**（当初 200 ＋ 強化魔法に 50 ＋ 2026-09-12 に 30 追加。残 47。台帳の `budget` 欄と `gemini_gen.py` の `BUDGET` が正）。逐次実行、並列禁止。使い先の候補: IMP-018 2 周目挿絵（1）、BUG-008 城の中景（2）。IMP-026 人魚縦長は 1 リクエストで済
 - **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）。最終デプロイ Version `2e0f11db`（2026-09-12 00:50、第二章の繭移動を含む。公開 URL で 282 読込・bootMs 599）。その前 `a2fb1446`（2026-09-11 13:40、Sprint Q〔デモ全面収録＋敵回避ボット・hurt2・box 定義〕＋ BUG-018/019〔涙の川・第二章の沼 5 タイル化、人魚クリップ〕を含む。公開 URL で `check_dist` 282 読込・bootMs 563 を確認）
 - コード構成: `docs/architecture.md`（境界づけられたコンテキスト app / stage / content / gfx / ui / platform / shared）。ファイルを増やす・移すときは `test/architecture.test.js` を通す。振る舞いを変える変更をしたら `GOLDEN_UPDATE=1 npx playwright test e2e/golden.spec.js` で黄金を更新し、差分の理由を commit に書く
 - 不具合報告: GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（テンプレートあり）。テスター計測はオプション「テスター報告を コピー」→ `docs/release/tester-guide.md` → `tools/tester_stats.mjs`
@@ -48,6 +48,7 @@
 | `box` は論理箱で改名しない | prompt の Logical box・後処理 `--logical`・manifest `fits` が同じ値を共有する（上限かつ目標）。`docs/gen-pipeline.md` §1 | DEBT-007 |
 | 地面からの隙間は最大 5 タイル | 主人公物理（SPEED 66・JUMP −218・二段 −196）では縁から 6 タイル（96 px）は渡れない（最大到達 96 px、着地に >96 が要る）。レベル編集後は `tools/check_gaps.mjs` を通す。トランポリン・助走・踏み石経路も検査する | BUG-018 |
 | 人魚は水の絵の位置でクリップ | `drawBog` は水面タイルの 6 px 下から描くので、人魚のクリップも `waterY + 6`。縦長スプライトへの差し替えは IMP-026（予算要） | BUG-019 |
+| 人魚は当たり判定を固定し、絵だけ縦長 | 待機コマを頭〜尾まで描いた 62×66 に差し替えたが、当たり判定は v1 由来の 8×15（`MERMAID_W/H`）、頭頂の位置は `MERMAID_HEAD_ABOVE`（8 セル）で不変。伸びた分は水面下に α0.3 で透かす。スプライト寸法から当たり判定を出す `fitSprite` はこの敵には使わない | IMP-026 |
 | 衣装コマの割り当ては 2 パス | 共通コマ → 衣装別コマの順に代入する。1 パスだと manifest の読み込み完了順で共通コマが衣装別を上書きする（BUG-016） | `assets.js assignPlayerFrames`、`test/costume-frames.test.js` |
 | 溜めは 2 段階 | 0.9 秒 `CHARGE_T` で溜め魔法、1.8 秒 `SUPER_T` で強化魔法（`magic.js SUPER`）。強化魔法は新規生成素材なしで、既存スプライト＋粒子＋画面演出で作る | 05-systems 5.1、Sprint K |
 | 素材の軽量化 | フォントはゲーム用サブセット（`tools/subset_font.py`。文言を足したら作り直す。`test/font-subset.test.js` が漏れを検出）、スプライトはパレット PNG（`tools/optimize_pngs.py`、可逆検査つき）。`/assets/*` は 1 年 immutable なので PNG は `?v=<ビルド ID>` で破棄する | IMP-019、`docs/release/deploy.md` |
@@ -68,7 +69,7 @@
 
 **環境メモ（2026-09-11、GitHub MCP）**: Claude Code の GitHub MCP プラグイン（`plugin:github:github`）は環境変数 `GITHUB_PERSONAL_ACCESS_TOKEN`（`~/.zshrc`）を読む。PAT は再生成済みで `api.github.com` / `api.githubcopilot.com/mcp/` とも 200 を確認したが、Claude Code のプロセスが古い環境を引き継いでいると 401 になる。新しいターミナル（またはアプリの再起動）から `claude` を起こしてから `/mcp` を確認する。`gh` CLI（karak）は使える。
 
-**P3**: IMP-026 人魚スプライトの縦長化（1〜2 リクエスト、攻撃範囲維持）、IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは敵回避（候補行動 × 弾の予測のシミュレーション）と放物線先読み入り（総死亡 16 → 6、全面 60 秒。塔だけ素朴なボットが選ばれ 2 死）。残る死因は妖精の毒の至近弾・針の群れの突進・ピエロのナイフ・塔の蛆弾。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
+**P3**: IMP-018 2 周目専用挿絵（1 リクエスト）、IMP-009 マイルド表現（血の色。表現の変更なのでユーザー判断）、BUG-006 私服の色分け（手修正）。IMP-015・BUG-007・DEBT-007 は Sprint Q で済。デモのボットは敵回避（候補行動 × 弾の予測のシミュレーション）と放物線先読み入り（総死亡 16 → 6、全面 60 秒。塔だけ素朴なボットが選ばれ 2 死）。残る死因は妖精の毒の至近弾・針の群れの突進・ピエロのナイフ・塔の蛆弾。人手で収録し直すなら `window.__game.startRecording()` → プレイ → `stopRecording()` の JSON を `assets/demo/<面名>.json` に置く。
 
 **ビジュアル保留**: hurt のつば幅 1.45x（傾いた帽子）、fall_nohat 髪幅 1.39x、走り撃ち通過コマの杖。
 
@@ -90,8 +91,8 @@ node tools/shot_stages.mjs --stages 1,2 --at 0.35,0.7  # 章の同じ位置を�
 node tools/make_trailer.mjs                # トレーラー GIF 再生成（5175）。--scale 0.3333 --out docs/release/trailer_256.gif でカバー用
 node tools/gather_deaths.mjs --runs 2 --secs 150   # 死亡ログ収集（5173 が起きていること）
 
-# 素材生成（Python は参照プロジェクトの venv。DEBT-008）
-PY="/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.venv/bin/python"
+# 素材生成（Python は本リポの .venv。DEBT-008 で完結済み。外部 HDD の参照プロジェクト venv は不要。PATH の python3 には numpy / google-genai が無い）
+PY=".venv/bin/python"
 "$PY" tools/gemini_gen.py <spec> [--ref raw.png]   # 1 件ずつ。台帳に記録される
 "$PY" tools/build_sprites.py <spec…>               # 後処理 → assets/sprites, manifest。QA WARN を読む
 "$PY" tools/derive_variants.py                     # 主人公の帽子合成・衣装・hurt2・run*s

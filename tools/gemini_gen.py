@@ -3,7 +3,7 @@
 
 - API キーは環境変数 GEMINI_API_KEY、本リポの .env（.env.example を複製、git 管理外）、参照プロジェクトの .env の順に探す（DEBT-008）
 - 生成回数は tools/gen_ledger.json に記録し、BUDGET を超えたら停止する
-  セッション予算: 200（当初）＋ 50（強化魔法の素材。ユーザー指示 2026-09-10）= 250
+  セッション予算: 200（当初）＋ 50（強化魔法の素材。ユーザー指示 2026-09-10）= 250 → ＋ 30（ユーザー指示 2026-09-11）= 280
 - 生成物は assets/gen/raw/<name>-v<N>.png、プロンプトは assets/gen/prompts/<name>-v<N>.txt に保存
 
 使い方: python3 tools/gemini_gen.py <name> --prompt-file p.txt [--ref image.png ...] [--n 1]
@@ -18,7 +18,7 @@ LEDGER = ROOT / 'tools/gen_ledger.json'
 # .env の探索順: 本リポ → 参照プロジェクト（後者は従来の場所。外部 HDD が無くても動くようにした。DEBT-008）
 ENV_FILES = [ROOT / '.env', Path('/Volumes/Mac external HDD/Projects/claude-virtual-office-materialized/.env')]
 MODEL = 'gemini-2.5-flash-image'
-BUDGET = 250  # 200（当初）＋ 50（強化魔法。2026-09-10 追加）
+BUDGET = 280  # 200（当初）＋ 50（強化魔法。2026-09-10 追加）＋ 30（人魚縦長・2 周目挿絵・城の中景。ユーザー指示 2026-09-11）
 
 
 def load_key() -> str:
@@ -131,6 +131,10 @@ PART_LABELS = {
     'legs_height': 'legs (hem to sole, socks + boots): {v} cells',
     'boot_height': 'boots: {v} cells tall',
     'boot_width': 'each boot: {v} cells long',
+    # 人魚人形（IMP-026）: 胴と尾の長さを部位で指定する
+    'hips_height': 'hips (waist to where the fish tail begins): {v} cells',
+    'tail_length': 'fish tail from the hips to the tip of the tail fin: {v} cells measured along the tail',
+    'tail_fin_width': 'tail fin: {v} cells wide at its widest',
 }
 
 

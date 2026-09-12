@@ -1099,17 +1099,17 @@
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 53,
+  "h": 66,
   "src": "assets/sprites/enemies/mermaid1.png",
-  "w": 42
+  "w": 62
  },
  "enemies/mermaid2": {
   "anchor": "bottom",
   "colors": 15,
   "fits": true,
-  "h": 77,
+  "h": 81,
   "src": "assets/sprites/enemies/mermaid2.png",
-  "w": 78
+  "w": 77
  },
  "enemies/mushroom1": {
   "anchor": "bottom",
