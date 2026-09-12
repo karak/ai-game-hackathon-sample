@@ -14,7 +14,7 @@
 | 資料 | デザインカタログ 7 章（キャラ／敵／アイテム／タイル／背景／ステージ／UI） | `catalog.html` |
 | 入力・保存 | キーボード／Gamepad API（standard mapping、オプションに診断行）／タッチ、キーコンフィグ、`localStorage` セーブ（進行・音量・ミュート・割り当て・ハイスコア）、通しプレイ記録 `lyrica_runs`（テスター報告のコピー、`src/runlog.js`） | `src/input.js`、`src/settings.js`、`test/input.test.js`、`test/settings.test.js` |
 | バランス | 復活地点 ±96 湧き禁止、復活後 2 秒敵弾なし、制限時間 300/300/330（歩行×3＋ボス 90 秒） | `src/balance.js`、`test/balance.test.js` |
-| テスト | Vitest 129 件＋ Playwright E2E 11 件（8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・golden〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。デモ入力ログは 8 面（`tools/record_demos.mjs`、再生一致を検査） | `npm test`、`npm run e2e` |
+| テスト | Vitest 148 件＋ Playwright E2E 13 件（構造化ログ `telemetry.spec` 2 件を含む。8 面ボット自走〔縦面は登攀ボット〕・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・golden〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。デモ入力ログは 8 面（`tools/record_demos.mjs`、再生一致を検査） | `npm test`、`npm run e2e` |
 | ビルド・配信 | Vite（index.html / catalog.html、`copySprites` で素材を dist へ）。dist 6.0 MB、`tools/check_dist.mjs` で preview 起動確認。`LICENSE`、`docs/release/`（itch ページ原稿・既知の問題・トレーラー GIF） | `npm run build`、`node tools/check_dist.mjs` |
 
 ## 素材（manifest 235 エントリ）

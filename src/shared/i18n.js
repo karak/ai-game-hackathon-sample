@@ -20,7 +20,7 @@ export const EN = {
   'おんりょう': 'Volume', 'ミュート': 'Mute', 'げんご': 'Language', 'キー か ボタン を おしてください': 'Press a key or button', 'そうさを しょきかに もどす': 'Reset controls', 'タイトルへ もどる': 'Back to title',
   'ひだり': 'Left', 'みぎ': 'Right', 'うえ': 'Up', 'した': 'Down', 'まほう': 'Magic', 'ジャンプ': 'Jump', 'けってい': 'OK', 'ポーズ': 'Pause',
   // オプション: パッド診断・テスター報告（実機パッド確認とテスター計測の再開、2026-09-10）
-  'ゲームパッド': 'Gamepad', 'みけんしゅつ': 'not detected', 'テスター報告を コピー': 'Copy tester report', 'コピーしました': 'Copied', 'コピーできません': 'Copy failed',
+  'ゲームパッド': 'Gamepad', 'みけんしゅつ': 'not detected', 'テスター報告を コピー': 'Copy tester report', 'ログそうしん': 'Send logs', 'コピーしました': 'Copied', 'コピーできません': 'Copy failed',
   // 溜め魔法（L1）と強化魔法（L2）の名前。発動時にトーストで出る（magic.js MAGIC / SUPER）
   '流星群': 'Meteor Shower', '影の連射': 'Shadow Volley', '大爆発': 'Big Bang', '火柱': 'Fire Pillars',
   '星屑の葬列': 'Stardust Cortege', '鏡像の舞踏会': 'Mirror Waltz', '心臓の花園': 'Heart Garden', '蝋の聖歌隊': 'Wax Choir',

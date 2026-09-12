@@ -6,6 +6,7 @@ import { createBoss } from './entities/bosses.js';
 import { SONGS } from '../platform/audio.js';
 import { BOSS_NAMES } from '../content/story.js';
 import { t } from '../shared/i18n.js';
+import { log } from '../shared/log.js'; // 構造化ログ（Sprint R）: BOSS.START / BOSS.END
 
 export function startBoss(world) {
   const trig = world.level.bossTriggers[world.bossIdx]; const map = world.level.map; const kind = world.level.bosses[world.bossIdx] ?? world.level.boss;
@@ -26,6 +27,7 @@ export function startBoss(world) {
   world.enemies = world.enemies.filter(e => !(e.spawnX >= x0 - 200)); // 周辺の雑魚は消す
   world.enemies.push(world.boss);
   world.audio.playBgm(SONGS[world.level.bossSong ?? 'boss']); // 最終章は bossFinal
+  world.bossStartT = world.t; log.emit('BOSS.START', kind, { boss: kind, hp: world.boss.hpMax });
   world.fx.bossIntro(bossName(world));
 }
 
@@ -34,6 +36,7 @@ export function bossName(world, kind = world.level.bosses[world.bossIdx] ?? worl
 export function onBossDying(world) { world.cutscene = true; world.audio.stopBgm(); world.fx.bossDefeat(); }
 
 export function onBossDefeated(world) {
+  log.emit('BOSS.END', world.level.bosses[world.bossIdx] ?? world.level.boss, { boss: world.level.bosses[world.bossIdx] ?? world.level.boss, sec: Math.round(world.t - (world.bossStartT ?? world.t)), deaths: world.deaths });
   if (world.bossIdx + 1 < world.level.bosses.length) { // 連戦: 次のボスへ（部屋を開放して先へ進ませる）
     world.bossIdx++; world.boss = null; world.arena = null; world.bossState = 'none'; world.cutscene = false; world.enemies = world.enemies.filter(e => !e.isBoss && !e.head);
     world.player.invT = Math.max(world.player.invT, 1.5); world.time = Math.max(world.time, 90); world.toast(t('先へ進め')); world.audio.playBgm(SONGS[world.level.theme]); return;

@@ -298,3 +298,38 @@
 
 ユーザー指示「次の sprint に実ユーザーおよび bot による e2e プレイテストのための observability を積む。スコープは console（Chrome DevTools）/ wrangler のログ。OTel や外部ツールは導入しないが、導入可能な形（構造化ログ・error code・session-id / request-id・context）にする」。計画は **[09-observability.md](09-observability.md)**（IMP-027）。作業 R1〜R7、合計 2.75 日。出口条件: 人 1 セッションとボット 1 本の `wrangler tail` NDJSON を `docs/plan/logs/tail/` に置き、`tools/log_stats.mjs` の表をここに貼る。
 
+### 結果（2026-09-12、R1〜R7 済。計画との差分は 09 §6）
+
+| 作業 | 済 | 証跡 |
+|------|----|------|
+| R1 コード表・ロガー | `src/shared/logcodes.js`（26 コード）、`src/shared/log.js`（LogEvent・ctx 自動・PII 鍵除去・200 字／20 鍵／2 KB／500 件）、`src/platform/telemetry.js` | `test/log.test.js` 9 件、`test/logcodes.test.js` 2 件 |
+| R2 計装 | SESSION.START / GAME.BOOT / GAME.STATE / RUN.START・END / STAGE.START・CLEAR / PLAYER.HIT・DEATH・CONTINUE / BOSS.START・END / DEMO.START・END / INPUT.PAD / PERF.FRAME / ASSET.FAIL / SAVE.FAIL / ERR.UNCAUGHT・PROMISE・AUDIO / LOG.DROP・TRUNCATED | `e2e/telemetry.spec.js` 2 件（順序・sid 同一・seq 連番・error 0・rid 同一・`?telemetry=0`）。既存 Vitest 129 → 148、Playwright 11 → 13、architecture テスト通過 |
+| R3 Worker | `worker/index.js`（POST 以外 405、64 KB 超 413、不正 JSON／空／200 件超／スキーマ違反 400、1 イベント 1 行＋`EDGE.LOG_BATCH`）、`wrangler.jsonc` に `main` / `ASSETS` / `run_worker_first` | `test/worker.test.js` 4 件。本番デプロイ Version `2aa0c3f2`、`check_dist` 282 読込・warn 0・error 0、`curl` GET 405 / POST 204 |
+| R4 道具 | `tools/tail_logs.mjs`（整形済み JSON を波括弧の深さで切る）、`tools/log_stats.mjs`（sid 表・到達ファネル・死亡 面×原因×x・エラー・fps p95） | `test/tail_logs.test.js` 2 件、`test/log_stats.test.js` 2 件、`docs/release/tester-guide.md` に集め方 |
+| R5 ボット | `golden.spec.js`・`autoplay.spec.js`・`record_demos.mjs` が `setSource('bot', { test })`、`/api/log` は `page.route` で握る、golden に `lvl: error` 0 件と user 2 件（setSource 前）だけの assert、`check_dist` は `?telemetry=0` | `e2e/golden.spec.js`（options 画面のハッシュだけ更新: telemetry 行の追加） |
+| R6 報告 v2 | `buildReport` に `sid` と直近 200 件 `log`（`report: 2`）、オプション「ログそうしん」（既定 ON、設定 `telemetry`）、i18n `Send logs` | `test/runlog.test.js`、`e2e/gamepad.spec.js` の既存 assert 維持 |
+| R7 記録 | `docs/architecture.md`（shared/log・platform/telemetry・worker/）、`HANDOFF.md` §3/§5/§7、09 §6、本表、backlog IMP-027 | この commit |
+
+公開 URL の `wrangler tail`（`docs/plan/logs/tail/2026-09-12-sprint-r.ndjson`、ボット 1 セッション `public-bot` ＋ ボット扱いにしない Playwright 1 セッション。各 40 秒ぶんを早送り、1 死）を `node tools/log_stats.mjs … --src all` で集計:
+
+```
+events 14  by src: user=8 bot=4 worker=2
+
+sessions (gap = seq の欠け。サーバー側の NDJSON では debug（GAME.STATE）を送らないので欠けが出るのが正常。dump() / 報告 JSON では 0 のはず)
+sid      src  build    env                   ev   gap run reach clear end death err p95  sec
+75443dea bot  mtxtpcjf en-US 1280x720 [public-bot]6    2   1   1     0     0   1     0   -    1
+bdd84f63 user mtxtpcjf en-US 1280x720        6    2   1   1     0     0   1     0   -    1
+
+funnel (sessions that started / cleared each stage)
+  stage1           started 2    cleared 0
+
+deaths (stage: total, by reason, x buckets of 64 px)
+  stage1           2    hit=2  x: 1600:2
+
+errors / asset failures / drops (0)
+
+perf: 0 samples, fps p95 min - median -, long frames 0
+```
+
+未達（ユーザー受入）: 人の実操作 1 セッション（公開 URL を開いて 1 面遊び、DevTools で `[LYR` フィルタ、オプション「テスター報告を コピー」の JSON を `docs/plan/logs/testers/` に置く）。`PERF.FRAME` は 30 秒の実時間が要るので早送りのボットでは出ない（人のセッションで初めて出る）。
+

@@ -1,5 +1,7 @@
 // 死亡地点ログ（IMP-007 / M5）。localStorage に蓄積し、難易度調整の根拠にする。純粋関数群（ストレージは注入）
 // 1 件 = { s: ステージ名, x, y: 世界座標（整数）, r: 原因（hit/fall/spike/bog/press/time）, t: 面の経過秒, l: 周回（0/1）, at: epoch ms }
+import { log } from '../shared/log.js'; // 構造化ログ（Sprint R）: SAVE.FAIL
+
 export const DEATH_KEY = 'lyrica_deaths';
 export const DEATH_MAX = 600;          // 超えたら古い順に捨てる
 export const DEATH_REASONS = ['hit', 'fall', 'spike', 'bog', 'press', 'time'];
@@ -12,7 +14,7 @@ function clean(e) {
 export function loadDeathLog(storage) {
   try { const j = JSON.parse(storage?.getItem(DEATH_KEY) ?? '[]'); return Array.isArray(j) ? j.map(clean).filter(Boolean).slice(-DEATH_MAX) : []; } catch { return []; }
 }
-export function saveDeathLog(log, storage) { try { storage?.setItem(DEATH_KEY, JSON.stringify(log)); return true; } catch { return false; } }
+export function saveDeathLog(dlog, storage) { try { storage?.setItem(DEATH_KEY, JSON.stringify(dlog)); return true; } catch (e) { log.warn('SAVE.FAIL', 'deaths', { key: DEATH_KEY }, e); return false; } }
 // 追記して上限で切る（新しい配列を返す）
 export function pushDeath(log, entry) { const e = clean(entry); if (!e) return log; const out = [...log, e]; return out.length > DEATH_MAX ? out.slice(out.length - DEATH_MAX) : out; }
 

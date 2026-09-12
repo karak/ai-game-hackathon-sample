@@ -24,7 +24,8 @@ for (const look of [10, 14, 20]) VARIANTS.push({ simple: true, shoot: 15, stuck:
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 900, height: 760 } });
 const errors = []; page.on('pageerror', e => errors.push(String(e)));
-const boot = async () => { await page.goto(`${URL}/index.html`); await page.waitForFunction(() => !!window.__game, null, { timeout: 30_000 }); };
+await page.route('**/api/log', r => r.fulfill({ status: 204 })); // 構造化ログの送信は握る（Sprint R）。収録面の JSON には sid を書く（ボットの run を後で引けるように）
+const boot = async () => { await page.goto(`${URL}/index.html`); await page.waitForFunction(() => !!window.__game, null, { timeout: 30_000 }); await page.evaluate(() => window.__log.setSource('bot', { test: 'record_demos' })); };
 await boot();
 const names = await page.evaluate(async () => (await import('/src/content/levels/index.js')).STAGES.map(s => s.name));
 const targets = ONLY.length ? ONLY : names;

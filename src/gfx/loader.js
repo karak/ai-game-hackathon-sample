@@ -3,6 +3,7 @@
 import { flipH, HD_SCALE } from './sprite.js';
 
 export const BUILD_ID = typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev';
+export const LOAD_FAILURES = []; // 読めなかった素材 { path, error }。main.js が GAME.BOOT の前に ASSET.FAIL として記録する（gfx から log を読まないのは依存の向きのため。Sprint R）
 
 export async function loadImage(url) {
   const im = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('load failed ' + url)); im.src = url; });
@@ -29,7 +30,7 @@ export async function loadManifest(manifest, base = '', onProgress = null) {
       const img = await loadImage(u.href);
       const r = toCanvas(img);
       out[key] = { r, l: flipH(r), w: r.width / HD_SCALE, h: r.height / HD_SCALE, hd: true, anchor: m.anchor, brim: m.brim_overlap ? m.brim_overlap / HD_SCALE : undefined }; // w,h は世界単位
-    } catch (e) { console.warn('[loader]', e.message); }
+    } catch (e) { console.warn('[loader]', e.message); LOAD_FAILURES.push({ path: m.src, error: e.message }); }
     finally { done++; onProgress?.(done, entries.length); }
   }));
   return out;

@@ -4,6 +4,7 @@ export const STORAGE_KEY = 'lyrica_save';
 export const LEGACY_HI_KEY = 'lyrica_hi';
 export { ACTIONS, REBINDABLE, ACTION_LABEL, DEFAULT_KEYS, DEFAULT_PAD, PAD_BUTTON_NAME } from '../platform/keymap.js'; // 既定の割り当ては platform/keymap.js（再公開。既存の import 元を保つ）
 import { ACTIONS, DEFAULT_KEYS, DEFAULT_PAD, PAD_BUTTON_NAME } from '../platform/keymap.js';
+import { log } from '../shared/log.js'; // 構造化ログ（Sprint R）: SAVE.FAIL
 
 export const VOLUME_MAX = 10;
 export const DEFAULTS = Object.freeze({
@@ -12,6 +13,7 @@ export const DEFAULTS = Object.freeze({
   volume: 7,          // 0..10。7 で従来のマスター音量 0.35
   muted: false,
   progress: { stage: 0, cleared: false }, // 「つづきから」で始められる最大ステージ index／1 周クリア済み（2 周目を開放）
+  telemetry: true, // 構造化ログの送信（/api/log）。OFF でもバッファと console は動く（Sprint R）
   hi: 0,
   lang: 'ja',         // 表示言語 'ja' | 'en'（IMP-008）。保存が無ければ loadSettings がブラウザ言語から決める
 });
@@ -48,6 +50,7 @@ export function loadSettings(storage, nav = globalThis.navigator) {
         if (isMap(j.progress)) s.progress.cleared = j.progress.cleared === true;
         if (Number.isFinite(j.hi) && j.hi >= 0) s.hi = Math.floor(j.hi);
         if (LANGS.includes(j.lang)) s.lang = j.lang;
+        if (typeof j.telemetry === 'boolean') s.telemetry = j.telemetry; // ログ送信（Sprint R）。既定 ON
       }
     } catch {}
   }
@@ -57,8 +60,8 @@ export function loadSettings(storage, nav = globalThis.navigator) {
 }
 
 export function saveSettings(s, storage) {
-  try { storage?.setItem(STORAGE_KEY, JSON.stringify({ version: 1, keys: s.keys, pad: s.pad, volume: s.volume, muted: s.muted, progress: s.progress, hi: s.hi, lang: s.lang })); return true; }
-  catch { return false; }
+  try { storage?.setItem(STORAGE_KEY, JSON.stringify({ version: 1, keys: s.keys, pad: s.pad, volume: s.volume, muted: s.muted, progress: s.progress, hi: s.hi, lang: s.lang, telemetry: s.telemetry !== false })); return true; }
+  catch (e) { log.warn('SAVE.FAIL', 'settings', { key: STORAGE_KEY }, e); return false; }
 }
 
 // 操作 action の割り当てを code 一つに置き換える（他の操作に付いていた同じ code は外す）。新しいマップを返す

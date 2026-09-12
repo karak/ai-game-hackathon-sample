@@ -12,10 +12,11 @@ DDD の「境界づけられたコンテキスト」で `src/` を切り分け�
 | **コンテンツ**（Content） | `src/content/` | 作品データ: 8 章の地形文字列と章題、物語本文（両言語）、ボス名、デモ入力ログ。コードは持たず、ステージ・進行が読む | `levels/index.js`、`levels/stitch.js`、`story.js`、`demos.js` |
 | **描画基盤**（Graphics） | `src/gfx/` | 生成素材の読み込みと切り出し、パレット、HD スプライトの blit、地形帯からのタイル合成、背景層、フォールバックの文字列ドット絵 | `assets.js`、`loader.js`、`sprite.js`、`palette.js`、`tiles.js`、`hdworld.js`、`background.js`、`sprites/*` |
 | **UI 部品**（UI） | `src/ui/` | 窓・文字・ミニフォント・HUD の描画部品（256×224 の論理座標で配置、実測幅で折り返し） | `window.js`、`text.js`、`minifont.js`、`hud.js`、`layout.js` |
-| **プラットフォーム**（Platform） | `src/platform/` | ブラウザとの境界: キーボード／ゲームパッド／タッチ入力、Web Audio の合成音、キー・パッドの既定割り当て | `input.js`、`keymap.js`、`audio.js` |
-| **共有カーネル**（Shared） | `src/shared/` | どこからでも使う小さな道具: シード付き乱数、clamp/lerp、表示言語 `t()` と辞書 | `util.js`、`i18n.js` |
+| **プラットフォーム**（Platform） | `src/platform/` | ブラウザとの境界: キーボード／ゲームパッド／タッチ入力、Web Audio の合成音、キー・パッドの既定割り当て、構造化ログの console 出力と `/api/log` 送信（Sprint R） | `input.js`、`keymap.js`、`audio.js`、`telemetry.js` |
+| **共有カーネル**（Shared） | `src/shared/` | どこからでも使う小さな道具: シード付き乱数、clamp/lerp、表示言語 `t()` と辞書、構造化ログの核 `log`（LogEvent の組み立て・通番・上限・リングバッファ。ブラウザ API に触らない）と登録制のコード表 | `util.js`、`i18n.js`、`log.js`、`logcodes.js` |
 | **制作ツール**（Authoring） | `src/catalog/`、`tools/` | ゲームには同梱しない資料と素材パイプライン。ゲームの全コンテキストを読んでよい | `catalog.html`、`tools/*.py`、`tools/*.mjs` |
-| 起動 | `src/main.js` | 合成ルート。素材を読み、プラットフォームと進行を組み立て、固定ステップで回す | — |
+| 起動 | `src/main.js` | 合成ルート。素材を読み、プラットフォームと進行を組み立て、固定ステップで回す。ログの sid・ctx（`Game.ctxSnapshot`）・送信の ON/OFF もここで結線する | — |
+| Worker（配信側） | `worker/index.js` | Cloudflare Worker。`/api/log` で LogEvent の束を受けて 1 行 1 JSON で Workers Logs に出し、他は Static Assets に渡す。`src/` の外（ブラウザのバンドルに入れない、`shared` も import しない） | `worker/index.js`、`wrangler.jsonc` |
 
 ## 2. 依存の向き（許可リスト）
 
@@ -32,6 +33,8 @@ content ──▶ shared のみ
 shared ──▶ なし
 catalog ──▶ なんでも
 ```
+
+構造化ログ（Sprint R）は「どこからでも `shared/log.js` の `log.emit()` を呼ぶ」形にした。stage（`player.js`・`bossflow.js`）や gfx から platform を読む向きは禁止のままなので、ログの核を shared に置き、ブラウザ依存（console・fetch/sendBeacon・onerror・sessionStorage）だけを `platform/telemetry.js` に分けた。`gfx/loader.js` は失敗を `LOAD_FAILURES` に積み、`main.js` が `ASSET.FAIL` にする。
 
 禁止（テストで落ちる）: `stage → app`、`content → stage/app/gfx/ui/platform`、`gfx → app/stage(physics 以外)/ui/platform`、`platform → app/stage/gfx/ui`、`shared → それ以外`、`ui → app/platform`。
 

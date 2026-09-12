@@ -1,5 +1,6 @@
 // キーボード・ゲームパッド・タッチ入力。pressed = 今フレーム押された、held = 押し続け
 import { DEFAULT_KEYS, DEFAULT_PAD } from './keymap.js';
+import { log } from '../shared/log.js'; // 構造化ログ（Sprint R）: INPUT.PAD
 
 // 互換用: 既定のキーマップ
 export const MAP = DEFAULT_KEYS;
@@ -51,6 +52,7 @@ export class Input {
   poll() {
     let gp = null;
     try { for (const p of this.getPads() ?? []) if (p && p.connected !== false) { gp = p; break; } } catch { gp = null; }
+    if (!!gp !== this.padConnected) log.emit('INPUT.PAD', gp ? `pad connected: ${gp.id}` : 'pad disconnected', { id: gp?.id ?? this.padId ?? null, mapping: gp?.mapping ?? null, connected: !!gp }); // 接続状態が変わったフレームだけ
     this.padConnected = !!gp; this.padId = gp?.id ?? null; // オプション画面の診断行（実機パッド確認用）が読む
     const now = new Set(), buttons = new Set();
     if (gp) {

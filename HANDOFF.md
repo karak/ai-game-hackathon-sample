@@ -5,13 +5,13 @@
 ## 1. 現在地
 
 - リポジトリ: `/Users/yasushi/projects/poc-square`、**公開リポジトリ https://github.com/karak/ai-game-hackathon-sample**（`origin/main`、public）。HEAD は Sprint Q（デモ全面収録・敵回避ボットの調整・hurt2・box 定義）のコミット（`git log -5`）、`origin/main` へ push 済み、作業ツリー clean
-- 検証: `npm test` Vitest **129 件**通過（architecture 5 件を含む）、`npm run e2e` Playwright **11 件**通過（8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・**golden**〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 282 読込を確認
+- 検証: `npm test` Vitest **148 件**通過（architecture 5 件、構造化ログ 19 件を含む）、`npm run e2e` Playwright **13 件**通過（構造化ログ `telemetry.spec` 2 件・8 面ボット自走・設定保存・デモ決定論・ポーズ／コンティニュー／2 周目／死亡ログ・実キー回帰・ロード時間・英語 UI・スマホ縦・強化魔法・偽装ゲームパッド・**golden**〔全 8 面の軌跡と画素ハッシュ＋画廊〕）。`npm run build` → `node tools/check_dist.mjs` で dist の素材 282 読込を確認
 - 生成予算: Gemini 台帳 `tools/gen_ledger.json` **236 / 280**（当初 200 ＋ 強化魔法に 50 ＋ 2026-09-12 に 30 追加。残 44。台帳の `budget` 欄と `gemini_gen.py` の `BUDGET` が正）。逐次実行、並列禁止。追加分 30 の使い先だった IMP-026 人魚縦長（1）・IMP-018 2 周目挿絵（1）・BUG-008 城の中景 B/C（2）は 2026-09-12 に済（計 4）。残 44 は予備（生成が要る新規項目はユーザー判断）
-- **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）。最終デプロイ Version `2e0f11db`（2026-09-12 00:50、第二章の繭移動を含む。公開 URL で 282 読込・bootMs 599）。その前 `a2fb1446`（2026-09-11 13:40、Sprint Q〔デモ全面収録＋敵回避ボット・hurt2・box 定義〕＋ BUG-018/019〔涙の川・第二章の沼 5 タイル化、人魚クリップ〕を含む。公開 URL で `check_dist` 282 読込・bootMs 563 を確認）
+- **公開中**: https://magical-lyrica.karak97.workers.dev（Cloudflare Workers Static Assets、専用 Worker `magical-lyrica`。`npm run deploy` で更新。`docs/release/deploy.md`）。最終デプロイ Version `2aa0c3f2`（2026-09-12 12:35、**Sprint R の Worker `/api/log` と人魚縦長・scene7・城の中景 B/C を含む**。公開 URL で `check_dist` 282 読込・warn 0・error 0、`curl` GET 405 / POST 204、`wrangler tail` で 2 リクエスト 14 イベント受信）。その前 `2e0f11db`（2026-09-12 00:50、第二章の繭移動を含む。公開 URL で 282 読込・bootMs 599）。その前 `a2fb1446`（2026-09-11 13:40、Sprint Q〔デモ全面収録＋敵回避ボット・hurt2・box 定義〕＋ BUG-018/019〔涙の川・第二章の沼 5 タイル化、人魚クリップ〕を含む。公開 URL で `check_dist` 282 読込・bootMs 563 を確認）
 - コード構成: `docs/architecture.md`（境界づけられたコンテキスト app / stage / content / gfx / ui / platform / shared）。ファイルを増やす・移すときは `test/architecture.test.js` を通す。振る舞いを変える変更をしたら `GOLDEN_UPDATE=1 npx playwright test e2e/golden.spec.js` で黄金を更新し、差分の理由を commit に書く
 - 不具合報告: GitHub Issues https://github.com/karak/ai-game-hackathon-sample/issues/new/choose（テンプレートあり）。テスター計測はオプション「テスター報告を コピー」→ `docs/release/tester-guide.md` → `tools/tester_stats.mjs`
 - マイルストーン: M0〜M4 済、M5 は実装分済（テスター計測は人手のため繰延）、M6 済（実機確認のみ繰延）、M7 公開済（バグ報告先と初回ロード短縮 IMP-019 が残）。表は `docs/plan/03-roadmap.md`
-- スプリント履歴: E → F → G → H → I → J（公開）→ K（強化魔法）→ L（第二章再設計・カットイン）→ M（挿絵級の画風統一 IMP-022）→ N（毒沼と足場 IMP-021）→ O（テスター計測・パッド診断・Issue テンプレート）→ P（DDD コンテキスト整理とリファクタリング。DEBT-004 / DEBT-011）→ Q（人手のいらない残課題: デモ全面収録 IMP-015・hurt2 BUG-007・`box` 定義 DEBT-007、敵回避ボット、沼 5 タイル化 BUG-018・人魚クリップ BUG-019）→ **R（次、計画済み）: 観測性 IMP-027（`docs/plan/09-observability.md`）**（`docs/plan/02-near-term.md` 末尾）
+- スプリント履歴: E → F → G → H → I → J（公開）→ K（強化魔法）→ L（第二章再設計・カットイン）→ M（挿絵級の画風統一 IMP-022）→ N（毒沼と足場 IMP-021）→ O（テスター計測・パッド診断・Issue テンプレート）→ P（DDD コンテキスト整理とリファクタリング。DEBT-004 / DEBT-011）→ R（観測性: 構造化ログ・Worker `/api/log`・tail/集計。2026-09-12）← Q（人手のいらない残課題: デモ全面収録 IMP-015・hurt2 BUG-007・`box` 定義 DEBT-007、敵回避ボット、沼 5 タイル化 BUG-018・人魚クリップ BUG-019）→ **R（次、計画済み）: 観測性 IMP-027（`docs/plan/09-observability.md`）**（`docs/plan/02-near-term.md` 末尾）
 
 ## 2. 最初に読むもの（順番）
 
@@ -48,6 +48,9 @@
 | `box` は論理箱で改名しない | prompt の Logical box・後処理 `--logical`・manifest `fits` が同じ値を共有する（上限かつ目標）。`docs/gen-pipeline.md` §1 | DEBT-007 |
 | 地面からの隙間は最大 5 タイル | 主人公物理（SPEED 66・JUMP −218・二段 −196）では縁から 6 タイル（96 px）は渡れない（最大到達 96 px、着地に >96 が要る）。レベル編集後は `tools/check_gaps.mjs` を通す。トランポリン・助走・踏み石経路も検査する | BUG-018 |
 | 人魚は水の絵の位置でクリップ | `drawBog` は水面タイルの 6 px 下から描くので、人魚のクリップも `waterY + 6`。縦長スプライトへの差し替えは IMP-026（予算要） | BUG-019 |
+| 構造化ログの核は shared、ブラウザ依存は platform | `src/shared/log.js`（LogEvent・通番・上限・リングバッファ）はどこからでも `log.emit(code, msg, attr)` できる。console／fetch(keepalive)／onerror／sessionStorage は `src/platform/telemetry.js`。stage・gfx → platform は依存の向きで禁止のため（`09-observability.md` §6） | IMP-027 |
+| ログ送信は本番だけ既定 ON | dev サーバーには `/api/log` が無い（404 が console error になり E2E が落ちる）。dev で送信を試すときは `?telemetry=1`、本番で止めるときは `?telemetry=0` かオプション「ログそうしん」OFF。Playwright は `page.route('**/api/log')` で握る | IMP-027 |
+| ログコードは登録制で、未使用も落とす | `src/shared/logcodes.js` に無いコードは `log.emit` が throw。`test/logcodes.test.js` が src/worker/e2e/tools を走査し、未登録と未使用の両方を落とす | IMP-027 |
 | 人魚は当たり判定を固定し、絵だけ縦長 | 待機コマを頭〜尾まで描いた 62×66 に差し替えたが、当たり判定は v1 由来の 8×15（`MERMAID_W/H`）、頭頂の位置は `MERMAID_HEAD_ABOVE`（8 セル）で不変。伸びた分は水面下に α0.3 で透かす。スプライト寸法から当たり判定を出す `fitSprite` はこの敵には使わない | IMP-026 |
 | 衣装コマの割り当ては 2 パス | 共通コマ → 衣装別コマの順に代入する。1 パスだと manifest の読み込み完了順で共通コマが衣装別を上書きする（BUG-016） | `assets.js assignPlayerFrames`、`test/costume-frames.test.js` |
 | 溜めは 2 段階 | 0.9 秒 `CHARGE_T` で溜め魔法、1.8 秒 `SUPER_T` で強化魔法（`magic.js SUPER`）。強化魔法は新規生成素材なしで、既存スプライト＋粒子＋画面演出で作る | 05-systems 5.1、Sprint K |
@@ -56,6 +59,8 @@
 | 配信文書 | `docs/release/`: `itch-page.md`（手順・日英本文）、`known-issues.md`（08-backlog の ID）、`trailer.gif`（384×336, 5.2 MB）/ `trailer_256.gif`（256×224, 2.55 MB）。再生成は `node tools/make_trailer.mjs` | Sprint J |
 
 ## 4. 残課題（優先順。ID は 08-backlog）
+
+**Sprint R（観測性 IMP-027）は R1〜R7 済（2026-09-12）。** 残るのはユーザー受入 1 回: 公開 URL を開いて 1 面遊び、DevTools の Console を `[LYR` でフィルタ（本番は warn 以上だけ出る。全件は `window.__log.dump()`）、オプション「テスター報告を コピー」の JSON（`report: 2`、`sid`＋直近 200 件）を `docs/plan/logs/testers/` に置く。開発側は同時に `node tools/tail_logs.mjs --secs 600` を回し、`node tools/log_stats.mjs docs/plan/logs/tail/*.ndjson` の表を `02-near-term.md` Sprint R に追記する（人のセッションでは 30 秒ごとの `PERF.FRAME` も出る）。
 
 **人手待ち（繰延決定済み）**: テスター 5 人の完走率（M5 出口）、IMP-017 死亡多発地点の検証（第三章 x512 棘、涙の川 x1280 沼、工房 x1088 プレス、遊園地 x2688 沼、菓子の森 x2304）、実機ゲームパッド。
 
@@ -91,6 +96,12 @@ node tools/shot_stages.mjs --stages 1,2 --at 0.35,0.7  # 章の同じ位置を�
 node tools/make_trailer.mjs                # トレーラー GIF 再生成（5175）。--scale 0.3333 --out docs/release/trailer_256.gif でカバー用
 node tools/gather_deaths.mjs --runs 2 --secs 150   # 死亡ログ収集（5173 が起きていること）
 
+# 構造化ログ（Sprint R、docs/plan/09-observability.md）
+node tools/tail_logs.mjs --secs 600 [--out docs/plan/logs/tail/<名>.ndjson]   # 公開 Worker の wrangler tail を NDJSON に落とす（wrangler login 済み）
+node tools/log_stats.mjs docs/plan/logs/tail/*.ndjson [--src user|bot|all] [--json]   # sid 表・到達ファネル・死亡 面×原因×x・エラー・fps p95
+npx wrangler tail --format json                    # 生のまま見る（整形済み JSON が複数行で流れる）
+# ブラウザ側: DevTools Console を "[LYR" でフィルタ、window.__log.dump() / .sid / .flush() / .setSource('bot', {test}) / .stats()。送信の ON/OFF は ?telemetry=1/0
+
 # 素材生成（Python は本リポの .venv。DEBT-008 で完結済み。外部 HDD の参照プロジェクト venv は不要。PATH の python3 には numpy / google-genai が無い）
 PY=".venv/bin/python"
 "$PY" tools/gemini_gen.py <spec> [--ref raw.png]   # 1 件ずつ。台帳に記録される
@@ -124,3 +135,6 @@ PY=".venv/bin/python"
 - zsh で `for n in $LIST` は分割されない。名前を列挙する
 - `Bash` の `sleep` 連結は使えない。長い処理は `run_in_background` と完了通知
 - 生成の再試行は 2 回まで。3 回目は仕様（部位のセル数・箱の大きさ・参照画像）を変える
+- `wrangler tail --format json` は 1 行 1 JSON ではなく整形済み JSON が複数行で流れる。`tools/tail_logs.mjs` は波括弧の深さで切る（行単位の版は 0 件になった）
+- Playwright の `page.route` は `navigator.sendBeacon` を捕まえない。ログ送信は `fetch(keepalive)` にしてある。新しい E2E で `/api/log` を検査するときも fetch 前提
+- ログコードを増やすときは `src/shared/logcodes.js` → `09-observability.md` §2.1 の表 → 呼び出し、の順。表だけ足して使わないと `test/logcodes.test.js` が落ちる

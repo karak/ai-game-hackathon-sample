@@ -3,6 +3,7 @@ import { PlayerShot, WEAPONS } from './projectiles.js';
 import { castMagic, magicName, CHARGE_T, SUPER_T } from './magic.js';
 import { carryByPlatform, landOnPlatforms, triggerCrumbles, applyFlow, applyConveyor, ladderAt, ladderBelow, LADDER_SPEED, trampolineAt, TRAMPOLINE_V } from './gimmicks.js';
 import { t } from '../../shared/i18n.js';
+import { log } from '../../shared/log.js'; // 構造化ログ（Sprint R）: 変身解除 PLAYER.HIT
 
 const SPEED = 66, GRAV = 560, JUMP_V = -218, DJUMP_V = -196; // 単発ジャンプ 42 世界px(2.6タイル)
 const HURT_T = 0.35, HURT_FLASH_T = 0.1; // 被弾でのけぞる時間と、その先頭で白飛びコマ hurt2 を出す時間（BUG-007）
@@ -162,7 +163,9 @@ export class Player {
   hit(source) {
     if (this.state !== 'normal' || this.invT > 0) return false;
     const w = this.world;
+    this.lastHitBy = source ? (source.def?.kind ?? source.def?.sprite ?? source.type ?? source.constructor?.name ?? 'unknown') : 'unknown'; // ログ用（PLAYER.HIT / PLAYER.DEATH の by）
     if (this.costume === 'plain') { this.die('hit'); return true; }
+    log.emit('PLAYER.HIT', `undressed by ${this.lastHitBy}`, { by: this.lastHitBy, x: Math.round(this.centerX), y: Math.round(this.y + this.h) });
     // 変身解除
     w.particles.emit('sparkle', this.centerX, this.y + 10, 16);
     w.particles.emit('stuffing', this.centerX, this.y + 12, 6);

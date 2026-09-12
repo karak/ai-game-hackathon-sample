@@ -6,7 +6,7 @@ import { t, LANGS, LANG_LABEL } from '../shared/i18n.js';
 import { volumeGain, bind, codesFor, keyName, padName, REBINDABLE, ACTION_LABEL, VOLUME_MAX, DEFAULT_KEYS, DEFAULT_PAD } from './settings.js';
 
 // オプション画面の行。kind: volume / mute / key(action) / reset / back
-export const OPTION_ROWS = [{ kind: 'volume' }, { kind: 'mute' }, { kind: 'lang' }, { kind: 'pad' }, ...REBINDABLE.map(a => ({ kind: 'key', action: a })), { kind: 'reset' }, { kind: 'report' }, { kind: 'back' }]; // pad = 接続中のパッドと押下ボタンの診断表示、report = テスター報告をクリップボードへ
+export const OPTION_ROWS = [{ kind: 'volume' }, { kind: 'mute' }, { kind: 'lang' }, { kind: 'pad' }, ...REBINDABLE.map(a => ({ kind: 'key', action: a })), { kind: 'reset' }, { kind: 'telemetry' }, { kind: 'report' }, { kind: 'back' }]; // pad = 接続中のパッドと押下ボタンの診断表示、report = テスター報告をクリップボードへ
 
 // ---- オプション（音量 / ミュート / キー・パッド割り当て） ----
 export function updateOptions(game, inp) {
@@ -29,6 +29,7 @@ export function updateOptions(game, inp) {
     });
   }
   else if (row.kind === 'reset' && ok) { game.settings.keys = { ...DEFAULT_KEYS }; game.settings.pad = { ...DEFAULT_PAD }; game.input.setKeys(game.settings.keys); game.input.setPad(game.settings.pad); game.save(); game.audio.sfx('select'); }
+  else if (row.kind === 'telemetry' && (dir || ok)) { game.settings.telemetry = !game.settings.telemetry; game.telemetry?.setEnabled(game.settings.telemetry); game.save(); game.audio.sfx('select'); } // ログ送信（Sprint R）。OFF でもバッファと console は動く
   else if (row.kind === 'report' && ok) game.copyReport();
   else if (row.kind === 'back' && ok) game.leaveOptions();
 }
@@ -48,6 +49,7 @@ export function optionRowText(game, row) {
       const id = String(game.input.padId ?? 'PAD').replace(/\s*\(.*$/, '').slice(0, 22), pressed = [...game.input.padButtons].map(i => padName('b' + i)).join(' ');
       return [t('ゲームパッド'), `${id}${pressed ? '  [' + pressed + ']' : ''}`];
     }
+    case 'telemetry': return [t('ログそうしん'), game.settings.telemetry === false ? 'OFF' : 'ON'];
     case 'report': return [t('テスター報告を コピー'), game.reportMsg ? t(game.reportMsg.ok ? 'コピーしました' : 'コピーできません') : ''];
     case 'reset': return [t('そうさを しょきかに もどす'), ''];
     case 'back': return [t('タイトルへ もどる'), ''];

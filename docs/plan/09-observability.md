@@ -132,6 +132,22 @@
 | ボットのログが人のログに混ざる | `src: 'bot'` と `attr.test` で分け、集計は既定で人だけ。Playwright は `/api/log` を route で握り本番へ送らない |
 | DevTools の console が騒がしくなる | 本番は warn 以上だけ。dev は `[LYR` 接頭辞で一括フィルタ |
 
-## 6. スコープ外（今回はやらない）
+## 6. 実装メモ（2026-09-12、R1〜R7 済）— 計画からの差分
+
+| 計画 | 実装 | 理由 |
+|------|------|------|
+| `src/platform/log.js` に全部 | 核は **`src/shared/log.js`**（LogEvent・通番・切り詰め・リングバッファ・sink）、ブラウザ依存は **`src/platform/telemetry.js`**（console・送信・onerror・PERF.FRAME・`window.__log`） | stage / gfx → platform の import は依存の向きで禁止（`test/architecture.test.js`）。shared なら `player.js`・`bossflow.js`・`input.js`・`audio.js`・`settings.js` から直接 `log.emit()` できる |
+| `navigator.sendBeacon` | **`fetch(keepalive: true)` を優先**、無ければ sendBeacon | Playwright の `page.route` は sendBeacon を捕まえられず、E2E で送信内容を検査できなかった。keepalive fetch は pagehide でも届く |
+| 送信は既定 ON | **本番だけ既定 ON**。dev サーバー（`import.meta.env.DEV`）は既定 OFF、`?telemetry=1` で ON | dev には `/api/log` が無く 404 の console error が既存 E2E（`keyboard.spec.js`）を落とした |
+| `ASSET.FAIL` は loader.js から | `gfx/loader.js` は `LOAD_FAILURES` に積むだけ。`main.js` が `GAME.BOOT` の前に `ASSET.FAIL` を出す | gfx → shared は可だが、読込は起動前に終わるので main で一括のほうが GAME.BOOT の `loaderWarnings` と揃う |
+| `BOSS.END` の `hits` | `sec`（登場からの秒）と `deaths` | 被弾数は追っていない。要るなら `Boss.hurt` に数える |
+| `RUN.END` はゲームオーバー確定でも | タイトル復帰・エンディング（`finishRun`）のときだけ。ゲームオーバー画面でコンティニューすると run は続く | run の定義（runlog.js）に合わせた。ゲームオーバーは `GAME.STATE`（debug）と `PLAYER.DEATH` で分かる |
+| `wrangler tail --format json` は 1 行 1 JSON | **整形済み（複数行）の JSON** で流れる。`tools/tail_logs.mjs` は波括弧の深さで最上位オブジェクトを切り出す | wrangler 4.130 の実測（最初の版は 0 件になった） |
+| `LOG.TRUNCATED` は表に無かった | 追加（切り詰めをセッションで 1 回知らせる） | 上限で黙って削るのを避ける |
+| dev の `build` は `"dev"` | vite の define は dev サーバーにも効くので base36 の時刻（例 `mtxtpcjf`）。Vitest だけ `'dev'` | 実害なし。デプロイ版は `BUILD_ID` 環境変数で固定できる |
+
+受入の証跡: `test/log.test.js`（9）・`test/logcodes.test.js`（2）・`test/worker.test.js`（4）・`test/log_stats.test.js`（2）・`test/tail_logs.test.js`（2）、`e2e/telemetry.spec.js`（2）、golden に `lvl: error` 0 件と `src` の assert。公開 URL の `wrangler tail` から取った NDJSON は `docs/plan/logs/tail/2026-09-12-sprint-r.ndjson`（ボット 1 セッション＋ボット扱いにしない Playwright 1 セッション。人の実操作はまだ）。集計は `02-near-term.md` の Sprint R 表。
+
+## 7. スコープ外（今回はやらない）
 
 OTel SDK / Collector、Sentry 等の外部 SaaS、サーバー側の永続化（KV/D1/R2 へのログ保存）、リプレイ動画、ヒートマップ描画（`tools/gather_deaths.mjs` の既存で足りる）。§2 の写像表があるので、必要になったら Worker 側で NDJSON → OTLP 変換を足す。

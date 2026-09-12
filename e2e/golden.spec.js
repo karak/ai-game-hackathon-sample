@@ -23,8 +23,10 @@ test('golden: trajectories and canvas hashes of all stages and menu screens are 
     let s = 0x9e3779b9; const rnd = () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
     Math.random = rnd; window.__seedRandom = v => { s = v >>> 0 || 1; };
   });
+  await page.route('**/api/log', r => r.fulfill({ status: 204 })); // 構造化ログの送信は握って本番へ出さない（Sprint R。route はアクションの前）
   await page.goto('/index.html');
   await page.waitForFunction(() => !!window.__game, null, { timeout: 30_000 });
+  await page.evaluate(() => window.__log.setSource('bot', { test: 'golden' }));
 
   const got = await page.evaluate(async ({ FRAMES, SAMPLE, SHOT_AT }) => {
     const g = window.__game, STEP = 1 / 60;
@@ -84,6 +86,9 @@ test('golden: trajectories and canvas hashes of all stages and menu screens are 
     return { stages, screens, gallery, canvas: [canvas.width, canvas.height] };
   }, { FRAMES, SAMPLE, SHOT_AT });
   expect(errors).toEqual([]);
+  // 構造化ログ: 20 秒 × 8 面 ＋ 画廊で lvl: error が 0 件、全件 src: bot（Sprint R / R5）
+  const logs = await page.evaluate(() => { const d = window.__log.dump(); return { errors: d.filter(e => e.lvl === 'error').map(e => e.code + ' ' + (e.err?.message ?? e.msg)), n: d.length, users: d.filter(e => e.src === 'user').map(e => e.code), sid: window.__log.sid }; });
+  expect(logs.errors).toEqual([]); expect(logs.users).toEqual(['SESSION.START', 'GAME.BOOT']); expect(logs.n).toBeGreaterThan(50); // setSource の前に出る 2 件だけが user
 
   if (UPDATE || !existsSync(GOLDEN)) {
     mkdirSync('test/golden', { recursive: true });

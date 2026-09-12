@@ -16,3 +16,10 @@
 - 受け取った JSON を `docs/plan/logs/testers/<名前や番号>.json` に保存し、`node tools/tester_stats.mjs` で集計する（完走率・完走者の平均時間・章ごとの到達数・死亡の多い章）。
 - 完走率 60% 未満、または平均 3 時間超のときは、死亡の多い章から難易度を調整する（`docs/plan/08-backlog.md` IMP-017 の多発地点と照合）。
 - 実機ゲームパッドの結果は「ゲームパッド」行の表示（パッド名・ボタン名）と機種名を `docs/release/known-issues.md` の該当行に記録する。
+
+## 構造化ログ（Sprint R、`docs/plan/09-observability.md`）
+
+- ゲームは出来事（面の開始・死亡・エラー・fps など）を 1 行 1 JSON の `LogEvent` として記録し、既定では公開サイトの `/api/log` に送る（個人情報は入れない: UA・言語・画面・パッド名まで）。オプション「ログそうしん」を OFF にするか、URL に `?telemetry=0` を付けると送らない（記録と DevTools 表示は動く）。
+- テスターの手元で見る: DevTools の Console で `[LYR` でフィルタ（本番は warn 以上だけ出る）。`window.__log.dump()` で全件（直近 500 件）、`window.__log.sid` がセッション ID。「テスター報告を コピー」の JSON（`report: 2`）には `sid` と直近 200 件の `log` が同梱される。
+- 開発側で集める: `node tools/tail_logs.mjs --secs 600`（`wrangler tail --format json` を `docs/plan/logs/tail/<日時>.ndjson` に落とす）→ `node tools/log_stats.mjs docs/plan/logs/tail/*.ndjson [--src user|bot|all]`（sid ごとの到達ファネル・死亡の面 × 原因 × 座標・エラー件数・fps p95）。テスター報告の JSON も `node tools/log_stats.mjs <report.json>` で同じ表になる（`log` 配列を読む場合は `jq .log` で取り出す）。
+- ボットの記録は `src: bot`（`attr.test` に Playwright のテスト名）で分かれ、集計の既定（人だけ）には入らない。

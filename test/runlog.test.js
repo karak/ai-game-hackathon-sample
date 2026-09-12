@@ -28,9 +28,12 @@ test('buildReport is valid JSON with version, env, run summary and death summary
   const runs = [{ ...newRun({ start: 0, lang: 'en' }), stage: 1, deaths: 2, sec: 120, end: 5 }];
   const txt = buildReport({ runs, deaths: [{ s: 'graveyard', r: 'hit' }], settings: { volume: 7, muted: false, lang: 'en', progress: { stage: 1, cleared: false } }, env: { version: 'abc123', ua: 'UA', lang: 'en-US', screen: '390x844', pad: 'Fake Pad', now: 0 }, summarizeDeaths: d => ({ count: d.length, byReason: { hit: 1 } }) });
   const j = JSON.parse(txt);
-  expect(j.report).toBe(1); expect(j.version).toBe('abc123'); expect(j.at).toBe('1970-01-01T00:00:00.000Z');
+  expect(j.report).toBe(2); expect(j.version).toBe('abc123'); expect(j.sid).toBeNull(); expect(j.log).toEqual([]); expect(j.at).toBe('1970-01-01T00:00:00.000Z');
   expect(j.env).toEqual({ ua: 'UA', lang: 'en-US', screen: '390x844', pad: 'Fake Pad', touch: false });
   expect(j.runs).toMatchObject({ runs: 1, cleared: 0, deaths: 2 }); expect(j.runList).toHaveLength(1);
   expect(j.deaths).toEqual({ count: 1, byReason: { hit: 1 } });
-  expect(Object.keys(j).sort()).toEqual(['at', 'deaths', 'env', 'report', 'runList', 'runs', 'settings', 'version']);
+  expect(Object.keys(j).sort()).toEqual(['at', 'deaths', 'env', 'log', 'report', 'runList', 'runs', 'settings', 'sid', 'version']);
+  // v2: sid と直近 200 件の構造化ログを同梱（Sprint R）
+  const many = Array.from({ length: 250 }, (_, i) => ({ v: 1, seq: i + 1, code: 'GAME.STATE' }));
+  const j2 = JSON.parse(buildReport({ sid: 'a'.repeat(32), log: many })); expect(j2.sid).toBe('a'.repeat(32)); expect(j2.log.length).toBe(200); expect(j2.log[0].seq).toBe(51);
 });

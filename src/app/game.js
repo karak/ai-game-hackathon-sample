@@ -13,6 +13,7 @@ import { loadDeathLog, saveDeathLog, pushDeath, summarizeDeaths } from './deathl
 import { loadRuns, saveRuns, newRun, pushRun, buildReport } from './runlog.js';
 import { BUILD_ID } from '../gfx/loader.js';
 import { defaultSettings, saveSettings, volumeGain, DEFAULT_KEYS, DEFAULT_PAD } from './settings.js';
+import { log } from '../shared/log.js'; // 構造化ログ（Sprint R）。ctx は ctxSnapshot() を main.js が log.bind() で注入する
 
 export const NO_MISS_BONUS = 5000; // クリア画面: 面をノーミスで抜けたときの加点
 
@@ -33,7 +34,14 @@ export class Game {
     this.audio.setVolume(volumeGain(this.settings.volume)); this.audio.setMuted(this.settings.muted);
     setLang(this.settings.lang); this.onLangChange = null; // 表示言語（IMP-008）。main.js が index.html の説明文を差し替えるコールバックを置く
   }
-  setState(s) { (this.trace ??= []).push(`${this.state}>${s}@${Math.round(performance.now())}`); if (this.trace.length > 20) this.trace.shift(); this.state = s; this.stateT = 0; }
+  setState(s) { (this.trace ??= []).push(`${this.state}>${s}@${Math.round(performance.now())}`); if (this.trace.length > 20) this.trace.shift(); log.emit('GAME.STATE', `${this.state} > ${s}`, { from: this.state, to: s }); this.state = s; this.stateT = 0; }
+  // ログの ctx（LogEvent.ctx）: 進行の現在値のスナップショット。ロガーが毎イベント自動で付ける（呼び手は書かない）
+  ctxSnapshot() {
+    const w = this.world, p = w?.player, st = STAGES[this.stageIndex];
+    const c = { state: this.state, stage: st?.name ?? null, loop: this.loop, lives: this.lives, score: this.score, demo: this.state === 'demo' };
+    if (w) { c.t_stage = Math.round(w.t * 10) / 10; c.costume = p?.costume; c.x = Math.round(p?.centerX ?? 0); c.y = Math.round((p?.y ?? 0) + (p?.h ?? 0)); if (w.boss) c.boss = w.level.bosses?.[w.bossIdx] ?? w.level.boss; }
+    return c;
+  }
   save() { return saveSettings(this.settings, this.storage); }
   // タイトルメニュー項目（進行があれば「つづきから」）
   titleMenu() { const m = [{ id: 'new', label: t('はじめから') }]; if (this.settings.progress.stage > 0) m.push({ id: 'continue', label: t('つづきから（第{n}章）', { n: this.settings.progress.stage + 1 }) }); if (this.settings.progress.cleared) m.push({ id: 'loop2', label: t('2 周目（真の結末）') }); m.push({ id: 'options', label: t('オプション') }); return m; }
@@ -45,24 +53,32 @@ export class Game {
   startGame(stage = 0, loop = 0) {
     this.score = 0; this.lives = 2; this.stageIndex = Math.max(0, Math.min(STAGES.length - 1, stage)); this.loop = loop; this.continued = false;
     this.finishRun(); this.run = newRun({ loop, start: this.stageIndex, lang: this.settings.lang }); this.runs = pushRun(this.runs, this.run); this.saveRuns();
+    log.emit('RUN.START', `run from stage ${this.stageIndex + 1} loop ${loop}`, { start: this.stageIndex, loop, mode: loop > 0 ? 'loop2' : this.stageIndex > 0 ? 'continue' : 'new' });
     if (this.stageIndex === 0) { this.setState('prologue'); this.textIdx = 0; this.audio.playBgm(SONGS.title); }
     else this.startStage();
   }
   startStage() {
     this.world = new World(this, STAGES[this.stageIndex]);
+    log.emit('STAGE.START', STAGES[this.stageIndex].name, { stage: STAGES[this.stageIndex].name, index: this.stageIndex });
     this.setState('intro'); this.audio.playJingle(SONGS.jStart); this.irisT = 0; // アイリスが開く。開始ジングル → play でテーマ曲
   }
   // アイリスワイプで閉じてから then() を実行する（画面遷移）
   startWipe(then) { if (this.state === 'wipe') return; this.wipe = { from: this.state, t: 0, then }; this.setState('wipe'); }
-  gameOver() { if (this.state === 'demo') { this.endDemo(); return; } this.setState('gameover'); this.goIdx = 0; this.audio.playJingle(SONGS.jGameOver); this.saveHi(); this.saveRuns(); }
+  gameOver() { if (this.state === 'demo') { this.endDemo('gameover'); return; } this.setState('gameover'); this.goIdx = 0; this.audio.playJingle(SONGS.jGameOver); this.saveHi(); this.saveRuns(); }
   // ---- 通しプレイの記録（runlog.js）。run は startGame で開き、エンディング到達かタイトル復帰で閉じる ----
   saveRuns() { saveRuns(this.runs, this.storage); }
-  finishRun() { if (this.run && this.run.end == null) { this.run.end = Date.now(); this.saveRuns(); } this.run = null; }
+  finishRun() {
+    if (this.run && this.run.end == null) {
+      this.run.end = Date.now(); this.saveRuns();
+      const r = this.run; log.emit('RUN.END', `reached stage ${r.stage + 1}${r.cleared ? ' cleared' : ''}`, { reached: r.stage, cleared: r.cleared, deaths: r.deaths, continues: r.continues, sec: Math.round((r.end - r.at) / 1000) });
+    }
+    this.run = null;
+  }
   // テスター報告をクリップボードへ（オプション「テスター報告を コピー」）。戻り値は Promise<boolean>
   reportText() {
     const nav = globalThis.navigator, scr = globalThis.screen;
     return buildReport({ runs: this.runs, deaths: this.deathLog, settings: { ...this.settings, keysChanged: JSON.stringify(this.settings.keys) !== JSON.stringify(DEFAULT_KEYS) || JSON.stringify(this.settings.pad) !== JSON.stringify(DEFAULT_PAD) },
-      env: { version: BUILD_ID, ua: nav?.userAgent ?? '', lang: nav?.language ?? '', screen: scr ? `${scr.width}x${scr.height}` : '', pad: this.input.padId, touch: typeof window !== 'undefined' && 'ontouchstart' in window }, summarizeDeaths, stages: STAGES.length });
+      env: { version: BUILD_ID, ua: nav?.userAgent ?? '', lang: nav?.language ?? '', screen: scr ? `${scr.width}x${scr.height}` : '', pad: this.input.padId, touch: typeof window !== 'undefined' && 'ontouchstart' in window }, sid: log.sid, log: log.dump(200), summarizeDeaths, stages: STAGES.length });
   }
   async copyReport() {
     const txt = this.reportText(); let ok = false;
@@ -70,11 +86,12 @@ export class Game {
     this.lastReport = txt; this.reportMsg = { ok, t: 2.5 }; this.audio.sfx('select'); return ok;
   }
   // コンティニュー: 面の先頭からスコア 0 で再開。回数無制限、ハイスコアには記録しない（05-systems 5.1）
-  continueGame() { this.continued = true; this.score = 0; this.lives = 2; if (this.run) { this.run.continues++; this.saveRuns(); } this.startStage(); }
+  continueGame() { this.continued = true; this.score = 0; this.lives = 2; if (this.run) { this.run.continues++; this.saveRuns(); } log.emit('PLAYER.CONTINUE', STAGES[this.stageIndex].name, { stage: STAGES[this.stageIndex].name }); this.startStage(); }
   stageClear() {
     if (this.state === 'demo') { this.endDemo(); return; }
     this.timeBonus = Math.ceil(this.world.time) * 10; this.noMissBonus = this.world.deaths === 0 ? NO_MISS_BONUS : 0; this.kills = this.world.kills;
     this.score += this.timeBonus + this.noMissBonus; this.setState('clear'); this.audio.playJingle(SONGS.jClear);
+    log.emit('STAGE.CLEAR', `${STAGES[this.stageIndex].name} in ${Math.round(this.world.t)}s`, { stage: STAGES[this.stageIndex].name, sec: Math.round(this.world.t), deaths: this.world.deaths, kills: this.kills });
     // 進行を保存（次章から「つづきから」で再開できる）
     if (this.stageIndex + 1 < STAGES.length && this.stageIndex + 1 > this.settings.progress.stage) { this.settings.progress.stage = this.stageIndex + 1; this.save(); }
   }
@@ -85,6 +102,7 @@ export class Game {
     this.deathLog = pushDeath(this.deathLog, { s: STAGES[this.stageIndex].name, x: p.centerX, y: p.y + p.h, r: reason, t: this.world.t, l: this.loop, at: Date.now() });
     saveDeathLog(this.deathLog, this.storage);
     if (this.run) { this.run.deaths++; this.saveRuns(); }
+    log.emit('PLAYER.DEATH', `died: ${reason} at ${STAGES[this.stageIndex].name} (${Math.round(p.centerX)},${Math.round(p.y + p.h)})`, { reason, x: Math.round(p.centerX), y: Math.round(p.y + p.h), by: p.lastHitBy ?? null });
   }
   saveHi() { if (this.continued) return; if (this.score > this.hi) { this.hi = this.score; this.settings.hi = this.hi; this.save(); } }
   toggleMute() { this.settings.muted = this.audio.toggleMute(); this.save(); }
@@ -116,7 +134,7 @@ export class Game {
         if (inp.anyKey || inp.hit('start') || inp.hit('shoot') || inp.hit('jump')) { this.endDemo(); break; }
         const d = this.demo; d.t += dt;
         this.world.update(dt, d.input); d.input.next();
-        if (d.input.done || d.t > DEMO_MAX_T || this.state !== 'demo') { if (this.state === 'demo') { if (!this.startDemo(this.demoIdx + 1)) this.endDemo(); } }
+        if (d.input.done || d.t > DEMO_MAX_T || this.state !== 'demo') { if (this.state === 'demo') { if (!this.startDemo(this.demoIdx + 1)) this.endDemo('timeout'); } }
         break;
       }
       case 'wipe':
@@ -195,11 +213,11 @@ export class Game {
       this.demoIdx = k; this.score = 0; this.lives = 2; this.stageIndex = k; this.loop = 0; // デモは 1 周目の規則で再生（収録条件と同じ）
       this.world = new World(this, { ...STAGES[k], seed: d.seed });
       this.demo = { input: new DemoInput(d), t: 0 }; this.irisT = 99;
-      this.audio.playBgm(SONGS[this.world.level.theme]); this.setState('demo'); return true;
+      this.audio.playBgm(SONGS[this.world.level.theme]); this.setState('demo'); log.emit('DEMO.START', STAGES[k].name, { stage: STAGES[k].name }); return true;
     }
     return false;
   }
-  endDemo() { this.demo = null; this.world = null; this.demoIdx = 0; this.setState('title'); this.audio.playBgm(SONGS.title); }
+  endDemo(reason = 'input') { log.emit('DEMO.END', reason, { reason }); this.demo = null; this.world = null; this.demoIdx = 0; this.setState('title'); this.audio.playBgm(SONGS.title); }
 
   // ---- デバッグキー（A-5 の演出確認用。F1 被弾ヒットストップ / F2 最寄りの敵を撃破 / F3 ボス撃破演出 / F4 アイリスワイプ / F6 ボス登場バナー）----
   debugKeys(inp) {

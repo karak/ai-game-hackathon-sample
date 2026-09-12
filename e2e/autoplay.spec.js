@@ -6,8 +6,10 @@ const boot = async page => {
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.route('**/api/log', r => r.fulfill({ status: 204 })); // 構造化ログの送信は握る（Sprint R）
   await page.goto('/index.html');
   await page.waitForFunction(() => !!window.__game, null, { timeout: 30_000 });
+  await page.evaluate(() => window.__log.setSource('bot', { test: 'autoplay' }));
   return errors;
 };
 

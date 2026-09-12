@@ -1,6 +1,8 @@
 // Web Audio によるチップチューン合成。外部素材なし。
 // SFX は関数で合成、BGM は簡易シーケンサで矩形波/三角波/ノイズを鳴らす。
 
+import { log } from '../shared/log.js'; // 構造化ログ（Sprint R）: ERR.AUDIO
+
 export const NOTE = {}; // 'C4' → Hz
 {
   const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -28,7 +30,7 @@ export class Audio {
       this.noise = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
       const d = this.noise.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
       return true;
-    } catch { return false; }
+    } catch (e) { this.ctx = null; log.warn('ERR.AUDIO', 'AudioContext unavailable', null, e); return false; }
   }
   resume() { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); }
   toggleMute() { return this.setMuted(!this.muted); }
