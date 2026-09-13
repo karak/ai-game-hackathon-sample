@@ -59,3 +59,29 @@ test('English UI: saved lang=en drives title menu, options, stage intro, boss na
   await page.screenshot({ path: 'test-results/shots/en_title.png' });
   expect(errors).toEqual([]);
 });
+
+// ADR-0040 / DEBT-003: 素材が 1 枚読めなくても起動し、そのキーには manifest の寸法どおりのプレースホルダが入り、ASSET.FAIL が 1 件出る。
+// 旧文字列ドット絵へのフォールバックは撤去したので、欠落は「見えない」ではなく「市松で見える」のが正
+test('a sprite that fails to load becomes a same-size placeholder, boot continues, ASSET.FAIL is logged once', async ({ page }) => {
+  await page.route('**/assets/sprites/enemies/zombie1.png*', r => r.abort()); // route はアクションの前
+  const errors = [];
+  page.on('pageerror', e => errors.push(String(e)));
+  page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.goto('/index.html');
+  await page.waitForFunction(() => !!window.__game, null, { timeout: 30_000 });
+  const r = await page.evaluate(() => {
+    const g = window.__game, STEP = 1 / 60, A = g.assets;
+    const tick = n => { for (let i = 0; i < n; i++) { g.update(STEP); g.input.endFrame(); } };
+    const z = A.enemies.zombie1, z2 = A.enemies.zombie2;
+    g.input.held.clear(); g.startGame(0); g.stageIndex = 0; g.startStage(); g.setState('play'); g.irisT = 99;
+    g.input.held.add('right'); tick(240); // ゾンビが湧いて描かれる区間（描画で例外が出ないこと）
+    const d = window.__log.dump();
+    return { z: { missing: !!z.missing, hd: !!z.hd, w: z.w, h: z.h, rw: z.r.width, rh: z.r.height }, z2missing: !!z2.missing, fails: d.filter(e => e.code === 'ASSET.FAIL').map(e => e.attr.path), boot: d.find(e => e.code === 'GAME.BOOT')?.attr.loaderWarnings, zombies: g.world.enemies.filter(e => e.def?.kind === 'zombie' || /zombie/.test(e.baseSprite ?? '')).length, state: g.state };
+  });
+  expect(r.z).toEqual({ missing: true, hd: true, w: 64 / 3, h: 101 / 3, rw: 64, rh: 101 }); // manifest enemies/zombie1 = 64×101
+  expect(r.z2missing).toBe(false);
+  expect(r.fails).toEqual(['assets/sprites/enemies/zombie1.png']); expect(r.boot).toBe(1);
+  expect(r.state).toBe('play');
+  await page.screenshot({ path: 'test-results/shots/placeholder_zombie1.png' });
+  expect(errors.filter(e => !/load failed|net::ERR_FAILED/.test(e))).toEqual([]); // 握った PNG のネットワークエラー（ブラウザの console.error と loader の warn）以外に error は無い
+});

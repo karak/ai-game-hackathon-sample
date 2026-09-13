@@ -62,5 +62,5 @@ export async function render(main, A) {
   ]));
   main.appendChild(h2('4. 毒溜まり・炎'));
   main.appendChild(frameStrip([{ name: 'pool', spr: A.shots.pool }, { name: 'fire1', spr: A.shots.fire1 }, { name: 'fire2', spr: A.shots.fire2 }]));
-  main.appendChild(note('毒溜まり: 3.5 秒、接触で被弾。炎（キャンドル）: 1.3 秒、敵に 0.35 秒毎 1 ダメージ。炎は暫定で旧ドット絵（3 倍表示）。'));
+  main.appendChild(note('毒溜まり: 3.5 秒、接触で被弾。炎（キャンドル）: 1.3 秒、敵に 0.35 秒毎 1 ダメージ。炎は生成素材 shots/fire1・fire2（2 コマ、hd）。'));
 }

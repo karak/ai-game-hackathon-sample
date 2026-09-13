@@ -226,7 +226,7 @@ function drawPlayerBody(e, g, cam, assets, dy) {
     const t = e.deathT; const hx = e.centerX - hat.w / 2 - cam.x + t * 20 * -e.facing, hy = py + (spr.headY ?? 0) + hatDy - (60 * t - 90 * t * t);
     blit(g, hat, e.facing < 0, hx, Math.min(hy, py + spr.h * 0.5));
   }
-  if (e.broomT > 0) blit(g, assets.broom, e.facing < 0, e.centerX - assets.broom.w / 2 - cam.x, e.y + e.h - 4 - cam.y);
+  if (e.broomT > 0 && assets.broom) blit(g, assets.broom, e.facing < 0, e.centerX - assets.broom.w / 2 - cam.x, e.y + e.h - 4 - cam.y); // 旧文字列のほうきは w/h 欠落で NaN 座標になり描かれていなかった（BUG-024）。HD 素材ができるまで null
   if (e.chargeT > CHARGE_T && Math.floor(e.chargeT * 20) % 2) blit(g, assets.shots.charge, false, e.centerX + (e.facing > 0 ? 12 : -22) - cam.x, e.y + 8 - cam.y);
   if (e.chargeT >= SUPER_T) { // 強化魔法が出る合図: 生成した光輪（magicfx/aura、2 コマで回る）。無ければ円で描く
     const aura = assets.generated?.magicfx, spr = aura && (Math.floor(e.chargeT * 8) % 2 ? aura.aura2 : aura.aura1);

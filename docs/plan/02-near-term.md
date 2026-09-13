@@ -337,3 +337,17 @@ perf: 0 samples, fps p95 min - median -, long frames 0
 
 未達（ユーザー受入）: 人の実操作 1 セッション（公開 URL を開いて 1 面遊び、DevTools で `[LYR` フィルタ、オプション「テスター報告を コピー」の JSON を `docs/plan/logs/testers/` に置く）。`PERF.FRAME` は 30 秒の実時間が要るので早送りのボットでは出ない（人のセッションで初めて出る）。
 
+
+## Sprint S — 「人手のいらない残課題: 旧文字列ドット絵の撤去（DEBT-003）」（2026-09-13、0 リクエスト）
+
+ユーザー指示「自走できる部分の開発を進めて」。HANDOFF §3 のうち人手待ち（Sprint R 受入・M5・IMP-017・IMP-024・M6）と生成予算・表現の変更（IMP-009・IMP-013・BUG-006）は触らない。
+
+| 項目 | 結果 | 証跡 |
+|------|------|------|
+| DEBT-003 計測 | 文字列定義 38 種（敵 15・ボス 3・弾 14・アイテム 6）は全部 manifest に生成素材あり。主人公 28 コマは命名が違い未参照。装飾 9 種は全 8 面の地形文字列で 0 回（`DECO_MAP` と重ならない）。炎 shots/fire1・fire2 は既に生成素材（commit 0d46a4e） | 計測スクリプトの出力を ADR-0040 背景に転記 |
+| DEBT-003 削除 | `src/gfx/sprites/*`（6 ファイル 1261 行）、`tools/gen_player.py`、`sprite.js makeSprite/buildSheet`、`palette.js COSTUMES`、`tiles.js`/`hdworld.js` の `deco_*` 分岐。読めない素材は manifest 寸法の市松プレースホルダ（ADR-0040） | `test/loader.test.js` 4 件、`e2e/boot.spec.js`「a sprite that fails to load …」（zombie1.png を握る → 64×101 の市松、`ASSET.FAIL` 1 件、例外 0）、`test-results/shots/placeholder_zombie1.png` |
+| BUG-023（調査で発見） | 宝箱から出たアイテムが公開版でも旧文字列ドット絵で描かれていた（`pickups` を合流前に作っていた）。合流後に作るよう修正 | `pickups_before_debt003.png`（16×12 の三角形のドレス）→ `pickups_after_debt003.png`（生成 14×14.7）。golden は画廊 f0/f12 のみ更新 |
+| BUG-024（調査で発見） | 二段ジャンプのほうきは `w/h` 欠落の NaN 座標で一度も描かれていなかった。粗い 3 倍ドットを出すのは表現の変更なので描かないまま（`assets.broom = null`）。HD 生成はユーザー判断 | `golden_stage1_f90_diff.png`（左 = 旧、右 = 描かれた版）。全 8 面の 90 フレーム目ハッシュが変わったので戻し、golden は 8 面・メニューとも不変 |
+| カタログ | items 章の注記「炎は暫定で旧ドット絵」を実態（生成 2 コマ）に修正、chars 章のほうき行は素材があるときだけ。8 ページ error 0 | `catalog_chars_debt003.png` |
+
+検証: Vitest **152 件**（sprites.test 4 件 −、loader.test 4 件 ＋）、Playwright **14 件**（golden は画廊のみ更新、boot に 1 件追加）、`npm run build && node tools/check_dist.mjs` 283 読込・bootMs 161・loaderWarnings 0・errors 0。デプロイは未実施（ユーザー判断。BUG-023 は公開版で見えている不具合）。

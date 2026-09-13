@@ -60,3 +60,4 @@ HANDOFF.md には書かない（HANDOFF はセッションごとに変わる内�
 | [ADR-0037](0037-deploy-workers-static-assets.md) | 配信先は Cloudflare Workers Static Assets | 採用 | IMP-019 |
 | [ADR-0038](0038-release-docs.md) | 配信文書は docs/release/ に置く | 採用 | Sprint J |
 | [ADR-0039](0039-generation-sequential-ledger.md) | 素材生成は逐次実行し、台帳に全リクエストを記録する | 採用 | `tools/gen_ledger.json` |
+| [ADR-0040](0040-missing-sprite-placeholder.md) | 読めない素材はプレースホルダで見せ、文字列ドット絵へは戻さない | 採用 | DEBT-003 / BUG-023 / BUG-024 |

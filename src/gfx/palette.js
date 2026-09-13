@@ -67,10 +67,3 @@ export const PAL = {
   't': '#e0709e', // hair shadow
 };
 
-// 衣装ごとの色置換テーブル
-export const COSTUMES = {
-  // p 主色 / a 主色の影 / b 主色の光 / q 副色(スカート) / e 副色の影 / r 縁・リボン / s,t,c,d 髪
-  dress:  { p: '#d84f9c', a: '#a32f78', b: '#f07ab8', q: '#ff8fc8', e: '#e06aa8', y: '#ffb0d8', r: '#fdfbf7', s: '#ffb6dc', t: '#e0709e', c: '#ffe4f2', d: '#b04878' },
-  plain:  { p: '#26397a', a: '#182552', b: '#3a52a0', q: '#e8e8f0', e: '#b8b8cc', y: '#ffffff', r: '#d9262b', s: '#ffb6dc', t: '#e0709e', c: '#ffe4f2', d: '#b04878' },
-  gold:   { p: '#f0a838', a: '#c07818', b: '#ffd060', q: '#fff0a0', e: '#e8c060', y: '#fff8d0', r: '#fdfbf7', s: '#fff1c8', t: '#e8b060', c: '#ffffff', d: '#c89040' },
-};

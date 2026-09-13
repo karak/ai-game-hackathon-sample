@@ -1,6 +1,4 @@
 import { PAL } from './palette.js';
-import { makeSprite } from './sprite.js';
-import { DECO } from './sprites/index.js';
 import { rng } from '../shared/util.js';
 import { TILE } from '../stage/physics.js';
 
@@ -176,8 +174,7 @@ export function buildTileset(themeName) {
   }
   tiles.spike = spike;
 
-  // 装飾
-  for (const [k, rows] of Object.entries(DECO)) tiles['deco_' + k] = makeSprite(rows);
+  // 装飾: 旧文字列ドット絵（deco_*）は DEBT-003 で撤去。装飾は生成素材（stage/decomap.js → hdworld.renderMapLayerHD）だけ
   return tiles;
 }
 
@@ -206,8 +203,6 @@ export function renderMapLayer(map, tiles, chunkPx = 512) {
         g.drawImage(tiles.plat, px, py);
       } else if (ch === '^') {
         g.drawImage(tiles.spike, px, py);
-      } else if (tiles['deco_' + ch]) {
-        g.drawImage(tiles['deco_' + ch], px, py);
       }
     }
     chunks.push({ x: cx, canvas: c });

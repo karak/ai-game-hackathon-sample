@@ -120,7 +120,6 @@ export function renderMapLayerHD(map, tiles, decoTiles, chunkWorld = 512, decoHD
         if (!map.isSolid(tx, ty + 1) && ty < map.height - 1) { g.fillStyle = 'rgba(26,15,30,0.45)'; g.fillRect(px, py + T - 4, T, 4); }
       } else if (map.isOneWay(tx, ty)) g.drawImage(tiles.plat[v], px, py);
       else if (decoHD && decoHD[ch]) { const d = decoHD[ch].r; g.drawImage(d, px + Math.round((T - d.width) / 2), py + T - d.height); } // 生成装飾: 足元をタイル下端に
-      else if (decoTiles && decoTiles['deco_' + ch]) g.drawImage(decoTiles['deco_' + ch], px, py, T, T); // 旧装飾は 3 倍表示（暫定）
       else if (ch === '^') { if (spikeHD) g.drawImage(spikeHD, px, py); else if (decoTiles) g.drawImage(decoTiles.spike, px, py, T, T); }
     }
     chunks.push({ x: cx, canvas: c });

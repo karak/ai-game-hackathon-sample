@@ -42,7 +42,7 @@ export async function render(main, A) {
   // 帽子・ほうき（合成パーツ）
   main.appendChild(h2('3. 合成パーツ'));
   main.appendChild(note('帽子はドレス系の帽子なしコマに合成（髪の最上行 +6 セルにつばを重ねる）。死亡時は帽子だけが放物線で飛ぶ。ほうきは二段ジャンプ 0.45 秒間だけ足元に表示。'));
-  main.appendChild(frameStrip([{ name: 'hat', spr: A.hat, size: true }, { name: 'broom', spr: A.broom }], { gap: 16 }));
+  main.appendChild(frameStrip([{ name: 'hat', spr: A.hat, size: true }, ...(A.broom ? [{ name: 'broom', spr: A.broom }] : [])], { gap: 16 })); // ほうきは HD 素材ができるまで無し（BUG-024）
 
   // 射出位置
   main.appendChild(h2('4. 弾の発生位置'));
