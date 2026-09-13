@@ -1694,7 +1694,7 @@
  },
  "player/hurt2_gold": {
   "anchor": "bottom",
-  "colors": 15,
+  "colors": 17,
   "fits": true,
   "h": 118,
   "src": "assets/sprites/player/hurt2_gold.png",
@@ -1710,7 +1710,7 @@
  },
  "player/hurt2_plain": {
   "anchor": "bottom",
-  "colors": 15,
+  "colors": 17,
   "fits": true,
   "h": 114,
   "src": "assets/sprites/player/hurt2_plain.png",

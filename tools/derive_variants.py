@@ -211,6 +211,174 @@ def apply_map(im, mp):
     return out
 
 
+# ---- BUG-006（2026-09-13）: 位置で判定する衣装置換 ----------------------------------------------------------
+# 色 → 色の写像（rule_map / costume_map）だけでは直せなかった 3 点を、画素ごとの分類で直す:
+#  (a) 髪の陰影（209,89,134）がスカートの襞にも使われ、髪ガードで残って白いスカートに桃色の斑が出る
+#  (b) 前髪のハイライトに衣装の桃色（230,122,156）が使われ、白に化ける
+#  (c) 襟・袖口・裾フリルのクリーム（251,237,232 / 236,227,216）は目の白・靴下・頬と同色で、色では区別できない
+# 分類: 各コマで「髪確定色」（平均 y が高さの 30% より上・20 画素以上）と「衣装確定色」（桃〜赤紫で平均 y が 45% より下、
+# 彩度 0.7 超か明度 0.3 未満 = 胴着の紅・濃影）を色から決め、候補画素は 5×5 近傍の確定色の多数決で髪／衣装に振り分ける
+# （2 段: まず明るい桃、次に陰影・輪郭。同数は髪 = 変えない。高さ 30% より上は常に髪／帽子）。
+# 縫い取り: クリームの連結成分のうち衣装画素に接するものだけ（襟・袖口・裾）。目の白・靴下・頬は衣装に接しないので残る。
+# 私服のパレット（15 色以内に収めるため 3 色だけ足す。ADR-0041）: 白 (232,232,240)、紺 (38,57,122)、赤 (217,38,43)。
+# 陰影は肌影 (204,122,141)、輪郭・濃影は靴の暗紫 (48,35,69) を共有する。
+import colorsys
+
+PLAIN_WHITE = (232, 232, 240); PLAIN_NAVY = (38, 57, 122); PLAIN_TRIM = (217, 38, 43)
+PLAIN_SHADE = (204, 122, 141); PLAIN_DARK = (48, 35, 69)
+CREAMS = {(251, 237, 232), (236, 227, 216)}
+EYE = (71, 58, 107)  # 瞳・靴の紐の暗紫。目の白（クリーム）を縫い取りから外す目印
+
+
+def _hls(c):
+    h, l, s = colorsys.rgb_to_hls(*(v / 255 for v in c)); return h * 360, l, s
+
+
+def is_costume_hue(c):
+    """桃〜赤紫（肌の暖色は除外）。rule_map と同じ判定"""
+    deg, l, s = _hls(c)
+    if l >= 0.6 and s < 0.5: return False  # 肌影（204,122,141）は衣装でも髪でもない = 経路にも縫い取りの隣接にも使わない
+    return s > 0.35 and (deg >= 300 or deg <= 5) and not (l > 0.8 and s < 0.5)
+
+
+REF_ROLES = None  # 帽子なし idle から取った基準の (髪確定色, 衣装確定色)。帽子つきコマでは髪が高さの 30% より下に出て髪確定色が空になるので併用する
+
+
+def color_roles(im):
+    """コマ内の色を 髪確定 / 衣装確定 / 候補 に分ける（位置の統計から。基準コマの確定色も併用）"""
+    a = np.asarray(im); al = a[..., 3] > 0; h = a.shape[0]
+    pos = {}
+    for y in range(h):
+        for x in range(a.shape[1]):
+            if al[y, x]: pos.setdefault(tuple(int(v) for v in a[y, x, :3]), []).append(y)
+    hair, costume, cand = set(), set(), set()
+    for c, ys in pos.items():
+        if not is_costume_hue(c): continue
+        my = float(np.mean(ys)); deg, l, s = _hls(c)
+        if my < h * 0.30 and len(ys) >= 20: hair.add(c)
+        elif my > h * 0.45 and (s > 0.7 or l < 0.3): costume.add(c)
+        else: cand.add(c)
+    if REF_ROLES:
+        # 基準コマがあれば確定色は基準の集合だけにする。コマ単独の統計だと、髪が大きく高いコマ（run4・run3s・jump）で
+        # スカートの襞にも使う (209,89,134) の平均 y が 30% より上になり髪確定色に入って、襞が 1 画素も変わらなかった（2026-09-13 計測）
+        rh, rc = REF_ROLES; cand |= hair | costume; hair = rh & set(pos); costume = (rc & set(pos)) - hair; cand -= hair | costume
+    return hair, costume, cand
+
+
+def classify_costume(im, head_frac=0.0):
+    """衣装画素のマスク（True = 衣装）。
+    種: 髪確定色（H/p）= 髪、衣装確定色（胴着の紅・濃影）= 衣装、明るい桃（明度 0.6・彩度 0.6 以上）= 5×5 近傍に髪確定色が 2 個以上なら髪、
+    それ以外は衣装（前髪のハイライトは髪、袖・スカートは衣装）。陰影・輪郭（209,89,134 / 174,61,106 / 184,81,112 など）は
+    両方の種からの多ソース BFS（4 近傍、候補画素の上だけ）で近い側に振り分ける。どちらにも届かなければ髪 = 変えない。
+    v1（5×5 多数決）はスカートが同数 → 髪で 440 画素残り、v2（確定色だけを種にした BFS）は髪が裾に接する左半分が髪に流れた（2026-09-13 計測）"""
+    from collections import deque
+    a = np.asarray(im); al = a[..., 3] > 0; h, w = a.shape[:2]
+    hair, costume, cand = color_roles(im)
+    bright = {c for c in cand if _hls(c)[1] >= 0.6 and _hls(c)[2] >= 0.6}
+    col = [[tuple(int(v) for v in a[y, x, :3]) if al[y, x] else None for x in range(w)] for y in range(h)]
+    label = np.zeros((h, w), np.int8)  # 0 未定, 1 髪, 2 衣装
+    q = deque()
+    for y in range(h):
+        for x in range(w):
+            c = col[y][x]
+            if c in hair: label[y, x] = 1; q.append((y, x))
+            elif y < h * head_frac: label[y, x] = 1; q.append((y, x))  # 帽子つきコマ（金）は上 30% を髪・帽子扱い（金にしない）。飾りリボンの紅がコマにより衣装確定色になって金になり走行中に点滅した。上 30% を全部衣装にすると帽子帯と髪の陰影まで金になった（2026-09-13 計測）。飾りの紅・濃紫は apply_costume で近い髪系色へ寄せて 15 色に収める
+            elif c in costume: label[y, x] = 2; q.append((y, x))
+            elif c in bright:
+                # 5×5 に髪確定色が 2 個以上なら髪（前髪のハイライト 1 画素が 8 近傍 3 個の条件を満たさず衣装になり、接するクリームまで縫い取り色になった）
+                hv = sum(1 for dy in range(-2, 3) for dx in range(-2, 3) if (dy or dx) and 0 <= y + dy < h and 0 <= x + dx < w and col[y + dy][x + dx] in hair)
+                label[y, x] = 1 if hv >= 2 else 2; q.append((y, x))
+    # 明るい桃で衣装と判定された 3 画素以下の孤立成分（8 近傍）は前髪・毛先のハイライト → 髪へ戻す（金衣装で前髪に金の斑が出た）
+    seen = np.zeros((h, w), bool)
+    for y in range(h):
+        for x in range(w):
+            if seen[y, x] or label[y, x] != 2 or col[y][x] not in bright: continue
+            comp = []; st = [(y, x)]; seen[y, x] = True
+            while st:
+                cy, cx = st.pop(); comp.append((cy, cx))
+                for dy in (-1, 0, 1):
+                    for dx in (-1, 0, 1):
+                        ny, nx = cy + dy, cx + dx
+                        if 0 <= ny < h and 0 <= nx < w and not seen[ny, nx] and label[ny, nx] == 2 and col[ny][nx] in bright: seen[ny, nx] = True; st.append((ny, nx))
+            if len(comp) <= 3:
+                for p in comp: label[p] = 1
+    while q:
+        y, x = q.popleft()
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            ny, nx = y + dy, x + dx
+            if not (0 <= ny < h and 0 <= nx < w) or label[ny, nx] or col[ny][nx] not in cand: continue
+            label[ny, nx] = label[y, x]; q.append((ny, nx))
+    stray = (label != 2) & np.array([[col[y][x] in costume for x in range(w)] for y in range(h)])  # 髪・帽子側に残った衣装確定色（飾りリボンの紅・濃紫、毛先の紅）
+    return label == 2, (label == 1) & np.array([[col[y][x] in bright for x in range(w)] for y in range(h)]), hair, hair | cand | {PLAIN_DARK}, stray
+
+
+def trim_mask(im, costume):
+    """クリームの連結成分（4 近傍）のうち、衣装画素に 8 近傍で接するもの = 襟・袖口・裾フリル"""
+    a = np.asarray(im); al = a[..., 3] > 0; h, w = a.shape[:2]
+    cream = np.zeros((h, w), bool)
+    for y in range(h):
+        for x in range(w):
+            if al[y, x] and tuple(int(v) for v in a[y, x, :3]) in CREAMS: cream[y, x] = True
+    seen = np.zeros((h, w), bool); out = np.zeros((h, w), bool)
+    for y in range(h):
+        for x in range(w):
+            if not cream[y, x] or seen[y, x]: continue
+            comp = []; stack = [(y, x)]; seen[y, x] = True; touch = set(); eye = 0
+            while stack:
+                cy, cx = stack.pop(); comp.append((cy, cx))
+                for dy in (-1, 0, 1):
+                    for dx in (-1, 0, 1):
+                        ny, nx = cy + dy, cx + dx
+                        if not (0 <= ny < h and 0 <= nx < w): continue
+                        if costume[ny, nx]: touch.add((ny, nx))
+                        if al[ny, nx] and tuple(int(v) for v in a[ny, nx, :3]) == EYE: eye += 1
+                        if cream[ny, nx] and not seen[ny, nx] and (dy == 0 or dx == 0): seen[ny, nx] = True; stack.append((ny, nx))
+            # 実測（2026-09-13、idle/fall/cast1/run3s/attack）: 襟・袖口・裾は衣装画素との隣接 4〜43、瞳の色との隣接 0。
+            # 目の白は衣装隣接 0〜1・瞳隣接 11〜28、杖の星は衣装隣接 2、詠唱の光と靴下は 120 画素超か衣装隣接 0
+            if len(touch) >= 3 and eye == 0 and len(comp) <= 120:
+                for p in comp: out[p] = True
+    return out
+
+
+def plain_color(c):
+    deg, l, s = _hls(c)
+    if l >= 0.6 and s >= 0.6: return PLAIN_WHITE       # 袖・スカートの地
+    if l >= 0.55 or (l >= 0.6 and s < 0.6): return PLAIN_SHADE  # 襞・影（肌影と共有）
+    if s > 0.7: return PLAIN_NAVY                       # 胴着
+    return PLAIN_DARK                                    # 輪郭・濃影（靴と共有）
+
+
+GOLD_LIGHT = (247, 205, 120); GOLD_MID = (222, 160, 60); GOLD_DEEP = (197, 133, 9)
+
+
+def gold_color(c):
+    """金衣装は 3 色の固定ランプ＋輪郭は靴の暗紫を共有（連続写像だと 20 色を超えた。15 色以内）"""
+    deg, l, s = _hls(c)
+    if l >= 0.6 and s >= 0.6: return GOLD_LIGHT
+    if l >= 0.55 or (l >= 0.6 and s < 0.6): return GOLD_MID if s >= 0.5 else c  # 肌影（204,122,141）はそのまま
+    if s > 0.7: return GOLD_DEEP
+    return PLAIN_DARK
+
+
+def apply_costume(im, target):
+    """位置分類つきの衣装置換。target = 'plain' | 'gold'"""
+    costume, hair_bright, hair, hairlike, stray = classify_costume(im, 0.30 if target == 'gold' else 0.0)
+    trim = trim_mask(im, costume) if target == 'plain' else None
+    nearest = lambda pool, c: min(pool, key=lambda hc: sum((a - b) ** 2 for a, b in zip(hc, c))) if pool else c
+    nearest_hair = lambda c: nearest(hair, c)
+    out = im.copy(); px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            c = px[x, y]
+            if not c[3]: continue
+            if trim is not None and trim[y, x]: px[x, y] = (*PLAIN_TRIM, 255); continue
+            if hair_bright[y, x]: t = nearest_hair(c[:3]); px[x, y] = (t[0], t[1], t[2], 255); continue  # 髪に残る衣装色のハイライト（十数画素）は最も近い髪色へ寄せ、15 色に収める
+            if stray[y, x]: t = nearest(hairlike - {c[:3]}, c[:3]); px[x, y] = (t[0], t[1], t[2], 255); continue  # 帽子飾り・毛先に残る衣装確定色（紅・濃紫）も近い髪系色へ（色数 15 のため）
+            if costume[y, x]:
+                t = plain_color(c[:3]) if target == 'plain' else gold_color(c[:3]); px[x, y] = (t[0], t[1], t[2], 255)
+    return out
+
+
 def main():
     manifest = json.loads(MANIFEST.read_text())
     hm = derive_hat(); manifest['player/hat'] = {'src': 'assets/sprites/player/hat.png', 'anchor': 'center', **hm}
@@ -236,21 +404,22 @@ def main():
             out = load(n); manifest[f'player/{n}'].update({'w': out.width, 'h': out.height}); print('hat composited onto', n)
     # plain: 帽子なしフレーム(*_nohat) に、全コマから作った衣装写像を適用（コマ固有の陰影も置換する）
     if (SPR / 'idle_nohat.png').exists():
+        global REF_ROLES; rh, rc, _ = color_roles(load('idle_nohat')); REF_ROLES = (rh, rc); print('reference roles from idle_nohat: hair', sorted(rh), 'costume', sorted(rc))
         guard = hair_colors(load('idle_nohat'))
-        mp = costume_map([f'{n}_nohat' for n in frames], 'plain', guard); print('plain mapped colors', len(mp))
+        mp = costume_map([f'{n}_nohat' for n in frames], 'plain', guard); print('plain mapped colors', len(mp))  # 旧: 色→色の写像（BUG-006 で位置分類 apply_costume に置換。写像は参考出力）
         for n in frames:
             src = SPR / f'{n}_nohat.png'
             if not src.exists(): continue
-            out = apply_map(Image.open(src).convert('RGBA'), mp); out.save(SPR / f'{n}_plain.png')
+            out = apply_costume(Image.open(src).convert('RGBA'), 'plain'); out.save(SPR / f'{n}_plain.png')
             manifest[f'player/{n}_plain'] = {'src': f'assets/sprites/player/{n}_plain.png', 'w': out.width, 'h': out.height, 'anchor': 'bottom', 'fits': True, 'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0])}
     # gold: 帽子ありフレームに、全コマから作った衣装写像を適用（帽子と髪の色は guard で除く）
     if (SPR / 'idle.png').exists():
         guard = hair_colors(load('idle_nohat'))
-        mp = costume_map(frames, 'gold', guard); print('gold mapped colors', len(mp))
+        mp = costume_map(frames, 'gold', guard); print('gold mapped colors', len(mp))  # 旧: 色→色の写像（BUG-006 で位置分類 apply_costume に置換）
         for n in frames:
             src = SPR / f'{n}.png'
             if not src.exists(): continue
-            out = apply_map(Image.open(src).convert('RGBA'), mp); out.save(SPR / f'{n}_gold.png')
+            out = apply_costume(Image.open(src).convert('RGBA'), 'gold'); out.save(SPR / f'{n}_gold.png')
             manifest[f'player/{n}_gold'] = {'src': f'assets/sprites/player/{n}_gold.png', 'w': out.width, 'h': out.height, 'anchor': 'bottom', 'fits': True, 'colors': len([c for c in out.getcolors(9999) if c[1][3] > 0])}
     MANIFEST.write_text(json.dumps(manifest, indent=1, sort_keys=True)); print('manifest updated', len(manifest))
     optimize_pngs.main([str(SPR / '*.png')])  # 派生コマもパレット PNG に（可逆。IMP-019）
