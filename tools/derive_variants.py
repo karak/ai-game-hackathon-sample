@@ -225,7 +225,9 @@ def apply_map(im, mp):
 import colorsys
 
 PLAIN_WHITE = (232, 232, 240); PLAIN_NAVY = (38, 57, 122); PLAIN_TRIM = (217, 38, 43)
-PLAIN_SHADE = (204, 122, 141); PLAIN_DARK = (48, 35, 69)
+PLAIN_SHADE = (196, 200, 216); PLAIN_DARK = (48, 35, 69)  # 白い布の陰影。当初は肌影 (204,122,141) を共有したが襞の多いコマで薄桃のスカートになった（ユーザー判断 2026-09-13: 案 1）
+# 私服パレットの設計（実機のパレット差し替えと同じ考え方）: 髪の暗い 2 色 HAIR_FOLD を 1 色に畳んで 1 枝空け、白の陰影に使う。元絵の 12 色を不変にしたまま 3 色足すと布の陰影が持てなかった
+HAIR_FOLD = {(184, 81, 112): (174, 61, 106)}
 CREAMS = {(251, 237, 232), (236, 227, 216)}
 EYE = (71, 58, 107)  # 瞳・靴の紐の暗紫。目の白（クリーム）を縫い取りから外す目印
 
@@ -237,8 +239,14 @@ def _hls(c):
 def is_costume_hue(c):
     """桃〜赤紫（肌の暖色は除外）。rule_map と同じ判定"""
     deg, l, s = _hls(c)
-    if l >= 0.6 and s < 0.5: return False  # 肌影（204,122,141）は衣装でも髪でもない = 経路にも縫い取りの隣接にも使わない
+    if l >= 0.6 and s < 0.5: return False  # 肌影（204,122,141）は色だけでは衣装と決めない（is_rose: 肌・クリームに隣接しない画素だけ候補にする）
     return s > 0.35 and (deg >= 300 or deg <= 5) and not (l > 0.8 and s < 0.5)
+
+
+def is_rose(c):
+    """肌影と同じ薄い桃 (204,122,141) 系。run3s ではスカートの陰影が 437 画素この色で塗られていた（量子化で肌影と同色に）"""
+    deg, l, s = _hls(c)
+    return l >= 0.6 and 0.35 < s < 0.5 and (deg >= 300 or deg <= 5)
 
 
 REF_ROLES = None  # 帽子なし idle から取った基準の (髪確定色, 衣装確定色)。帽子つきコマでは髪が高さの 30% より下に出て髪確定色が空になるので併用する
@@ -277,6 +285,13 @@ def classify_costume(im, head_frac=0.0):
     bright = {c for c in cand if _hls(c)[1] >= 0.6 and _hls(c)[2] >= 0.6}
     col = [[tuple(int(v) for v in a[y, x, :3]) if al[y, x] else None for x in range(w)] for y in range(h)]
     label = np.zeros((h, w), np.int8)  # 0 未定, 1 髪, 2 衣装
+    SKIN = (227, 190, 182)
+    rose_ok = np.zeros((h, w), bool)  # 肌影色の画素のうち、肌・クリームに 8 近傍で接しないもの = スカートの陰影として候補に入れる（2026-09-13 案 1 の続き）
+    for y in range(h):
+        for x in range(w):
+            c = col[y][x]
+            if c is None or not is_rose(c): continue
+            if not any(0 <= y + dy < h and 0 <= x + dx < w and (col[y + dy][x + dx] == SKIN or col[y + dy][x + dx] in CREAMS) for dy in (-1, 0, 1) for dx in (-1, 0, 1)): rose_ok[y, x] = True
     q = deque()
     for y in range(h):
         for x in range(w):
@@ -302,12 +317,19 @@ def classify_costume(im, head_frac=0.0):
                         if 0 <= ny < h and 0 <= nx < w and not seen[ny, nx] and label[ny, nx] == 2 and col[ny][nx] in bright: seen[ny, nx] = True; st.append((ny, nx))
             if len(comp) <= 3:
                 for p in comp: label[p] = 1
+    # クリーム（フリル・襟）は通過できるがラベルは付けない: jump ではスカート裏の陰影がフリルと脚に囲まれて届かず 299 画素が薄桃のまま残った
+    passed = np.zeros((h, w), np.int8)
     while q:
         y, x = q.popleft()
         for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
             ny, nx = y + dy, x + dx
-            if not (0 <= ny < h and 0 <= nx < w) or label[ny, nx] or col[ny][nx] not in cand: continue
-            label[ny, nx] = label[y, x]; q.append((ny, nx))
+            if not (0 <= ny < h and 0 <= nx < w) or label[ny, nx]: continue
+            c = col[ny][nx]; lab = label[y, x] if label[y, x] else passed[y, x]
+            if c in CREAMS:
+                if not passed[ny, nx]: passed[ny, nx] = lab; q.append((ny, nx))
+                continue
+            if not (c in cand or rose_ok[ny, nx]): continue
+            label[ny, nx] = lab; q.append((ny, nx))
     stray = (label != 2) & np.array([[col[y][x] in costume for x in range(w)] for y in range(h)])  # 髪・帽子側に残った衣装確定色（飾りリボンの紅・濃紫、毛先の紅）
     return label == 2, (label == 1) & np.array([[col[y][x] in bright for x in range(w)] for y in range(h)]), hair, hair | cand | {PLAIN_DARK}, stray
 
@@ -330,7 +352,7 @@ def trim_mask(im, costume):
                     for dx in (-1, 0, 1):
                         ny, nx = cy + dy, cx + dx
                         if not (0 <= ny < h and 0 <= nx < w): continue
-                        if costume[ny, nx]: touch.add((ny, nx))
+                        if costume[ny, nx] and not is_rose(tuple(int(v) for v in a[ny, nx, :3])): touch.add((ny, nx))  # 肌影色の衣装画素は数えない（腕のハイライトが縫い取りにならないように）
                         if al[ny, nx] and tuple(int(v) for v in a[ny, nx, :3]) == EYE: eye += 1
                         if cream[ny, nx] and not seen[ny, nx] and (dy == 0 or dx == 0): seen[ny, nx] = True; stack.append((ny, nx))
             # 実測（2026-09-13、idle/fall/cast1/run3s/attack）: 襟・袖口・裾は衣装画素との隣接 4〜43、瞳の色との隣接 0。
@@ -343,7 +365,7 @@ def trim_mask(im, costume):
 def plain_color(c):
     deg, l, s = _hls(c)
     if l >= 0.6 and s >= 0.6: return PLAIN_WHITE       # 袖・スカートの地
-    if l >= 0.55 or (l >= 0.6 and s < 0.6): return PLAIN_SHADE  # 襞・影（肌影と共有）
+    if l >= 0.55 or (l >= 0.6 and s < 0.6): return PLAIN_SHADE  # 襞・影（白の陰影。案 1 で肌影の共有をやめた）
     if s > 0.7: return PLAIN_NAVY                       # 胴着
     return PLAIN_DARK                                    # 輪郭・濃影（靴と共有）
 
@@ -355,7 +377,7 @@ def gold_color(c):
     """金衣装は 3 色の固定ランプ＋輪郭は靴の暗紫を共有（連続写像だと 20 色を超えた。15 色以内）"""
     deg, l, s = _hls(c)
     if l >= 0.6 and s >= 0.6: return GOLD_LIGHT
-    if l >= 0.55 or (l >= 0.6 and s < 0.6): return GOLD_MID if s >= 0.5 else c  # 肌影（204,122,141）はそのまま
+    if l >= 0.55 or (l >= 0.6 and s < 0.6): return GOLD_MID  # 襞・影。肌影色はここへ来るのは is_rose で衣装と判定された画素（肌に接しないスカートの陰影）だけ
     if s > 0.7: return GOLD_DEEP
     return PLAIN_DARK
 
@@ -374,6 +396,7 @@ def apply_costume(im, target):
             if trim is not None and trim[y, x]: px[x, y] = (*PLAIN_TRIM, 255); continue
             if hair_bright[y, x]: t = nearest_hair(c[:3]); px[x, y] = (t[0], t[1], t[2], 255); continue  # 髪に残る衣装色のハイライト（十数画素）は最も近い髪色へ寄せ、15 色に収める
             if stray[y, x]: t = nearest(hairlike - {c[:3]}, c[:3]); px[x, y] = (t[0], t[1], t[2], 255); continue  # 帽子飾り・毛先に残る衣装確定色（紅・濃紫）も近い髪系色へ（色数 15 のため）
+            if target == 'plain' and c[:3] in HAIR_FOLD: t = HAIR_FOLD[c[:3]]; px[x, y] = (t[0], t[1], t[2], 255); continue  # 私服: 髪の暗い 2 色を 1 色に畳む（白の陰影に枝を回す）
             if costume[y, x]:
                 t = plain_color(c[:3]) if target == 'plain' else gold_color(c[:3]); px[x, y] = (t[0], t[1], t[2], 255)
     return out
