@@ -58,7 +58,7 @@
 - 事象: ほうき v1 単体 171×36、v2「2 本横並び・幅 40%」でも各 159×38（縦に積んだ）
 - 学び: 大きさは後処理（同一列の削除 `shorten_to`）で揃える。`docs/gen-pipeline.md` §1.1 に追記済み
 
-## スキル化の候補（未着手。writing-skills の規律 = 先に失敗する場面を再現してから書く、を満たしていないので追記していない）
+## スキル化（superpowers:writing-skills の RED → GREEN で 3 件を検査、19:04〜19:10）
 
 | スキル | 追記したい内容 | 根拠 |
 |---|---|---|
@@ -66,4 +66,12 @@
 | `retro-game-art-direction` | Rationalization Table に「15 色に収まらないから基準を緩める」→「実機流にパレットを設計し直す（階調を畳む）のが先」 | 学び 6 |
 | `generating-pixel-art-with-gemini` | Quick Reference に「衣装派生: 色 → 色写像は限界、位置分類（確定色を種にした BFS・連結成分の隣接数）」「細長い小物は大きさ指示を守らない → shorten_to」 | 学び 7・10 |
 
-追記するときは、その規則が無い状態でサブエージェントに同じ場面を与えて失敗を確認してから書く（superpowers:writing-skills）。
+結果（規則なしのサブエージェント = Sonnet に同じ場面を与えた基準テスト）:
+
+| スキル | 基準テスト | 処置 |
+|---|---|---|
+| `verifying-browser-games-with-bots` | 通過（ポートの PID・cwd と配信内容を先に確認、と答えた。場面設定に「別プロジェクトを触っていた」の誘導あり） | 追記なし。CLAUDE.md の作業ルールに留める |
+| `retro-game-art-direction` | 通過（継承 12 色の冗長な組を統合 → ディザ → 紺の兼用 → 基準見直しは最後、の順で答えた） | 追記なし。同上 |
+| `generating-pixel-art-with-gemini` | 問題 1（衣装派生）は通過、**問題 2（細長い小物の寸法）は失敗**: 「主人公と同じ絵に入れて比率で測る」で 1 リクエスト追加、柄の同一列を削る案なし | Quick Reference と Common Mistakes に 1 行ずつ、`reference/model-behavior.md` に実測を追記。同じ場面で再検証 → 「新規生成 0、柄の単色列を削って 83〜104 セルへ、specs に shorten_to」と答えた（GREEN） |
+
+失敗が再現しなかった 2 件は書かない（規則の無い側で失敗しないものに規則を足すと、スキルが長くなるだけ）。
