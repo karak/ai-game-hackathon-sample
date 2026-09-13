@@ -5,10 +5,10 @@
 ## 1. 現在地（2026-09-13 13:05 JST）
 
 - HEAD: Sprint S（DEBT-003・BUG-023・BUG-024）をコミット済み、`origin/main` と一致。`git log -4` 参照
-- 公開: https://magical-lyrica.karak97.workers.dev Version `d2ab28d0`（2026-09-13 13:00 デプロイ。`check_dist` 285 読込・loaderWarnings 0・error 0、bootMs 1364（初回）/ 542（2 回目）。公開 URL で `pickups.dress.hd === true`、`assets.broom` 33.3×12.7 世界単位、`missing` 0 件）。HEAD のコードと同一
+- 公開: https://magical-lyrica.karak97.workers.dev Version `d2ab28d0`（2026-09-13 13:00 デプロイ。**BUG-006 の私服は未反映**、デプロイはユーザー判断。`check_dist` 285 読込・loaderWarnings 0・error 0、bootMs 1364（初回）/ 542（2 回目）。公開 URL で `pickups.dress.hd === true`、`assets.broom` 33.3×12.7 世界単位、`missing` 0 件）。HEAD のコードと同一
 - 検証: Vitest 152 件（`test/loader.test.js` 4 件を含む）、Playwright 14 件通過（golden は画廊 f0/f12 と、ほうきの出る 8 面の 90 フレーム目・工房／塔の 600 フレーム目を更新。軌跡・メニューは不変）。build → check_dist 285 読込・bootMs 153・loaderWarnings 0。デモ 8 面はすべて 0 死・再生一致
 - 生成予算: 台帳 `tools/gen_ledger.json` **238 / 280**（残 42。予備。生成が要る新規項目はユーザー判断）
-- Vite dev server は 127.0.0.1:5173 で起きていた（`nohup`、ログ `/tmp/claude-501/vite5173.log`。セッション再開で一度死んで起こし直した）。次のセッションで死んでいたら `npx vite --port 5173 --host 127.0.0.1 --strictPort`
+- Vite dev server は **127.0.0.1:5175**（`nohup`、ログ `/tmp/claude-501/vite5175.log`）。5173 は別プロジェクト（ALCHEMION）の dev server に取られていて、そこへ当てた確認は無効になる。起こすときは `npx vite --port 5175 --host 127.0.0.1 --strictPort`、確認前に `curl -s http://127.0.0.1:5175/catalog.html | grep src/catalog/index.js`
 
 ## 2. 今回のセッション（9/13 昼、Sprint S）でやったこと
 
@@ -17,6 +17,7 @@
 3. 調査で発見した BUG-024（二段ジャンプのほうきが `w/h` 欠落で一度も描かれていなかった）をユーザー承認で HD 生成して修正（台帳 237〜238）: `props/broom`・`broom2` 100×38 / 100×37 セル・15 色。v1 単体 171×36 は不採用、v2 の柄 59 列を `build_sprites.py shorten()` で削除。証跡 `test-results/shots/broom_vs_idle_3x.png`・`broom_ingame_doublejump.png`
 4. デプロイ（ユーザー指示）: Version `d2ab28d0`、公開 URL で 285 読込・error 0
 5. ユーザー評価（2026-09-13 15:51）: 現状のほうきは「間に合わせ。部品を合成しただけで、生きた動きとは言い難い」。いったんこのまま採用。実測: 2 コマは同じ raw の縦積み 2 本を別々に切り出したもので、最良の位置合わせ（dx 0, dy −1）でも不透明セル 1942 のうち 891（46%）が異なり、差は 1〜99 列の全幅に散る（穂先だけの制御された揺れではなく、モデルが 2 本を描き直した差）。加えて柄は同一列 59 列の削除で詰めた。 → backlog IMP-029（改善案 3 つ、予算が要るものはユーザー判断）
+7. BUG-006 私服の色分け（ユーザー指示 16:15、commit db580a6）: 派生を色 → 色から画素の位置分類へ（ADR-0041）。白・紺・赤の 3 色で襟・袖口・裾を縫い取り、15 コマ × 私服・金が 15 色、桃の残存 0。golden は涙の川・工房の 600 フレーム目と画廊だけ更新。証跡 `test-results/shots/bug006_*`。**デプロイは未実施**（公開版 d2ab28d0 は旧私服）
 6. `docs/plan/01-status.md` を Sprint S 時点の実測で更新（manifest 285・予算 238/280・Vitest 152・Playwright 14）。学びは `docs/retro/2026-09-13-retrospective.md`
 
 ### 前回（9/12〜13 夜）

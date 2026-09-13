@@ -61,3 +61,4 @@ HANDOFF.md には書かない（HANDOFF はセッションごとに変わる内�
 | [ADR-0038](0038-release-docs.md) | 配信文書は docs/release/ に置く | 採用 | Sprint J |
 | [ADR-0039](0039-generation-sequential-ledger.md) | 素材生成は逐次実行し、台帳に全リクエストを記録する | 採用 | `tools/gen_ledger.json` |
 | [ADR-0040](0040-missing-sprite-placeholder.md) | 読めない素材はプレースホルダで見せ、文字列ドット絵へは戻さない | 採用 | DEBT-003 / BUG-023 / BUG-024 |
+| [ADR-0041](0041-costume-recolor-by-position.md) | 私服・金衣装の派生は画素の位置分類で行い、私服は白・紺・赤の 3 色を足して 15 色に収める | 採用 | BUG-006 |

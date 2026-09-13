@@ -41,6 +41,10 @@ postprocess.py RAW.png OUTDIR/ --logical WxH --split --names a,b [--palette BASE
 6. **出力**: 自然サイズの透過 PNG ＋ 同名 `.json`（`w,h,colors,fits,pitch`）。`fits` は specs.json の最大箱との照合結果
 7. **列の削除（`build_sprites.py shorten()`、specs `shorten_to: N`）**: 細長い小物で「全行が同一色の列」が最も長く続く区間（ほうきの柄）の中間列を削って幅 N にする。セル列の削除であり再標本化はしない。json に `shortened_from` を残す（BUG-024）
 
+### 2.1 派生（`tools/derive_variants.py`、BUG-006 / ADR-0041、2026-09-13）
+
+衣装（私服・金）は色 → 色の写像ではなく画素の位置分類で作る: 髪確定色・衣装確定色（帽子なし idle の位置統計）を種にした BFS で陰影・輪郭を髪／衣装に振り分け、クリームは衣装に接する連結成分（隣接 3 画素以上・瞳に非隣接・120 画素以下）だけ赤の縫い取りにする。私服は白 (232,232,240)・紺 (38,57,122)・赤 (217,38,43) の 3 色追加、金は 3 色ランプで、各コマ 15 色以内。
+
 ## 3. 生成台帳
 
 `tools/gemini_gen.py` が `tools/gen_ledger.json` に全リクエストを記録する（セッション予算 200）。

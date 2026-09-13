@@ -26,7 +26,7 @@
 
 | 種別 | 数 | 内訳 |
 |------|----|------|
-| 主人公（player 66） | 16 コマ × ドレス／私服／金 ＋ 帽子なし 16 ＋ 帽子・素体 | idle / run1〜4 / run1s・run3s（走り撃ち）/ jump / fall / attack / crouch / hurt / hurt2 / dead / cast1・cast2。私服・金は色相規則で派生（ADR-0034 の 2 パス割り当て） |
+| 主人公（player 66） | 16 コマ × ドレス／私服／金 ＋ 帽子なし 16 ＋ 帽子・素体 | idle / run1〜4 / run1s・run3s（走り撃ち）/ jump / fall / attack / crouch / hurt / hurt2 / dead / cast1・cast2。私服・金は画素の位置分類で派生（ADR-0041。白・紺・赤の 3 色追加で各 15 色）、割り当ては 2 パス（ADR-0034） |
 | 雑魚（enemies 33） | 16 種 × 2 コマ ＋ zombieRise | 人魚 v2 は頭〜尾まで 62×66（当たり判定は固定、ADR-0033）。鏡像は主人公のコマを流用（noSprite） |
 | ボス（bosses 20） | 8 体 × 2 コマ ＋ 大蛇（頭 2・胴・尾） | |
 | 弾・演出（shots 19） | 自弾 4（star・knife・heart・candle）＋ 溜め charge・meteor・burst・pillar、敵弾 9、毒溜まり、炎 2 コマ | |
