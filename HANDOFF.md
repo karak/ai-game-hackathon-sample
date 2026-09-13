@@ -20,7 +20,7 @@
 7. BUG-006 私服の色分け（ユーザー指示 16:15、commit db580a6）: 派生を色 → 色から画素の位置分類へ（ADR-0041）。白・紺・赤の 3 色で襟・袖口・裾を縫い取り、15 コマ × 私服・金が 15 色、桃の残存 0。ユーザーの問い「色数の制約は表現力より重要か」→ 案 1（私服パレットの設計し直し: 髪の暗い 2 色を畳んで白の陰影を確保）で 15 色のまま解決、案 2（派生は 17 色まで）は不要。golden は涙の川・工房の 600 フレーム目と画廊だけ更新。証跡 `test-results/shots/bug006_*`。デプロイ済み（Version `68717f69`）
 6. `docs/plan/01-status.md` を Sprint S 時点の実測で更新（manifest 285・予算 238/280・Vitest 152・Playwright 14）。学びは `docs/retro/2026-09-13-retrospective.md`
 
-8. セッション終了時の振り返り: `docs/retro/2026-09-13-retrospective.md` に午後の学び 5 件とスキル化候補 3 件を追記。CLAUDE.md 作業ルールに 5 行追加（dev server の配信確認、基準内で設計し直す案を先に、ユーザー評価の原文記録、Claude メモリ不使用、docs コミット前の diff 確認）。dev-guide の port を 5175 に
+8. セッション終了時の振り返り: `docs/retro/2026-09-13-retrospective.md` に午後の学び 5 件を追記し、スキル化は 3 件を基準テスト（superpowers:writing-skills の RED → GREEN）にかけて、失敗が再現した generating-pixel-art-with-gemini（細長い小物の寸法 → `shorten_to`）だけ追記・再検証済み（commit a86cce1）。他 2 件は基準で失敗せず追記なし。CLAUDE.md 作業ルールに 5 行追加（dev server の配信確認、基準内で設計し直す案を先に、ユーザー評価の原文記録、Claude メモリ不使用、docs コミット前の diff 確認）。dev-guide の port を 5175 に
 
 ### 前回（9/12〜13 夜）
 
