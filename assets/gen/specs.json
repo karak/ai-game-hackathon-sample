@@ -2434,6 +2434,22 @@
    ],
    "outline_val_max": 0.23,
    "_note": "IMP-018（2026-09-12）: 2 周目「真の結末」の専用挿絵。ending-5 と同じ物差し（_illust_style、尊重物 scene1 ＋ 立ち絵 lyrica-illust）。game.js endingScenes は scene7 が無ければ scene5 を流用"
+  },
+  "player-broom": {
+   "box": [
+    104,
+    40
+   ],
+   "frames": 2,
+   "anchor": "center",
+   "subject": "player-broom.txt",
+   "out": [
+    "props/broom",
+    "props/broom2"
+   ],
+   "strip_caption": true,
+   "_note": "BUG-024（2026-09-13）: 二段ジャンプの 0.45 秒に足元へ出るほうき。旧 32×6 の文字列ドット絵は w/h 欠落で描かれていなかった。主人公 idle（69 セル幅）の約 1.15 倍幅、高さ 16〜24 セル。ref は配色合わせ（帽子の藍・リボンの桃）。group は props（衣装コマの割り当てや pickups に混ざらないため）。ref は自動文（キャラの設計を同一に）がキャラを描かせかねないので specs に置かず、--ref で player-base-v5 を添え主題側でパレット限定の参照と明記。v1 は単体で 171×36（pitch 5 px、キャンバスの 83% 幅）と大きすぎ fits:false → v2 は 2 本横並び（各 40% 幅）で密度を落とす。2 本目は穂先の揺れの 2 コマ目に使う。v2 も各 159×38（モデルは『40% 幅』を無視し 2 本を縦に積んだ。pitch 5 px）。柄の 66〜149 列（84 列）は全行同一なので shorten_to=100 で中間 59 列を削除（再標本化なし）。box は実測の高さ 38 に合わせ 104×40",
+   "shorten_to": 100
   }
  }
 }

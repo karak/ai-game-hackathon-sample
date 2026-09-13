@@ -20,6 +20,7 @@ export async function buildAssets(onProgress = null) {
     assets.hatTopOffset = gen.player.base_hat ? Math.max(1, (findHairTop(gen.player.base_hat.r) - firstOpaqueRow(gen.player.base_hat.r)) / HD_SCALE) : 3;
   }
   for (const g of ['enemies', 'bosses', 'items', 'shots']) if (gen[g]) Object.assign(assets[g], gen[g]);
+  assets.broom = gen.props?.broom ?? null; assets.broom2 = gen.props?.broom2 ?? assets.broom; // 二段ジャンプのほうき 2 コマ（穂先の揺れ。BUG-024、台帳 238）
   assets.pickups = { ...assets.items, ...assets.shots }; // 宝箱から出る武器アイテムは弾のスプライトを流用。生成素材を合流した後に作る（BUG-023: 合流前に作ると落ちたアイテムだけ旧文字列ドット絵で描かれた）
   assets.generated = gen;
   return assets;
@@ -66,7 +67,7 @@ function baseAssets() {
   const assets = {
     player,
     hat: null, // 生成の player/hat を buildAssets が入れる
-    broom: null, // 二段ジャンプのほうき。HD 素材を生成したら { r, l, w, h } を入れる（BUG-024、ユーザー判断）
+    broom: null, // 二段ジャンプのほうき。HD 素材を生成したら { r, l, w, h } を入れる（BUG-024、ユーザー判断）→ 生成済み props/broom・broom2 を buildAssets が入れる（2026-09-13）
     enemies: {}, bosses: {}, shots: {}, items: {},
     tiles: {}, backgrounds: {},
   };

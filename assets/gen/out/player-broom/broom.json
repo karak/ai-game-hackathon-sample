@@ -1,0 +1,17 @@
+{
+ "source": "/Users/yasushi/projects/poc-square/assets/gen/raw/player-broom-v2.png",
+ "pitch": [
+  5.0,
+  5.0
+ ],
+ "max_box": [
+  104,
+  40
+ ],
+ "frames": null,
+ "w": 159,
+ "h": 38,
+ "fits": false,
+ "colors": 15,
+ "name": "broom"
+}

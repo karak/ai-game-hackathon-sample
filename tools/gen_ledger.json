@@ -1,5 +1,5 @@
 {
- "requests": 236,
+ "requests": 238,
  "entries": [
   {
    "name": "player-base",
@@ -1848,6 +1848,22 @@
    "secs": 16.6,
    "text": "",
    "ts": 1789182419.907052
+  },
+  {
+   "name": "player-broom",
+   "v": 1,
+   "ok": true,
+   "secs": 12.3,
+   "text": "",
+   "ts": 1789271502.12418
+  },
+  {
+   "name": "player-broom",
+   "v": 2,
+   "ok": true,
+   "secs": 12.1,
+   "text": "",
+   "ts": 1789271566.608264
   }
  ],
  "note": "並列実行で計数が競合したため 16 に手動補正（4 base/nohat/hat + 2 + 7 enemies + 3 bosses）。以後は逐次実行。",

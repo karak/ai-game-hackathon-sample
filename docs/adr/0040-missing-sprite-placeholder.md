@@ -34,3 +34,5 @@
 - `test-results/shots/golden_stage1_f90_diff.png`（左 = 旧、右 = ほうきが描かれた版。決定 4 で左に戻した）
 - `test-results/shots/placeholder_zombie1.png`（zombie1 を欠落させた起動）
 - Vitest 152 件、Playwright 14 件、`npm run build && node tools/check_dist.mjs` 283 読込・loaderWarnings 0
+
+追記 2026-09-13: 決定 4 のほうきは同日ユーザー承認で HD 生成した（台帳 237〜238/280、`props/broom`・`props/broom2` 100×38 / 100×37 セル・15 色・fits true）。v1 は単体で 171×36、v2 は 2 本横並び指示でも各 159×38（モデルは幅の指示を無視し縦に積んだ。pitch 5 px）。柄の 84 列が全行同一だったので `build_sprites.py shorten()` で中間 59 列を削って 100 幅にした（セル列の削除。再標本化なし）。`assets.broom / broom2` に入り、二段ジャンプの 0.45 秒に 12 Hz で 2 コマ交互。golden は 8 面の 90 フレーム目（全面で 2 回目のジャンプが 90 フレーム目に入る）と工房・塔の 600 フレーム目が変わり、軌跡・メニュー・画廊は不変。証跡 `test-results/shots/broom_vs_idle_3x.png`・`broom_zoom6.png`・`broom_ingame_doublejump.png`

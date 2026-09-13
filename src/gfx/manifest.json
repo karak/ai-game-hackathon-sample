@@ -1996,6 +1996,22 @@
   "src": "assets/sprites/player/run4_plain.png",
   "w": 60
  },
+ "props/broom": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 38,
+  "src": "assets/sprites/props/broom.png",
+  "w": 100
+ },
+ "props/broom2": {
+  "anchor": "center",
+  "colors": 15,
+  "fits": true,
+  "h": 37,
+  "src": "assets/sprites/props/broom2.png",
+  "w": 100
+ },
  "shots/acid": {
   "anchor": "center",
   "colors": 4,

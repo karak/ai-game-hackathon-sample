@@ -68,6 +68,28 @@ def build(name, sp):
     return res
 
 
+def shorten(dst, target, box):
+    """細長い小物の同一列の連なり（ほうきの柄など）から中間の列を削り、幅を target セルにする（BUG-024、2026-09-13）。
+    縮小フィルタではなくセル列の削除なので画素は 1 つも再標本化しない。削るのは「全行が完全に同一の色の列」が最も長く続く区間だけ。
+    足りなければ削れるだけ削って WARN。json の w / fits を書き直す"""
+    from PIL import Image
+    im = Image.open(dst).convert('RGBA'); w, h = im.size; px = im.load()
+    cols = [tuple(px[x, y] for y in range(h)) for x in range(w)]
+    best = (0, 0); i = 0
+    while i < w:
+        j = i
+        while j + 1 < w and cols[j + 1] == cols[i]: j += 1
+        if j - i + 1 > best[0]: best = (j - i + 1, i)
+        i = j + 1
+    run, x0 = best; cut = min(max(0, w - target), max(0, run - 2))  # 同一列は最低 2 列残す
+    if cut < w - target: print(f'  WARN {dst.name}: shorten_to {target} だが同一列の連なりが {run} 列しかない → {w - cut} 幅')
+    if cut == 0: return
+    mid = x0 + (run - cut) // 2
+    out = Image.new('RGBA', (w - cut, h)); out.paste(im.crop((0, 0, mid, h)), (0, 0)); out.paste(im.crop((mid + cut, 0, w, h)), (mid, 0)); out.save(dst)
+    j = json.loads(dst.with_suffix('.json').read_text()); j['w'] = w - cut; j['fits'] = (w - cut) <= box[0] and h <= box[1]; j['shortened_from'] = w
+    dst.with_suffix('.json').write_text(json.dumps(j, indent=1)); print(f'  {dst.name}: {w} -> {w - cut} 列（同一列 {run} 列のうち {cut} 列を削除）')
+
+
 def measure_parts(im):
     """主人公コマの部位を色で計測する（論理 px）。帽子＝暗い藍の画素が 40% 超の行、髪＝桃色の画素。
     値は色の閾値に依存するので、specs の part_sizes（目視実測）とは直接比べず、同じ関数で測った idle と比べる"""
@@ -120,6 +142,7 @@ def main():
         sp = SPECS['sprites'][name]; print(f'[{name}]')
         for key, dst in build(name, sp):
             if key in sp.get('skip_out', []): continue  # 別 spec に移した出力（例: tiles/press → gimmick-press）は manifest に載せない
+            if sp.get('shorten_to'): shorten(dst, sp['shorten_to'], sp['box'])  # 細長い小物の同一列を削って幅を揃える（ほうき。BUG-024）
             meta = json.loads(dst.with_suffix('.json').read_text())
             manifest[key] = {'src': str(dst.relative_to(ROOT)), 'w': meta['w'], 'h': meta['h'], 'fits': meta['fits'], 'colors': meta['colors'], 'anchor': sp['anchor']}
             qa_player_frame(key, dst, manifest)

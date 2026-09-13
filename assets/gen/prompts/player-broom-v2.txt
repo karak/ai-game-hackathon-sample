@@ -1,0 +1,27 @@
+PIXEL GRID CONTRACT (mandatory):
+- Treat the 1024x1024 canvas as a grid of 128x128 cells. ONE CELL = 8x8 screen pixels = ONE logical pixel of the sprite.
+- Every cell is filled with exactly one flat color. Never draw anything smaller than a cell: no anti-aliasing, no gradients, no sub-cell lines, no blur. Cell edges must align to multiples of 8 px.
+- Think of it as a genuine 16-bit sprite magnified 8 times.
+
+STYLE (strict): 16-bit SNES-era Japanese RPG pixel art in the manner of 1995 Square games (Secret of Mana, Chrono Trigger, Romancing SaGa 3). Chibi proportions 2.5-3 heads tall. Each material has 3-4 shade steps (shadow / base / light / highlight). Outlines are 1 cell wide, dark plum or dark brown (never pure black). Limited palette: 12-15 colors on the character.
+
+BACKGROUND: completely flat solid pure green #00FF00 filling the whole canvas. No floor, no shadow, no glow, no frame, no text, no signature.
+
+
+SIZE CONTRACT for this sprite:
+- Logical box: 88 cells wide x 24 cells tall (= 704 x 192 screen px at 8 px per cell).
+- The drawing must fit inside that box and should use most of it (at least 20 cells of the 24-cell height).
+- Exactly 2 figures side by side in one row, separated by clear gaps of green, the group centered horizontally. Same scale and same palette for every figure.
+- Vertically centered on the canvas.
+
+SUBJECT: TWO copies of the same witch's flying broomstick, side by side in one row with a wide green gap between them, each broom about 40% of the canvas width (roughly 80 cells long). Standalone objects, seen exactly from the side, lying HORIZONTAL and flying to the RIGHT. No rider, no hands, no character, no hat, no shadow, no sparkles. The two brooms are identical except the straw bristles: in the LEFT copy they flare slightly upward, in the RIGHT copy slightly downward (a 2-frame flutter animation).
+- Handle: a long, slightly curved wooden stick, warm brown wood with 3 shade steps (dark brown outline, mid brown, light tan highlight along the top), pointing RIGHT; the right tip has a small rounded knob.
+- Bristles: on the LEFT end, a bundle of straw-yellow twigs (3 shade steps: ochre, yellow, pale cream highlight) trailing behind and flaring out, tips uneven.
+- Binding: where bristles meet the handle, a dark-indigo cloth band (the same indigo as the reference character's witch hat) with a small magenta-pink ribbon bow on top and a tiny gold buckle.
+- Proportions on the grid: about 80 cells long and 18 cells tall in total; the handle is 3 cells thick; the bristle bundle is about 24 cells long and up to 18 cells tall.
+- Palette: 10-14 colors, taken from the reference character where possible (indigo, pink, gold, browns). Outline 1 cell wide, dark brown or dark plum, never pure black.
+
+REFERENCE: the attached image shows the pink-haired witch heroine who rides this broom. Use it ONLY for the pixel scale and the palette (her hat's indigo, her ribbon's magenta-pink, the gold buckle, the browns). Do NOT draw her or any part of her.
+
+
+[refs] assets/gen/raw/player-base-v5.png
