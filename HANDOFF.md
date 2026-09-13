@@ -16,8 +16,8 @@
 2. 調査で発見した BUG-023 を修正: 宝箱から出たアイテムが公開版でも旧文字列ドット絵で描かれていた（`pickups` を生成素材の合流前に作っていた）。証跡 `test-results/shots/pickups_before_debt003.png` / `_after_`
 3. 調査で発見した BUG-024（二段ジャンプのほうきが `w/h` 欠落で一度も描かれていなかった）をユーザー承認で HD 生成して修正（台帳 237〜238）: `props/broom`・`broom2` 100×38 / 100×37 セル・15 色。v1 単体 171×36 は不採用、v2 の柄 59 列を `build_sprites.py shorten()` で削除。証跡 `test-results/shots/broom_vs_idle_3x.png`・`broom_ingame_doublejump.png`
 4. デプロイ（ユーザー指示）: Version `d2ab28d0`、公開 URL で 285 読込・error 0
-6. `docs/plan/01-status.md` を Sprint S 時点の実測で更新（manifest 285・予算 238/280・Vitest 152・Playwright 14）。学びは `docs/retro/2026-09-13-retrospective.md`
 5. ユーザー評価（2026-09-13 15:51）: 現状のほうきは「間に合わせ。部品を合成しただけで、生きた動きとは言い難い」。いったんこのまま採用。実測: 2 コマは同じ raw の縦積み 2 本を別々に切り出したもので、最良の位置合わせ（dx 0, dy −1）でも不透明セル 1942 のうち 891（46%）が異なり、差は 1〜99 列の全幅に散る（穂先だけの制御された揺れではなく、モデルが 2 本を描き直した差）。加えて柄は同一列 59 列の削除で詰めた。 → backlog IMP-029（改善案 3 つ、予算が要るものはユーザー判断）
+6. `docs/plan/01-status.md` を Sprint S 時点の実測で更新（manifest 285・予算 238/280・Vitest 152・Playwright 14）。学びは `docs/retro/2026-09-13-retrospective.md`
 
 ### 前回（9/12〜13 夜）
 
