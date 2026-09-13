@@ -10,17 +10,17 @@
 4. `docs/adr/README.md` — 決定の一覧（形式もここ）
 5. `docs/art-standard.md`、`docs/gen-pipeline.md`（絵と生成の基準）、`docs/architecture.md`（コード構成）
 6. `.claude/skills/` の 3 スキル: `retro-game-art-direction` / `generating-pixel-art-with-gemini`（`reference/model-behavior.md` に失敗の記録）/ `verifying-browser-games-with-bots`
-7. Claude 用メモリ（`~/.claude/projects/-Users-yasushi-projects-poc-square/memory/MEMORY.md`）
+7. （Claude 用メモリは使わない。ユーザー指示 2026-09-13。引き継ぎはこの文書と HANDOFF・ADR・retro）
 
 ## 2. 作業手順（コマンド）
 
 ```bash
 # 開発
-npx vite --port 5173 --host 127.0.0.1     # http://127.0.0.1:5173/index.html, /catalog.html
+npx vite --port 5175 --host 127.0.0.1 --strictPort   # http://127.0.0.1:5175/index.html, /catalog.html。5173 は別プロジェクト（ALCHEMION）が使うことがある。起こしたら curl で src/catalog/index.js を含むことを確認
 npm test                                   # Vitest
 npm run e2e                                # Playwright（5174 を自動起動、headless）。証跡は test-results/shots/（outputDir は test-results/pw に分離）
 npm run build && node tools/check_dist.mjs # dist を vite preview（4174）で起こし素材の読込数を確認
-node tools/record_demos.mjs [--stages stage2] # デモ入力ログをボットで収録し再生一致を検査（5173 が起きていること。ADR-0019）
+node tools/record_demos.mjs [--stages stage2] # デモ入力ログをボットで収録し再生一致を検査（dev server が起きていること。port は record_demos.mjs の既定を確認。ADR-0019）
 node tools/check_gaps.mjs [--stages stage-river] # 横スクロール面の「縁から渡れない隙間」を本物の物理で総当たり検査（レベル編集後に必ず。終了コード 1 = 渡れない縁あり。ADR-0022）
 npm run deploy                             # Cloudflare へ本番デプロイ（wrangler login 済みが前提）。deploy:preview はプレビュー URL のみ
 node tools/check_dist.mjs https://magical-lyrica.karak97.workers.dev   # 公開 URL の検証（bootMs・素材・エラー）。読込は ?telemetry=0 で行う

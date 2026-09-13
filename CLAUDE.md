@@ -24,3 +24,8 @@
 - codex-review は使わない（ユーザー指示）
 - コマンド: `npm run dev`（Vite）、`npm test`（Vitest）、`npm run e2e`（Playwright ボット自走）、`npm run build`、素材は `python3 tools/gemini_gen.py <spec>` → `tools/build_sprites.py` → `tools/derive_variants.py`（PIL / numpy / google-genai 入りの Python）
 - カタログ `catalog.html` は資料（キャラシート／敵・ボス／アイテム・弾／タイル／背景／ステージ／UI）。素材を変えたら必ず該当章を確認
+- ブラウザで確認する前に、その dev server が**本プロジェクトを配っているか**を確かめる（`curl -s http://127.0.0.1:<port>/catalog.html | grep src/catalog/index.js`）。5173 は別プロジェクトに取られることがあり、そこへ当てた確認は証跡にならない（2026-09-13）
+- 基準（色数・寸法など）に収まらないときは、基準を緩める前に**基準の中で設計し直す案**を出す（例: 私服パレットは髪の階調を畳んで白の陰影を確保した、ADR-0041）。緩める案は代替として数値付きで並べ、選択はユーザー
+- ユーザーが絵や動きに下した評価（「間に合わせ」「生きた動きではない」等）は**原文のまま**、計測値（差分画素数など）を添えて backlog・ADR に記録し、改善案を IMP として起こす
+- Claude 用メモリ（`~/.claude/projects/.../memory/`）は使わない（ユーザー指示 2026-09-13）。引き継ぎは HANDOFF・docs・ADR・retro に書く
+- 記録（docs）をスクリプトで書き換えてコミットするときは、コミットの前に `git diff --stat docs` で変更が入っていることを確認する（スクリプトが途中で落ちて、コードだけのコミットになったことがある）
